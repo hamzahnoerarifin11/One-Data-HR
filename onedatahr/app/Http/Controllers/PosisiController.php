@@ -21,9 +21,12 @@ class PosisiController extends Controller
         return view('pages.rekrutmen.posisi.index', ['posisis' => $pos]);
     }
 
-    // create via API
+    // create via API (admin only)
     public function store(Request $request)
     {
+        // only admin may create posisi
+        abort_unless(auth()->user() && auth()->user()->role === 'admin', 403);
+
         $request->validate([
             'nama_posisi' => 'required|string|max:150|unique:posisi,nama_posisi',
         ]);
