@@ -16,7 +16,7 @@ class RekrutmenDailyTest extends TestCase
 
     public function test_create_and_list_daily()
     {
-        $user = \App\Models\User::first();
+        $user = \App\Models\User::where('role','admin')->first() ?? \App\Models\User::first();
         $pos = \App\Models\Posisi::first();
         $this->assertNotNull($pos);
 
