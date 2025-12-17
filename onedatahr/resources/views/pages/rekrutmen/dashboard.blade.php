@@ -22,12 +22,19 @@
                 <form id="filter-form">
                     <div class="mb-3">
                         <label class="block text-sm font-medium text-gray-600 dark:text-gray-300">Posisi</label>
-                        <select name="posisi_id" id="posisi_id" class="mt-1 block w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-primary focus:ring-primary">
-                            <option value="">-- Semua Posisi --</option>
-                            @foreach($posisis as $pos)
-                                <option value="{{ $pos->id_posisi }}">{{ $pos->nama_posisi }}</option>
-                            @endforeach
-                        </select>
+                        <div class="flex items-center gap-2">
+                            <select name="posisi_id" id="posisi_id" class="mt-1 block w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-primary focus:ring-primary">
+                                <option value="">-- Semua Posisi --</option>
+                                @foreach($posisis as $pos)
+                                    <option value="{{ $pos->id_posisi }}">{{ $pos->nama_posisi }}</option>
+                                @endforeach
+                            </select>
+
+                            <!-- small add button to create new posisi inline -->
+                            <button type="button" data-modal-id="add-posisi" class="mt-1 inline-flex h-9 w-9 items-center justify-center rounded-md border border-gray-200 bg-white text-sm text-gray-700 hover:bg-gray-50" title="Tambah Posisi">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">
@@ -91,6 +98,15 @@
             </div>
         </div>
     </div>
+
+    <x-modal id="add-posisi" title="Tambah Posisi" size="sm" closeLabel="Batal" confirmLabel="Tambah">
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Nama Posisi</label>
+            <input id="new-posisi-name" type="text" class="mt-2 block w-full rounded-md border border-gray-200 px-3 py-2 text-sm shadow-sm" placeholder="Contoh: Backend Engineer" />
+            <div id="new-posisi-error" class="mt-2 text-xs text-red-500 hidden"></div>
+        </div>
+    </x-modal>
+
 </div>
 @endsection
 
@@ -232,5 +248,51 @@
     fetchCandidates().then(renderCandidatesChart);
     fetchStages().then(renderStages);
     fetchSummary();
+
+    // handle add-posisi modal confirmation to create a new posisi and update the select
+    window.addEventListener('modal-confirmed', function(e){
+        if(!e?.detail || e.detail.id !== 'add-posisi') return;
+        const nameEl = document.getElementById('new-posisi-name');
+        const errEl = document.getElementById('new-posisi-error');
+        if(!nameEl) return;
+        const name = nameEl.value.trim();
+        errEl.classList.add('hidden'); errEl.innerText = '';
+        if(!name){ errEl.innerText = 'Nama posisi tidak boleh kosong.'; errEl.classList.remove('hidden'); return; }
+
+        const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        fetch("{{ route('posisi.store') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': token,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ nama_posisi: name })
+        }).then(r => r.json()).then(json => {
+            if(json?.success && json.posisi){
+                // append to select
+                const sel = document.getElementById('posisi_id');
+                const opt = document.createElement('option');
+                opt.value = json.posisi.id_posisi;
+                opt.text = json.posisi.nama_posisi;
+                sel.appendChild(opt);
+                sel.value = json.posisi.id_posisi;
+
+                // clear input and close modal
+                nameEl.value = '';
+                window.dispatchEvent(new CustomEvent('close-modal', { detail: { id: 'add-posisi' } }));
+
+                // update exports and re-run filters
+                updateExportLink();
+                document.getElementById('apply-filters').click();
+            } else if(json?.errors){
+                // validation errors
+                const msg = (json.errors.nama_posisi || []).join(' ') || 'Tidak dapat membuat posisi.';
+                errEl.innerText = msg; errEl.classList.remove('hidden');
+            } else {
+                errEl.innerText = 'Terjadi kesalahan.'; errEl.classList.remove('hidden');
+            }
+        }).catch(() => { errEl.innerText = 'Terjadi kesalahan jaringan.'; errEl.classList.remove('hidden'); });
+    });
 </script>
 @endsection

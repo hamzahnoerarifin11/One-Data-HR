@@ -55,6 +55,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('proses/{kandidat_id}/edit', [ProsesRekrutmenController::class,'edit'])->name('proses.edit');
         Route::post('proses', [ProsesRekrutmenController::class,'store'])->name('proses.store');
         Route::resource('pemberkasan', PemberkasanController::class)->only(['index','create','store','edit','update']);
+
+        // posisi - small API for listing and creating positions (used by dashboard filters)
+        Route::get('posisi/list', [\App\Http\Controllers\PosisiController::class, 'index'])->name('posisi.list');
+        Route::post('posisi', [\App\Http\Controllers\PosisiController::class, 'store'])->name('posisi.store');
     });
 });
 
