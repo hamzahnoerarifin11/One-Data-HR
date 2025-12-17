@@ -262,13 +262,31 @@
         const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         fetch("{{ route('rekrutmen.posisi.store') }}", {
             method: 'POST',
+            credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': token,
                 'Accept': 'application/json'
             },
             body: JSON.stringify({ nama_posisi: name })
-        }).then(r => r.json()).then(json => {
+        }).then(async (r) => {
+            if (r.ok) return r.json();
+            // try to parse JSON for validation or error messages
+            let json = null;
+            try { json = await r.json(); } catch(e) { /* ignore */ }
+            if (r.status === 422 && json && json.errors) {
+                const msg = (json.errors.nama_posisi || []).join(' ') || 'Validasi gagal.';
+                errEl.innerText = msg; errEl.classList.remove('hidden');
+                return null;
+            }
+            if (r.status === 419) {
+                errEl.innerText = 'Session expired. Silakan refresh halaman dan coba lagi.'; errEl.classList.remove('hidden');
+                return null;
+            }
+            errEl.innerText = (json && json.message) ? json.message : 'Terjadi kesalahan server.'; errEl.classList.remove('hidden');
+            return null;
+        }).then(json => {
+            if (!json) return;
             if(json?.success && json.posisi){
                 // append to select
                 const sel = document.getElementById('posisi_id');
@@ -285,14 +303,8 @@
                 // update exports and re-run filters
                 updateExportLink();
                 document.getElementById('apply-filters').click();
-            } else if(json?.errors){
-                // validation errors
-                const msg = (json.errors.nama_posisi || []).join(' ') || 'Tidak dapat membuat posisi.';
-                errEl.innerText = msg; errEl.classList.remove('hidden');
-            } else {
-                errEl.innerText = 'Terjadi kesalahan.'; errEl.classList.remove('hidden');
             }
-        }).catch(() => { errEl.innerText = 'Terjadi kesalahan jaringan.'; errEl.classList.remove('hidden'); });
+        }).catch((err) => { console.error('posisi create error', err); errEl.innerText = 'Terjadi kesalahan jaringan.'; errEl.classList.remove('hidden'); });
     });
 </script>
 @endsection
