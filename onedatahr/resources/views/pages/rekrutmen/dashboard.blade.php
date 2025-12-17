@@ -260,7 +260,7 @@
         if(!name){ errEl.innerText = 'Nama posisi tidak boleh kosong.'; errEl.classList.remove('hidden'); return; }
 
         const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        fetch("{{ route('posisi.store') }}", {
+        fetch("{{ route('rekrutmen.posisi.store') }}", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
