@@ -59,6 +59,10 @@ Route::middleware(['auth'])->group(function () {
         // posisi - small API for listing and creating positions (used by dashboard filters)
         Route::get('posisi/list', [\App\Http\Controllers\PosisiController::class, 'index'])->name('posisi.list');
         Route::post('posisi', [\App\Http\Controllers\PosisiController::class, 'store'])->name('posisi.store');
+        // posisi management (page + update/delete)
+        Route::get('posisi', [\App\Http\Controllers\PosisiController::class, 'manage'])->name('posisi.index');
+        Route::put('posisi/{id}', [\App\Http\Controllers\PosisiController::class, 'update'])->name('posisi.update');
+        Route::delete('posisi/{id}', [\App\Http\Controllers\PosisiController::class, 'destroy'])->name('posisi.destroy');
     });
 });
 
