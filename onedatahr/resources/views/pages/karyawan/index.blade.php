@@ -115,9 +115,9 @@
 
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                     <template x-for="row in paginated" :key="row.id">
-                        <tr> 
+                        <tr>
                         <!-- class="hover:bg-gray-50 dark:hover:bg-gray-800/20 transition" -->
-                                
+
                         <!-- <td class="px-4 py-3 text-center">
                                 <input type="checkbox" class="rounded border-gray-300 dark:border-gray-600" />
                             </td> -->
@@ -160,10 +160,10 @@
                                         </svg>
                                     </a>
 
-                                    <form :action="`{{ url('karyawan') }}/${row.id}`" method="POST" class="inline" onsubmit="return confirm('Hapus karyawan ini?')">
+                                    <form :action="`{{ url('karyawan') }}/${row.id}`" :id="`delete-form-${row.id}`" method="POST" class="inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-red-50 p-2 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40 transition" title="Hapus">
+                                        <button type="button" aria-label="Hapus Karyawan" data-modal-id="delete-confirm" :data-modal-target="`delete-form-${row.id}`" :data-modal-title="'Hapus Karyawan'" :data-modal-message="`Yakin ingin menghapus karyawan: ${row.nama}?`" class="inline-flex items-center justify-center rounded-lg bg-red-50 p-2 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40 transition" title="Hapus">
                                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                                             </svg>
@@ -201,6 +201,11 @@
             </div>
         </div>
     </div>
+
+    <!-- Global delete confirmation modal (reusable) -->
+    <x-modal id="delete-confirm" size="sm" title="Konfirmasi Hapus" closeLabel="Batal" confirmLabel="Hapus">
+        <p class="text-sm text-gray-600">Gunakan tombol <strong>Hapus</strong> untuk mengonfirmasi penghapusan karyawan yang dipilih.</p>
+    </x-modal>
 </div>
 
 <script>

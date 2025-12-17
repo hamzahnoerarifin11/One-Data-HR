@@ -68,6 +68,7 @@
     ],
     selectedRows: [],
     selectAll: false,
+    pendingDeleteId: null,
     handleSelectAll() {
         this.selectAll = !this.selectAll;
         if (this.selectAll) {
@@ -92,10 +93,17 @@
         return classes[status] || '';
     },
     deleteRow(id) {
-        if (confirm('Are you sure you want to delete this order?')) {
-            this.tableRowData = this.tableRowData.filter(row => row.id !== id);
-            this.selectedRows = this.selectedRows.filter(rowId => rowId !== id);
-        }
+        this.pendingDeleteId = id;
+        const handler = (e) => {
+            if (e?.detail?.id === 'delete-order') {
+                this.tableRowData = this.tableRowData.filter(row => row.id !== this.pendingDeleteId);
+                this.selectedRows = this.selectedRows.filter(rowId => rowId !== this.pendingDeleteId);
+                this.pendingDeleteId = null;
+                window.removeEventListener('modal-confirmed', handler);
+            }
+        };
+        window.addEventListener('modal-confirmed', handler);
+        window.dispatchEvent(new CustomEvent('open-modal', {detail: {id: 'delete-order', title: 'Delete Order', message: 'Are you sure you want to delete this order?'}}));
     }
 }">
     <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white pt-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
@@ -186,13 +194,13 @@
                                 <p class="text-gray-700 text-theme-sm dark:text-gray-400" x-text="row.closeDate"></p>
                             </td>
                             <td class="px-4 sm:px-6 py-3.5">
-                                <span class="text-theme-xs inline-block rounded-full px-2 py-0.5 font-medium" 
-                                    :class="getStatusClass(row.status)" 
+                                <span class="text-theme-xs inline-block rounded-full px-2 py-0.5 font-medium"
+                                    :class="getStatusClass(row.status)"
                                     x-text="row.status"></span>
                             </td>
                             <td class="px-4 sm:px-6 py-3.5">
                                 <button @click="deleteRow(row.id)">
-                                    <svg class="text-gray-700 cursor-pointer size-5 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-500" 
+                                    <svg class="text-gray-700 cursor-pointer size-5 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-500"
                                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                     </svg>
@@ -203,5 +211,10 @@
                 </tbody>
             </table>
         </div>
+
+        <x-modal id="delete-order" title="Delete Order" size="sm" closeLabel="Batal" confirmLabel="Hapus">
+            Are you sure you want to delete this order?
+        </x-modal>
+
     </div>
 </div>
