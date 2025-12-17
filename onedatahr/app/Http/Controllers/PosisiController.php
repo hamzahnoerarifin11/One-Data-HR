@@ -33,9 +33,11 @@ class PosisiController extends Controller
         return response()->json(['success' => true, 'posisi' => $pos]);
     }
 
-    // update via API
+    // update via API (admin only)
     public function update(Request $request, $id)
     {
+        abort_unless(auth()->user() && auth()->user()->role === 'admin', 403);
+
         $request->validate([
             'nama_posisi' => 'required|string|max:150|unique:posisi,nama_posisi,'.$id.',id_posisi',
         ]);
@@ -47,9 +49,11 @@ class PosisiController extends Controller
         return response()->json(['success' => true, 'posisi' => $pos]);
     }
 
-    // destroy via API
+    // destroy via API (admin only)
     public function destroy(Request $request, $id)
     {
+        abort_unless(auth()->user() && auth()->user()->role === 'admin', 403);
+
         $pos = Posisi::findOrFail($id);
         $pos->delete();
 

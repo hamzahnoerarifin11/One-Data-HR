@@ -62,7 +62,8 @@
         "test": [
             "@php artisan config:clear --ansi",
             "@php artisan test"
-        ]
+        ],
+        "db:setup": "php artisan migrate --force && php artisan db:seed"
     },
     "extra": {
         "laravel": {
