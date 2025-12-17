@@ -8,6 +8,7 @@ use App\Http\Controllers\RecruitmentDashboardController;
 use App\Http\Controllers\KandidatController;
 use App\Http\Controllers\ProsesRekrutmenController;
 use App\Http\Controllers\PemberkasanController;
+use App\Http\Controllers\KpiAssessmentController;
 
 // Minimal routes for One Data HR
 Route::get('/', function () {
@@ -56,6 +57,11 @@ Route::middleware(['auth'])->group(function () {
         Route::post('proses', [ProsesRekrutmenController::class,'store'])->name('proses.store');
         Route::resource('pemberkasan', PemberkasanController::class)->only(['index','create','store','edit','update']);
     });
+
+    // KPI Assessment Routes
+    // Contoh URL: /kpi/penilaian/5/2025 (Karyawan ID 5, Tahun 2025)
+    Route::get('/kpi/penilaian/{karyawan_id}/{tahun}', [KpiAssessmentController::class, 'show'])->name('kpi.show');
+    Route::post('/kpi/update/{id}', [KpiAssessmentController::class, 'update'])->name('kpi.update');
 });
 
 
