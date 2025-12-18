@@ -105,11 +105,19 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('daily/entries/{id}', [\App\Http\Controllers\RekrutmenCalendarController::class, 'destroy'])->name('daily.entries.destroy');
     });
 
-    // KPI Assessment Routes
-    // Contoh URL: /kpi/penilaian/5/2025 (Karyawan ID 5, Tahun 2025)
-    Route::get('/kpi/penilaian/{karyawan_id}/{tahun}', [KpiAssessmentController::class, 'show'])->name('kpi.show');
-    Route::post('/kpi/update/{id}', [KpiAssessmentController::class, 'update'])->name('kpi.update');
 });
+
+// Dashboard Monitoring (All Karyawan)
+Route::get('/kpi/dashboard', [KpiAssessmentController::class, 'index'])->name('kpi.index');
+// Hapus KPI
+Route::delete('/kpi/delete/{id}', [KpiAssessmentController::class, 'destroy'])->name('kpi.destroy');
+
+// Generate KPI Baru
+Route::post('/kpi/store', [KpiAssessmentController::class, 'store'])->name('kpi.store');
+// KPI Assessment Routes
+// Contoh URL: /kpi/penilaian/5/2025 (Karyawan ID 5, Tahun 2025)
+Route::get('/kpi/penilaian/{karyawan_id}/{tahun}', [KpiAssessmentController::class, 'show'])->name('kpi.show');
+Route::post('/kpi/update/{id}', [KpiAssessmentController::class, 'update'])->name('kpi.update');
 
 
 

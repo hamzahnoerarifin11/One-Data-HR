@@ -2,6 +2,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\KpiAssessment;
 
 class Karyawan extends Model
 {
@@ -55,8 +56,9 @@ class Karyawan extends Model
         return $this->hasOne(StatusKaryawan::class, 'id_karyawan', 'id_karyawan');
     }
 
-    public function kpiAssessments()
+    public function kpiAssessment()
     {
-        return $this->hasMany(KpiAssessment::class, 'karyawan_id', 'id_karyawan');
-    }   
+        // Kita pakai hasOne karena logic dashboard adalah "Satu Karyawan punya Satu KPI di tahun yang dipilih"
+        return $this->hasOne(KpiAssessment::class, 'karyawan_id', 'id_karyawan');
+    }
 }
