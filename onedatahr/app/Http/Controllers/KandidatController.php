@@ -36,7 +36,7 @@ class KandidatController extends Controller
 
         Kandidat::create($data);
 
-        return redirect()->route('kandidat.index')->with('success','Kandidat created');
+        return redirect()->route('rekrutmen.kandidat.index')->with('success','Kandidat created');
     }
 
     public function show(Kandidat $kandidat)
@@ -62,12 +62,12 @@ class KandidatController extends Controller
         ]);
 
         $kandidat->update($data);
-        return redirect()->route('kandidat.index')->with('success','Kandidat updated');
+        return redirect()->route('rekrutmen.kandidat.index')->with('success','Kandidat updated');
     }
 
     public function destroy(Kandidat $kandidat)
     {
         $kandidat->delete();
-        return redirect()->route('kandidat.index')->with('success','Kandidat deleted');
+        return redirect()->route('rekrutmen.kandidat.index')->with('success','Kandidat deleted');
     }
 }

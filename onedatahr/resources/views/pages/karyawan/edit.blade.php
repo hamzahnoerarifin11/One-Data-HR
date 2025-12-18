@@ -1561,7 +1561,7 @@
                     <button type="button" @click="next" x-show="currentStep < steps.length-1" class="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 dark:text-white hover:bg-primary-700">Selanjutnya
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                     </button>
-                    <button type="submit" x-show="currentStep===steps.length-1" class="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 dark:text-white hover:bg-brand-700">Simpan
+                    <button type="submit" x-show="currentStep===steps.length-1" class="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 dark:text-white hover:bg-emerald-700">Simpan
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                     </button>
                 </div>

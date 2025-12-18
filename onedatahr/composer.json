@@ -20,8 +20,8 @@
         "laravel/pint": "^1.24",
         "laravel/sail": "^1.41",
         "mockery/mockery": "^1.6",
-        "nunomaduro/collision": "^8.6",
-        "sebastian/environment": "^7.2"
+        "phpunit/phpunit": "10",
+        "sebastian/environment": "^6.0|^7.2"
     },
     "autoload": {
         "psr-4": {

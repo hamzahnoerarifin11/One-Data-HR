@@ -10,6 +10,11 @@ class RekrutmenDailyController extends Controller
 {
     public function index(Request $request)
     {
+        // If the request does not expect JSON (browser navigation), redirect to the calendar page
+        if (! $request->wantsJson()) {
+            return redirect()->route('rekrutmen.calendar');
+        }
+
         $request->validate([
             'posisi_id' => 'nullable|integer|exists:posisi,id_posisi',
             'from' => 'nullable|date',

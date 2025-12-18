@@ -7,7 +7,17 @@ use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\RecruitmentDashboardController;
 use App\Http\Controllers\KandidatController;
 use App\Http\Controllers\ProsesRekrutmenController;
-use App\Http\Controllers\PemberkasanController;
+// use App\Http\Controllers\PemberkasanController;
+use App\Http\Controllers\Rekrutmen\PosisiController;
+use App\Http\Controllers\Rekrutmen\PelamarHarianController;
+use App\Http\Controllers\Rekrutmen\ScreeningCvController;
+use App\Http\Controllers\Rekrutmen\TesKompetensiController;
+use App\Http\Controllers\Rekrutmen\InterviewHrController;
+use App\Http\Controllers\Rekrutmen\InterviewUserController;
+use App\Http\Controllers\Rekrutmen\SummaryController;
+use App\Http\Controllers\Rekrutmen\PemberkasanController;
+use App\Http\Controllers\Rekrutmen\WigRekrutmenController;
+
 
 // Minimal routes for One Data HR
 Route::get('/', function () {
@@ -35,6 +45,23 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('rekrutmen')->name('rekrutmen.')->group(function(){
         Route::get('/', [RecruitmentDashboardController::class, 'index'])->name('dashboard');
 
+        Route::get('wig', [WigRekrutmenController::class, 'index'])
+        ->name('rekrutmen.wig');
+
+        Route::put('wig/{posisiId}', [WigRekrutmenController::class, 'update']);
+        Route::get('pelamar', [PelamarHarianController::class,'index'])
+        ->name('rekrutmen.pelamar');
+        Route::post('pelamar', [PelamarHarianController::class,'store']);
+
+
+        Route::get('screening-cv', [ScreeningCvController::class,'index']);
+        Route::get('tes-kompetensi', [TesKompetensiController::class,'index']);
+        Route::get('interview-hr', [InterviewHrController::class,'index']);
+        Route::get('interview-user', [InterviewUserController::class,'index']);
+
+
+        Route::get('summary', [SummaryController::class,'index']);
+        Route::get('pemberkasan', [PemberkasanController::class,'index']);
         // metrics endpoints (JSON)
         Route::get('/metrics/candidates', [RecruitmentDashboardController::class,'candidatesByPositionMonth'])->name('metrics.candidates');
         Route::get('/metrics/cv', [RecruitmentDashboardController::class,'cvPassedByPositionMonth'])->name('metrics.cv');
@@ -44,9 +71,17 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/metrics/kompetensi', [RecruitmentDashboardController::class,'kompetensiPassedByPosition'])->name('metrics.kompetensi');
         Route::get('/metrics/interview-hr', [RecruitmentDashboardController::class,'interviewHrPassedByPositionMonth'])->name('metrics.hr');
         Route::get('/metrics/interview-user', [RecruitmentDashboardController::class,'interviewUserPassedByPositionMonth'])->name('metrics.user');
+
+        // pages for per-stage metrics
+        Route::get('/metrics/cv-page', [RecruitmentDashboardController::class,'cvPage'])->name('metrics.cv.page');
+        Route::get('/metrics/psikotes-page', [RecruitmentDashboardController::class,'psikotesPage'])->name('metrics.psikotes.page');
+        Route::get('/metrics/kompetensi-page', [RecruitmentDashboardController::class,'kompetensiPage'])->name('metrics.kompetensi.page');
+        Route::get('/metrics/interview-hr-page', [RecruitmentDashboardController::class,'interviewHrPage'])->name('metrics.hr.page');
+        Route::get('/metrics/interview-user-page', [RecruitmentDashboardController::class,'interviewUserPage'])->name('metrics.user.page');
         Route::get('/metrics/progress', [RecruitmentDashboardController::class,'recruitmentProgressByPosition'])->name('metrics.progress');
         Route::get('/metrics/progress/export', [RecruitmentDashboardController::class,'exportProgressCsv'])->name('metrics.progress.export');
         Route::get('/metrics/pemberkasan', [RecruitmentDashboardController::class,'pemberkasanProgress'])->name('metrics.pemberkasan');
+        Route::get('/metrics/pemberkasan-page', [RecruitmentDashboardController::class,'pemberkasanPage'])->name('metrics.pemberkasan.page');
         // CSV export
         Route::get('/metrics/candidates/export', [RecruitmentDashboardController::class,'exportCandidatesCsv'])->name('metrics.candidates.export');
 
@@ -63,6 +98,13 @@ Route::middleware(['auth'])->group(function () {
         Route::get('posisi', [\App\Http\Controllers\PosisiController::class, 'manage'])->name('posisi.index');
         Route::put('posisi/{id}', [\App\Http\Controllers\PosisiController::class, 'update'])->name('posisi.update');
         Route::delete('posisi/{id}', [\App\Http\Controllers\PosisiController::class, 'destroy'])->name('posisi.destroy');
+
+        // daily recruitment metrics (calendar data, per-posisi daily counts)
+        Route::get('daily', [\App\Http\Controllers\RekrutmenDailyController::class, 'index'])->name('daily.index');
+        Route::get('calendar', [\App\Http\Controllers\RecruitmentDashboardController::class, 'calendarPage'])->name('calendar');
+        Route::post('daily', [\App\Http\Controllers\RekrutmenDailyController::class, 'store'])->name('daily.store');
+        Route::put('daily/{id}', [\App\Http\Controllers\RekrutmenDailyController::class, 'update'])->name('daily.update');
+        Route::delete('daily/{id}', [\App\Http\Controllers\RekrutmenDailyController::class, 'destroy'])->name('daily.destroy');
     });
 });
 

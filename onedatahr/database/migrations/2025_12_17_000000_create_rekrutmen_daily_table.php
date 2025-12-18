@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('rekrutmen_daily', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('posisi_id');
+            $table->unsignedInteger('posisi_id');
             $table->date('date');
             $table->integer('count')->default(0);
             $table->text('notes')->nullable();
