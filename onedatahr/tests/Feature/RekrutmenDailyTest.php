@@ -58,7 +58,9 @@ class RekrutmenDailyTest extends TestCase
         ])->postJson('/rekrutmen/daily', [
             'posisi_id' => $pos->id_posisi,
             'date' => now()->format('Y-m-d'),
-            'count' => 3,
+            'total_pelamar' => 7,
+            'lolos_cv' => 3,
+            'lolos_psikotes' => 2,
         ]);
         // if route redirects (302), capture target for debugging
         if ($resp->getStatusCode() !== 200) {
@@ -70,10 +72,11 @@ class RekrutmenDailyTest extends TestCase
         }
 
         $this->assertTrue($resp->json('success') === true);
+        $this->assertEquals(7, $resp->json('entry.total_pelamar'));
 
-        $list = $this->actingAs($user)->get('/rekrutmen/daily?month='.now()->format('n').'&year='.now()->format('Y'));
+        $list = $this->actingAs($user)->getJson('/rekrutmen/daily?month='.now()->format('n').'&year='.now()->format('Y'));
         $list->assertStatus(200);
-        $this->assertStringContainsString(now()->format('Y-m-d'), $list->getContent());
+        $list->assertJsonFragment(['total_pelamar' => 7]);
     }
 
     public function test_non_json_get_redirects_to_calendar()

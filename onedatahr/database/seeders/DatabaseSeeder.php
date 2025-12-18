@@ -34,6 +34,15 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        // KPI Module
+    $this->call([
+        KpiPeriodSeeder::class,
+        KpiSeeder::class,
+        KpiTargetSeeder::class,
+        KpiRealizationSeeder::class,
+    ]);
+
+
         // Seed recruitment demo data
         $this->call(\Database\Seeders\RecruitmentSeeder::class);
 

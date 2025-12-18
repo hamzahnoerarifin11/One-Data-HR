@@ -11,12 +11,18 @@ class RekrutmenDaily extends Model
 
     protected $table = 'rekrutmen_daily';
     protected $fillable = [
-        'posisi_id', 'date', 'count', 'notes', 'created_by'
+        'posisi_id', 'date', 'count', 'total_pelamar', 'lolos_cv', 'lolos_psikotes', 'lolos_kompetensi', 'lolos_hr', 'lolos_user', 'notes', 'created_by'
     ];
 
     protected $casts = [
         'date' => 'date',
         'count' => 'integer',
+        'total_pelamar' => 'integer',
+        'lolos_cv' => 'integer',
+        'lolos_psikotes' => 'integer',
+        'lolos_kompetensi' => 'integer',
+        'lolos_hr' => 'integer',
+        'lolos_user' => 'integer',
     ];
 
     public function posisi()

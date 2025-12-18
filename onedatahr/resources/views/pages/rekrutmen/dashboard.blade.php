@@ -10,8 +10,8 @@
             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Ringkasan aktivitas rekrutmen dan metrik penting</p>
         </div>
         <div class="flex items-center gap-2">
-            <a href="{{ route('rekrutmen.kandidat.index') }}" class="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-white shadow hover:bg-primary-dark transition">Manage Kandidat</a>
             <a href="{{ route('rekrutmen.posisi.index') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition">Manage Posisi</a>
+            <a href="{{ route('rekrutmen.kandidat.index') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition">Manage Kandidat</a>
             <a href="{{ route('rekrutmen.calendar') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition">Kalender Rekrutmen</a>
             <a href="{{ route('rekrutmen.metrics.pemberkasan.page') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition">Pemberkasan Monitor</a>
         </div>
@@ -20,8 +20,7 @@
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <!-- Filters -->
         <div class="lg:col-span-1">
-            <div class="rounded-xl border bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-white/[0.03]">
-                <h3 class="mb-3 text-lg font-semibold text-gray-800 dark:text-white">Filters</h3>
+            <x-rekrutmen.card title="Filters">
                 <form id="filter-form">
                     <div class="mb-3">
                         <label class="block text-sm font-medium text-gray-600 dark:text-gray-300">Posisi</label>
@@ -68,26 +67,32 @@
                         <p class="w-full text-xs text-gray-400">Exports reflect current filter selection.</p>
                     </div>
                 </form>
-            </div>
+            </x-rekrutmen.card>
         </div>
 
         <!-- Main content: KPIs and Charts -->
         <div class="lg:col-span-2">
             <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-                <div class="rounded-xl border bg-white p-6 shadow-sm text-center dark:border-gray-800 dark:bg-white/[0.03]">
-                    <p class="text-sm text-gray-500">Total Kandidat</p>
-                    <div id="total-kandidat" class="mt-2 text-2xl font-bold text-gray-900">-</div>
-                </div>
+                <x-rekrutmen.card>
+                    <div class="text-center">
+                        <p class="text-sm text-gray-500">Total Kandidat</p>
+                        <div id="total-kandidat" class="mt-2 text-2xl font-bold text-gray-900">-</div>
+                    </div>
+                </x-rekrutmen.card>
 
-                <div class="rounded-xl border bg-white p-6 shadow-sm text-center dark:border-gray-800 dark:bg-white/[0.03]">
-                    <p class="text-sm text-gray-500">Total CV Lolos</p>
-                    <div id="total-cv" class="mt-2 text-2xl font-bold text-gray-900">-</div>
-                </div>
+                <x-rekrutmen.card>
+                    <div class="text-center">
+                        <p class="text-sm text-gray-500">Total CV Lolos</p>
+                        <div id="total-cv" class="mt-2 text-2xl font-bold text-gray-900">-</div>
+                    </div>
+                </x-rekrutmen.card>
 
-                <div class="rounded-xl border bg-white p-6 shadow-sm text-center dark:border-gray-800 dark:bg-white/[0.03]">
-                    <p class="text-sm text-gray-500">Total Psikotes Lolos</p>
-                    <div id="total-psikotes" class="mt-2 text-2xl font-bold text-gray-900">-</div>
-                </div>
+                <x-rekrutmen.card>
+                    <div class="text-center">
+                        <p class="text-sm text-gray-500">Total Psikotes Lolos</p>
+                        <div id="total-psikotes" class="mt-2 text-2xl font-bold text-gray-900">-</div>
+                    </div>
+                </x-rekrutmen.card>
             </div>
 
             <div class="mt-4 grid grid-cols-1 gap-4">

@@ -4,32 +4,33 @@
 
 @section('content')
 <div class="px-4 py-6">
-    <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-semibold">Pemberkasan - Monitoring</h2>
-        <div>
-            <select id="posisi-filter" class="px-3 py-2 border rounded">
-                <option value="">-- Semua Posisi --</option>
-                @foreach(App\Models\Posisi::orderBy('nama_posisi')->get() as $p)
-                    <option value="{{ $p->id_posisi }}">{{ $p->nama_posisi }}</option>
-                @endforeach
-            </select>
-            <button id="load-btn" class="btn btn-primary">Load</button>
-        </div>
-    </div>
+    <x-rekrutmen.card title="Pemberkasan - Monitoring">
+        <x-slot name="actions">
+            <div class="flex items-center gap-3">
+                <select id="posisi-filter" class="px-3 py-2 border rounded">
+                    <option value="">-- Semua Posisi --</option>
+                    @foreach(App\Models\Posisi::orderBy('nama_posisi')->get() as $p)
+                        <option value="{{ $p->id_posisi }}">{{ $p->nama_posisi }}</option>
+                    @endforeach
+                </select>
+                <button id="load-btn" class="btn btn-primary">Load</button>
+            </div>
+        </x-slot>
 
-    <div id="table" class="bg-white rounded shadow p-4">
-        <table class="w-full text-sm">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="p-2 text-left">Posisi</th>
-                    <th class="p-2 text-left">Total</th>
-                    <th class="p-2 text-left">Done Recruitment</th>
-                    <th class="p-2 text-left">% Done</th>
-                </tr>
-            </thead>
-            <tbody id="monitor-body"></tbody>
-        </table>
-    </div>
+        <div id="table" class="bg-white rounded shadow p-4">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="p-2 text-left">Posisi</th>
+                        <th class="p-2 text-left">Total</th>
+                        <th class="p-2 text-left">Done Recruitment</th>
+                        <th class="p-2 text-left">% Done</th>
+                    </tr>
+                </thead>
+                <tbody id="monitor-body"></tbody>
+            </table>
+        </div>
+    </x-rekrutmen.card>
 </div>
 
 <script>

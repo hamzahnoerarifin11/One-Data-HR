@@ -442,6 +442,6 @@ class KaryawanController extends Controller
             $karyawan->status()->delete();
             $karyawan->delete();
         });
-        return redirect()->route('pages.karyawan.index')->with('success', 'Karyawan berhasil dihapus');
+        return redirect()->route('karyawan.index')->with('success', 'Karyawan berhasil dihapus');
     }
 }

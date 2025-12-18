@@ -54,4 +54,9 @@ class Karyawan extends Model
     {
         return $this->hasOne(StatusKaryawan::class, 'id_karyawan', 'id_karyawan');
     }
+
+    public function kpiAssessments()
+    {
+        return $this->hasMany(KpiAssessment::class, 'karyawan_id', 'id_karyawan');
+    }   
 }

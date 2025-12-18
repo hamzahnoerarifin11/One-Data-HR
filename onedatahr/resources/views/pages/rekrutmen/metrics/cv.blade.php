@@ -4,20 +4,22 @@
 
 @section('content')
 <div class="px-4 py-6">
-    <h2 class="text-xl font-semibold mb-4">CV Lolos per Posisi</h2>
+    <x-rekrutmen.card title="CV Lolos per Posisi">
+        <x-slot name="actions">
+            <div class="flex items-center gap-3">
+                <select id="posisi-filter" class="px-3 py-2 border rounded">
+                    <option value="">-- Semua Posisi --</option>
+                    @foreach($posisis as $p)
+                        <option value="{{ $p->id_posisi }}">{{ $p->nama_posisi }}</option>
+                    @endforeach
+                </select>
+                <input type="month" id="month" class="px-3 py-2 border rounded" />
+                <button id="load-btn" class="btn btn-primary">Load</button>
+            </div>
+        </x-slot>
 
-    <div class="mb-4 flex items-center gap-3">
-        <select id="posisi-filter" class="px-3 py-2 border rounded">
-            <option value="">-- Semua Posisi --</option>
-            @foreach($posisis as $p)
-                <option value="{{ $p->id_posisi }}">{{ $p->nama_posisi }}</option>
-            @endforeach
-        </select>
-        <input type="month" id="month" class="px-3 py-2 border rounded" />
-        <button id="load-btn" class="btn btn-primary">Load</button>
-    </div>
-
-    <div id="chart" class="bg-white rounded p-4 shadow"></div>
+        <div id="chart" class="bg-white rounded p-4 shadow"></div>
+    </x-rekrutmen.card>
 </div>
 
 <script>

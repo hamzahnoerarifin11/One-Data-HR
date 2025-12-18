@@ -70,4 +70,21 @@ class KandidatController extends Controller
         $kandidat->delete();
         return redirect()->route('rekrutmen.kandidat.index')->with('success','Kandidat deleted');
     }
+
+    /**
+     * Return a JSON list of candidates for use in ajax selects (filtered by posisi or q)
+     */
+    public function list(Request $request)
+    {
+        $query = Kandidat::orderBy('created_at','desc');
+        if ($request->filled('posisi_id')) {
+            $query->where('posisi_id', $request->posisi_id);
+        }
+        if ($request->filled('q')) {
+            $query->where('nama', 'like', '%'.$request->q.'%');
+        }
+        $c = $query->limit(50)->get(['id_kandidat','nama']);
+        return response()->json($c);
+    }
 }
+

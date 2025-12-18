@@ -7,16 +7,7 @@ use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\RecruitmentDashboardController;
 use App\Http\Controllers\KandidatController;
 use App\Http\Controllers\ProsesRekrutmenController;
-// use App\Http\Controllers\PemberkasanController;
-use App\Http\Controllers\Rekrutmen\PosisiController;
-use App\Http\Controllers\Rekrutmen\PelamarHarianController;
-use App\Http\Controllers\Rekrutmen\ScreeningCvController;
-use App\Http\Controllers\Rekrutmen\TesKompetensiController;
-use App\Http\Controllers\Rekrutmen\InterviewHrController;
-use App\Http\Controllers\Rekrutmen\InterviewUserController;
-use App\Http\Controllers\Rekrutmen\SummaryController;
-use App\Http\Controllers\Rekrutmen\PemberkasanController;
-use App\Http\Controllers\Rekrutmen\WigRekrutmenController;
+use App\Http\Controllers\PemberkasanController;
 
 
 // Minimal routes for One Data HR
@@ -94,6 +85,8 @@ Route::middleware(['auth'])->group(function () {
         // posisi - small API for listing and creating positions (used by dashboard filters)
         Route::get('posisi/list', [\App\Http\Controllers\PosisiController::class, 'index'])->name('posisi.list');
         Route::post('posisi', [\App\Http\Controllers\PosisiController::class, 'store'])->name('posisi.store');
+        // kandidat list API for ajax selects
+        Route::get('kandidat/list', [\App\Http\Controllers\KandidatController::class, 'list'])->name('kandidat.list');
         // posisi management (page + update/delete)
         Route::get('posisi', [\App\Http\Controllers\PosisiController::class, 'manage'])->name('posisi.index');
         Route::put('posisi/{id}', [\App\Http\Controllers\PosisiController::class, 'update'])->name('posisi.update');
@@ -105,7 +98,17 @@ Route::middleware(['auth'])->group(function () {
         Route::post('daily', [\App\Http\Controllers\RekrutmenDailyController::class, 'store'])->name('daily.store');
         Route::put('daily/{id}', [\App\Http\Controllers\RekrutmenDailyController::class, 'update'])->name('daily.update');
         Route::delete('daily/{id}', [\App\Http\Controllers\RekrutmenDailyController::class, 'destroy'])->name('daily.destroy');
+
+        // per-date candidate entries for calendar (list, create, delete)
+        Route::get('daily/entries', [\App\Http\Controllers\RekrutmenCalendarController::class, 'index'])->name('daily.entries.index');
+        Route::post('daily/entries', [\App\Http\Controllers\RekrutmenCalendarController::class, 'store'])->name('daily.entries.store');
+        Route::delete('daily/entries/{id}', [\App\Http\Controllers\RekrutmenCalendarController::class, 'destroy'])->name('daily.entries.destroy');
     });
+
+    // KPI Assessment Routes
+    // Contoh URL: /kpi/penilaian/5/2025 (Karyawan ID 5, Tahun 2025)
+    Route::get('/kpi/penilaian/{karyawan_id}/{tahun}', [KpiAssessmentController::class, 'show'])->name('kpi.show');
+    Route::post('/kpi/update/{id}', [KpiAssessmentController::class, 'update'])->name('kpi.update');
 });
 
 

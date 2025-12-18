@@ -4,47 +4,48 @@
 
 @section('content')
 <div class="px-4 py-6">
-    <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-semibold">Daftar Posisi</h2>
-        <button class="btn btn-primary" data-modal-id="add-posisi" data-modal-title="Tambah Posisi">Tambah Posisi</button>
-    </div>
+    <x-rekrutmen.card title="Daftar Posisi">
+        <x-slot name="actions">
+            <button class="btn btn-primary" data-modal-id="add-posisi" data-modal-title="Tambah Posisi">Tambah Posisi</button>
+        </x-slot>
 
-    <div class="bg-white shadow rounded-lg overflow-hidden">
-        <table class="w-full text-sm">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="p-3 text-left">#</th>
-                    <th class="p-3 text-left">Nama Posisi</th>
-                    <th class="p-3 text-left">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($posisis as $p)
-                <tr class="border-t">
-                    <td class="p-3">{{ $loop->iteration }}</td>
-                    <td class="p-3">{{ $p->nama_posisi }}</td>
-                    <td class="p-3">
-                        <button class="btn btn-sm" data-modal-id="edit-posisi-{{ $p->id_posisi }}" data-modal-title="Edit Posisi">Edit</button>
-                        <button type="button" class="btn btn-danger btn-sm ml-2 delete-posisi-btn" data-id="{{ $p->id_posisi }}" data-name="{{ $p->nama_posisi }}">Hapus</button>
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="p-3 text-left">#</th>
+                        <th class="p-3 text-left">Nama Posisi</th>
+                        <th class="p-3 text-left">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($posisis as $p)
+                    <tr class="border-t">
+                        <td class="p-3">{{ $loop->iteration }}</td>
+                        <td class="p-3">{{ $p->nama_posisi }}</td>
+                        <td class="p-3">
+                            <button class="btn btn-sm" data-modal-id="edit-posisi-{{ $p->id_posisi }}" data-modal-title="Edit Posisi">Edit</button>
+                            <button type="button" class="btn btn-danger btn-sm ml-2 delete-posisi-btn" data-id="{{ $p->id_posisi }}" data-name="{{ $p->nama_posisi }}">Hapus</button>
 
-                        {{-- edit modal per posisi (AJAX) --}}
-                        <x-modal id="edit-posisi-{{ $p->id_posisi }}" title="Edit Posisi">
-                            <div class="mb-3">
-                                <label class="block text-sm">Nama Posisi</label>
-                                <input type="text" id="edit-posisi-name-{{ $p->id_posisi }}" name="nama_posisi" value="{{ old('nama_posisi', $p->nama_posisi) }}" class="mt-1 block w-full rounded border px-3 py-2" />
-                                <p id="edit-posisi-error-{{ $p->id_posisi }}" class="text-sm text-red-600 mt-2 hidden"></p>
-                            </div>
-                            <div class="flex justify-end">
-                                <button type="button" class="btn btn-secondary mr-2" data-modal-id="edit-posisi-{{ $p->id_posisi }}">Batal</button>
-                                <button type="button" class="btn btn-primary save-posisi-btn" data-id="{{ $p->id_posisi }}">Simpan</button>
-                            </div>
-                        </x-modal>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
+                            {{-- edit modal per posisi (AJAX) --}}
+                            <x-modal id="edit-posisi-{{ $p->id_posisi }}" title="Edit Posisi">
+                                <div class="mb-3">
+                                    <label class="block text-sm">Nama Posisi</label>
+                                    <input type="text" id="edit-posisi-name-{{ $p->id_posisi }}" name="nama_posisi" value="{{ old('nama_posisi', $p->nama_posisi) }}" class="mt-1 block w-full rounded border px-3 py-2" />
+                                    <p id="edit-posisi-error-{{ $p->id_posisi }}" class="text-sm text-red-600 mt-2 hidden"></p>
+                                </div>
+                                <div class="flex justify-end">
+                                    <button type="button" class="btn btn-secondary mr-2" data-modal-id="edit-posisi-{{ $p->id_posisi }}">Batal</button>
+                                    <button type="button" class="btn btn-primary save-posisi-btn" data-id="{{ $p->id_posisi }}">Simpan</button>
+                                </div>
+                            </x-modal>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </x-rekrutmen.card>
 </div>
 
 {{-- add modal (shared with dashboard) --}}
