@@ -3,17 +3,32 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\KpiScore; // <--- Pastikan baris ini ada jika IDE masih error, atau untuk memastikan
+use App\Models\KpiScore; 
 
 class KpiItem extends Model
 {
     protected $table = 'kpi_items';
     protected $primaryKey = 'id_kpi_item';
-    protected $guarded = [];
+    
+    // UBAH DISINI:
+    // Kita ganti $guarded dengan $fillable agar lebih eksplisit
+    // Pastikan 'target', 'polaritas', dan 'satuan' masuk disini.
+    protected $fillable = [
+        'kpi_assessment_id',
+        'perspektif',
+        'key_result_area',
+        'key_performance_indicator',
+        'bobot',
+        'target',      // <--- Kolom Baru (Penting untuk Template)
+        'realisasi',
+        'skor',
+        'skor_akhir',
+        'polaritas',   // <--- Kolom Baru (Penting untuk Template)
+        'satuan',      // <--- Kolom Baru (Penting untuk Template)
+    ];
 
     public function scores()
     {
-        // Pastikan nama class 'KpiScore' sesuai dengan nama file KpiScore.php
         return $this->hasMany(KpiScore::class, 'kpi_item_id', 'id_kpi_item');
     }
     

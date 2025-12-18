@@ -43,6 +43,18 @@ class MenuHelper
         ];
     }
 
+    // --- [BARU] Menambahkan Menu Khusus Performance (KPI) ---
+    public static function getPerformanceItems()
+    {
+        return [
+            [
+                'icon' => 'charts', 
+                'name' => 'KPI Karyawan', // Nama menu diperjelas
+                'path' => '/kpi/dashboard', // <-- Link baru ke halaman index
+            ],
+        ];
+    }
+
     public static function getOthersItems()
     {
         return [
@@ -58,6 +70,7 @@ class MenuHelper
         ];
     }
 
+
     public static function getMenuGroups()
     {
         return [
@@ -68,6 +81,11 @@ class MenuHelper
             [
                 'title' => 'Others',
                 'items' => self::getOthersItems()
+            ],
+            // --- APAKAH BAGIAN INI SUDAH ADA? ---
+            [
+                'title' => 'Performance',
+                'items' => self::getPerformanceItems() // <--- INI WAJIB ADA
             ]
         ];
     }
