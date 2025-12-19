@@ -14,7 +14,14 @@
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 p-6">
 
     <div class="max-w-7xl mx-auto">
-        
+        {{-- button kembali --}}
+        <div class="mb-4">
+            <a href="{{ url('/dashboard') }}" class="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium text-sm">
+                <i class="fas fa-arrow-left"></i>
+                <span>Kembali ke Dashboard Utama</span>
+            </a>
+        </div>
+        {{--  --}}
         <div class="flex flex-col md:flex-row justify-between items-center mb-6">
             <div>
                 <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Performance Dashboard</h2>
@@ -27,13 +34,35 @@
                     <i id="theme-toggle-dark-icon" class="fas fa-moon hidden"></i>
                 </button>
 
-                <form action="{{ route('kpi.index') }}" method="GET" class="flex items-center gap-2">
-                    <label class="text-sm font-semibold text-gray-600 dark:text-gray-400">Periode:</label>
-                    <select name="tahun" onchange="this.form.submit()" class="border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-md px-3 py-1.5 text-sm">
-                        @for($y = date('Y'); $y >= 2023; $y--)
-                            <option value="{{ $y }}" {{ $tahun == $y ? 'selected' : '' }}>{{ $y }}</option>
-                        @endfor
-                    </select>
+                <form action="{{ route('kpi.index') }}" method="GET" class="flex flex-col sm:flex-row items-center gap-3">
+                    
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <i class="fas fa-search text-gray-400"></i>
+                        </div>
+                        <input type="text" name="search" value="{{ request('search') }}" 
+                            class="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500 w-full sm:w-64" 
+                            placeholder="Cari Nama / Jabatan...">
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm font-semibold text-gray-600 dark:text-gray-400 hidden sm:block">Periode:</label>
+                        <select name="tahun" onchange="this.form.submit()" class="border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500 cursor-pointer">
+                            @for($y = date('Y'); $y >= 2023; $y--)
+                                <option value="{{ $y }}" {{ $tahun == $y ? 'selected' : '' }}>{{ $y }}</option>
+                            @endfor
+                        </select>
+                    </div>
+
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition">
+                        Cari
+                    </button>
+
+                    @if(request('search'))
+                        <a href="{{ route('kpi.index', ['tahun' => $tahun]) }}" class="text-red-500 hover:text-red-700 text-sm font-medium">
+                            <i class="fas fa-times"></i> Reset
+                        </a>
+                    @endif
                 </form>
             </div>
         </div>
@@ -114,6 +143,7 @@
                 </div>
             @endif
         </div>
+        
         <div class="flex flex-col md:flex-row ...">
                 <table class="w-full text-left border-collapse">
                     <thead class="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 uppercase text-xs font-semibold">
@@ -137,15 +167,30 @@
                             <td class="p-4">
                                 {{ $kry->pekerjaan->first()->Jabatan ?? '-' }}
                             </td>
-                            <td class="p-4 text-center">
-                                @if($kpi)
-                                    <span class="px-2 py-1 rounded text-xs font-bold bg-yellow-100 text-yellow-800">
-                                        {{ $kpi->status }}
-                                    </span>
-                                @else
-                                    <span class="px-2 py-1 rounded text-xs font-bold bg-gray-100 text-gray-600">Belum Ada</span>
-                                @endif
-                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                               @if($kpi)
+                                        {{-- Jika Data KPI ADA, cek statusnya --}}
+                                        @if($kpi->status == 'FINAL')
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 border border-green-200">
+                                                FINAL
+                                            </span>
+                                        @elseif($kpi->status == 'SUBMITTED')
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 border border-yellow-200">
+                                                SUBMITTED
+                                            </span>
+                                        @else
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 border border-blue-200">
+                                                DRAFT
+                                            </span>
+                                        @endif
+                                    @else
+                                        {{-- Jika Data KPI BELUM ADA (Null) --}}
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-500 border border-gray-200">
+                                            Belum Ada
+                                        </span>
+                                    @endif
+                                </td>
+                            
                             <td class="p-4 text-center font-bold">
                                 {{ $kpi ? $kpi->total_skor_akhir : '-' }}
                             </td>

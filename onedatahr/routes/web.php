@@ -58,6 +58,8 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('pemberkasan', PemberkasanController::class)->only(['index','create','store','edit','update']);
     });
 
+    Route::post('/kpi/{id}/finalize', [App\Http\Controllers\KpiAssessmentController::class, 'finalize'])->name('kpi.finalize');
+
 });
 
 // Dashboard Monitoring (All Karyawan)
