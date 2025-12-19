@@ -25,7 +25,30 @@
             <button form="kpiForm" type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition shadow-lg flex items-center gap-2">
                 <i class="fas fa-save"></i> Simpan Penilaian
             </button>
+            {{-- LOGIKA TOMBOL BERDASARKAN STATUS --}}
+            @if($kpi->status != 'FINAL')
+                
+                {{-- Tombol Simpan (Hanya muncul jika BELUM Final) --}}
+                <button form="kpiForm" type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition shadow-lg flex items-center gap-2">
+                    <i class="fas fa-save"></i> Simpan Draft
+                </button>
+
+                {{-- Tombol Finalisasi (Muncul terpisah) --}}
+                <form action="{{ route('kpi.finalize', $kpi->id_kpi_assessment) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin? Setelah difinalisasi, data TIDAK BISA diubah lagi.')">
+                    @csrf
+                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 transition shadow-lg flex items-center gap-2">
+                        <i class="fas fa-check-circle"></i> Finalisasi / Selesai
+                    </button>
+                </form>
+
+            @else
+                {{-- Jika Sudah Final, Tampilkan Badge --}}
+                <span class="px-4 py-2 bg-gray-500 text-white rounded-lg text-sm flex items-center gap-2 cursor-not-allowed">
+                    <i class="fas fa-lock"></i> Data Terkunci (Final)
+                </span>
+            @endif
         </div>
+        
     </div>
 
     <form id="kpiForm" action="{{ route('kpi.update', $kpi->id_kpi_assessment) }}" method="POST">
@@ -82,6 +105,7 @@
                                 <input type="number" step="0.01" 
                                        name="kpi[{{ $item->id_kpi_item }}][target]" 
                                        value="{{ $targetVal }}"
+                                       @disabled($kpi->status == 'FINAL')
                                        class="input-target w-full p-2 border border-gray-300 dark:border-gray-600 rounded text-center font-bold text-blue-700 focus:ring-2 focus:ring-blue-500 outline-none">
                             </td>
 
@@ -89,6 +113,7 @@
                                 <input type="number" step="0.01" 
                                        name="kpi[{{ $item->id_kpi_item }}][realisasi]" 
                                        value="{{ $realisasiVal }}"
+                                       @disabled($kpi->status == 'FINAL')
                                        class="input-realisasi w-full p-2 border border-gray-300 dark:border-gray-600 rounded text-center font-bold text-gray-800 dark:text-white focus:ring-2 focus:ring-yellow-500 outline-none">
                             </td>
 
@@ -128,7 +153,22 @@
         const rows = document.querySelectorAll('.row-kpi');
         const grandTotalEl = document.getElementById('grand-total');
 
+        // --- HELPER: Mengubah format "0,5" atau "10%" menjadi angka desimal ---
+        function parseNumber(val) {
+            if (!val) return 0;
+            // Ubah string jadi string biasa, hapus %, ganti Koma jadi Titik
+            let cleanStr = val.toString().replace('%', '').replace(',', '.');
+            return parseFloat(cleanStr) || 0;
+        }
+
+        // --- HELPER: Mengubah angka jadi format tampilan (2 desimal) ---
+        function formatNumber(num) {
+            // Tampilkan 2 desimal, ganti Titik jadi Koma (opsional, biar indonesia banget)
+            return num.toFixed(2).replace('.', ',');
+        }
+
         function calculateRow(row) {
+            // 1. Ambil Elemen Input
             const targetInput = row.querySelector('.input-target');
             const realisasiInput = row.querySelector('.input-realisasi');
             const bobotInput = row.querySelector('.input-bobot');
@@ -137,38 +177,68 @@
             const skorEl = row.querySelector('.text-skor');
             const akhirEl = row.querySelector('.text-akhir');
 
-            let target = parseFloat(targetInput.value) || 0;
-            let realisasi = parseFloat(realisasiInput.value) || 0;
-            let bobot = parseFloat(bobotInput.value) || 0;
+            // 2. Cek apakah input "Masih Kosong" (String kosong)
+            // Tujuannya membedakan antara "Belum diisi" dengan "User mengetik 0"
+            const isTargetEmpty = targetInput.value.trim() === '';
+            const isRealisasiEmpty = realisasiInput.value.trim() === '';
+
+            // Ambil Nilai Angka (Kalau kosong dianggap 0)
+            let target    = parseNumber(targetInput.value);
+            let realisasi = parseNumber(realisasiInput.value);
+            let bobot     = parseNumber(bobotInput.value);
             let polaritas = polaritasInput.value;
 
-            let skor = 0;
+            let pencapaian = 0;
 
-            // Rumus Excel
-            if (target > 0) {
-                if (polaritas === 'Positif' || polaritas === 'Maximize') {
-                    // Makin tinggi makin bagus
-                    skor = (realisasi / target) * 100;
-                } else {
-                    // Makin rendah makin bagus (Minimize/Negatif)
-                    // Rumus: (200% - (Realisasi/Target * 100%)) 
-                    // Atau: (Target / Realisasi) * 100 -> Tergantung kebijakan perusahaanmu
-                    // Kita pakai rumus umum invert:
-                    let ratio = (realisasi / target) * 100;
-                    skor = (ratio === 0) ? 100 : (100 + (100 - ratio)); 
-                    // Revisi: Agar aman pakai rumus (Target / Realisasi) * 100 saja untuk start
-                    if(realisasi > 0) skor = (target / realisasi) * 100;
+            // --- LOGIKA BARU: CEK KEKOSONGAN ---
+            // Jika Target 0 DAN Realisasi 0 (Kasus baris belum diisi / default), paksa 0.
+            // Ini akan menimpa logika "Negatif 0/0 = 100" agar tidak membingungkan saat form baru dibuka.
+            if (target === 0 && realisasi === 0) {
+                pencapaian = 0;
+            } 
+            // Jika salah satu ada isinya, baru hitung rumus
+            else {
+                // KASUS KHUSUS: Jika Target 0 tapi Realisasi ada isinya (misal target 0 kecelakaan, tapi terjadi 1)
+                if (target === 0) {
+                     if (polaritas === 'Negatif' || polaritas === 'Minimize') {
+                        // Target 0, Realisasi > 0 (Jelek) -> Skor 0 (atau minus, tergantung kebijakan)
+                        // Target 0, Realisasi 0 (Bagus) -> Skor 100 (TAPI ini sudah dihandle if diatas jika dua-duanya 0)
+                        // Jadi kalau lolos ke sini berarti Realisasi > 0, maka skor 0.
+                        pencapaian = 0;
+                     } else {
+                        pencapaian = 0; // Positif target 0 = skor 0
+                     }
+                } 
+                // KASUS NORMAL: Target > 0
+                else {
+                    if (polaritas === 'Positif' || polaritas === 'Maximize') {
+                        pencapaian = (realisasi / target) * 100;
+                    } 
+                    else if (polaritas === 'Negatif' || polaritas === 'Minimize') {
+                        // Rumus Linear (200% - Ratio)
+                        let ratio = realisasi / target;
+                        pencapaian = (2 - ratio) * 100;
+                    } 
+                    else if (polaritas === 'Yes/No') {
+                        pencapaian = (realisasi >= target) ? 100 : 0;
+                    }
                 }
             }
 
-            // Capping skor maksimal 120% atau 200% (Opsional, di sini saya los dulu)
-            // skor = Math.min(skor, 120); 
+            // 4. VALIDASI TERAKHIR (Jaring Pengaman NaN)
+            if (isNaN(pencapaian) || !isFinite(pencapaian)) {
+                pencapaian = 0;
+            }
+            
+            // Opsional: Skor tidak boleh minus
+            if (pencapaian < 0) pencapaian = 0;
 
-            let nilaiAkhir = skor * (bobot / 100);
+            // 5. Hitung Nilai Akhir
+            let nilaiAkhir = (pencapaian * bobot) / 100;
 
-            // Update UI Row
-            skorEl.textContent = skor.toFixed(2);
-            akhirEl.textContent = nilaiAkhir.toFixed(2);
+            // 6. Update Tampilan
+            skorEl.textContent = formatNumber(pencapaian);
+            akhirEl.textContent = formatNumber(nilaiAkhir);
 
             return nilaiAkhir;
         }
@@ -178,10 +248,11 @@
             rows.forEach(row => {
                 total += calculateRow(row);
             });
-            grandTotalEl.textContent = total.toFixed(2);
+            // Update Total Besar di Bawah
+            grandTotalEl.textContent = formatNumber(total);
         }
 
-        // Event Listener untuk setiap input
+        // Event Listener: Hitung ulang setiap kali user mengetik
         rows.forEach(row => {
             const inputs = row.querySelectorAll('input');
             inputs.forEach(input => {
@@ -189,7 +260,7 @@
             });
         });
 
-        // Hitung awal saat loading
+        // Hitung awal saat halaman pertama dimuat
         calculateGrandTotal();
     });
 </script>

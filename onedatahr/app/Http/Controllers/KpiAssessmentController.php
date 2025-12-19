@@ -15,23 +15,60 @@ class KpiAssessmentController extends Controller
     // --- 1. DASHBOARD MONITORING (All Employees) ---
     public function index(Request $request)
     {
-        // Default tahun sekarang, atau dari filter user
-        $tahun = $request->input('tahun', date('Y')); 
+        // 1. Ambil Tahun (Default tahun ini)
+        $tahun = $request->input('tahun', date('Y'));
+        
+        // 2. Ambil Kata Kunci Search
+        $search = $request->input('search');
 
-        // Ambil SEMUA Karyawan + Data KPI mereka di tahun terpilih (Eager Loading)
-        $karyawanList = Karyawan::with(['pekerjaan', 'kpiAssessment' => function($q) use ($tahun) {
+        // 3. Query Karyawan
+        $query = Karyawan::with(['pekerjaan', 'kpiAssessment' => function($q) use ($tahun) {
             $q->where('tahun', $tahun);
-        }])->get();
+        }]);
 
-        // --- Hitung Statistik untuk Cards di Atas ---
+        // --- LOGIKA SEARCH (Modifikasi Disini) ---
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                // Cari berdasarkan Nama
+                $q->where('Nama_Lengkap_Sesuai_Ijazah', 'LIKE', "%{$search}%")
+                  // ATAU Cari berdasarkan Jabatan (Relasi Pekerjaan)
+                  ->orWhereHas('pekerjaan', function($subQ) use ($search) {
+                      $subQ->where('Jabatan', 'LIKE', "%{$search}%");
+                  });
+            });
+        }
+        // ------------------------------------------
+
+        $karyawanList = $query->get();
+
+        // 4. Hitung Statistik (Sama seperti sebelumnya)
         $stats = [
             'total_karyawan' => $karyawanList->count(),
-            'sudah_final'    => KpiAssessment::where('tahun', $tahun)->where('status', 'APPROVED')->count(),
-            'draft'          => KpiAssessment::where('tahun', $tahun)->whereIn('status', ['DRAFT', 'SUBMITTED'])->count(),
-            'rata_rata'      => KpiAssessment::where('tahun', $tahun)->avg('total_skor_akhir') ?? 0
+            'sudah_final'    => 0,
+            'draft'          => 0,
+            'rata_rata'      => 0
         ];
 
-        return view('kpi.index', compact('karyawanList', 'tahun', 'stats'));
+        $totalSkor = 0;
+        $countSkor = 0;
+
+        foreach ($karyawanList as $kry) {
+            $kpi = $kry->kpiAssessment; // Sudah difilter tahun di query atas
+            if ($kpi) {
+                if ($kpi->status == 'FINAL') $stats['sudah_final']++;
+                else $stats['draft']++;
+
+                if ($kpi->total_skor_akhir > 0) {
+                    $totalSkor += $kpi->total_skor_akhir;
+                    $countSkor++;
+                }
+            }
+        }
+
+        $stats['rata_rata'] = $countSkor > 0 ? ($totalSkor / $countSkor) : 0;
+
+        // Return ke View (Jangan lupa sesuaikan path views.pages.kpi.index)
+        return view('pages.kpi.index', compact('karyawanList', 'tahun', 'stats'));
     }
 
 
@@ -69,68 +106,41 @@ class KpiAssessmentController extends Controller
             // Total Bobot harus 100%
             $templateItems = [
                 [
-                    'perspektif' => 'Financial',
-                    'kra'        => 'Efisiensi Anggaran',
-                    'kpi'        => 'Persentase penggunaan anggaran operasional sesuai budget',
-                    'bobot'      => 10,
-                    'polaritas'  => 'Minimize', // Makin hemat makin baik (atau Maximize jika targetnya serapan)
+                    'perspektif' => 'Internal Business Process',
+                    'kra'        => 'Kualitas produk',
+                    'kpi'        => 'Presentase Barang Defect Pada Semeseter 1 Tahun 2025',
+                    'bobot'      => 30,
+                    'polaritas'  => 'Negatif', // Makin hemat makin baik (atau Maximize jika targetnya serapan)
                     'target'     => 100, // 100%
                     'satuan'     => '%'
                 ],
                 [
-                    'perspektif' => 'Customer',
-                    'kra'        => 'Kepuasan Pelanggan (Internal/Eksternal)',
-                    'kpi'        => 'Nilai rata-rata kepuasan user/klien (Survey)',
-                    'bobot'      => 20,
-                    'polaritas'  => 'Maximize',
+                    'perspektif' => 'Financial',
+                    'kra'        => 'Produktivitas karyawan',
+                    'kpi'        => 'Presentase Capaian Produksi Factory 1 pada semester 1 Tahun 2025',
+                    'bobot'      => 40,
+                    'polaritas'  => 'Positif', // Makin tinggi makin baik
                     'target'     => 4.5, // Skala 1-5
                     'satuan'     => 'Skala'
                 ],
                 [
-                    'perspektif' => 'Customer',
-                    'kra'        => 'Penanganan Komplain',
-                    'kpi'        => 'Jumlah komplain yang tidak terselesaikan (Unresolved)',
-                    'bobot'      => 10,
-                    'polaritas'  => 'Minimize', // Makin sedikit makin baik
+                    'perspektif' => 'Learning & Growth',
+                    'kra'        => 'Kepatuhan dan keselamatan kerja',
+                    'kpi'        => 'Tingkat Kedisiplinan Penggunaan APD Factory 1 pada semseter 1 Tahun 2025',
+                    'bobot'      => 20,
+                    'polaritas'  => 'Positif', // Makin tinggi makin baik
                     'target'     => 0,
                     'satuan'     => 'Kasus'
                 ],
                 [
-                    'perspektif' => 'Internal Process',
-                    'kra'        => 'Penyelesaian Tugas Utama',
-                    'kpi'        => 'Persentase penyelesaian project/tugas tepat waktu (On-time)',
-                    'bobot'      => 30, // Bobot paling besar
-                    'polaritas'  => 'Maximize',
+                    'perspektif' => 'Learning & Growth',
+                    'kra'        => 'Pengembangan Kompetensi & Keterlibatan Karyawan',
+                    'kpi'        => 'Presentease Kehadiran Kegiatan TEMPA',
+                    'bobot'      => 10, // Bobot paling besar
+                    'polaritas'  => 'Positif',
                     'target'     => 100,
                     'satuan'     => '%'
-                ],
-                [
-                    'perspektif' => 'Internal Process',
-                    'kra'        => 'Kualitas Kerja',
-                    'kpi'        => 'Jumlah kesalahan (error/rework) major dalam pekerjaan',
-                    'bobot'      => 15,
-                    'polaritas'  => 'Minimize',
-                    'target'     => 0,
-                    'satuan'     => 'Kasus'
-                ],
-                [
-                    'perspektif' => 'Learning & Growth',
-                    'kra'        => 'Pengembangan Diri',
-                    'kpi'        => 'Jumlah jam pelatihan / training yang diikuti',
-                    'bobot'      => 10,
-                    'polaritas'  => 'Maximize',
-                    'target'     => 20, // 20 Jam setahun
-                    'satuan'     => 'Jam'
-                ],
-                [
-                    'perspektif' => 'Learning & Growth',
-                    'kra'        => 'Kedisiplinan',
-                    'kpi'        => 'Persentase kehadiran kerja (Absensi)',
-                    'bobot'      => 5,
-                    'polaritas'  => 'Maximize',
-                    'target'     => 98, // Minimal 98% hadir
-                    'satuan'     => '%'
-                ],
+                ]
             ];
 
             // 4. Loop dan Masukkan ke Database
@@ -190,7 +200,7 @@ class KpiAssessmentController extends Controller
         }
 
         // 3. Kirim variabel $karyawan dan $kpi ke View
-        return view('kpi.form', compact('karyawan', 'kpi'));
+        return view('pages.kpi.form', compact('karyawan', 'kpi'));
     }
 
     public function update(Request $request, $id_kpi_assessment)
@@ -263,43 +273,50 @@ class KpiAssessmentController extends Controller
         }
     }
 
-    // --- 5. PRIVATE HELPER (Rumus Hitung) ---
     private function hitungSkor($target, $realisasi, $polaritas, $bobot)
     {
-        // Bersihkan format input
+        // 1. Bersihkan input: Hapus %, ganti Koma jadi Titik
+        // Contoh: "0,5%" jadi 0.5
         $t = floatval(str_replace(['%', ','], ['', '.'], $target));
         $r = floatval(str_replace(['%', ','], ['', '.'], $realisasi));
         $b = floatval(str_replace(['%', ','], ['', '.'], $bobot));
 
-        // Jika target 0, skor 0 untuk menghindari error division by zero
-        if ($t == 0) return ['skor_mentah' => 0, 'skor_akhir_bobot' => 0];
+        $pencapaian = 0;
 
-        $skor = 0;
-
-        // Logika Polaritas
-        if ($polaritas == 'Positif' || $polaritas == 'Maximize') {
-            // Makin tinggi makin bagus
-            $skor = ($r / $t) * 100;
-        } elseif ($polaritas == 'Negatif' || $polaritas == 'Minimize') {
-            // Makin rendah makin bagus
-            // Rumus umum (Target / Realisasi * 100)
-            if ($r > 0) {
-                $skor = ($t / $r) * 100;
-            } else {
-                $skor = 100; // Jika realisasi 0 (misal complain 0), anggap sempurna
+        if ($t == 0) {
+             // Hindari error bagi 0
+            $pencapaian = ($r == 0) ? 100 : 0; 
+        } else {
+            // --- LOGIKA PERHITUNGAN ---
+            
+            if ($polaritas == 'Positif' || $polaritas == 'Maximize') {
+                // Rumus: (Realisasi / Target) * 100
+                $pencapaian = ($r / $t) * 100;
+            } 
+            elseif ($polaritas == 'Negatif' || $polaritas == 'Minimize') {
+                // Rumus Spreadsheet: 200% - (Realisasi / Target)
+                // Contoh: 2 - (0.01 / 0.5) = 1.98 -> 198%
+                $ratio = $r / $t;
+                $pencapaian = (2 - $ratio) * 100;
+                
+                // Opsional: Skor tidak boleh minus
+                if ($pencapaian < 0) $pencapaian = 0;
+            } 
+            elseif ($polaritas == 'Yes/No') {
+                // Yes/No logic
+                $pencapaian = ($r >= $t) ? 100 : 0;
             }
         }
 
-        // Hitung skor akhir dikali bobot
-        $skorAkhir = $skor * ($b / 100);
+        // Hitung Skor Akhir (Pencapaian * Bobot / 100)
+        // Contoh: 198 * 30 / 100 = 59.4
+        $skorAkhir = ($pencapaian * $b) / 100;
 
         return [
-            'skor_mentah'      => round($skor, 2),
+            'skor_mentah'      => round($pencapaian, 2),
             'skor_akhir_bobot' => round($skorAkhir, 2)
         ];
     }
-
-    // ... method update ...
 
     // --- 6. HAPUS KPI (Untuk Reset) ---
     public function destroy($id)
@@ -316,6 +333,25 @@ class KpiAssessmentController extends Controller
         $kpi->delete(); // Hapus header
 
         return redirect()->back()->with('success', 'Data KPI berhasil dihapus/reset.');
+    }
+
+    // --- 7. FINALISASI KPI (Mengunci Data) ---
+    public function finalize($id)
+    {
+        $kpi = KpiAssessment::findOrFail($id);
+        
+        // Cek apakah skor sudah terisi (Opsional)
+        if ($kpi->total_skor_akhir == 0) {
+            return redirect()->back()->with('error', 'Tidak bisa finalisasi karena skor masih 0.');
+        }
+
+        // Ubah Status jadi FINAL
+        $kpi->update([
+            'status' => 'FINAL',
+            // 'tanggal_finalisasi' => now() // Jika punya kolom ini
+        ]);
+
+        return redirect()->back()->with('success', 'KPI berhasil difinalisasi! Data sekarang terkunci.');
     }
 
 }
