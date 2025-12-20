@@ -136,9 +136,21 @@
                             <td class="p-4 text-center font-bold text-gray-800 dark:text-white">
                                 {{ $kpi->items->sum('bobot') }}%
                             </td>
-                            <td colspan="4" class="p-4 text-right font-bold uppercase text-gray-600 dark:text-gray-300">TOTAL SKOR AKHIR</td>
-                            <td class="p-4 text-center font-bold text-2xl text-blue-700 dark:text-blue-400">
-                                <span id="grand-total">{{ $kpi->total_skor_akhir }}</span>
+                            <td colspan="4" class="p-4 text-right font-bold uppercase text-gray-600 dark:text-gray-300 align-middle">
+                                TOTAL SKOR AKHIR & GRADE
+                            </td>
+                            <td class="p-4 text-center">
+                                {{-- Angka Total Skor --}}
+                                <div class="font-bold text-3xl text-blue-700 dark:text-blue-400">
+                                    <span id="grand-total">{{ number_format($kpi->total_skor_akhir, 2) }}</span>
+                                </div>
+                                
+                                {{-- Label Grade Dinamis --}}
+                                <div id="grade-container" class="mt-1">
+                                    <span id="grade-label" class="px-3 py-1 rounded-full text-xs font-bold bg-gray-200 text-gray-600">
+                                        {{ $kpi->grade ?? '...' }}
+                                    </span>
+                                </div>
                             </td>
                         </tr>
                     </tfoot>
@@ -152,23 +164,48 @@
     document.addEventListener('DOMContentLoaded', function() {
         const rows = document.querySelectorAll('.row-kpi');
         const grandTotalEl = document.getElementById('grand-total');
+        const gradeLabel = document.getElementById('grade-label');
 
-        // --- HELPER: Mengubah format "0,5" atau "10%" menjadi angka desimal ---
+        // --- HELPER: Format Angka ---
         function parseNumber(val) {
             if (!val) return 0;
-            // Ubah string jadi string biasa, hapus %, ganti Koma jadi Titik
             let cleanStr = val.toString().replace('%', '').replace(',', '.');
             return parseFloat(cleanStr) || 0;
         }
 
-        // --- HELPER: Mengubah angka jadi format tampilan (2 desimal) ---
         function formatNumber(num) {
-            // Tampilkan 2 desimal, ganti Titik jadi Koma (opsional, biar indonesia banget)
-            return num.toFixed(2).replace('.', ',');
+            return num.toFixed(2); // Pakai titik dulu biar JS aman, nanti bisa direplace koma kalau mau
+        }
+
+        // --- LOGIKA GRADE (Sama dengan Controller) ---
+        function updateGrade(totalSkor) {
+            let grade = '';
+            let classes = '';
+
+            // Tentukan Grade & Warna
+            if (totalSkor >= 100) { 
+                grade = 'Outstanding'; 
+                classes = 'bg-purple-100 text-purple-700 border border-purple-300';
+            } else if (totalSkor >= 90) { 
+                grade = 'Great'; 
+                classes = 'bg-green-100 text-green-700 border border-green-300';
+            } else if (totalSkor >= 75) { 
+                grade = 'Good'; 
+                classes = 'bg-blue-100 text-blue-700 border border-blue-300';
+            } else if (totalSkor >= 60) { 
+                grade = 'Enough'; 
+                classes = 'bg-yellow-100 text-yellow-700 border border-yellow-300';
+            } else { 
+                grade = 'Poor'; 
+                classes = 'bg-red-100 text-red-700 border border-red-300';
+            }
+
+            // Update Teks & Warna Badge
+            gradeLabel.textContent = grade;
+            gradeLabel.className = `px-3 py-1 rounded-full text-xs font-bold transition-colors ${classes}`;
         }
 
         function calculateRow(row) {
-            // 1. Ambil Elemen Input
             const targetInput = row.querySelector('.input-target');
             const realisasiInput = row.querySelector('.input-realisasi');
             const bobotInput = row.querySelector('.input-bobot');
@@ -177,12 +214,6 @@
             const skorEl = row.querySelector('.text-skor');
             const akhirEl = row.querySelector('.text-akhir');
 
-            // 2. Cek apakah input "Masih Kosong" (String kosong)
-            // Tujuannya membedakan antara "Belum diisi" dengan "User mengetik 0"
-            const isTargetEmpty = targetInput.value.trim() === '';
-            const isRealisasiEmpty = realisasiInput.value.trim() === '';
-
-            // Ambil Nilai Angka (Kalau kosong dianggap 0)
             let target    = parseNumber(targetInput.value);
             let realisasi = parseNumber(realisasiInput.value);
             let bobot     = parseNumber(bobotInput.value);
@@ -190,55 +221,32 @@
 
             let pencapaian = 0;
 
-            // --- LOGIKA BARU: CEK KEKOSONGAN ---
-            // Jika Target 0 DAN Realisasi 0 (Kasus baris belum diisi / default), paksa 0.
-            // Ini akan menimpa logika "Negatif 0/0 = 100" agar tidak membingungkan saat form baru dibuka.
+            // Logika Cek Kekosongan
             if (target === 0 && realisasi === 0) {
                 pencapaian = 0;
-            } 
-            // Jika salah satu ada isinya, baru hitung rumus
-            else {
-                // KASUS KHUSUS: Jika Target 0 tapi Realisasi ada isinya (misal target 0 kecelakaan, tapi terjadi 1)
+            } else {
                 if (target === 0) {
-                     if (polaritas === 'Negatif' || polaritas === 'Minimize') {
-                        // Target 0, Realisasi > 0 (Jelek) -> Skor 0 (atau minus, tergantung kebijakan)
-                        // Target 0, Realisasi 0 (Bagus) -> Skor 100 (TAPI ini sudah dihandle if diatas jika dua-duanya 0)
-                        // Jadi kalau lolos ke sini berarti Realisasi > 0, maka skor 0.
-                        pencapaian = 0;
-                     } else {
-                        pencapaian = 0; // Positif target 0 = skor 0
-                     }
-                } 
-                // KASUS NORMAL: Target > 0
-                else {
+                     if (polaritas === 'Negatif' || polaritas === 'Minimize') pencapaian = 0;
+                     else pencapaian = 0;
+                } else {
                     if (polaritas === 'Positif' || polaritas === 'Maximize') {
                         pencapaian = (realisasi / target) * 100;
-                    } 
-                    else if (polaritas === 'Negatif' || polaritas === 'Minimize') {
-                        // Rumus Linear (200% - Ratio)
+                    } else if (polaritas === 'Negatif' || polaritas === 'Minimize') {
                         let ratio = realisasi / target;
                         pencapaian = (2 - ratio) * 100;
-                    } 
-                    else if (polaritas === 'Yes/No') {
+                    } else if (polaritas === 'Yes/No') {
                         pencapaian = (realisasi >= target) ? 100 : 0;
                     }
                 }
             }
 
-            // 4. VALIDASI TERAKHIR (Jaring Pengaman NaN)
-            if (isNaN(pencapaian) || !isFinite(pencapaian)) {
-                pencapaian = 0;
-            }
-            
-            // Opsional: Skor tidak boleh minus
+            if (isNaN(pencapaian) || !isFinite(pencapaian)) pencapaian = 0;
             if (pencapaian < 0) pencapaian = 0;
 
-            // 5. Hitung Nilai Akhir
             let nilaiAkhir = (pencapaian * bobot) / 100;
 
-            // 6. Update Tampilan
-            skorEl.textContent = formatNumber(pencapaian);
-            akhirEl.textContent = formatNumber(nilaiAkhir);
+            skorEl.textContent = formatNumber(pencapaian).replace('.', ',');
+            akhirEl.textContent = formatNumber(nilaiAkhir).replace('.', ',');
 
             return nilaiAkhir;
         }
@@ -248,11 +256,14 @@
             rows.forEach(row => {
                 total += calculateRow(row);
             });
-            // Update Total Besar di Bawah
-            grandTotalEl.textContent = formatNumber(total);
+            
+            // Update Angka Total
+            grandTotalEl.textContent = formatNumber(total).replace('.', ',');
+            
+            // Update Grade secara Real-time
+            updateGrade(total);
         }
 
-        // Event Listener: Hitung ulang setiap kali user mengetik
         rows.forEach(row => {
             const inputs = row.querySelectorAll('input');
             inputs.forEach(input => {
@@ -260,7 +271,7 @@
             });
         });
 
-        // Hitung awal saat halaman pertama dimuat
+        // Hitung saat load pertama kali
         calculateGrandTotal();
     });
 </script>
