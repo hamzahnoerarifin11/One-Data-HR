@@ -271,6 +271,21 @@ class KpiAssessmentController extends Controller
             DB::rollback();
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
+
+        // 1. Hitung Total Skor
+        $totalSkor = KpiScore::whereHas('item', function($q) use ($id_kpi_assessment) {
+            $q->where('kpi_assessment_id', $id_kpi_assessment);
+        })->sum('skor_akhir');
+
+        // 2. Tentukan Grade Baru
+        $grade = $this->determineGrade($totalSkor);
+
+        // 3. Update ke Database
+        $assessment->update([
+            'total_skor_akhir' => $totalSkor,
+            'grade'            => $grade,     // <--- Simpan Grade disini
+            'status'           => ($assessment->status == 'DRAFT') ? 'SUBMITTED' : $assessment->status
+        ]);
     }
 
     private function hitungSkor($target, $realisasi, $polaritas, $bobot)
@@ -352,6 +367,17 @@ class KpiAssessmentController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'KPI berhasil difinalisasi! Data sekarang terkunci.');
+    }
+
+    // --- HELPER: MENENTUKAN GRADE ---
+    private function determineGrade($skor)
+    {
+        // Sesuaikan rentang nilai ini dengan kebijakan perusahaan Anda
+        if ($skor >= 100) return 'Outstanding'; // Luar Biasa
+        if ($skor >= 90)  return 'Great';       // Sangat Baik
+        if ($skor >= 75)  return 'Good';        // Baik
+        if ($skor >= 60)  return 'Enough';      // Cukup
+        return 'Poor';                          // Kurang
     }
 
 }
