@@ -206,43 +206,37 @@ class KpiAssessmentController extends Controller
     public function update(Request $request, $id_kpi_assessment)
     {
         $assessment = KpiAssessment::findOrFail($id_kpi_assessment);
-        
-        // Data input bentuknya: name="kpi[ITEM_ID][target]" dan "kpi[ITEM_ID][realisasi]"
-        $inputs = $request->input('kpi'); 
+        $inputs = $request->input('kpi');
 
         if (!$inputs) {
-            return redirect()->back()->with('warning', 'Tidak ada data yang dikirim.');
+            return redirect()->back()->with('warning', 'Tidak ada data input yang dikirim.');
         }
 
         DB::beginTransaction();
         try {
+            // 1. Loop Simpan Per-Item (Target & Realisasi)
             foreach ($inputs as $itemId => $data) {
-                
-                // Ambil Target & Realisasi dari input
                 $targetBaru = $data['target'] ?? 0;
                 $realisasiBaru = $data['realisasi'] ?? 0;
 
-                // Ambil Item KPI (untuk tau Bobot & Polaritas)
                 $item = KpiItem::find($itemId);
                 if (!$item) continue;
 
-                // Cari Score Record (Asumsi Semester 1 dulu)
                 $scoreRecord = KpiScore::where('kpi_item_id', $itemId)
-                                        ->where('nama_periode', 'Semester 1')
-                                        ->first();
+                                       ->where('nama_periode', 'Semester 1') // Sesuaikan jika ada periode lain
+                                       ->first();
 
                 if ($scoreRecord) {
-                    // Hitung Skor di Backend (Agar aman & tersimpan di DB)
+                    // Panggil helper hitungSkor
                     $hasilHitung = $this->hitungSkor(
-                        $targetBaru,        // Pakai target baru dari input
+                        $targetBaru, 
                         $realisasiBaru, 
                         $item->polaritas, 
                         $item->bobot
                     );
 
-                    // Update Database (Target + Realisasi + Skor)
                     $scoreRecord->update([
-                        'target'     => $targetBaru,      // Simpan Target Baru
+                        'target'     => $targetBaru,
                         'realisasi'  => $realisasiBaru,
                         'skor'       => $hasilHitung['skor_mentah'],
                         'skor_akhir' => $hasilHitung['skor_akhir_bobot']
@@ -250,42 +244,29 @@ class KpiAssessmentController extends Controller
                 }
             }
 
-            // Hitung Ulang Total Skor Assessment
+            // 2. HITUNG ULANG TOTAL SKOR
             $totalSkor = KpiScore::whereHas('item', function($q) use ($id_kpi_assessment) {
                 $q->where('kpi_assessment_id', $id_kpi_assessment);
             })->sum('skor_akhir');
 
-            // Update Status jadi SUBMITTED jika sebelumnya DRAFT
-            $status = ($assessment->status == 'DRAFT') ? 'SUBMITTED' : $assessment->status;
+            // 3. TENTUKAN GRADE (INI YANG MUNGKIN HILANG DI KODINGAN ANDA)
+            $grade = $this->determineGrade($totalSkor);
 
+            // 4. UPDATE HEADER ASSESSMENT
             $assessment->update([
                 'total_skor_akhir' => $totalSkor,
-                'status' => $status
+                'grade'            => $grade,     // <--- PASTIKAN BARIS INI ADA!
+                'status'           => ($assessment->status == 'DRAFT') ? 'SUBMITTED' : $assessment->status
             ]);
 
-            DB::commit(); 
+            DB::commit();
 
-            return redirect()->back()->with('success', 'Data KPI berhasil disimpan. Total Skor: ' . number_format($totalSkor, 2));
+            return redirect()->back()->with('success', 'Data berhasil disimpan. Skor: ' . number_format($totalSkor, 2) . ' (Grade: ' . $grade . ')');
 
         } catch (\Exception $e) {
             DB::rollback();
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
-
-        // 1. Hitung Total Skor
-        $totalSkor = KpiScore::whereHas('item', function($q) use ($id_kpi_assessment) {
-            $q->where('kpi_assessment_id', $id_kpi_assessment);
-        })->sum('skor_akhir');
-
-        // 2. Tentukan Grade Baru
-        $grade = $this->determineGrade($totalSkor);
-
-        // 3. Update ke Database
-        $assessment->update([
-            'total_skor_akhir' => $totalSkor,
-            'grade'            => $grade,     // <--- Simpan Grade disini
-            'status'           => ($assessment->status == 'DRAFT') ? 'SUBMITTED' : $assessment->status
-        ]);
     }
 
     private function hitungSkor($target, $realisasi, $polaritas, $bobot)
