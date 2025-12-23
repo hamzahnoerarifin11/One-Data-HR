@@ -148,6 +148,22 @@
 
 </body>
 
+<script>
+    // Delegated handler for elements that open a modal using data attributes.
+    document.addEventListener('click', function (e) {
+        const el = e.target.closest('[data-modal-id]');
+        if (!el) return;
+        const detail = {
+            id: el.dataset.modalId,
+            targetForm: el.dataset.modalTarget || null,
+            title: el.dataset.modalTitle || null,
+            message: el.dataset.modalMessage || null,
+        };
+        window.dispatchEvent(new CustomEvent('open-modal', { detail }));
+        e.preventDefault();
+    });
+</script>
+
 @stack('scripts')
 
 </html>

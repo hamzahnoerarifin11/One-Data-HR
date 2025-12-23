@@ -188,6 +188,12 @@ class RecruitmentDashboardController extends Controller
         return response()->streamDownload($callback, $filename, ['Content-Type' => 'text/csv']);
     }
 
+    public function calendarPage()
+    {
+        $posisis = Posisi::all();
+        return view('pages.rekrutmen.calendar', compact('posisis'));
+    }
+
     public function cvPassedByPositionMonth(Request $request)
     {
         $this->validateFilters($request);
@@ -326,6 +332,37 @@ class RecruitmentDashboardController extends Controller
         return response()->json($data);
     }
 
+    // simple page views for per-stage metrics
+    public function cvPage()
+    {
+        $posisis = Posisi::orderBy('nama_posisi')->get();
+        return view('pages.rekrutmen.metrics.cv', compact('posisis'));
+    }
+
+    public function psikotesPage()
+    {
+        $posisis = Posisi::orderBy('nama_posisi')->get();
+        return view('pages.rekrutmen.metrics.psikotes', compact('posisis'));
+    }
+
+    public function kompetensiPage()
+    {
+        $posisis = Posisi::orderBy('nama_posisi')->get();
+        return view('pages.rekrutmen.metrics.kompetensi', compact('posisis'));
+    }
+
+    public function interviewHrPage()
+    {
+        $posisis = Posisi::orderBy('nama_posisi')->get();
+        return view('pages.rekrutmen.metrics.interview_hr', compact('posisis'));
+    }
+
+    public function interviewUserPage()
+    {
+        $posisis = Posisi::orderBy('nama_posisi')->get();
+        return view('pages.rekrutmen.metrics.interview_user', compact('posisis'));
+    }
+
     public function pemberkasanProgress(Request $request)
     {
         $this->validateFilters($request);
@@ -351,6 +388,11 @@ class RecruitmentDashboardController extends Controller
         });
 
         return response()->json($data);
+    }
+
+    public function pemberkasanPage()
+    {
+        return view('pages.rekrutmen.pemberkasan.monitor');
     }
 
     /**

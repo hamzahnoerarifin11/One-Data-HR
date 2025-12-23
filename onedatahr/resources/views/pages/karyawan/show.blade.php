@@ -10,13 +10,13 @@
         </div>
         <div class="flex items-center gap-2">
             @if(auth()->user() && auth()->user()->role === 'admin')
-                <a href="{{ route('karyawan.edit', $karyawan->id_karyawan) }}" class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-center dark:text-white font-medium hover:bg-blue-700 transition">
+                <a href="{{ route('karyawan.edit', $karyawan->id_karyawan) }}" class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-center text-white font-medium hover:bg-blue-700 transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                     </svg>
                     Edit
                 </a>
-                <button onclick="if(confirm('Yakin ingin menghapus?')) document.getElementById('deleteForm').submit()" class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2.5 text-center dark:text-white font-medium hover:bg-red-700 transition">
+                <button type="button" aria-label="Hapus Karyawan" data-modal-id="delete-confirm" data-modal-target="deleteForm" data-modal-title="Hapus Karyawan" data-modal-message="{{ e('Yakin ingin menghapus karyawan: ' . $karyawan->Nama_Sesuai_KTP . '?') }}" class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2.5 text-center text-white font-medium hover:bg-red-700 transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                     </svg>
@@ -538,6 +538,11 @@
         @csrf
         @method('DELETE')
     </form>
+
+    <!-- Global delete confirmation modal (reusable) -->
+    <x-modal id="delete-confirm" size="sm" title="Konfirmasi Hapus" closeLabel="Batal" confirmLabel="Hapus">
+        <p class="text-sm text-gray-600">Gunakan tombol <strong>Hapus</strong> untuk mengonfirmasi penghapusan karyawan ini.</p>
+    </x-modal>
     @endif
 </div>
 @endsection

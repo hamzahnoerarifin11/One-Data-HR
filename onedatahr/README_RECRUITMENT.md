@@ -18,8 +18,9 @@ Permissions
 - Editing recruitment process (`/rekrutmen/proses`) and pemberkasan (`/rekrutmen/pemberkasan/*`) is restricted to users with `role === 'admin'`.
 
 Seeding & Tests
-- Run `php artisan db:seed --class=Database\\Seeders\\RecruitmentSeeder` to load sample recruitment data (includes positions, candidates, processes, pemberkasan).
-- Tests added: feature tests for metrics, exports, CRUD, and permission checks.
+- Run `php artisan migrate` then `php artisan db:seed` to load sample recruitment data (includes positions, candidates, processes, pemberkasan). New seeders added: `PosisiModalTestSeeder`, `RekrutmenDailySeeder` (seed is already registered in `DatabaseSeeder`).
+- To seed only recruitment data: `php artisan db:seed --class=Database\\Seeders\\RecruitmentSeeder`.
+- Tests added: feature tests for metrics, exports, CRUD, and permission checks. Run tests with `./vendor/bin/phpunit` or `php artisan test`.
 - If `php artisan test` fails due to missing test runner adapters (e.g., Collision), run `composer install` to ensure vendor dependencies are present.
 
 UI

@@ -45,5 +45,11 @@ class DatabaseSeeder extends Seeder
 
         // Seed recruitment demo data
         $this->call(\Database\Seeders\RecruitmentSeeder::class);
+
+        // Seed some default positions used by the dashboard filters and tests
+        $this->call(\Database\Seeders\PosisiModalTestSeeder::class);
+
+        // Seed some daily recruitment demo metrics (calendar)
+        $this->call(\Database\Seeders\RekrutmenDailySeeder::class);
     }
 }

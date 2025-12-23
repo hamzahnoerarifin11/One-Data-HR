@@ -10,19 +10,19 @@ class KandidatController extends Controller
 {
     public function index(Request $request)
     {
+        // Ambil semua data tanpa pagination dulu untuk Alpine.js filter
+        // Atau gunakan ->get() jika datanya belum ribuan
         $query = Kandidat::with('posisi')->orderBy('created_at','desc');
+        
         if ($request->filled('posisi_id')) {
             $query->where('posisi_id', $request->posisi_id);
         }
-        $kandidats = $query->paginate(20);
-        $posisis = Posisi::all();
-        return view('pages.rekrutmen.kandidat.index', compact('kandidats','posisis'));
-    }
 
-    public function create()
-    {
+        // Tips: Untuk Alpine.js search side-client, kita butuh koleksi data
+        $kandidats = $query->get(); 
         $posisis = Posisi::all();
-        return view('pages.rekrutmen.kandidat.create', compact('posisis'));
+        
+        return view('pages.rekrutmen.kandidat.index', compact('kandidats','posisis'));
     }
 
     public function store(Request $request)
@@ -34,40 +34,66 @@ class KandidatController extends Controller
             'sumber' => 'nullable|string|max:100',
         ]);
 
-        Kandidat::create($data);
+        $kandidat = Kandidat::create($data);
 
-        return redirect()->route('kandidat.index')->with('success','Kandidat created');
+        // Jika request datang dari AJAX (Fetch)
+        if ($request->wantsJson()) {
+            return response()->json(['message' => 'Kandidat berhasil ditambahkan', 'data' => $kandidat]);
+        }
+
+        return redirect()->route('rekrutmen.kandidat.index')->with('success','Kandidat created');
     }
 
-    public function show(Kandidat $kandidat)
+    // Gunakan $id alih-alih Type-hint Kandidat jika binding bermasalah
+    public function update(Request $request, $id)
     {
-        $kandidat->load('posisi','proses','pemberkasan');
-        return view('pages.rekrutmen.kandidat.show', compact('kandidat'));
-    }
+        $kandidat = Kandidat::findOrFail($id);
 
-    public function edit(Kandidat $kandidat)
-    {
-        $posisis = Posisi::all();
-        return view('pages.rekrutmen.kandidat.edit', compact('kandidat','posisis'));
-    }
-
-    public function update(Request $request, Kandidat $kandidat)
-    {
         $data = $request->validate([
             'nama' => 'required|string|max:150',
             'posisi_id' => 'required|exists:posisi,id_posisi',
             'tanggal_melamar' => 'nullable|date',
             'sumber' => 'nullable|string|max:100',
-            'status_akhir' => 'nullable|string|max:100',
+            'status_akhir' => 'required|string',
         ]);
 
         $kandidat->update($data);
-        return redirect()->route('kandidat.index')->with('success','Kandidat updated');
+
+        if ($request->wantsJson()) {
+            return response()->json(['message' => 'Data berhasil diperbarui']);
+        }
+
+        return redirect()->route('rekrutmen.kandidat.index')->with('success','Kandidat updated');
     }
 
-    public function destroy(Kandidat $kandidat)
+    public function destroy($id)
     {
+        $kandidat = Kandidat::findOrFail($id);
         $kandidat->delete();
-        return redirect()->route('kandidat.index')->with('success','Kandidat deleted');
+
+        if (request()->wantsJson()) {
+            return response()->json(['message' => 'Kandidat berhasil dihapus']);
+        }
+
+        return redirect()->route('rekrutmen.kandidat.index')->with('success','Kandidat deleted');
+    }
+
+    // Method lainnya tetap sama...
+
+    /**
+     * Return a JSON list of candidates for use in ajax selects (filtered by posisi or q)
+     */
+    public function list(Request $request)
+    {
+        $query = Kandidat::orderBy('created_at','desc');
+        if ($request->filled('posisi_id')) {
+            $query->where('posisi_id', $request->posisi_id);
+        }
+        if ($request->filled('q')) {
+            $query->where('nama', 'like', '%'.$request->q.'%');
+        }
+        $c = $query->limit(50)->get(['id_kandidat','nama']);
+        return response()->json($c);
     }
 }
+
