@@ -7,9 +7,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class KpiAssessment extends Model
 {
+    use HasFactory; // Tambahkan ini (standard Laravel)
+
     protected $table = 'kpi_assessments';
     protected $primaryKey = 'id_kpi_assessment';
-    protected $guarded = [];
+
+    // HAPUS $guarded, GANTI DENGAN $fillable
+    // Pastikan semua nama kolom tabel kamu ada di sini
+    protected $fillable = [
+        'karyawan_id',
+        'tahun',
+        'periode',
+        'status',
+        'total_skor_akhir',
+        'grade',         // <--- INI YANG PALING PENTING
+        'created_by',    // Tambahkan jika ada kolom created_by/updated_by custom
+        // Tambahkan kolom lain jika ada
+    ];
 
     public function items()
     {
