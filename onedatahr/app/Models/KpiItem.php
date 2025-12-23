@@ -24,7 +24,7 @@ class KpiItem extends Model
         'skor',
         'skor_akhir',
         'polaritas',   // <--- Kolom Baru (Penting untuk Template)
-        'satuan',      // <--- Kolom Baru (Penting untuk Template)
+        'units',      // <--- Kolom Baru (Penting untuk Template)
     ];
 
     public function scores()
