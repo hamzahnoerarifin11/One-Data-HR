@@ -39,10 +39,10 @@
             'nama'       => $k->Nama_Sesuai_KTP,
             'nik'        => $k->NIK,
             'phone'      => $k->Nomor_Telepon_Aktif_Karyawan,
-            'jabatan'    => $k->pekerjaan->first()->Jabatan,
-            'lokasi'     => $k->pekerjaan->first()->Lokasi_Kerja,
-            'divisi'     => $k->pekerjaan->first()->Divisi,
-            'perusahaan' => $k->perusahaan?->Perusahaan,
+            'jabatan'    => $k->pekerjaan->first()?->Jabatan ?? '-',
+            'lokasi'     => $k->pekerjaan->first()?->Lokasi_Kerja ?? '-',
+            'divisi'     => $k->pekerjaan->first()?->Divisi ?? '-',
+            'perusahaan' => $k->perusahaan?->Perusahaan ?? '-',
         ])->values();
     @endphp
 
@@ -51,18 +51,41 @@
 
         <!-- TOP BAR -->
         <div class="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
-            <div class="flex items-center gap-2">
-                <label class="text-sm text-gray-500 dark:text-gray-400">Show</label>
-                <select x-model.number="perPage" @change="resetPage" class="h-11 rounded-lg border border-gray-300 bg-white px-3 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300">
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
-                </select>
+            <div class="flex items-center gap-3">
+                <span class="text-sm text-gray-500 dark:text-gray-400">Show</span>
+
+                <div x-data="{ isOptionSelected: false }" class="relative z-20">
+                    <select 
+                        x-model.number="perPage" 
+                        @change="resetPage(); isOptionSelected = true" 
+                        class="h-11 w-20 appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 pr-8 text-sm text-gray-800 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                        :class="isOptionSelected && 'text-gray-800 dark:text-white/90'"
+                    >
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                    </select>
+
+                    <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500 dark:text-gray-400">
+                        <svg class="fill-current" width="18" height="18" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                        </svg>
+                    </span>
+                </div>
+
                 <span class="text-sm text-gray-500 dark:text-gray-400">entries</span>
             </div>
 
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <button 
+                    x-show="selected.length > 0"
+                    @click="confirmBatchDelete"
+                    class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2.5 text-center text-white font-medium hover:bg-red-700 transition shadow-sm"
+                >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    Hapus (<span x-text="selected.length"></span>)
+                </button>
                 <div class="relative">
                     <button class="absolute text-gray-500 -translate-y-1/2 left-4 top-1/2 dark:text-gray-400">
                         <svg class="h-5 w-5 fill-current" viewBox="0 0 20 20">
@@ -101,18 +124,49 @@
             <table class="w-full min-w-full">
                 <thead>
                     <tr class="border-y border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-900">
-                        <!-- <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400" style="width:48px"></th> -->
-                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400">Nama</th>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400">NIK</th>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400">No. HP</th>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400">Jabatan</th>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400">Lokasi Kerja</th>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400">Divisi</th>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400">Perusahaan</th>
-                        <th class="px-4 py-3 text-center text-sm font-medium text-gray-600 dark:text-gray-400">Action</th>
+                        <th class="px-4 py-3 text-center w-10">
+                            <input type="checkbox" @change="toggleAll" :checked="isAllSelected" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                        </th>
+                        <th @click="sortBy('nama')" class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400 cursor-pointer hover:text-blue-600 transition">
+                            <div class="flex items-center gap-1">
+                                Nama
+                                <svg :class="sortCol === 'nama' ? (sortDir === 'asc' ? 'rotate-0' : 'rotate-180') : 'opacity-20'" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+                            </div>
+                        </th>
+                        <th @click="sortBy('nik')" class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400 cursor-pointer hover:text-blue-600 transition">
+                            <div class="flex items-center gap-1">
+                                NIK
+                                <svg :class="sortCol === 'nik' ? (sortDir === 'asc' ? 'rotate-0' : 'rotate-180') : 'opacity-20'" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+                            </div>
+                        </th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400">Nomor Telepon</th>
+                        <th @click="sortBy('jabatan')" class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400 cursor-pointer hover:text-blue-600 transition">
+                            <div class="flex items-center gap-1">
+                                Jabatan
+                                <svg :class="sortCol === 'jabatan' ? (sortDir === 'asc' ? 'rotate-0' : 'rotate-180') : 'opacity-20'" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+                            </div>
+                        </th>
+                        <th @click="sortBy('lokasi')" class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400 cursor-pointer hover:text-blue-600 transition">
+                            <div class="flex items-center gap-1">
+                                Lokasi Kerja
+                                <svg :class="sortCol === 'lokasi' ? (sortDir === 'asc' ? 'rotate-0' : 'rotate-180') : 'opacity-20'" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+                            </div>
+                        </th>
+                        <th @click="sortBy('divisi')" class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400 cursor-pointer hover:text-blue-600 transition">
+                            <div class="flex items-center gap-1">
+                                Divisi
+                                <svg :class="sortCol === 'divisi' ? (sortDir === 'asc' ? 'rotate-0' : 'rotate-180') : 'opacity-20'" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+                            </div>
+                        </th>
+                        <th @click="sortBy('perusahaan')" class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400 cursor-pointer hover:text-blue-600 transition">
+                            <div class="flex items-center gap-1">
+                                Perusahaan
+                                <svg :class="sortCol === 'perusahaan' ? (sortDir === 'asc' ? 'rotate-0' : 'rotate-180') : 'opacity-20'" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+                            </div>
+                        </th>
+                        <th class="px-4 py-3 text-center text-sm font-medium text-gray-600 dark:text-gray-400">Aksi</th>
                     </tr>
                 </thead>
-
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                     <template x-for="row in paginated" :key="row.id">
                         <tr>
@@ -122,6 +176,9 @@
                                 <input type="checkbox" class="rounded border-gray-300 dark:border-gray-600" />
                             </td> -->
 
+                            <td class="px-4 py-3 text-center">
+                                <input type="checkbox" :value="row.id" x-model="selected" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                            </td>
                             <td class="px-4 py-3">
                                 <div class="flex items-center gap-3">
                                     <div class="shrink-0 w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-sm font-semibold text-gray-700 dark:text-white">
@@ -215,18 +272,82 @@ function karyawanTable() {
         search: '',
         page: 1,
         perPage: 10,
+        // State baru untuk sorting
+        sortCol: 'nama', 
+        sortDir: 'asc',
+        selected: [], // Array untuk menyimpan ID yang dicheck
+
 
         resetPage() {
             this.page = 1;
+            this.selected = [];
+        },
+        // LOGIC CHECKBOX
+        toggleAll() {
+            if (this.isAllSelected) {
+                this.selected = [];
+            } else {
+                this.selected = this.paginated.map(row => row.id);
+            }
+        },
+
+        get isAllSelected() {
+            return this.paginated.length > 0 && this.paginated.every(row => this.selected.includes(row.id));
+        },
+
+        // LOGIC BATCH DELETE
+        confirmBatchDelete() {
+            if (confirm(`Hapus ${this.selected.length} data karyawan terpilih?`)) {
+                // Buat form submit secara dinamis ke route delete
+                let form = document.createElement('form');
+                form.action = "{{ route('karyawan.batchDelete') }}"; // Pastikan route ini ada di web.php
+                form.method = 'POST';
+                form.innerHTML = `
+                    @csrf
+                    @method('DELETE')
+                    <input type="hidden" name="ids" value="${this.selected.join(',')}">
+                `;
+                document.body.appendChild(form);
+                form.submit();
+            }
+        },
+
+        // Fungsi untuk handle klik header
+        sortBy(column) {
+            if (this.sortCol === column) {
+                this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
+            } else {
+                this.sortCol = column;
+                this.sortDir = 'asc';
+            }
         },
 
         get filtered() {
-            const q = this.search.toLowerCase();
-            return this.data.filter(d =>
-                Object.values(d).join(' ').toLowerCase().includes(q)
-            );
-        },
+            let filteredData = this.data;
+            
+            // 1. Logic Search
+            if (this.search) {
+                const q = this.search.toLowerCase();
+                filteredData = filteredData.filter(d =>
+                    Object.values(d).join(' ').toLowerCase().includes(q)
+                );
+            }
 
+            // 2. Logic Sorting
+            return filteredData.sort((a, b) => {
+                let aVal = a[this.sortCol] || '';
+                let bVal = b[this.sortCol] || '';
+                
+                if (typeof aVal === 'string') aVal = aVal.toLowerCase();
+                if (typeof bVal === 'string') bVal = bVal.toLowerCase();
+
+                if (aVal < bVal) return this.sortDir === 'asc' ? -1 : 1;
+                if (aVal > bVal) return this.sortDir === 'asc' ? 1 : -1;
+                return 0;
+            });
+        },
+        
+        // ... (fungsi totalPages, paginated, dll tetap sama seperti kode lama Anda)
         get totalPages() {
             return Math.max(1, Math.ceil(this.filtered.length / this.perPage));
         },
@@ -235,11 +356,10 @@ function karyawanTable() {
             const start = (this.page - 1) * this.perPage;
             return this.filtered.slice(start, start + this.perPage);
         },
-
+        
         prevPage() { if (this.page > 1) this.page--; },
         nextPage() { if (this.page < this.totalPages) this.page++; },
         goToPage(p) { if (typeof p === 'number' && p >= 1 && p <= this.totalPages) this.page = p; },
-
         get displayedPages() {
             const range = [];
             for (let i = 1; i <= this.totalPages; i++) {
@@ -251,12 +371,10 @@ function karyawanTable() {
             }
             return range;
         },
-
         get startItem() {
             if (this.filtered.length === 0) return 0;
             return (this.page - 1) * this.perPage + 1;
         },
-
         get endItem() {
             return Math.min(this.page * this.perPage, this.filtered.length);
         }

@@ -49,9 +49,7 @@
 
            <!-- STEP 0: Data Karyawan -->
             <div x-show="currentStep===0" class="space-y-6">
-
                 <div class="grid grid-cols-2 gap-4">
-
                     <!-- NIK -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">NIK</label>
@@ -94,7 +92,7 @@
 
                             <option value="">-- Pilih Kode --</option>
                             <option value="Aktif" {{ old('Kode') == 'Aktif' ? 'selected' : '' }}>Aktif</option>
-                            <option value="Tidak Aktif" {{ old('Kode') == 'Tidak Aktif' ? 'selected' : '' }}>Tidak Aktif</option>
+                            <option value="Non Aktif" {{ old('Kode') == 'Non Aktif' ? 'selected' : '' }}>Non Aktif</option>
                         </select>
                         <span
                                 class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
@@ -257,7 +255,7 @@
                     </div>
 
                     <!-- Alamat KTP -->
-                    <div class="col-span-2">
+                    <div class="col-span-4">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Alamat KTP</label>
                         <textarea id="Alamat_KTP" placeholder="Contoh: Jl Mawar No 21 RT 01 RW 02, Desa Bumirejo" name="Alamat_KTP" rows="2"
                             class="dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border border-gray-300 bg-transparent
@@ -388,7 +386,7 @@
 
                     <!--  ALAMAT DOMISILI -->
 
-                    <div class="col-span-2">
+                    <div class="col-span-4">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Alamat Domisili</label>
                         <textarea id="Alamat_Domisili" name="Alamat_Domisili" placeholder="Contoh: Jl Melati No 15 RT 03 RW 04" rows="2"
                             class="dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border border-gray-300 bg-transparent
@@ -491,10 +489,8 @@
                         </div>
                     </div>
 
-
-
                     <!-- Alamat Lengkap -->
-                    <div class="col-span-2">
+                    <div class="col-span-4">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Alamat Lengkap</label>
                         <textarea id="Alamat_Lengkap" name="Alamat_Lengkap" placeholder="Contoh: Jl Melati No 15 RT 03 RW 04, Kel Sukamaju, Kec Sukoharjo" rows="3"
                             class="dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border border-gray-300 bg-transparent
@@ -1629,7 +1625,7 @@ function karyawanForm() {
         if (statusValue === "1") {
             kodeField.value = "Aktif";
         } else if (statusValue === "0") {
-            kodeField.value = "Tidak Aktif";
+            kodeField.value = "Non Aktif";
         } else {
             kodeField.value = "";
         }

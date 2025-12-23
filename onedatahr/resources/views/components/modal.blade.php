@@ -1,20 +1,39 @@
-@props(['id','size' => 'md', 'title' => '','closeLabel' => 'Batal','confirmLabel' => 'Konfirmasi'])
+@props([
+    'id',
+    'size' => 'md', 
+    'title' => '',
+    'closeLabel' => 'Batal',
+    'confirmLabel' => 'Konfirmasi',
+    'showFooter' => true // 1. Tambahkan prop baru ini
+])
 
-<div x-cloak x-data="{ open:false, title: '{{ $title }}', message: '', targetForm: null, sizeClass: {
-        'sm': 'max-w-md',
-        'md': 'max-w-xl',
-        'lg': 'max-w-3xl'
-    }['{{ $size }}'], onConfirm(){ if(this.targetForm){ const f = document.getElementById(this.targetForm); if(f) f.submit(); } window.dispatchEvent(new CustomEvent('modal-confirmed',{detail:{id: '{{ $id }}', targetForm}})); this.open = false } }"
-     x-init="window.addEventListener('open-modal', e => { if(!e?.detail) return; if(e.detail.id !== '{{ $id }}') return; title = e.detail.title || title; message = e.detail.message || message; targetForm = e.detail.targetForm || null; open = true; }); window.addEventListener('close-modal', e => { if(!e?.detail || !e.detail.id || e.detail.id === '{{ $id }}') open = false; });"
-     x-show="open"
-     @keydown.escape.window="open = false"
-     role="dialog" aria-modal="true"
-     class="fixed inset-0 z-50 flex items-center justify-center px-4">
+<div x-cloak x-data="{ 
+        open:false, 
+        title: '{{ $title }}', 
+        message: '', 
+        targetForm: null, 
+        sizeClass: {
+            'sm': 'max-w-md',
+            'md': 'max-w-xl',
+            'lg': 'max-w-3xl'
+        }['{{ $size }}'], 
+        onConfirm(){ 
+            if(this.targetForm){ 
+                const f = document.getElementById(this.targetForm); 
+                if(f) f.submit(); 
+            } 
+            window.dispatchEvent(new CustomEvent('modal-confirmed',{detail:{id: '{{ $id }}', targetForm}})); 
+            this.open = false 
+        } 
+    }"
+    x-init="window.addEventListener('open-modal', e => { if(!e?.detail) return; if(e.detail.id !== '{{ $id }}') return; title = e.detail.title || title; message = e.detail.message || message; targetForm = e.detail.targetForm || null; open = true; }); window.addEventListener('close-modal', e => { if(!e?.detail || !e.detail.id || e.detail.id === '{{ $id }}') open = false; });"
+    x-show="open"
+    @keydown.escape.window="open = false"
+    role="dialog" aria-modal="true"
+    class="fixed inset-0 z-50 flex items-center justify-center px-4">
 
-    <!-- Overlay -->
     <div x-show="open" x-transition.opacity class="fixed inset-0 bg-black/40 backdrop-blur-sm" @click="open = false"></div>
 
-    <!-- Dialog -->
     <div x-show="open" x-transition x-trap="open" aria-labelledby="{{ $id }}-title" class="relative w-full flex items-center justify-center">
         <div :class="sizeClass" class="mx-auto rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800">
             <header class="flex items-start justify-between">
@@ -31,10 +50,13 @@
                 <div x-show="!message">{{ $slot }}</div>
             </div>
 
+            {{-- 2. Bungkus Footer dengan kondisi IF --}}
+            @if($showFooter)
             <footer class="mt-6 flex justify-end gap-3">
                 <button type="button" @click="open = false" class="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">{{ $closeLabel }}</button>
-                <button type="button" @click="onConfirm()" class="rounded-lg bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700">{{ $confirmLabel }}</button>
+                <button type="button" @click="onConfirm()"  class="rounded-lg bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700">{{ $confirmLabel }}</button>
             </footer>
+            @endif
         </div>
     </div>
 </div>

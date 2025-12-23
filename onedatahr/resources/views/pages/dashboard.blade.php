@@ -156,14 +156,66 @@
         };
 
         // Gender pie
-        renderChart('#chart-gender', {
-            series: genderSeries,
-            chart: { type: 'pie', height: 240 },
-            labels: genderLabels,
-            colors: ['#06B6D4', '#f946ffff', '#F97316'],
-            legend: { position: 'bottom' },
-            responsive: [{ breakpoint: 640, options: { chart: { height: 200 } } }]
-        });
+       renderChart('#chart-gender', {
+        series: genderSeries,
+        chart: { 
+            type: 'pie', // Donut biasanya terlihat lebih modern daripada Pie standar
+            height: 300,   // Sedikit ditambah agar teks tidak berdesakan
+            fontFamily: 'Inter, system-ui, sans-serif'
+        },
+        labels: genderLabels,
+        colors: ['#06B6D4', '#D946EF', '#F97316'], // Warna sedikit disesuaikan agar kontras
+        stroke: {
+            show: true,
+            width: 2,
+            colors: ['#ffff'] // Memberi jarak antar potongan (border putih)
+        },
+        plotOptions: {
+            pie: {
+                pie: {
+                    size: '70%',
+                    labels: {
+                        show: true,
+                        total: {
+                            show: false,
+                            label: 'Total',
+                            fontSize: '16px',
+                            fontWeight: 600,
+                        }
+                    }
+                }
+            }
+        },
+        dataLabels: {
+            enabled: true,
+            style: {
+                fontSize: '14px',
+                fontWeight: 'bold',
+                colors: ['#ffffff'] // Memastikan teks di dalam grafik terbaca
+            },
+            dropShadow: {
+                enabled: true,
+                top: 1,
+                left: 1,
+                blur: 1,
+                opacity: 0.45
+            }
+        },
+        legend: { 
+            position: 'bottom',
+            fontSize: '14px',
+            fontWeight: 500,
+            markers: { radius: 12 },
+            itemMargin: { horizontal: 10, vertical: 5 }
+        },
+        responsive: [{ 
+            breakpoint: 640, 
+            options: { 
+                chart: { height: 280 },
+                legend: { position: 'bottom' } 
+            } 
+        }]
+    });
 
         // Jabatan bar (top 10)
         // renderChart('#chart-jabatan', {

@@ -13,6 +13,8 @@
             <a href="{{ route('rekrutmen.posisi.index') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition">Manage Posisi</a>
             <a href="{{ route('rekrutmen.kandidat.index') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition">Manage Kandidat</a>
             <a href="{{ route('rekrutmen.calendar') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition">Kalender Rekrutmen</a>
+            <a href="{{ route('rekrutmen.interview_hr.index') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition">Interview HR</a>
+            <a href="{{ route('rekrutmen.wig.index') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition">Database WIG</a>
             <a href="{{ route('rekrutmen.metrics.pemberkasan.page') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition">Pemberkasan Monitor</a>
         </div>
     </div>

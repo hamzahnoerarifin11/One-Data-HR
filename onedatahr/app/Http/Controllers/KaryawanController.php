@@ -23,8 +23,17 @@ class KaryawanController extends Controller
     }
     public function index()
     {
-        $karyawans = Karyawan::with(['pekerjaan','pendidikan','kontrak','keluarga','bpjs','perusahaan','status'])->orderBy('id_karyawan','desc')->paginate(15);
+        // Gunakan get() agar 800+ data dikirim semua ke view
+        $karyawans = Karyawan::with(['pekerjaan','pendidikan','kontrak','keluarga','bpjs','perusahaan','status'])
+            ->orderBy('id_karyawan','desc')
+            ->get(); 
+            
         return view('pages.karyawan.index', compact('karyawans'));
+    }
+    public function batchDelete(Request $request) {
+    $ids = explode(',', $request->ids);
+    \App\Models\Karyawan::whereIn('id_karyawan', $ids)->delete();
+    return back()->with('success', count($ids) . ' karyawan berhasil dihapus.');
     }
 
     public function create()
@@ -417,7 +426,7 @@ class KaryawanController extends Controller
             }
         }
 
-        return redirect()->route('pages.karyawan.show', $id)->with('success', 'Karyawan berhasil diperbarui');
+        return redirect()->route('karyawan.show', $id)->with('success', 'Karyawan berhasil diperbarui');
     }
 
     public function destroy($id)

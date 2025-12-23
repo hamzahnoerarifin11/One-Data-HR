@@ -96,7 +96,7 @@
 
                             <option value="">-- Pilih Kode --</option>
                             <option value="Aktif" {{ old('Kode', $karyawan->Kode) == 'Aktif' ? 'selected' : '' }}>Aktif</option>
-                            <option value="Tidak Aktif" {{ old('Kode', $karyawan->Kode) == 'Tidak Aktif' ? 'selected' : '' }}>Tidak Aktif</option>
+                            <option value="Non Aktif" {{ old('Kode', $karyawan->Kode) == 'Non Aktif' ? 'selected' : '' }}>Non Aktif</option>
                         </select>
                         <span
                                 class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
@@ -1639,7 +1639,7 @@ function karyawanForm() {
         if (statusValue === "1") {
             kodeField.value = "Aktif";
         } else if (statusValue === "0") {
-            kodeField.value = "Tidak Aktif";
+            kodeField.value = "Non Aktif";
         } else {
             kodeField.value = "";
         }

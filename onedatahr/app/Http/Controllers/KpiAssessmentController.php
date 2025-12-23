@@ -16,7 +16,7 @@ class KpiAssessmentController extends Controller
     public function index(Request $request)
     {
         // Default tahun sekarang, atau dari filter user
-        $tahun = $request->input('tahun', date('Y')); 
+        $tahun = $request->input('tahun', date('Y'));
 
         // Ambil SEMUA Karyawan + Data KPI mereka di tahun terpilih (Eager Loading)
         $karyawanList = Karyawan::with(['pekerjaan', 'kpiAssessment' => function($q) use ($tahun) {
@@ -31,7 +31,7 @@ class KpiAssessmentController extends Controller
             'rata_rata'      => KpiAssessment::where('tahun', $tahun)->avg('total_skor_akhir') ?? 0
         ];
 
-        return view('kpi.index', compact('karyawanList', 'tahun', 'stats'));
+        return view('pages.kpi.index', compact('karyawanList', 'tahun', 'stats'));
     }
 
 
@@ -181,7 +181,7 @@ class KpiAssessmentController extends Controller
         // 2. Ambil Data KPI
         $kpi = KpiAssessment::where('karyawan_id', $karyawanId)
                             ->where('tahun', $tahun)
-                            ->with(['items.scores']) 
+                            ->with(['items.scores'])
                             ->first();
 
         // Jika belum ada, redirect kembali ke dashboard
@@ -190,15 +190,15 @@ class KpiAssessmentController extends Controller
         }
 
         // 3. Kirim variabel $karyawan dan $kpi ke View
-        return view('kpi.form', compact('karyawan', 'kpi'));
+        return view('pages.kpi.form', compact('karyawan', 'kpi'));
     }
 
     public function update(Request $request, $id_kpi_assessment)
     {
         $assessment = KpiAssessment::findOrFail($id_kpi_assessment);
-        
+
         // Data input bentuknya: name="kpi[ITEM_ID][target]" dan "kpi[ITEM_ID][realisasi]"
-        $inputs = $request->input('kpi'); 
+        $inputs = $request->input('kpi');
 
         if (!$inputs) {
             return redirect()->back()->with('warning', 'Tidak ada data yang dikirim.');
@@ -207,7 +207,7 @@ class KpiAssessmentController extends Controller
         DB::beginTransaction();
         try {
             foreach ($inputs as $itemId => $data) {
-                
+
                 // Ambil Target & Realisasi dari input
                 $targetBaru = $data['target'] ?? 0;
                 $realisasiBaru = $data['realisasi'] ?? 0;
@@ -225,8 +225,8 @@ class KpiAssessmentController extends Controller
                     // Hitung Skor di Backend (Agar aman & tersimpan di DB)
                     $hasilHitung = $this->hitungSkor(
                         $targetBaru,        // Pakai target baru dari input
-                        $realisasiBaru, 
-                        $item->polaritas, 
+                        $realisasiBaru,
+                        $item->polaritas,
                         $item->bobot
                     );
 
@@ -253,7 +253,7 @@ class KpiAssessmentController extends Controller
                 'status' => $status
             ]);
 
-            DB::commit(); 
+            DB::commit();
 
             return redirect()->back()->with('success', 'Data KPI berhasil disimpan. Total Skor: ' . number_format($totalSkor, 2));
 
@@ -305,14 +305,14 @@ class KpiAssessmentController extends Controller
     public function destroy($id)
     {
         $kpi = KpiAssessment::findOrFail($id);
-        
+
         // Hapus (Items dan Scores akan terhapus otomatis jika sudah set cascade on delete di migration)
         // Jika belum, kita hapus manual items-nya agar bersih
         foreach($kpi->items as $item) {
             $item->scores()->delete(); // Hapus skor
             $item->delete(); // Hapus item
         }
-        
+
         $kpi->delete(); // Hapus header
 
         return redirect()->back()->with('success', 'Data KPI berhasil dihapus/reset.');
