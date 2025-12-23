@@ -80,26 +80,33 @@ Route::middleware(['auth'])->group(function () {
     
 
     // --- SCRIPT SEMENTARA (HAPUS SETELAH DIPAKAI) ---
-Route::get('/fix-grades-manual', function () {
-    // 1. Ambil semua data KPI
-    $allKpi = \App\Models\KpiAssessment::all();
-    $count = 0;
+    Route::get('/fix-grades-manual', function () {
+        // 1. Ambil semua data KPI
+        $allKpi = \App\Models\KpiAssessment::all();
+        $count = 0;
 
-    foreach ($allKpi as $kpi) {
-        // 2. Tentukan Grade berdasarkan Skor yang sudah ada
-        $skor = $kpi->total_skor_akhir;
-        $grade = 'Poor'; // Default
+        foreach ($allKpi as $kpi) {
+            // 2. Tentukan Grade berdasarkan Skor yang sudah ada
+            $skor = $kpi->total_skor_akhir;
+            $grade = 'Poor'; // Default
 
-        if ($skor >= 100) { $grade = 'Outstanding'; }
-        elseif ($skor >= 90) { $grade = 'Great'; }
-        elseif ($skor >= 75) { $grade = 'Good'; }
-        elseif ($skor >= 60) { $grade = 'Enough'; }
-        
-        // 3. Update Database
-        $kpi->update(['grade' => $grade]);
-        $count++;
-    }
+            if ($skor >= 100) { $grade = 'Outstanding'; }
+            elseif ($skor >= 90) { $grade = 'Great'; }
+            elseif ($skor >= 75) { $grade = 'Good'; }
+            elseif ($skor >= 60) { $grade = 'Enough'; }
+            
+            // 3. Update Database
+            $kpi->update(['grade' => $grade]);
+            $count++;
+        }
 
-    return "Sukses! Berhasil update grade untuk $count data KPI. Silakan kembali ke Dashboard.";
-});
+        return "Sukses! Berhasil update grade untuk $count data KPI. Silakan kembali ke Dashboard.";
+    });
+
+    // Route khusus untuk menyimpan ITEM KPI baru
+    Route::post('/kpi/items/store', [KpiAssessmentController::class, 'storeItem'])->name('kpi.store-item');
+    // Route untuk Hapus Item KPI
+    Route::delete('/kpi/items/{id}', [KpiAssessmentController::class, 'destroyItem'])->name('kpi.delete-item');
+    // Route untuk Update Item KPI
+    Route::put('/kpi/items/{id}', [KpiAssessmentController::class, 'updateItem'])->name('kpi.update-item');
 });

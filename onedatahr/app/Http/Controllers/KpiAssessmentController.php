@@ -214,48 +214,84 @@ class KpiAssessmentController extends Controller
 
         DB::beginTransaction();
         try {
-            // 1. Loop Simpan Per-Item (Target & Realisasi)
+            // --- BAGIAN INI YANG BERUBAH DRASTIS ---
+            
             foreach ($inputs as $itemId => $data) {
-                $targetBaru = $data['target'] ?? 0;
-                $realisasiBaru = $data['realisasi'] ?? 0;
-
+                // 1. Ambil Data Item dari DB
                 $item = KpiItem::find($itemId);
                 if (!$item) continue;
 
                 $scoreRecord = KpiScore::where('kpi_item_id', $itemId)
-                                       ->where('nama_periode', 'Semester 1') // Sesuaikan jika ada periode lain
+                                       ->where('nama_periode', 'Semester 1') 
                                        ->first();
 
                 if ($scoreRecord) {
-                    // Panggil helper hitungSkor
+                    // 2. Siapkan Array untuk Update Data Bulanan
+                    // Kita akan menampung data update di variable $updateData
+                    $updateData = [
+                        'adjustment' => $data['adjustment'] ?? null, // Ambil input Adjustment
+                    ];
+
+                    // 3. Loop Bulan (Juli - Desember) untuk Hitung Total Semester
+                    $totalTargetSemester = 0;
+                    $totalRealSemester = 0;
+                    $listBulan = ['jul', 'aug', 'sep', 'okt', 'nov', 'des'];
+
+                    foreach ($listBulan as $bln) {
+                        // Ambil input per bulan (default 0 jika kosong)
+                        $t = $data['target_' . $bln] ?? 0;
+                        $r = $data['real_' . $bln] ?? 0;
+
+                        // Masukkan ke array untuk disimpan ke DB
+                        $updateData['target_' . $bln] = $t;
+                        $updateData['real_' . $bln] = $r;
+
+                        // Akumulasi Total Semester
+                        $totalTargetSemester += $t;
+                        $totalRealSemester += $r;
+                    }
+
+                    // 4. Hitung Skor Murni (Berdasarkan Total Semester)
                     $hasilHitung = $this->hitungSkor(
-                        $targetBaru, 
-                        $realisasiBaru, 
-                        $item->polaritas, 
+                        $totalTargetSemester,
+                        $totalRealSemester,
+                        $item->polaritas,
                         $item->bobot
                     );
 
-                    $scoreRecord->update([
-                        'target'     => $targetBaru,
-                        'realisasi'  => $realisasiBaru,
-                        'skor'       => $hasilHitung['skor_mentah'],
-                        'skor_akhir' => $hasilHitung['skor_akhir_bobot']
-                    ]);
+                    // 5. Logika Adjustment (PENTING!)
+                    // Jika ada input adjustment, pakai itu. Jika tidak, pakai skor murni sistem.
+                    $adj = $updateData['adjustment'];
+                    $skorFinalItem = ($adj !== null && $adj !== '') ? $adj : $hasilHitung['skor_mentah'];
+                    
+                    // Hitung Skor Akhir Terbobot
+                    $skorAkhirBobot = ($skorFinalItem * $item->bobot) / 100;
+
+                    // 6. Masukkan sisa data ke array update
+                    $updateData['target']     = $totalTargetSemester; // Total target disimpan di kolom utama
+                    $updateData['realisasi']  = $totalRealSemester;   // Total realisasi disimpan di kolom utama
+                    $updateData['skor']       = $skorFinalItem;
+                    $updateData['skor_akhir'] = $skorAkhirBobot;
+
+                    // 7. Eksekusi Update ke Database
+                    $scoreRecord->update($updateData);
                 }
             }
+            // --- AKHIR BAGIAN YANG DIUBAH ---
 
-            // 2. HITUNG ULANG TOTAL SKOR
+
+            // 2. HITUNG ULANG TOTAL SKOR (Tetap Sama)
             $totalSkor = KpiScore::whereHas('item', function($q) use ($id_kpi_assessment) {
                 $q->where('kpi_assessment_id', $id_kpi_assessment);
             })->sum('skor_akhir');
 
-            // 3. TENTUKAN GRADE (INI YANG MUNGKIN HILANG DI KODINGAN ANDA)
+            // 3. TENTUKAN GRADE (Tetap Sama)
             $grade = $this->determineGrade($totalSkor);
 
-            // 4. UPDATE HEADER ASSESSMENT
+            // 4. UPDATE HEADER ASSESSMENT (Tetap Sama)
             $assessment->update([
                 'total_skor_akhir' => $totalSkor,
-                'grade'            => $grade,     // <--- PASTIKAN BARIS INI ADA!
+                'grade'            => $grade,
                 'status'           => ($assessment->status == 'DRAFT') ? 'SUBMITTED' : $assessment->status
             ]);
 
@@ -353,12 +389,106 @@ class KpiAssessmentController extends Controller
     // --- HELPER: MENENTUKAN GRADE ---
     private function determineGrade($skor)
     {
-        // Sesuaikan rentang nilai ini dengan kebijakan perusahaan Anda
-        if ($skor >= 100) return 'Outstanding'; // Luar Biasa
-        if ($skor >= 90)  return 'Great';       // Sangat Baik
-        if ($skor >= 75)  return 'Good';        // Baik
-        if ($skor >= 60)  return 'Enough';      // Cukup
-        return 'Poor';                          // Kurang
+        // Logika sesuai gambar Spreadsheet atasan
+        if ($skor > 89)  return 'Great';             // Hijau Tua
+        if ($skor > 79)  return 'Good';              // Hijau/Biru
+        if ($skor > 69)  return 'Average';           // Kuning
+        return 'Need Improvement';                   // Merah (<= 69)
     }
+
+ 
+
+        public function storeItem(Request $request)
+        {
+            // 1. Validasi Input
+            $request->validate([
+                'kpi_assessment_id'         => 'required|exists:kpi_assessments,id_kpi_assessment',
+                'key_performance_indicator' => 'required|string',
+                'bobot'                     => 'required|numeric',
+                'target'                    => 'required|numeric',
+            ]);
+
+            // 2. Simpan Item KPI (Pertanyaannya)
+            $newItem = KpiItem::create([
+                'kpi_assessment_id'         => $request->kpi_assessment_id,
+                'perspektif'                => $request->perspektif,
+                'key_result_area'           => $request->key_result_area,
+                'key_performance_indicator' => $request->key_performance_indicator,
+                'units'                     => $request->units,
+                'polaritas'                 => $request->polaritas,
+                'bobot'                     => $request->bobot,
+                'target'                    => $request->target,
+            ]);
+
+            // 3. PENTING: Buat Slot Score Kosong (Agar kolom input bulanan muncul)
+            // Kita isi default target bulanan dengan target tahunan (opsional, atau 0)
+            KpiScore::create([
+                'kpi_item_id'  => $newItem->id_kpi_item, 
+                'nama_periode' => 'Full Year 2025',
+                
+                // Kolom Wajib
+                'target'      => $newItem->target, 
+                'realisasi'   => 0,
+
+                // Inisialisasi Kolom Bulanan dengan 0
+                'target_smt1' => $newItem->target, 'real_smt1' => 0,
+                
+                'target_jul' => $newItem->target, 'real_jul' => 0,
+                'target_aug' => $newItem->target, 'real_aug' => 0,
+                'target_sep' => $newItem->target, 'real_sep' => 0,
+                'target_okt' => $newItem->target, 'real_okt' => 0,
+                'target_nov' => $newItem->target, 'real_nov' => 0,
+                'target_des' => $newItem->target, 'real_des' => 0,
+            ]);
+
+            return redirect()->back()->with('success', 'Indikator KPI berhasil ditambahkan!');
+        }
+
+
+        public function destroyItem($id)
+        {
+            // 1. Cari Item berdasarkan ID
+            $item = KpiItem::findOrFail($id);
+
+            // 2. Hapus Item
+            // Note: Karena setting database biasanya 'ON DELETE CASCADE', 
+            // maka Score (Nilai) terkait item ini otomatis ikut terhapus.
+            $item->delete();
+
+            // 3. Kembali ke halaman sebelumnya
+            return redirect()->back()->with('success', 'Item KPI berhasil dihapus.');
+        }
+
+        public function updateItem(Request $request, $id)
+        {
+            // 1. Validasi
+            $request->validate([
+                'key_performance_indicator' => 'required|string',
+                'bobot'                     => 'required|numeric',
+                'target'                    => 'required|numeric',
+            ]);
+
+            // 2. Ambil Item & Update
+            $item = KpiItem::findOrFail($id);
+            
+            $item->update([
+                'perspektif'                => $request->perspektif,
+                'key_result_area'           => $request->key_result_area,
+                'key_performance_indicator' => $request->key_performance_indicator,
+                'units'                     => $request->units,
+                'polaritas'                 => $request->polaritas,
+                'bobot'                     => $request->bobot,
+                'target'                    => $request->target,
+            ]);
+
+            // 3. (Opsional) Update Target di Score jika berubah
+            // Agar nilai referensi di tabel input ikut berubah
+            $score = KpiScore::where('kpi_item_id', $id)->first();
+            if($score) {
+                $score->update(['target' => $request->target]);
+            }
+
+            return redirect()->back()->with('success', 'KPI berhasil diperbarui!');
+        }
 
 }
