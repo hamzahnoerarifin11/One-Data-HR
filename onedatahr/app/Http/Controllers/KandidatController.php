@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Kandidat;
 use App\Models\Posisi;
+// use App\Models\RekrutmenDaily; // Pastikan model ini ada
+// use Carbon\Carbon;
 
 class KandidatController extends Controller
 {

@@ -26,6 +26,15 @@ Route::get('/', function () {
     return auth()->check() ? redirect()->route('dashboard.index') : redirect()->route('signin');
 });
 
+// Logika sinkronisasi manual
+// $kandidatGroups = Kandidat::select('posisi_id', 'status_akhir', \DB::raw('DATE(updated_at) as date'), \DB::raw('count(*) as total'))
+//     ->groupBy('posisi_id', 'status_akhir', 'date')
+//     ->get();
+
+// foreach ($kandidatGroups as $group) {
+//     // Masukkan ke tabel rekrutmen_daily
+// }
+
 //Delete Batch Karyawan
 Route::delete('/karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
 // Authentication pages

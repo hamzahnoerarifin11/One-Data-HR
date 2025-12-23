@@ -16,7 +16,9 @@
         <a href="{{ route('rekrutmen.interview_hr.index') }}"
            class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium
                   text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/[0.05] transition-all">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
             Kembali
         </a>
     </div>
@@ -35,11 +37,19 @@
                 <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                     <div>
                         <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Pilih Kandidat</label>
-                        <select name="kandidat_id" id="kandidat_select" class="form-input w-full rounded-lg border-gray-300 focus:border-brand-500 focus:ring-brand-500" required>
+                        <!-- <select name="kandidat_id" id="kandidat_select" class="form-input w-full rounded-lg border-gray-300 focus:border-brand-500 focus:ring-brand-500" required>
                             <option value="" disabled selected>-- Pilih Kandidat --</option>
                             @foreach($kandidat as $k)
-                                {{-- Kita simpan data posisi di attribute data-posisi --}}
                                 <option value="{{ $k->id_kandidat }}" data-posisi="{{ $k->posisi_dilamar }}">
+                                    {{ $k->nama }}
+                                </option>
+                            @endforeach
+                        </select> -->
+                        <select name="kandidat_id" id="kandidat_select" class="form-input w-full rounded-lg border-gray-300" required>
+                            <option value="" disabled selected>-- Pilih Kandidat --</option>
+                            @foreach($kandidat as $k)
+                                <option value="{{ $k->id_kandidat }}" 
+                                        data-posisi="{{ $k->posisi ? $k->posisi->nama_posisi : 'Posisi tidak diset' }}">
                                     {{ $k->nama }}
                                 </option>
                             @endforeach
@@ -49,7 +59,7 @@
                     <div>
                         <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Posisi Dilamar</label>
                         <input type="text" name="posisi_dilamar" id="posisi_dilamar" 
-                               class="form-input w-full rounded-lg bg-gray-50 border-gray-300 dark:bg-gray-800/50" 
+                               class="form-input w-full rounded-lg bg-gray-50 border-gray-300 dark:bg-gray-800/50 cursor-not-allowed" 
                                placeholder="Otomatis terisi..." readonly>
                         <p class="mt-1 text-xs text-gray-500 italic">*Terisi otomatis berdasarkan data kandidat</p>
                     </div>
@@ -128,15 +138,15 @@
                     <div class="space-y-4">
                         <div>
                             <label class="mb-1 block text-xs font-medium text-brand-700">Total Skor</label>
-                            <input type="text" id="total_skor" name="total_skor" class="w-full border-none bg-transparent text-2xl font-bold p-0 focus:ring-0" readonly>
+                            <input type="text" id="total_skor" name="total_skor" class="w-full border-none bg-transparent text-2xl font-bold p-0 focus:ring-0" readonly value="0">
                         </div>
                         <div>
                             <label class="mb-1 block text-xs font-medium text-brand-700">Rata-rata</label>
-                            <input type="text" id="rata_rata" name="rata_rata" class="w-full border-none bg-transparent text-2xl font-bold p-0 focus:ring-0" readonly>
+                            <input type="text" id="rata_rata" name="rata_rata" class="w-full border-none bg-transparent text-2xl font-bold p-0 focus:ring-0" readonly value="0">
                         </div>
                         <div>
                             <label class="mb-1 block text-xs font-medium text-brand-700">Kategori</label>
-                            <input type="text" id="kategori_nilai" class="w-full border-none bg-transparent text-xl font-semibold p-0 focus:ring-0" readonly>
+                            <input type="text" id="kategori_nilai" class="w-full border-none bg-transparent text-xl font-semibold p-0 focus:ring-0" readonly value="-">
                         </div>
                     </div>
                 </div>
@@ -145,7 +155,7 @@
                     <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white">✅ Keputusan Akhir</h3>
                     <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
                         <div>
-                            <label class="mb-2 block text-sm font-medium text-gray-700">Status Keputusan</label>
+                            <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Status Keputusan</label>
                             <select name="keputusan" class="form-input w-full rounded-lg border-gray-300">
                                 <option value="DITERIMA" class="text-green-600 font-bold">DITERIMA</option>
                                 <option value="DITOLAK" class="text-red-600 font-bold">DITOLAK</option>
@@ -154,12 +164,12 @@
                         </div>
 
                         <div>
-                            <label class="mb-2 block text-sm font-medium text-gray-700">Hasil Akhir (Status Proses)</label>
+                            <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Hasil Akhir (Status Proses)</label>
                             <input name="hasil_akhir" class="form-input w-full rounded-lg border-gray-300" placeholder="Contoh: Lolos ke Tahap User">
                         </div>
 
                         <div class="md:col-span-2">
-                            <label class="mb-2 block text-sm font-medium text-gray-700">Catatan Kesimpulan</label>
+                            <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Catatan Kesimpulan</label>
                             <textarea name="catatan_tambahan" rows="3" class="form-input w-full rounded-lg border-gray-300"
                                       placeholder="Berikan kesimpulan akhir mengapa kandidat ini diterima/ditolak..."></textarea>
                         </div>
@@ -171,11 +181,11 @@
                 <p class="text-xs text-gray-500 italic">Pastikan seluruh aspek penilaian telah terisi dengan objektif.</p>
                 <div class="flex gap-3">
                     <a href="{{ route('rekrutmen.interview_hr.index') }}"
-                       class="rounded-lg border border-gray-300 px-8 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all">
+                       class="rounded-lg border border-gray-300 px-8 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all dark:text-gray-300 dark:border-gray-700">
                         Batal
                     </a>
                     <button type="submit"
-                            class="rounded-lg bg-brand-600 px-8 py-2.5 text-sm font-medium text-white shadow-lg shadow-brand-200 hover:bg-brand-700 transition-all">
+                            class="rounded-lg bg-blue-600 px-8 py-2.5 text-sm font-medium text-white shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all">
                         💾 Simpan Hasil Interview
                     </button>
                 </div>
@@ -188,69 +198,77 @@
 
 @push('scripts')
 <script>
-    // FUNGSI AUTO-FILL POSISI
-    const kandidatSelect = document.getElementById('kandidat_select');
-    const posisiInput = document.getElementById('posisi_dilamar');
+    document.addEventListener('DOMContentLoaded', function() {
+        const kandidatSelect = document.getElementById('kandidat_select');
+        const posisiInput = document.getElementById('posisi_dilamar');
 
-    kandidatSelect.addEventListener('change', function() {
-        // Ambil atribut data-posisi dari option yang dipilih
-        const selectedOption = this.options[this.selectedIndex];
-        const posisi = selectedOption.getAttribute('data-posisi');
-        
-        // Isi input posisi
-        posisiInput.value = posisi || '';
-        
-        // Tambahkan efek visual sedikit agar user sadar ada yang berubah
-        posisiInput.classList.add('bg-blue-50');
-        setTimeout(() => posisiInput.classList.remove('bg-blue-50'), 500);
-    });
-
-    // FUNGSI HITUNG NILAI
-    function hitungNilaiInterview() {
-        let total = 0;
-        let jumlah = 0;
-
-        document.querySelectorAll('.skor-interview').forEach(function(el) {
-            const nilai = parseInt(el.value);
-            if (!isNaN(nilai)) {
-                total += nilai;
-                jumlah++;
+        // 1. AUTO-FILL POSISI BERDASARKAN KANDIDAT
+        kandidatSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const namaPosisi = selectedOption.dataset.posisi;
+            
+            if (namaPosisi) {
+                posisiInput.value = namaPosisi;
+            } else {
+                posisiInput.value = '';
             }
+            // const posisi = selectedOption.getAttribute('data-posisi');
+            // posisiInput.value = posisi || '';
+            
+            // // Efek Highlight
+            // posisiInput.classList.add('bg-blue-50');
+            // setTimeout(() => posisiInput.classList.remove('bg-blue-50'), 500);
         });
 
-        const rata = jumlah > 0 ? (total / jumlah).toFixed(2) : 0;
+        // 2. FUNGSI HITUNG NILAI OTOMATIS
+        function hitungNilaiInterview() {
+            let total = 0;
+            let jumlah = 0;
+            const skorElements = document.querySelectorAll('.skor-interview');
 
-        document.getElementById('total_skor').value = total;
-        document.getElementById('rata_rata').value = rata;
+            skorElements.forEach(function(el) {
+                const nilai = parseInt(el.value);
+                if (!isNaN(nilai)) {
+                    total += nilai;
+                    jumlah++;
+                }
+            });
 
-        // Visual Kategori & Warna
-        let kategori = '-';
-        let colorClass = 'text-gray-500';
+            const rata = jumlah > 0 ? (total / jumlah).toFixed(2) : 0;
 
-        if (rata >= 4.5) {
-            kategori = 'Sangat Baik';
-            colorClass = 'text-green-600';
-        } else if (rata >= 3.5) {
-            kategori = 'Baik';
-            colorClass = 'text-blue-600';
-        } else if (rata >= 2.5) {
-            kategori = 'Cukup';
-            colorClass = 'text-yellow-600';
-        } else {
-            kategori = 'Kurang';
-            colorClass = 'text-red-600';
+            document.getElementById('total_skor').value = total;
+            document.getElementById('rata_rata').value = rata;
+
+            // Visual Kategori & Warna
+            let kategori = '-';
+            let colorClass = 'text-gray-500';
+
+            if (rata >= 4.5) {
+                kategori = 'Sangat Baik';
+                colorClass = 'text-green-600';
+            } else if (rata >= 3.5) {
+                kategori = 'Baik';
+                colorClass = 'text-blue-600';
+            } else if (rata >= 2.5) {
+                kategori = 'Cukup';
+                colorClass = 'text-yellow-600';
+            } else if (rata > 0) {
+                kategori = 'Kurang';
+                colorClass = 'text-red-600';
+            }
+
+            const katInput = document.getElementById('kategori_nilai');
+            katInput.value = kategori;
+            katInput.className = `w-full border-none bg-transparent text-xl font-bold p-0 focus:ring-0 ${colorClass}`;
         }
 
-        const katInput = document.getElementById('kategori_nilai');
-        katInput.value = kategori;
-        katInput.className = `w-full border-none bg-transparent text-xl font-bold p-0 focus:ring-0 ${colorClass}`;
-    }
+        // Jalankan saat ada perubahan skor
+        document.querySelectorAll('.skor-interview').forEach(el => {
+            el.addEventListener('change', hitungNilaiInterview);
+        });
 
-    // Event listeners
-    document.querySelectorAll('.skor-interview').forEach(el => {
-        el.addEventListener('change', hitungNilaiInterview);
+        // Jalankan saat halaman pertama kali dimuat
+        hitungNilaiInterview();
     });
-
-    document.addEventListener('DOMContentLoaded', hitungNilaiInterview);
 </script>
 @endpush

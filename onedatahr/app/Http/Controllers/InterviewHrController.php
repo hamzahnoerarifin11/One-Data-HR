@@ -14,9 +14,20 @@ class InterviewHrController extends Controller
         return view('pages.rekrutmen.interview_hr.index', compact('data'));
     }
 
+    // public function create()
+    // {
+    //     $kandidat = Kandidat::where('status_akhir','Interview HR Lolos')->get();
+    //     return view('pages.rekrutmen.interview_hr.create', compact('kandidat'));
+        
+    // }
     public function create()
     {
-        $kandidat = Kandidat::where('status_akhir','Masuk')->get();
+        // 1. Tambahkan with('posisi')
+        // 2. Pastikan filter status_akhir sesuai dengan data yang ada di database Anda
+        $kandidat = Kandidat::with('posisi')
+            ->where('status_akhir', 'Interview HR Lolos') // Sesuaikan status ini (misal: 'Proses' atau 'Interview HR')
+            ->get();
+
         return view('pages.rekrutmen.interview_hr.create', compact('kandidat'));
     }
 
