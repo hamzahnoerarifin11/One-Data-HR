@@ -16,6 +16,9 @@ Route::get('/', function () {
     return auth()->check() ? redirect()->route('dashboard.index') : redirect()->route('login');
 });
 
+//Delete Batch Karyawan
+Route::delete('/karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
+
 // authentication pages
 Route::get('/signin', function () {
     return view('pages.auth.signin', ['title' => 'Sign In']);
