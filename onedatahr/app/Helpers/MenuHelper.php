@@ -20,7 +20,16 @@ class MenuHelper
             [
                 'icon' => 'task',
                 'name' => 'Rekrutmen',
-                'path' => '/rekrutmen',
+                'subItems' => [
+                    ['name' => 'Dashboard Rekrutmen', 'path' => route('rekrutmen.dashboard')],
+                    ['name' => 'Manage Posisi', 'path' => route('rekrutmen.posisi.index')],
+                    ['name' => 'Manage Kandidat', 'path' => route('rekrutmen.kandidat.index')],
+                    ['name' => 'Kalender Rekrutmen', 'path' => route('rekrutmen.calendar')],
+                    ['name' => 'Interview HR', 'path' => route('rekrutmen.interview_hr.index')],
+                    ['name' => 'Database WIG', 'path' => route('rekrutmen.wig.index')],
+                    ['name' => 'Pemberkasan Monitor', 'path' => route('rekrutmen.metrics.pemberkasan.page')],
+                ],
+                // 'path' => '/rekrutmen',
             ],
             [
                 'icon' => 'forms',
@@ -40,20 +49,25 @@ class MenuHelper
                 'name' => 'Laporan',
                 'path' => '/laporan',
             ],
-        ];
-    }
-
-    // --- [BARU] Menambahkan Menu Khusus Performance (KPI) ---
-    public static function getPerformanceItems()
-    {
-        return [
             [
-                'icon' => 'charts', 
+                'icon' => 'charts',
                 'name' => 'KPI Karyawan', // Nama menu diperjelas
                 'path' => '/kpi/dashboard', // <-- Link baru ke halaman index
             ],
         ];
     }
+      // --- [BARU] Menambahkan Menu Khusus Performance (KPI) ---
+    public static function getPerformanceItems()
+    {
+        return [
+            [
+                'icon' => 'charts',
+                'name' => 'KPI Karyawan', // Nama menu diperjelas
+                'path' => '/kpi/dashboard', // <-- Link baru ke halaman index
+            ],
+        ];
+    }
+
 
     public static function getOthersItems()
     {
@@ -70,7 +84,6 @@ class MenuHelper
         ];
     }
 
-
     public static function getMenuGroups()
     {
         return [
@@ -82,11 +95,11 @@ class MenuHelper
                 'title' => 'Others',
                 'items' => self::getOthersItems()
             ],
-            // --- APAKAH BAGIAN INI SUDAH ADA? ---
-            [
-                'title' => 'Performance',
-                'items' => self::getPerformanceItems() // <--- INI WAJIB ADA
-            ]
+              // --- APAKAH BAGIAN INI SUDAH ADA? ---
+            // [
+            //     'title' => 'Performance',
+            //     'items' => self::getPerformanceItems() // <--- INI WAJIB ADA
+            // ]
         ];
     }
 
@@ -131,4 +144,5 @@ class MenuHelper
 
         return $icons[$iconName] ?? '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/></svg>';
     }
+
 }
