@@ -94,7 +94,12 @@ class MenuHelper
             [
                 'title' => 'Others',
                 'items' => self::getOthersItems()
-            ]
+            ],
+              // --- APAKAH BAGIAN INI SUDAH ADA? ---
+            // [
+            //     'title' => 'Performance',
+            //     'items' => self::getPerformanceItems() // <--- INI WAJIB ADA
+            // ]
         ];
     }
 
