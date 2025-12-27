@@ -26,6 +26,7 @@ class MenuHelper
                     ['name' => 'Manage Kandidat', 'path' => route('rekrutmen.kandidat.index')],
                     ['name' => 'Kalender Rekrutmen', 'path' => route('rekrutmen.calendar')],
                     ['name' => 'Interview HR', 'path' => route('rekrutmen.interview_hr.index')],
+                    ['name' => 'Kandidat Lanjut User', 'path' => route('rekrutmen.kandidat_lanjut_user.index')],
                     ['name' => 'Database WIG', 'path' => route('rekrutmen.wig.index')],
                     ['name' => 'Pemberkasan Monitor', 'path' => route('rekrutmen.metrics.pemberkasan.page')],
                 ],

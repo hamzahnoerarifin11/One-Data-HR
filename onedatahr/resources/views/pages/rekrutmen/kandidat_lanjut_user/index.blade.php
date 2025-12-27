@@ -6,39 +6,38 @@
     <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-                Interview HR
+                Kandidat Lanjut User
             </h1>
             <p class="mt-1 text-gray-600 dark:text-gray-400">
-                Daftar hasil interview HR kandidat rekrutmen
+                Tahapan lanjutan interview kandidat ke User
             </p>
         </div>
 
-        <a href="{{ route('rekrutmen.interview_hr.create') }}"
+        <a href="{{ route('rekrutmen.kandidat_lanjut_user.create') }}"
            class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700 transition">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
-            Tambah Interview
+            Tambah Data
         </a>
     </div>
 
     @php
-        // Menyiapkan data untuk Alpine.js
+        // Menyiapkan data untuk Alpine.js (Sesuai pola Interview HR)
         $tableData = $data->map(fn($row) => [
-            'id'             => $row->id_interview_hr,
-            'tanggal'        => $row->hari_tanggal,
-            'nama_kandidat' => $row->kandidat?->nama ?? '-',
-            'posisi'        => $row->kandidat?->posisi?->nama_posisi ?? '-',
-            'nama_interviewer'        => $row->nama_interviewer ?? '-',
-            'total'          => $row->total,
-            'keputusan'      => $row->keputusan,
-            'show_url'       => route('rekrutmen.interview_hr.show', $row->id_interview_hr),
-            'edit_url'       => route('rekrutmen.interview_hr.edit', $row->id_interview_hr),
-            'delete_url'     => route('rekrutmen.interview_hr.destroy', $row->id_interview_hr),
+            'id'             => $row->id_kandidat_lanjut_user,
+            'nama'           => $row->kandidat?->nama ?? '-',
+            'posisi'         => $row->kandidat?->posisi?->nama_posisi ?? '-',
+            'user_terkait'   => $row->user_terkait ?? '-',
+            'ass'            => $row->hasil_ass ?? '-',
+            'asm'            => $row->hasil_asm ?? '-',
+            'show_url'       => route('rekrutmen.kandidat_lanjut_user.show', $row->id_kandidat_lanjut_user),
+            'edit_url'       => route('rekrutmen.kandidat_lanjut_user.edit', $row->id_kandidat_lanjut_user),
+            'delete_url'     => route('rekrutmen.kandidat_lanjut_user.destroy', $row->id_kandidat_lanjut_user),
         ])->values();
     @endphp
 
-    <div x-data="interviewTable()" class="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+    <div x-data="kandidatTable()" class="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
 
         <div class="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
             <div class="flex items-center gap-3">
@@ -79,64 +78,63 @@
             <table class="w-full min-w-full">
                 <thead>
                     <tr class="border-y border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-900">
-                        <th @click="sortBy('tanggal')" class="px-5 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400 cursor-pointer hover:text-blue-600">
-                            <div class="flex items-center gap-1">
-                                Tanggal
-                            <svg :class="sortCol === 'tanggal' ? (sortDir === 'asc' ? 'rotate-0' : 'rotate-180') : 'opacity-20'" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
-                            </div>
-                        </th>
-                        <th @click="sortBy('nama_kandidat')" class="px-5 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400 cursor-pointer hover:text-blue-600">
+                        <th @click="sortBy('nama')" class="px-5 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400 cursor-pointer hover:text-blue-600">
                             <div class="flex items-center gap-1">
                                 Nama Kandidat
-                            <svg :class="sortCol === 'nama_kandidat' ? (sortDir === 'asc' ? 'rotate-0' : 'rotate-180') : 'opacity-20'" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+                                <svg :class="sortCol === 'nama' ? (sortDir === 'asc' ? 'rotate-0' : 'rotate-180') : 'opacity-20'" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
                             </div>
                         </th>
                         <th @click="sortBy('posisi')" class="px-5 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400 cursor-pointer hover:text-blue-600">
                             <div class="flex items-center gap-1">
                                 Posisi
-                            <svg :class="sortCol === 'posisi' ? (sortDir === 'asc' ? 'rotate-0' : 'rotate-180') : 'opacity-20'" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+                                <svg :class="sortCol === 'posisi' ? (sortDir === 'asc' ? 'rotate-0' : 'rotate-180') : 'opacity-20'" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
                             </div>
                         </th>
-                        <th @click="sortBy('nama_interviewer')" class="px-5 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400 cursor-pointer hover:text-blue-600">
+                        <th @click="sortBy('user_terkait')" class="px-5 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400 cursor-pointer hover:text-blue-600">
                             <div class="flex items-center gap-1">
-                                Nama Interviewer
-                            <svg :class="sortCol === 'nama_interviewer' ? (sortDir === 'asc' ? 'rotate-0' : 'rotate-180') : 'opacity-20'" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+                                User Terkait
+                                <svg :class="sortCol === 'user_terkait' ? (sortDir === 'asc' ? 'rotate-0' : 'rotate-180') : 'opacity-20'" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
                             </div>
                         </th>
-                        <th @click="sortBy('total')" class="px-5 py-3 text-center text-sm font-medium text-gray-600 dark:text-gray-400 cursor-pointer hover:text-blue-600">
-                            <div class="flex items-center gap-1">
-                                Total Skor
-                            <svg :class="sortCol === 'total' ? (sortDir === 'asc' ? 'rotate-0' : 'rotate-180') : 'opacity-20'" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
-                            </div>
-                        </th>
-                        <th @click="sortBy('keputusan')" class="px-5 py-3 text-center text-sm font-medium text-gray-600 dark:text-gray-400 cursor-pointer hover:text-blue-600">
-                            <div class="flex items-center gap-1">
-                                Keputusan
-                            <svg :class="sortCol === 'keputusan' ? (sortDir === 'asc' ? 'rotate-0' : 'rotate-180') : 'opacity-20'" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
-                            </div>
-                        </th>
-                        <th class="px-5 py-3 text-center text-sm font-medium text-gray-600 dark:text-gray-400">
-                            Aksi
-                        </th>
+                        <th class="px-5 py-3 text-center text-sm font-medium text-gray-600 dark:text-gray-400">Hasil ASS</th>
+                        <th class="px-5 py-3 text-center text-sm font-medium text-gray-600 dark:text-gray-400">Hasil ASM</th>
+                        <th class="px-5 py-3 text-center text-sm font-medium text-gray-600 dark:text-gray-400">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                     <template x-for="row in paginated" :key="row.id">
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/20 transition">
-                            <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400" x-text="row.tanggal"></td>
-                            <td class="px-5 py-4 text-sm font-medium text-gray-900 dark:text-white" x-text="row.nama_kandidat"></td>
+                            <td class="px-5 py-4 text-sm font-medium text-gray-900 dark:text-white" x-text="row.nama"></td>
                             <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400" x-text="row.posisi"></td>
-                            <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400" x-text="row.nama_interviewer"></td>
-                            <td class="px-5 py-4 text-center text-sm font-bold text-gray-700 dark:text-gray-300" x-text="row.total"></td>
+                            <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400" x-text="row.user_terkait"></td>
                             <td class="px-5 py-4 text-center">
-                                <template x-if="row.keputusan === 'DITERIMA'">
-                                    <span class="inline-flex rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">DITERIMA</span>
+                                <template x-if="row.ass === 'Lolos'">
+                                    <span class="inline-flex rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                                        LOLOS
+                                    </span>
                                 </template>
-                                <template x-if="row.keputusan === 'DITOLAK'">
-                                    <span class="inline-flex rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700 dark:bg-red-900/30 dark:text-red-400">DITOLAK</span>
+                                <template x-if="row.ass === 'Tidak Lolos'">
+                                    <span class="inline-flex rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                                        TIDAK LOLOS
+                                    </span>
                                 </template>
-                                <template x-if="row.keputusan !== 'DITERIMA' && row.keputusan !== 'DITOLAK'">
-                                    <span class="inline-flex rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400" x-text="row.keputusan"></span>
+                                <template x-if="row.ass !== 'Lolos' && row.ass !== 'Tidak Lolos'">
+                                    <span class="text-sm text-gray-500 dark:text-gray-400" x-text="row.ass"></span>
+                                </template>
+                            </td>
+                            <td class="px-5 py-4 text-center">
+                                <template x-if="row.asm === 'Lolos'">
+                                    <span class="inline-flex rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                                        LOLOS
+                                    </span>
+                                </template>
+                                <template x-if="row.asm === 'Tidak Lolos'">
+                                    <span class="inline-flex rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                                        TIDAK LOLOS
+                                    </span>
+                                </template>
+                                <template x-if="row.asm !== 'Lolos' && row.asm !== 'Tidak Lolos'">
+                                    <span class="text-sm text-gray-500 dark:text-gray-400" x-text="row.asm"></span>
                                 </template>
                             </td>
                             <td class="px-5 py-4 text-center">
@@ -148,17 +146,14 @@
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                     </a>
                                     <form :action="row.delete_url" method="POST"
-                                        @submit.prevent="if(confirm('Yakin ingin menghapus data interview ini?')) $el.submit()">
+                                          @submit.prevent="if(confirm('Yakin ingin menghapus data ini?')) $el.submit()">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit"
                                                 class="inline-flex items-center justify-center rounded-lg bg-red-50 p-2 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40 transition"
                                                 title="Hapus">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862
-                                                        a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6
-                                                        m2 0H7m3-3h4a1 1 0 011 1v1H9V5a1 1 0 011-1z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m2 0H7m3-3h4a1 1 0 011 1v1H9V5a1 1 0 011-1z"/>
                                             </svg>
                                         </button>
                                     </form>
@@ -187,14 +182,14 @@
 </div>
 
 <script>
-function interviewTable() {
+function kandidatTable() {
     return {
         data: @json($tableData),
         search: '',
         page: 1,
         perPage: 10,
-        sortCol: 'tanggal',
-        sortDir: 'desc',
+        sortCol: 'nama',
+        sortDir: 'asc',
 
         resetPage() { this.page = 1; },
         sortBy(column) {
@@ -210,14 +205,15 @@ function interviewTable() {
             if (this.search) {
                 const q = this.search.toLowerCase();
                 filteredData = filteredData.filter(d =>
-                    d.nama_kandidat.toLowerCase().includes(q) ||
+                    d.nama.toLowerCase().includes(q) ||
                     d.posisi.toLowerCase().includes(q) ||
-                    d.keputusan.toLowerCase().includes(q)
+                    d.user_terkait.toLowerCase().includes(q)
                 );
             }
             return filteredData.sort((a, b) => {
                 let aVal = a[this.sortCol], bVal = b[this.sortCol];
                 if (typeof aVal === 'string') aVal = aVal.toLowerCase();
+                if (typeof bVal === 'string') bVal = bVal.toLowerCase();
                 if (aVal < bVal) return this.sortDir === 'asc' ? -1 : 1;
                 if (aVal > bVal) return this.sortDir === 'asc' ? 1 : -1;
                 return 0;

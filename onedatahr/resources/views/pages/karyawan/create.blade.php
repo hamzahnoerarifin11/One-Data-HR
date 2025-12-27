@@ -255,7 +255,7 @@
                     </div>
 
                     <!-- Alamat KTP -->
-                    <div class="col-span-4">
+                    <div class="col-span-2">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Alamat KTP</label>
                         <textarea id="Alamat_KTP" placeholder="Contoh: Jl Mawar No 21 RT 01 RW 02, Desa Bumirejo" name="Alamat_KTP" rows="2"
                             class="dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border border-gray-300 bg-transparent
@@ -263,6 +263,7 @@
                     </div>
 
                     <!-- RT / RW -->
+                    <div class="col-span-2 grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">RT</label>
                         <input id="RT" name="RT" placeholder="Contoh: 01" value="{{ old('RT') }}"
@@ -275,6 +276,7 @@
                         <input id="RW" name="RW" placeholder="Contoh: 02" value="{{ old('RW') }}"
                             class="dark:bg-dark-900 shadow-theme-xs h-11 w-full rounded-lg border border-gray-300 bg-transparent
                             px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
+                    </div>
                     </div>
 
                     <!-- Provinsi -->
@@ -360,7 +362,7 @@
 
                     <!--  CHECKBOX SAMA DENGAN KTP -->
                     <!-- ========================= -->
-                    <div class="col-span-4 flex items-center gap-2 mt-2">
+                    <div class="col-span-2 flex items-center gap-2 mt-2">
                         <div x-data="{ checkboxToggle: false }">
                         <label for="sameAsKTP"
                             class="flex cursor-pointer items-center text-sm font-medium text-gray-700 select-none dark:text-gray-400">
@@ -386,7 +388,7 @@
 
                     <!--  ALAMAT DOMISILI -->
 
-                    <div class="col-span-4">
+                    <div class="col-span-2">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Alamat Domisili</label>
                         <textarea id="Alamat_Domisili" name="Alamat_Domisili" placeholder="Contoh: Jl Melati No 15 RT 03 RW 04" rows="2"
                             class="dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border border-gray-300 bg-transparent
@@ -490,7 +492,7 @@
                     </div>
 
                     <!-- Alamat Lengkap -->
-                    <div class="col-span-4">
+                    <div class="col-span-2">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Alamat Lengkap</label>
                         <textarea id="Alamat_Lengkap" name="Alamat_Lengkap" placeholder="Contoh: Jl Melati No 15 RT 03 RW 04, Kel Sukamaju, Kec Sukoharjo" rows="3"
                             class="dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border border-gray-300 bg-transparent

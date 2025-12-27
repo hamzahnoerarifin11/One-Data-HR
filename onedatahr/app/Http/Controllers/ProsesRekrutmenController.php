@@ -14,7 +14,7 @@ class ProsesRekrutmenController extends Controller
         $kandidat = Kandidat::findOrFail($id);
         // only admin can edit process
         abort_unless(auth()->user() && auth()->user()->role === 'admin', 403);
-        return view('rekrutmen.proses.edit', compact('proses','kandidat'));
+        return view('pages.rekrutmen.proses.edit', compact('proses','kandidat'));
     }
 
     public function store(Request $request)

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+
 class RekrutmenDaily extends Model
 {
     use HasFactory;
@@ -24,6 +25,7 @@ class RekrutmenDaily extends Model
         'lolos_hr' => 'integer',
         'lolos_user' => 'integer',
     ];
+    
 
     public function posisi()
     {
@@ -33,5 +35,13 @@ class RekrutmenDaily extends Model
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+    public function getYieldAttribute()
+    {
+        if ($this->total_pelamar == 0) {
+            return 0;
+        }
+
+        return round(($this->lolos_user / $this->total_pelamar) * 100, 2);
     }
 }

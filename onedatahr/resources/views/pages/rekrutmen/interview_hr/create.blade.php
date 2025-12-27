@@ -3,198 +3,272 @@
 @section('content')
 <div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
 
-    <div class="mb-8 flex flex-wrap items-center justify-between gap-4">
+    <!-- Header -->
+    <div class="mb-6 flex items-center justify-between">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-                Tambah Interview HR
-            </h1>
-            <p class="mt-1 text-gray-600 dark:text-gray-400">
-                Form penilaian hasil wawancara kandidat secara sistematis
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Tambah Interview HR</h1>
+            <p class="mt-2 text-gray-600 dark:text-gray-400">
+                Form penilaian hasil wawancara kandidat
             </p>
         </div>
 
         <a href="{{ route('rekrutmen.interview_hr.index') }}"
-           class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium
-                  text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/[0.05] transition-all">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+           class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/[0.05] transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
             </svg>
             Kembali
         </a>
     </div>
 
-    <form action="{{ route('rekrutmen.interview_hr.store') }}" method="POST">
-        @csrf
-
-        <div class="space-y-8">
-
-            <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-                <div class="flex items-center gap-2 mb-6 border-b border-gray-100 pb-4 dark:border-gray-800">
-                    <span class="text-xl">🧑‍💼</span>
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Identitas Interview</h3>
-                </div>
-
-                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                    <div>
-                        <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Pilih Kandidat</label>
-                        <!-- <select name="kandidat_id" id="kandidat_select" class="form-input w-full rounded-lg border-gray-300 focus:border-brand-500 focus:ring-brand-500" required>
-                            <option value="" disabled selected>-- Pilih Kandidat --</option>
-                            @foreach($kandidat as $k)
-                                <option value="{{ $k->id_kandidat }}" data-posisi="{{ $k->posisi_dilamar }}">
-                                    {{ $k->nama }}
-                                </option>
-                            @endforeach
-                        </select> -->
-                        <select name="kandidat_id" id="kandidat_select" class="form-input w-full rounded-lg border-gray-300" required>
-                            <option value="" disabled selected>-- Pilih Kandidat --</option>
-                            @foreach($kandidat as $k)
-                                <option value="{{ $k->id_kandidat }}" 
-                                        data-posisi="{{ $k->posisi ? $k->posisi->nama_posisi : 'Posisi tidak diset' }}">
-                                    {{ $k->nama }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Posisi Dilamar</label>
-                        <input type="text" name="posisi_dilamar" id="posisi_dilamar" 
-                               class="form-input w-full rounded-lg bg-gray-50 border-gray-300 dark:bg-gray-800/50 cursor-not-allowed" 
-                               placeholder="Otomatis terisi..." readonly>
-                        <p class="mt-1 text-xs text-gray-500 italic">*Terisi otomatis berdasarkan data kandidat</p>
-                    </div>
-
-                    <div>
-                        <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Tanggal Interview</label>
-                        <input type="date" name="hari_tanggal" class="form-input w-full rounded-lg border-gray-300" required value="{{ date('Y-m-d') }}">
-                    </div>
-
-                    <div>
-                        <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Nama Interviewer</label>
-                        <input name="nama_interviewer" class="form-input w-full rounded-lg border-gray-300" placeholder="Nama HR / User" required>
-                    </div>
-
-                    <div>
-                        <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Model Wawancara</label>
-                        <select name="model_wawancara" class="form-input w-full rounded-lg border-gray-300">
-                            <option value="Online">Online (Zoom/Meet)</option>
-                            <option value="Offline">Offline (Tatap Muka)</option>
-                        </select>
-                    </div>
-                </div>
+    <!-- Error Alert -->
+    @if($errors->any())
+        <div class="mb-6 flex rounded-lg border border-red-200 bg-red-50 p-4 text-red-800
+                    dark:border-red-900 dark:bg-red-900/20 dark:text-red-400">
+            <div class="mr-4">
+                <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd"
+                          d="M18 10A8 8 0 11 2 10a8 8 0 0116 0zM9 4h2v6H9V4zm0 8h2v2H9v-2z"
+                          clip-rule="evenodd"/>
+                </svg>
             </div>
-
-            <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-                <div class="flex items-center gap-2 mb-6 border-b border-gray-100 pb-4 dark:border-gray-800">
-                    <span class="text-xl">📊</span>
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Aspek Penilaian</h3>
-                </div>
-
-                @php
-                $aspek = [
-                    'profesional' => ['label' => 'Profesionalisme', 'desc' => 'Penampilan, ketepatan waktu, sikap'],
-                    'spiritual'   => ['label' => 'Spiritualitas', 'desc' => 'Kesesuaian nilai & karakter'],
-                    'learning'    => ['label' => 'Learning Agility', 'desc' => 'Kemauan belajar & adaptasi'],
-                    'initiative'  => ['label' => 'Initiative', 'desc' => 'Inisiatif & kemandirian'],
-                    'komunikasi'  => ['label' => 'Komunikasi', 'desc' => 'Cara bicara & penyampaian ide'],
-                    'problem_solving' => ['label' => 'Problem Solving', 'desc' => 'Logika & pemecahan masalah'],
-                    'teamwork'    => ['label' => 'Teamwork', 'desc' => 'Kerjasama & kolaborasi']
-                ];
-                @endphp
-
-                <div class="space-y-4">
-                    @foreach($aspek as $key => $data)
-                    <div class="group rounded-xl border border-gray-100 p-4 transition-all hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-white/[0.02]">
-                        <div class="grid grid-cols-1 gap-4 md:grid-cols-12 items-center">
-                            <div class="md:col-span-4">
-                                <span class="block font-bold text-gray-800 dark:text-white">{{ $data['label'] }}</span>
-                                <span class="text-xs text-gray-500">{{ $data['desc'] }}</span>
-                            </div>
-
-                            <div class="md:col-span-2">
-                                <label class="text-[10px] uppercase text-gray-400 font-bold mb-1 block md:hidden">Skor (1-5)</label>
-                                <select name="skor_{{ $key }}" class="form-input skor-interview w-full rounded-lg border-gray-300">
-                                    @for($i=1;$i<=5;$i++)
-                                        <option value="{{ $i }}" {{ $i==3 ? 'selected':'' }}>{{ $i }} {{ $i == 5 ? '(Perfect)' : '' }}</option>
-                                    @endfor
-                                </select>
-                            </div>
-
-                            <div class="md:col-span-6">
-                                <textarea name="catatan_{{ $key }}" rows="1"
-                                          class="form-input w-full rounded-lg border-gray-300 focus:h-20 transition-all"
-                                          placeholder="Tambahkan catatan khusus untuk aspek {{ $data['label'] }}..."></textarea>
-                            </div>
-                        </div>
-                    </div>
+            <div>
+                <h3 class="font-medium">Terjadi Kesalahan</h3>
+                <ul class="mt-2 list-disc pl-5 text-sm">
+                    @foreach($errors->all() as $err)
+                        <li>{{ $err }}</li>
                     @endforeach
-                </div>
+                </ul>
             </div>
-
-            <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
-                
-                <div class="lg:col-span-1 rounded-xl border border-brand-100 bg-brand-50/30 p-6 dark:border-brand-900/20 dark:bg-brand-900/10">
-                    <h3 class="mb-4 text-sm font-bold uppercase tracking-wider text-brand-600">📈 Summary Score</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="mb-1 block text-xs font-medium text-brand-700">Total Skor</label>
-                            <input type="text" id="total_skor" name="total_skor" class="w-full border-none bg-transparent text-2xl font-bold p-0 focus:ring-0" readonly value="0">
-                        </div>
-                        <div>
-                            <label class="mb-1 block text-xs font-medium text-brand-700">Rata-rata</label>
-                            <input type="text" id="rata_rata" name="rata_rata" class="w-full border-none bg-transparent text-2xl font-bold p-0 focus:ring-0" readonly value="0">
-                        </div>
-                        <div>
-                            <label class="mb-1 block text-xs font-medium text-brand-700">Kategori</label>
-                            <input type="text" id="kategori_nilai" class="w-full border-none bg-transparent text-xl font-semibold p-0 focus:ring-0" readonly value="-">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="lg:col-span-2 rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-                    <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white">✅ Keputusan Akhir</h3>
-                    <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
-                        <div>
-                            <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Status Keputusan</label>
-                            <select name="keputusan" class="form-input w-full rounded-lg border-gray-300">
-                                <option value="DITERIMA" class="text-green-600 font-bold">DITERIMA</option>
-                                <option value="DITOLAK" class="text-red-600 font-bold">DITOLAK</option>
-                                <option value="MENGUNDURKAN DIRI" class="text-gray-600">MENGUNDURKAN DIRI</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Hasil Akhir (Status Proses)</label>
-                            <input name="hasil_akhir" class="form-input w-full rounded-lg border-gray-300" placeholder="Contoh: Lolos ke Tahap User">
-                        </div>
-
-                        <div class="md:col-span-2">
-                            <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">Catatan Kesimpulan</label>
-                            <textarea name="catatan_tambahan" rows="3" class="form-input w-full rounded-lg border-gray-300"
-                                      placeholder="Berikan kesimpulan akhir mengapa kandidat ini diterima/ditolak..."></textarea>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex items-center justify-between gap-3 border-t border-gray-100 pt-6 dark:border-gray-800">
-                <p class="text-xs text-gray-500 italic">Pastikan seluruh aspek penilaian telah terisi dengan objektif.</p>
-                <div class="flex gap-3">
-                    <a href="{{ route('rekrutmen.interview_hr.index') }}"
-                       class="rounded-lg border border-gray-300 px-8 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all dark:text-gray-300 dark:border-gray-700">
-                        Batal
-                    </a>
-                    <button type="submit"
-                            class="rounded-lg bg-blue-600 px-8 py-2.5 text-sm font-medium text-white shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all">
-                        💾 Simpan Hasil Interview
-                    </button>
-                </div>
-            </div>
-
         </div>
-    </form>
+    @endif
+
+    <!-- Card -->
+    <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-lg
+                dark:border-gray-800 dark:bg-white/[0.03]">
+
+        <form action="{{ route('rekrutmen.interview_hr.store') }}" method="POST">
+            @csrf
+
+            <!-- ================= IDENTITAS ================= -->
+            <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
+                Identitas Interview
+            </h3>
+
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2 mb-8">
+
+                <!-- Kandidat -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Nama Kandidat</label>
+                    <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
+                    <select type="hidden" id="kandidat_select" name="kandidat_id" required
+                       class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
+                                :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true">
+                        <option value="">-- Pilih Kandidat --</option>
+                        @foreach($kandidat as $k)
+                            <option value="{{ $k->id_kandidat }}"
+                                data-posisi="{{ $k->posisi?->nama_posisi }}">
+                                {{ $k->nama }}
+                            </option>
+                        @endforeach
+                    </select>
+                        <span
+                                    class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
+                                    <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5"
+                                            stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Posisi -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Posisi Dilamar</label>
+                    <input id="posisi_dilamar" placeholder="Otomatis Terisi" readonly
+                        class="dark:bg-dark-900 shadow-theme-xs h-11 w-full rounded-lg border border-gray-300 bg-transparent
+                            px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                </div>
+
+                <!-- Tanggal -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Tanggal Interview</label>
+                    <div class="relative">
+                    <input type="date" name="hari_tanggal" value="{{ date('Y-m-d') }}"
+                        class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30" onclick="this.showPicker()" />
+                            <span class="absolute top-1/2 right-3.5 -translate-y-1/2 pointer-events-none">
+                                <svg class="fill-gray-700 dark:fill-gray-400" width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M4.33317 0.0830078C4.74738 0.0830078 5.08317 0.418794 5.08317 0.833008V1.24967H8.9165V0.833008C8.9165 0.418794 9.25229 0.0830078 9.6665 0.0830078C10.0807 0.0830078 10.4165 0.418794 10.4165 0.833008V1.24967L11.3332 1.24967C12.2997 1.24967 13.0832 2.03318 13.0832 2.99967V4.99967V11.6663C13.0832 12.6328 12.2997 13.4163 11.3332 13.4163H2.6665C1.70001 13.4163 0.916504 12.6328 0.916504 11.6663V4.99967V2.99967C0.916504 2.03318 1.70001 1.24967 2.6665 1.24967L3.58317 1.24967V0.833008C3.58317 0.418794 3.91896 0.0830078 4.33317 0.0830078ZM4.33317 2.74967H2.6665C2.52843 2.74967 2.4165 2.8616 2.4165 2.99967V4.24967H11.5832V2.99967C11.5832 2.8616 11.4712 2.74967 11.3332 2.74967H9.6665H4.33317ZM11.5832 5.74967H2.4165V11.6663C2.4165 11.8044 2.52843 11.9163 2.6665 11.9163H11.3332C11.4712 11.9163 11.5832 11.8044 11.5832 11.6663V5.74967Z" fill="" />
+                                </svg>
+                            </span>
+                        </div>
+                </div>
+
+                <!-- Interviewer -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Nama Interviewer</label>
+                    <input name="nama_interviewer" placeholder="HR"
+                        class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10
+                            dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent
+                            px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden
+                            dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
+                </div>
+
+                <!-- Model -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Model Wawancara</label>
+                    <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
+                    <select name="model_wawancara"
+                       class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
+                                :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true">
+                        <option value="">-- Pilih Model --</option>
+                        <option value="Online">Online</option>
+                        <option value="Offline">Offline</option>
+                    </select>
+                    <span
+                                class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
+                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </span>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ================= PENILAIAN ================= -->
+            <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
+                📊 Aspek Penilaian
+            </h3>
+
+            @php
+                $aspek = [
+                    'profesional','spiritual','learning','initiative',
+                    'komunikasi','problem_solving','teamwork'
+                ];
+            @endphp
+
+            <div class="space-y-4 mb-8">
+                @foreach($aspek as $a)
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                    <div class="md:col-span-4 font-medium capitalize text-gray-800 dark:text-white">
+                        {{ str_replace('_',' ',$a) }}
+                    </div>
+                    <div class="md:col-span-2">
+                        <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
+                        <select name="skor_{{ $a }}"
+                                    class="skor-interview dark:bg-dark-900 shadow-theme-xs focus:border-brand-300
+                                        focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none
+                                        rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11
+                                        text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden
+                                        dark:border-gray-700 dark:bg-gray-900 dark:text-white/90
+                                        dark:placeholder:text-white/30"
+                                    :class="isOptionSelected && 'text-gray-800 dark:text-white/90'"
+                                    @change="isOptionSelected = true">
+                            @for($i=1;$i<=5;$i++)
+                                <option value="{{ $i }}" {{ $i==3?'selected':'' }}>{{ $i }}</option>
+                            @endfor
+                        </select>
+                        <span
+                                class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
+                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </span>
+		                </div>
+                    </div>
+                    <div class="md:col-span-2                               ">
+                        <textarea name="catatan_{{ $a }}" placeholder="Catatan"
+                            class="dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border border-gray-300 bg-transparent
+                            px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"></textarea>
+
+                    </div>
+                </div>
+                @endforeach
+            </div>
+
+            <!-- ================= SUMMARY ================= -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div>
+                    <label class="md:col-span-4 font-medium capitalize text-gray-800 dark:text-white">Total Skor</label>
+                    <input id="total_skor" readonly
+                        class="w-full bg-transparent text-2xl font-bold border-none focus:ring-0 dark:text-white">
+                </div>
+                <div>
+                    <label class="md:col-span-4 font-medium capitalize text-gray-800 dark:text-white">Rata-rata</label>
+                    <input id="rata_rata" readonly
+                        class="w-full bg-transparent text-2xl font-bold border-none focus:ring-0 dark:text-white">
+                </div>
+                <div>
+                    <label class="md:col-span-4 font-medium capitalize text-gray-800 dark:text-white">Kategori</label>
+                    <input id="kategori_nilai" readonly
+                        class="w-full bg-transparent text-xl font-semibold border-none focus:ring-0 dark:text-white">
+                </div>
+            </div>
+
+            <!-- ================= KEPUTUSAN ================= -->
+            <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
+                ✅ Keputusan Akhir
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Keputusan</label>
+                <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
+                <select name="keputusan"
+                    class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
+                                :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true">
+                    <option value="">-- Pilih Keputusan --</option>
+                    <option value="DITERIMA">DITERIMA</option>
+                    <option value="DITOLAK">DITOLAK</option>
+                    <option value="MENGUNDURKAN DIRI">MENGUNDURKAN DIRI</option>
+                </select>
+                <span
+                                class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
+                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </span>
+                </div>
+		        </div>
+
+                <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Hasil Akhir</label>
+                <input name="hasil_akhir" placeholder="Status Proses"
+                    class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10
+                            dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent
+                            px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden
+                            dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30">
+
+                </div>
+            </div>
+            <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Catatan Tambahan</label>
+            <textarea name="catatan_tambahan" rows="3" placeholder="Kesimpulan akhir"
+                class="dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border border-gray-300 bg-transparent
+                            px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 mb-6"></textarea>
+            </div>
+            <!-- ACTION -->
+            <div class="flex justify-end gap-3">
+                <a href="{{ route('rekrutmen.interview_hr.index') }}"
+                   class="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/[0.05] transition">Batal</a>
+                <button class="rounded-lg bg-brand-600 px-6 py-2 text-sm text-white">
+                    Simpan
+                </button>
+            </div>
+
+        </form>
+    </div>
 </div>
 @endsection
+
 
 @push('scripts')
 <script>
@@ -206,7 +280,7 @@
         kandidatSelect.addEventListener('change', function() {
             const selectedOption = this.options[this.selectedIndex];
             const namaPosisi = selectedOption.dataset.posisi;
-            
+
             if (namaPosisi) {
                 posisiInput.value = namaPosisi;
             } else {
@@ -214,7 +288,7 @@
             }
             // const posisi = selectedOption.getAttribute('data-posisi');
             // posisiInput.value = posisi || '';
-            
+
             // // Efek Highlight
             // posisiInput.classList.add('bg-blue-50');
             // setTimeout(() => posisiInput.classList.remove('bg-blue-50'), 500);

@@ -22,7 +22,11 @@ class KandidatController extends Controller
 
         // Tips: Untuk Alpine.js search side-client, kita butuh koleksi data
         $kandidats = $query->get(); 
-        $posisis = Posisi::all();
+        // $posisis = Posisi::all();
+        $posisis = Posisi::where('status', 'Aktif')->get();
+        // ⬆️ JIKA KOLOM BERBEDA, GANTI BARIS INI SAJA:
+        // $posisis = Posisi::where('is_active', 1)->get()
+
         
         return view('pages.rekrutmen.kandidat.index', compact('kandidats','posisis'));
     }

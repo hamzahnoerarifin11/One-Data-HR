@@ -40,4 +40,17 @@ class Kandidat extends Model
     {
         return $this->hasOne(Pemberkasan::class, 'kandidat_id', 'id_kandidat');
     }
+
+    public function interviewHr()
+    {
+        return $this->hasOne(InterviewHr::class, 'kandidat_id', 'id_kandidat');
+    }
+     public function kandidatLanjutUser()
+    {
+        return $this->hasOne(
+            KandidatLanjutUser::class,
+            'kandidat_id',     // FK di tabel kandidat_lanjut_user
+            'id_kandidat'      // PK di tabel kandidat
+        );
+    }
 }

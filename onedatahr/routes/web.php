@@ -20,6 +20,7 @@ use App\Http\Controllers\TesKompetensiController;
 use App\Http\Controllers\InterviewHrController;
 use App\Http\Controllers\InterviewUserController;
 use App\Http\Controllers\SummaryController;
+use App\Http\Controllers\KandidatLanjutUserController;
 
 // Minimal routes for One Data HR
 Route::get('/', function () {
@@ -67,6 +68,9 @@ Route::middleware(['auth'])->group(function () {
                         InterviewHrController::class
                     )->names('interview_hr');
 
+        //Kandidat Lanjut User
+        Route::resource('kandidat_lanjut_user', KandidatLanjutUserController::class)->names('kandidat_lanjut_user');
+
         Route::get('interview-user', [InterviewUserController::class,'index'])->name('interview-user');
 
         Route::get('summary', [SummaryController::class,'index'])->name('summary');
@@ -97,6 +101,8 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('kandidat', KandidatController::class);
         Route::get('proses/{kandidat_id}/edit', [ProsesRekrutmenController::class,'edit'])->name('proses.edit');
         Route::post('proses', [ProsesRekrutmenController::class,'store'])->name('proses.store');
+
+
 
         // Perbaikan: Hindari double naming untuk resource
         Route::resource('pemberkasan', PemberkasanController::class)->only(['index','create','store','edit','update']);
