@@ -154,6 +154,10 @@
                 Tutup
             </button>
         </div>
+        <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row justify-between items-center text-xs text-gray-500 gap-2">
+            <p>Dibuat pada: <span id="show-created-at">-</span></p>
+            <p>Terakhir diperbarui: <span id="show-updated-at">-</span></p>
+        </div>
     </div>
 </x-modal>
 
@@ -342,12 +346,27 @@ function kandidatTable() {
 
         // Letakkan di dalam fungsi kandidatTable() { return { ... } }
         openShowModal(row) {
-            // Isi data ke elemen modal
+            const formatDate = (dateString) => {
+                if (!dateString) return '-';
+                const date = new Date(dateString);
+                return new Intl.DateTimeFormat('id-ID', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false,
+                    timeZone: 'Asia/Jakarta'
+                }).format(date).replace(/\./g, ':'); // Mengubah titik menjadi titik dua untuk jam
+            };
+                    // Isi data ke elemen modal
             document.getElementById('show-id').innerText = '#' + row.id_kandidat;
             document.getElementById('show-nama').innerText = row.nama;
             document.getElementById('show-posisi').innerText = row.posisi ? row.posisi.nama_posisi : '-';
             document.getElementById('show-sumber').innerText = row.sumber || '-';
             document.getElementById('show-tanggal').innerText = row.tanggal_melamar || '-';
+            document.getElementById('show-created-at').innerText = formatDate(row.created_at);
+            document.getElementById('show-updated-at').innerText = formatDate(row.updated_at);
 
             // Set badge status
             const badge = document.getElementById('show-status-badge');

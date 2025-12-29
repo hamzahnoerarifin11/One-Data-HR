@@ -10,15 +10,15 @@ class InterviewHrController extends Controller
 {
     public function index()
     {
-        $data = InterviewHr::with('kandidat')->latest()->get();
+        $data = InterviewHr::with('kandidat','posisi')->latest()->get();
         return view('pages.rekrutmen.interview_hr.index', compact('data'));
     }
 
     // public function create()
     // {
     //     $kandidat = Kandidat::where('status_akhir','Interview HR Lolos')->get();
-    //     return view('pages.rekrutmen.interview_hr.create', compact('kandidat'));
-        
+    //     return view('pages.rekrutmen.interview_hr.create', compact('kandidat','posisi'));
+
     // }
     public function create()
     {
@@ -26,6 +26,7 @@ class InterviewHrController extends Controller
         // 2. Pastikan filter status_akhir sesuai dengan data yang ada di database Anda
         $kandidat = Kandidat::with('posisi')
             ->where('status_akhir', 'Interview HR Lolos') // Sesuaikan status ini (misal: 'Proses' atau 'Interview HR')
+            ->whereDoesntHave('interviewHr')
             ->get();
 
         return view('pages.rekrutmen.interview_hr.create', compact('kandidat'));
@@ -61,7 +62,7 @@ class InterviewHrController extends Controller
 
     public function show($id)
     {
-        $interview = InterviewHr::with('kandidat')->findOrFail($id);
+        $interview = InterviewHr::with('kandidat','posisi')->findOrFail($id);
         return view('pages.rekrutmen.interview_hr.show', compact('interview'));
     }
 

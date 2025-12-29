@@ -23,5 +23,7 @@ class AppServiceProvider extends ServiceProvider
         // Register middleware alias for role checks
         $router = $this->app->make(Router::class);
         $router->aliasMiddleware('role', \App\Http\Middleware\EnsureRole::class);
+        \Carbon\Carbon::setLocale('id');
+        date_default_timezone_set('Asia/Jakarta');
     }
 }

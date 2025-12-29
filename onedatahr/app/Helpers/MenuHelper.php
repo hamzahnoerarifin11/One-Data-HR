@@ -27,29 +27,27 @@ class MenuHelper
                     ['name' => 'Kalender Rekrutmen', 'path' => route('rekrutmen.calendar')],
                     ['name' => 'Interview HR', 'path' => route('rekrutmen.interview_hr.index')],
                     ['name' => 'Kandidat Lanjut User', 'path' => route('rekrutmen.kandidat_lanjut_user.index')],
+                    ['name' => 'Pemberkasan', 'path' => route('rekrutmen.pemberkasan.index')],
                     ['name' => 'Database WIG', 'path' => route('rekrutmen.wig.index')],
-                    ['name' => 'Pemberkasan Monitor', 'path' => route('rekrutmen.metrics.pemberkasan.page')],
+                    // ['name' => 'Pemberkasan Monitor', 'path' => route('rekrutmen.metrics.pemberkasan.page')],
                 ],
                 // 'path' => '/rekrutmen',
             ],
             [
                 'icon' => 'forms',
-                'name' => 'Kontrak & Pekerjaan',
-                'subItems' => [
-                    ['name' => 'Kontrak', 'path' => '/kontrak'],
-                    ['name' => 'Pekerjaan', 'path' => '/pekerjaan'],
-                ],
+                'name' => 'Training',
+                'path' => '/training',
             ],
-            [
-                'icon' => 'tables',
-                'name' => 'Perusahaan',
-                'path' => '/perusahaan',
-            ],
-            [
-                'icon' => 'charts',
-                'name' => 'Laporan',
-                'path' => '/laporan',
-            ],
+            // [
+            //     'icon' => 'tables',
+            //     'name' => 'Perusahaan',
+            //     'path' => '/perusahaan',
+            // ],
+            // [
+            //     'icon' => 'charts',
+            //     'name' => 'Laporan',
+            //     'path' => '/laporan',
+            // ],
             [
                 'icon' => 'charts',
                 'name' => 'KPI Karyawan', // Nama menu diperjelas
@@ -73,15 +71,15 @@ class MenuHelper
     public static function getOthersItems()
     {
         return [
-            [
-                'icon' => 'support-ticket',
-                'name' => 'Tools',
-                'subItems' => [
-                    ['name' => 'Import Data', 'path' => '/tools/import'],
-                    ['name' => 'Export Data', 'path' => '/tools/export'],
-                    ['name' => 'Settings', 'path' => '/settings'],
-                ],
-            ],
+            // [
+            //     'icon' => 'support-ticket',
+            //     'name' => 'Tools',
+            //     'subItems' => [
+            //         ['name' => 'Import Data', 'path' => '/tools/import'],
+            //         ['name' => 'Export Data', 'path' => '/tools/export'],
+            //         ['name' => 'Settings', 'path' => '/settings'],
+            //     ],
+            // ],
         ];
     }
 

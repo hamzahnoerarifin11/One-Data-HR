@@ -9,6 +9,7 @@ class InterviewHr extends Model
     protected $table = 'interview_hr';
     protected $primaryKey = 'id_interview_hr';
     public $timestamps = true;
+    protected $keyType = 'int';
 
     protected $fillable = [
         'kandidat_id',
@@ -40,5 +41,9 @@ class InterviewHr extends Model
     public function kandidat()
     {
         return $this->belongsTo(Kandidat::class, 'kandidat_id', 'id_kandidat');
+    }
+    public function posisi()
+    {
+        return $this->belongsTo(Posisi::class, 'posisi_id', 'id_posisi');
     }
 }

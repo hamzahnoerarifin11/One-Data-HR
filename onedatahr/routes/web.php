@@ -21,11 +21,13 @@ use App\Http\Controllers\InterviewHrController;
 use App\Http\Controllers\InterviewUserController;
 use App\Http\Controllers\SummaryController;
 use App\Http\Controllers\KandidatLanjutUserController;
+use App\Http\Controllers\TrainingController;
 
 // Minimal routes for One Data HR
 Route::get('/', function () {
     return auth()->check() ? redirect()->route('dashboard.index') : redirect()->route('signin');
 });
+Route::resource('training', TrainingController::class)->names('training');
 
 //Delete Batch Karyawan
 Route::delete('/karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
@@ -70,6 +72,10 @@ Route::middleware(['auth'])->group(function () {
 
         //Kandidat Lanjut User
         Route::resource('kandidat_lanjut_user', KandidatLanjutUserController::class)->names('kandidat_lanjut_user');
+
+        //Pemberkasan
+        Route::resource('pemberkasan', PemberkasanController::class)->names('pemberkasan');
+
 
         Route::get('interview-user', [InterviewUserController::class,'index'])->name('interview-user');
 

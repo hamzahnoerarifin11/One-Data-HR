@@ -6,14 +6,14 @@
     <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-                Data Pemberkasan
+                Data Training
             </h1>
             <p class="mt-1 text-gray-600 dark:text-gray-400">
-                Monitoring pemberkasan, TTD kontrak, dan background checking kandidat
+                Monitoring hasil evaluasi dan jadwal training kandidat
             </p>
         </div>
 
-        <a href="{{ route('rekrutmen.pemberkasan.create') }}"
+        <a href="{{ route('training.create') }}"
            class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700 transition">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -23,22 +23,20 @@
     </div>
 
     @php
-        // Menyiapkan data untuk Alpine.js sesuai kolom Pemberkasan
-        $tableData = $pemberkasan->map(fn($row) => [
-            'id'             => $row->id_pemberkasan,
+        $tableData = $training->map(fn($row) => [
+            'id'             => $row->id_training,
             'nama'           => $row->kandidat?->nama ?? '-',
-            'posisi'         => $row->kandidat?->posisi?->nama_posisi ?? '-',
-            'tgl_kirim'      => $row->kandidat_kirim_berkas ? date('d/m/Y', strtotime($row->kandidat_kirim_berkas)) : '-',
-            'tgl_ttd_user'   => $row->selesai_ttd_user ? date('d/m/Y', strtotime($row->selesai_ttd_user)) : '-',
-            'jadwal_kontrak' => $row->jadwal_ttd_kontrak ? date('d/m/Y', strtotime($row->jadwal_ttd_kontrak)) : '-',
-            'bg_check'       => $row->background_checking ?? '-',
-            'show_url'       => route('rekrutmen.pemberkasan.show', $row->id_pemberkasan),
-            'edit_url'       => route('rekrutmen.pemberkasan.edit', $row->id_pemberkasan),
-            'delete_url'     => route('rekrutmen.pemberkasan.destroy', $row->id_pemberkasan),
+            'posisi'         => $row->posisi?->nama_posisi ?? '-',
+            'tgl_mulai'      => $row->tanggal_mulai ? date('d/m/Y', strtotime($row->tanggal_mulai)) : '-',
+            'tgl_selesai'    => $row->tanggal_selesai ? date('d/m/Y', strtotime($row->tanggal_selesai)) : '-',
+            'hasil'          => $row->hasil_evaluasi ?? '-',
+            'show_url'       => route('pages.training.show', $row->id_training),
+            'edit_url'       => route('pages.edit', $row->id_training),
+            'delete_url'     => route('training.destroy', $row->id_training),
         ])->values();
     @endphp
 
-    <div x-data="pemberkasanTable()" class="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+    <div x-data="trainingTable()" class="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
 
         <div class="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
             <div class="flex items-center gap-3">
@@ -63,7 +61,7 @@
 
             <div class="relative">
                 <button class="absolute text-gray-500 -translate-y-1/2 left-4 top-1/2">
-                        <svg class="h-5 w-5 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.04199 9.37363C3.04199 5.87693 5.87735 3.04199 9.37533 3.04199C12.8733 3.04199 15.7087 5.87693 15.7087 9.37363C15.7087 12.8703 12.8733 15.7053 9.37533 15.7053C5.87735 15.7053 3.04199 12.8703 3.04199 9.37363ZM9.37533 1.54199C5.04926 1.54199 1.54199 5.04817 1.54199 9.37363C1.54199 13.6991 5.04926 17.2053 9.37533 17.2053C11.2676 17.2053 13.0032 16.5344 14.3572 15.4176L17.1773 18.238C17.4702 18.5309 17.945 18.5309 18.2379 18.238C18.5308 17.9451 18.5309 17.4703 18.238 17.1773L15.4182 14.3573C16.5367 13.0033 17.2087 11.2669 17.2087 9.37363C17.2087 5.04817 13.7014 1.54199 9.37533 1.54199Z"/></svg>
+                    <svg class="h-5 w-5 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.04199 9.37363C3.04199 5.87693 5.87735 3.04199 9.37533 3.04199C12.8733 3.04199 15.7087 5.87693 15.7087 9.37363C15.7087 12.8703 12.8733 15.7053 9.37533 15.7053C5.87735 15.7053 3.04199 12.8703 3.04199 9.37363ZM9.37533 1.54199C5.04926 1.54199 1.54199 5.04817 1.54199 9.37363C1.54199 13.6991 5.04926 17.2053 9.37533 17.2053C11.2676 17.2053 13.0032 16.5344 14.3572 15.4176L17.1773 18.238C17.4702 18.5309 17.945 18.5309 18.2379 18.238C18.5308 17.9451 18.5309 17.4703 18.238 17.1773L15.4182 14.3573C16.5367 13.0033 17.2087 11.2669 17.2087 9.37363C17.2087 5.04817 13.7014 1.54199 9.37533 1.54199Z"/></svg>
                 </button>
                 <input
                     x-model="search"
@@ -86,10 +84,8 @@
                             </div>
                         </th>
                         <th class="px-5 py-3 text-sm font-medium text-gray-600 dark:text-gray-400">Posisi</th>
-                        <th class="px-5 py-3 text-sm font-medium text-gray-600 dark:text-gray-400 text-center">Tgl Kirim Berkas</th>
-                        <th class="px-5 py-3 text-sm font-medium text-gray-600 dark:text-gray-400 text-center">Selesai TTD User</th>
-                        <th class="px-5 py-3 text-sm font-medium text-gray-600 dark:text-gray-400 text-center">Jadwal TTD Kontrak</th>
-                        <th class="px-5 py-3 text-sm font-medium text-gray-600 dark:text-gray-400 text-center">BG Checking</th>
+                        <th class="px-5 py-3 text-sm font-medium text-gray-600 dark:text-gray-400 text-center">Periode Training</th>
+                        <th class="px-5 py-3 text-sm font-medium text-gray-600 dark:text-gray-400 text-center">Hasil Evaluasi</th>
                         <th class="px-5 py-3 text-sm font-medium text-gray-600 dark:text-gray-400 text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -102,13 +98,20 @@
                             <td class="px-5 py-4">
                                 <p class="text-sm text-gray-600 dark:text-gray-400" x-text="row.posisi"></p>
                             </td>
-                            <td class="px-5 py-4 text-center text-sm text-gray-600 dark:text-gray-400" x-text="row.tgl_kirim"></td>
-                            <td class="px-5 py-4 text-center text-sm text-gray-600 dark:text-gray-400" x-text="row.tgl_ttd_user"></td>
                             <td class="px-5 py-4 text-center">
-                                <span class="inline-flex rounded-lg bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-600 dark:bg-blue-900/20 dark:text-blue-400" x-text="row.jadwal_kontrak"></span>
+                                <div class="flex flex-col items-center justify-center gap-1">
+                                    <span class="text-xs font-medium text-gray-500" x-text="row.tgl_mulai"></span>
+                                    <div class="h-px w-4 bg-gray-300"></div>
+                                    <span class="text-xs font-medium text-gray-500" x-text="row.tgl_selesai"></span>
+                                </div>
                             </td>
                             <td class="px-5 py-4 text-center">
-                                <span class="text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded" x-text="row.bg_check"></span>
+                                <span :class="{
+                                    'bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400': row.hasil === 'LULUS TRAINING',
+                                    'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400': row.hasil === 'TIDAK LULUS TRAINING',
+                                    'bg-yellow-50 text-yellow-600 dark:bg-yellow-900/20 dark:text-yellow-400': row.hasil === 'MENGUNDURKAN DIRI',
+                                    'bg-gray-50 text-gray-600 dark:bg-gray-800 dark:text-gray-400': !['LULUS TRAINING', 'TIDAK LULUS TRAINING', 'MENGUNDURKAN DIRI'].includes(row.hasil)
+                                }" class="inline-flex rounded-lg px-2 py-1 text-xs font-bold" x-text="row.hasil"></span>
                             </td>
                             <td class="px-5 py-4">
                                 <div class="flex items-center justify-center gap-2">
@@ -118,7 +121,7 @@
                                     <a :href="row.edit_url" class="inline-flex items-center justify-center rounded-lg bg-yellow-50 p-2 text-yellow-600 hover:bg-yellow-100 dark:bg-yellow-900/20 dark:text-yellow-400 transition">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                     </a>
-                                    <form :action="row.delete_url" method="POST" @submit.prevent="if(confirm('Hapus data pemberkasan ini?')) $el.submit()">
+                                    <form :action="row.delete_url" method="POST" @submit.prevent="if(confirm('Hapus data training ini?')) $el.submit()">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-red-50 p-2 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 transition">
@@ -131,8 +134,8 @@
                     </template>
                     <template x-if="filtered.length === 0">
                         <tr>
-                            <td colspan="7" class="px-5 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
-                                Tidak ada data pemberkasan ditemukan.
+                            <td colspan="5" class="px-5 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
+                                Tidak ada data training ditemukan.
                             </td>
                         </tr>
                     </template>
@@ -148,7 +151,9 @@
             <div class="flex items-center gap-2">
                 <button @click="prevPage" :disabled="page === 1" class="rounded-lg border border-gray-300 px-3 py-1.5 text-sm dark:border-gray-700 dark:text-white disabled:opacity-50 transition hover:bg-gray-50 dark:hover:bg-gray-800">Prev</button>
                 <template x-for="p in displayedPages" :key="p">
-                    <button @click="goToPage(p)" :class="page === p ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-white'" class="px-3 py-1 text-sm rounded-lg border transition" x-text="p"></button>
+                    <button @click="goToPage(p)"
+                        :class="page === p ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-white'"
+                        class="px-3 py-1 text-sm rounded-lg border transition" x-text="p"></button>
                 </template>
                 <button @click="nextPage" :disabled="page === totalPages" class="rounded-lg border border-gray-300 px-3 py-1.5 text-sm dark:border-gray-700 dark:text-white disabled:opacity-50 transition hover:bg-gray-50 dark:hover:bg-gray-800">Next</button>
             </div>
@@ -157,7 +162,7 @@
 </div>
 
 <script>
-function pemberkasanTable() {
+function trainingTable() {
     return {
         data: @json($tableData),
         search: '',
@@ -182,7 +187,7 @@ function pemberkasanTable() {
                 filteredData = filteredData.filter(d =>
                     d.nama.toLowerCase().includes(q) ||
                     d.posisi.toLowerCase().includes(q) ||
-                    d.bg_check.toLowerCase().includes(q)
+                    d.hasil.toLowerCase().includes(q)
                 );
             }
             return filteredData.sort((a, b) => {

@@ -10,9 +10,14 @@ class Pekerjaan extends Model
     protected $fillable = [
         'id_karyawan','Jabatan','Bagian','Departement','Divisi','Unit','Jenis_Kontrak','Perjanjian','Lokasi_Kerja'
     ];
+    protected $touches = ['karyawan'];
 
     public function karyawan()
     {
         return $this->belongsTo(Karyawan::class, 'id_karyawan', 'id_karyawan');
     }
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 }

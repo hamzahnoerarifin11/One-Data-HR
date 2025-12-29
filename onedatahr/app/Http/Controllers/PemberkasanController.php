@@ -2,54 +2,67 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Pemberkasan;
+use App\Models\Kandidat;
+use App\Models\KandidatLanjutUser;
+use Illuminate\Http\Request;
 
 class PemberkasanController extends Controller
 {
     public function index()
     {
-        $data = Pemberkasan::with('kandidat.posisi')->paginate(20);
-        return view('pages.rekrutmen.pemberkasan.index', compact('data'));
+        // Load relasi kandidat untuk menampilkan Nama dan Posisi di tabel index
+        $pemberkasan = Pemberkasan::with('kandidat','posisi')->latest()->get();
+        return view('pages.rekrutmen.pemberkasan.index', compact('pemberkasan'));
     }
 
-    public function create(Request $request)
+    public function create()
     {
-        $kandidat_id = $request->get('kandidat_id');
-        return view('pages.rekrutmen.pemberkasan.create', compact('kandidat_id'));
+        // Ambil kandidat yang Lolos ASS dan Lolos ASM
+        // Kita join ke tabel kandidat untuk mendapatkan Nama dan Posisi
+        $kandidatLolos = KandidatLanjutUser::where('hasil_ass', 'Lolos')
+            ->where('hasil_asm', 'Lolos')
+            ->with('kandidat','posisi') // Pastikan di model KandidatLanjutUser ada relasi 'kandidat'
+            ->whereDoesntHave('kandidat.pemberkasan')
+            ->get();
+
+        return view('pages.rekrutmen.pemberkasan.create', compact('kandidatLolos'));
     }
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'kandidat_id' => 'required|exists:kandidat,id_kandidat',
-            'follow_up' => 'nullable|string',
-            'kandidat_kirim_berkas' => 'nullable|date',
-            'selesai_recruitment' => 'nullable|date',
-        ]);
-        Pemberkasan::create($data);
-        return redirect()->route('pages.rekrutmen.pemberkasan.index')->with('success','Pemberkasan dibuat');
+        Pemberkasan::create($request->all());
+        return redirect()->route('rekrutmen.pemberkasan.index')->with('success', 'Data pemberkasan berhasil ditambahkan.');
+    }
+
+    public function show($id)
+    {
+        $pemberkasan = Pemberkasan::with('kandidat','posisi')->findOrFail($id);
+        return view('pages.rekrutmen.pemberkasan.show', compact('pemberkasan'));
     }
 
     public function edit($id)
     {
-        $item = Pemberkasan::findOrFail($id);
-        // only admin
-        abort_unless(auth()->user() && auth()->user()->role === 'admin', 403);
-        return view('pages.rekrutmen.pemberkasan.edit', compact('item'));
+        $pemberkasan = Pemberkasan::findOrFail($id);
+        // Tetap tampilkan kandidat yang memenuhi syarat lolos untuk pilihan edit
+        $kandidatLolos = KandidatLanjutUser::where('hasil_ass', 'Lolos')
+            ->where('hasil_asm', 'Lolos')
+            ->with('kandidat','posisi')
+            ->get();
+
+        return view('pages.rekrutmen.pemberkasan.edit', compact('pemberkasan', 'kandidatLolos'));
     }
 
     public function update(Request $request, $id)
     {
-        $item = Pemberkasan::findOrFail($id);
-        // only admin
-        abort_unless(auth()->user() && auth()->user()->role === 'admin', 403);
-        $data = $request->validate([
-            'follow_up' => 'nullable|string',
-            'kandidat_kirim_berkas' => 'nullable|date',
-            'selesai_recruitment' => 'nullable|date',
-        ]);
-        $item->update($data);
-        return redirect()->route('pages.rekrutmen.pemberkasan.index')->with('success','Updated');
+        $pemberkasan = Pemberkasan::findOrFail($id);
+        $pemberkasan->update($request->all());
+        return redirect()->route('rekrutmen.pemberkasan.index')->with('success', 'Data diperbarui.');
+    }
+    public function destroy($id)
+    {
+        Pemberkasan::where('id_pemberkasan', $id)->delete();
+
+        return back()->with('success', 'Data berhasil dihapus');
     }
 }

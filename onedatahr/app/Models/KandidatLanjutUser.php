@@ -23,8 +23,11 @@ class KandidatLanjutUser extends Model
         'catatan',
     ];
 
-    public function kandidat()
+   public function kandidat() {
+    return $this->belongsTo(Kandidat::class, 'kandidat_id', 'id_kandidat');
+    }
+    public function posisi()
     {
-        return $this->belongsTo(Kandidat::class, 'kandidat_id');
+        return $this->belongsTo(Posisi::class, 'posisi_id', 'id_posisi');
     }
 }

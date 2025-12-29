@@ -61,4 +61,8 @@ class Karyawan extends Model
         // Kita pakai hasOne karena logic dashboard adalah "Satu Karyawan punya Satu KPI di tahun yang dipilih"
         return $this->hasOne(KpiAssessment::class, 'karyawan_id', 'id_karyawan');
     }
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 }

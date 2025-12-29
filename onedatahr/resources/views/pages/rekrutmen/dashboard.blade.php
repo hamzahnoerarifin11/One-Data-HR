@@ -9,14 +9,14 @@
             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Recruitment Dashboard</h1>
             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Ringkasan aktivitas rekrutmen dan metrik penting</p>
         </div>
-        <div class="flex items-center gap-2">
+        <!-- <div class="flex items-center gap-2">
             <a href="{{ route('rekrutmen.posisi.index') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition">Manage Posisi</a>
             <a href="{{ route('rekrutmen.kandidat.index') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition">Manage Kandidat</a>
             <a href="{{ route('rekrutmen.calendar') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition">Kalender Rekrutmen</a>
             <a href="{{ route('rekrutmen.interview_hr.index') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition">Interview HR</a>
             <a href="{{ route('rekrutmen.wig.index') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition">Database WIG</a>
             <a href="{{ route('rekrutmen.metrics.pemberkasan.page') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition">Pemberkasan Monitor</a>
-        </div>
+        </div> -->
     </div>
 
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">

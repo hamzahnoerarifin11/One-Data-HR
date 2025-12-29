@@ -40,7 +40,8 @@
                 dark:border-gray-800 dark:bg-white/[0.03]">
 
         <!-- ================= IDENTITAS ================= -->
-        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
+        <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2">
+            <span class="w-1 h-6 bg-brand-600 rounded-full"></span>
             Identitas Kandidat
         </h3>
 
@@ -63,14 +64,14 @@
             <div>
                 <label class="text-sm text-gray-500">Tanggal Interview HR</label>
                 <div class="mt-1 font-semibold text-gray-900 dark:text-white">
-                    {{ $data->tanggal_interview_hr ? date('d M Y', strtotime($data->tanggal_interview_hr)) : '-' }}
+                    {{ $data->tanggal_interview_hr ? \Carbon\Carbon::parse($data->tanggal_interview_hr)->translatedFormat('d F Y') : '-' }}
                 </div>
             </div>
 
             <div>
                 <label class="text-sm text-gray-500">Tanggal Penyerahan</label>
                 <div class="mt-1 font-semibold text-gray-900 dark:text-white">
-                    {{ $data->tanggal_penyerahan ? date('d M Y', strtotime($data->tanggal_penyerahan)) : '-' }}
+                    {{ $data->tanggal_penyerahan ? \Carbon\Carbon::parse($data->tanggal_penyerahan)->translatedFormat('d F Y') : '-' }}
                 </div>
             </div>
 
@@ -94,7 +95,7 @@
             <div>
                 <label class="text-sm text-gray-500">Tanggal Interview ASS</label>
                 <div class="mt-1 font-semibold text-gray-900 dark:text-white">
-                    {{ $data->tanggal_interview_user_ass ? date('d M Y', strtotime($data->tanggal_interview_user_ass)) : '-' }}
+                    {{ $data->tanggal_interview_user_ass ? \Carbon\Carbon::parse($data->tanggal_interview_user_ass)->translatedFormat('d F Y') : '-' }}
                 </div>
             </div>
 
@@ -119,7 +120,7 @@
             <div>
                 <label class="text-sm text-gray-500">Tanggal Interview ASM</label>
                 <div class="mt-1 font-semibold text-gray-900 dark:text-white">
-                    {{ $data->tanggal_interview_user_asm ? date('d M Y', strtotime($data->tanggal_interview_user_asm)) : '-' }}
+                    {{ $data->tanggal_interview_user_asm ? \Carbon\Carbon::parse($data->tanggal_interview_user_asm)->translatedFormat('d F Y') : '-' }}
                 </div>
             </div>
 
@@ -149,6 +150,10 @@
                         text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
                 {{ $data->catatan ?? '-' }}
             </div>
+        </div>
+        <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center text-xs text-gray-500">
+            <p>Dibuat pada: {{ $data->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}</p>
+            <p>Terakhir diperbarui: {{ $data->updated_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}</p>
         </div>
 
         <!-- ACTION -->

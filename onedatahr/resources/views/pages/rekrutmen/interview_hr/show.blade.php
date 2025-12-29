@@ -62,7 +62,7 @@
             <div>
                 <p class="text-sm text-gray-500">Tanggal Interview</p>
                 <p class="font-semibold text-gray-900 dark:text-white">
-                    {{ \Carbon\Carbon::parse($interview->hari_tanggal)->format('d M Y') }}
+                    {{ \Carbon\Carbon::parse($interview->hari_tanggal)->translatedFormat('d F Y') }}
                 </p>
             </div>
 
@@ -185,6 +185,10 @@
             <p class="text-gray-700 dark:text-gray-300">
                 {{ $interview->catatan_tambahan ?? '-' }}
             </p>
+        </div>
+        <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center text-xs text-gray-500">
+            <p>Dibuat pada: {{ $interview->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}</p>
+            <p>Terakhir diperbarui: {{ $interview->updated_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}</p>
         </div>
 
         <!-- ACTION -->
