@@ -40,35 +40,68 @@
                     </button>
                 </div>
 
-                <form action="{{ route('kpi.index') }}" method="GET" class="flex flex-col sm:flex-row items-center gap-3 w-full">
-                    {{-- Search Input --}}
-                    <div class="relative w-full sm:w-64">
-                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                            <i class="fas fa-search text-gray-400"></i>
-                        </div>
-                        <input type="text" name="search" value="{{ request('search') }}" 
-                            class="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg text-sm bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:ring-blue-500 focus:border-blue-500 w-full" 
-                            placeholder="Cari Nama / Jabatan...">
-                    </div>
+                {{-- FORM FILTER & SEARCH --}}
+                <div class="mb-6 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
+                    <form method="GET" action="{{ route('kpi.index') }}">
+                        {{-- Pertahankan Input Tahun yang mungkin hidden atau dropdown lain --}}
+                        <input type="hidden" name="tahun" value="{{ $tahun }}">
 
-                    {{-- Filter Tahun --}}
-                    <div class="w-full sm:w-auto">
-                        <select name="tahun" onchange="this.form.submit()" class="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500 cursor-pointer">
-                            @for($y = date('Y'); $y >= 2023; $y--)
-                                <option value="{{ $y }}" {{ $tahun == $y ? 'selected' : '' }}>Periode: {{ $y }}</option>
-                            @endfor
-                        </select>
-                    </div>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                            
+                            {{-- 1. SEARCH --}}
+                            <div class="md:col-span-1">
+                                <label class="block text-xs font-bold text-gray-500 mb-1">Cari Nama / NIK</label>
+                                <div class="relative">
+                                    <input type="text" name="search" value="{{ request('search') }}" 
+                                        class="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600" 
+                                        placeholder="Cari karyawan...">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-search text-gray-400"></i>
+                                    </div>
+                                </div>
+                            </div>
 
-                    {{-- Tombol Reset Search --}}
-                    @if(request('search'))
-                        <div class="self-end sm:self-center">
-                            <a href="{{ route('kpi.index', ['tahun' => $tahun]) }}" class="text-red-500 hover:text-red-700 text-sm font-medium whitespace-nowrap">
-                                <i class="fas fa-times"></i> Reset
-                            </a>
+                            {{-- 2. FILTER JABATAN --}}
+                            <div class="md:col-span-1">
+                                <label class="block text-xs font-bold text-gray-500 mb-1">Jabatan</label>
+                                <select name="filter_jabatan" class="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600">
+                                    <option value="">Semua Jabatan</option>
+                                    @foreach($listJabatan as $jabatan)
+                                        <option value="{{ $jabatan }}" {{ request('filter_jabatan') == $jabatan ? 'selected' : '' }}>
+                                            {{ $jabatan }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            {{-- 3. FILTER STATUS KPI --}}
+                            <div class="md:col-span-1">
+                                <label class="block text-xs font-bold text-gray-500 mb-1">Status KPI</label>
+                                <select name="filter_status" class="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600">
+                                    <option value="">Semua Status</option>
+                                    <option value="DRAFT" {{ request('filter_status') == 'DRAFT' ? 'selected' : '' }}>Draft (Proses)</option>
+                                    <option value="FINAL" {{ request('filter_status') == 'FINAL' ? 'selected' : '' }}>Final (Selesai)</option>
+                                    <option value="BELUM_ADA" {{ request('filter_status') == 'BELUM_ADA' ? 'selected' : '' }}>Belum Ada KPI</option>
+                                </select>
+                            </div>
+
+                            {{-- 4. TOMBOL ACTION --}}
+                            <div class="md:col-span-1 flex gap-2">
+                                <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition shadow-sm">
+                                    <i class="fas fa-filter mr-1"></i> Terapkan
+                                </button>
+                                
+                                {{-- Tombol Reset --}}
+                                @if(request('search') || request('filter_jabatan') || request('filter_status'))
+                                    <a href="{{ route('kpi.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-600 font-bold py-2 px-3 rounded-lg text-sm transition" title="Reset Filter">
+                                        <i class="fas fa-undo"></i>
+                                    </a>
+                                @endif
+                            </div>
+
                         </div>
-                    @endif
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
 
@@ -98,7 +131,7 @@
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6 border-l-4 border-yellow-500">
                 <div class="flex justify-between items-center">
                     <div>
-                        <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-medium">Proses / Draft</p>
+                        <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-medium">Draft</p>
                         <h3 class="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white">{{ $stats['draft'] }}</h3>
                     </div>
                     <div class="bg-yellow-100 dark:bg-yellow-900 p-2 sm:p-3 rounded-full text-yellow-600 dark:text-yellow-300"><i class="fas fa-edit"></i></div>
@@ -168,7 +201,7 @@
                                             <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-0.5 rounded border border-green-400">FINAL</span>
                                         @elseif($kpi->status == 'SUBMITTED')
                                             <span class="bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-0.5 rounded border border-yellow-400">SUBMITTED</span>
-                                        @else
+                                        @else($kpi->status == 'DRAFT')
                                             <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-0.5 rounded border border-blue-400">DRAFT</span>
                                         @endif
                                     @else
@@ -245,7 +278,9 @@
                         @forelse($karyawanList as $index => $kry)
                         @php $kpi = $kry->kpiAssessment; @endphp
                         <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition">
-                            <td class="px-6 py-4 text-center font-medium text-gray-900 dark:text-white">{{ $index + 1 }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                {{ $karyawanList->firstItem() + $index }}
+                            </td>
                             <td class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
                                 <div class="text-base font-semibold">{{ $kry->Nama_Lengkap_Sesuai_Ijazah }}</div>
                                 <div class="font-normal text-gray-500 text-xs">{{ $kry->NIK ?? '-' }}</div>
@@ -319,6 +354,9 @@
                         @endforelse
                     </tbody>
                 </table>
+                <div class="mt-4">
+                    {{ $karyawanList->links('components.pagination-custom') }}
+                </div>
             </div>
         </div>
     </div>

@@ -3,6 +3,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\KpiAssessment;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Karyawan extends Model
 {
@@ -61,4 +62,9 @@ class Karyawan extends Model
         // Kita pakai hasOne karena logic dashboard adalah "Satu Karyawan punya Satu KPI di tahun yang dipilih"
         return $this->hasOne(KpiAssessment::class, 'karyawan_id', 'id_karyawan');
     }
+
+    // 1. Import Trait HasFactory
+    use HasFactory; // 2. Pasang Trait ini di dalam class
+    // Pastikan field yang diisi di Factory ada di $fillable atau $guarded
+    protected $guarded = [];
 }
