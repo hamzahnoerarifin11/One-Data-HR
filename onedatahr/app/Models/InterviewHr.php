@@ -13,6 +13,7 @@ class InterviewHr extends Model
 
     protected $fillable = [
         'kandidat_id',
+        'posisi_id',
         'hari_tanggal',
         'nama_kandidat',
         'nama_interviewer',

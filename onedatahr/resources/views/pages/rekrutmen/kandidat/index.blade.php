@@ -97,6 +97,13 @@
                             </td>
                         </tr>
                     </template>
+                    <template x-if="filtered.length === 0">
+                        <tr>
+                            <td colspan="7" class="px-5 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
+                                Tidak ada data kandidat ditemukan.
+                            </td>
+                        </tr>
+                    </template>
                 </tbody>
             </table>
         </div>

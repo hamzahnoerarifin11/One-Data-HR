@@ -6,6 +6,7 @@ use App\Models\Kandidat;
 use App\Models\KandidatLanjutUser;
 use App\Models\InterviewHr;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class KandidatLanjutUserController extends Controller
 {
@@ -20,12 +21,6 @@ class KandidatLanjutUserController extends Controller
 
     public function create()
     {
-        /**
-         * Kandidat yang boleh lanjut:
-         * - Sudah interview HR
-         * - Keputusan = DITERIMA
-         * - Belum ada di kandidat_lanjut_user
-         */
         $kandidat = InterviewHr::with('kandidat.posisi')
             ->where('keputusan', 'DITERIMA')
             ->whereDoesntHave('kandidat.kandidatLanjutUser')
@@ -38,40 +33,43 @@ class KandidatLanjutUserController extends Controller
     {
         $request->validate([
             'kandidat_id' => 'required|exists:kandidat,id_kandidat',
-            'user_terkait' => 'required|string|max:100',
-
             'tanggal_penyerahan' => 'required|date',
-            'tanggal_interview_user_ass' => 'nullable|date',
-            'hasil_ass' => 'nullable|in:Lolos,Tidak Lolos',
-
-            'tanggal_interview_user_asm' => 'nullable|date',
-            'hasil_asm' => 'nullable|in:Lolos,Tidak Lolos',
-
             'catatan' => 'nullable|string',
+            // Validasi untuk array dinamis
+            'detail_interview' => 'nullable|array',
+            'detail_interview.*.nama_user' => 'required|string',
+            'detail_interview.*.tanggal' => 'required|date',
+            'detail_interview.*.hasil' => 'required|in:Lolos,Tidak Lolos,Pending',
         ]);
 
-        /**
-         * Ambil data interview HR kandidat
-         */
         $interviewHr = InterviewHr::where('kandidat_id', $request->kandidat_id)
             ->where('keputusan', 'DITERIMA')
             ->firstOrFail();
 
-        KandidatLanjutUser::create([
-            'kandidat_id' => $request->kandidat_id,
-            'user_terkait' => $request->user_terkait,
+        DB::transaction(function () use ($request, $interviewHr) {
+            $detail = $request->input('detail_interview', []);
 
-            'tanggal_interview_hr' => $interviewHr->hari_tanggal,
-            'tanggal_penyerahan' => $request->tanggal_penyerahan,
+            // Simpan data Lanjut User
+            KandidatLanjutUser::create([
+                'kandidat_id'          => $request->kandidat_id,
+                'tanggal_interview_hr' => $interviewHr->hari_tanggal,
+                'tanggal_penyerahan'   => $request->tanggal_penyerahan,
+                'catatan'              => $request->catatan,
+                'detail_interview'     => $detail,
+            ]);
 
-            'tanggal_interview_user_ass' => $request->tanggal_interview_user_ass,
-            'hasil_ass' => $request->hasil_ass,
+            // Update Status Akhir Kandidat
+            $this->updateStatusKandidat($request->kandidat_id, $detail);
+        });
 
-            'tanggal_interview_user_asm' => $request->tanggal_interview_user_asm,
-            'hasil_asm' => $request->hasil_asm,
-
-            'catatan' => $request->catatan,
-        ]);
+        // KandidatLanjutUser::create([
+        //     'kandidat_id'          => $request->kandidat_id,
+        //     'tanggal_interview_hr' => $interviewHr->hari_tanggal,
+        //     'tanggal_penyerahan'   => $request->tanggal_penyerahan,
+        //     'catatan'              => $request->catatan,
+        //     // Simpan array dinamis ke kolom detail_interview (JSON)
+        //     'detail_interview'     => $request->input('detail_interview', []),
+        // ]);
 
         return redirect()
             ->route('rekrutmen.kandidat_lanjut_user.index')
@@ -106,38 +104,55 @@ class KandidatLanjutUserController extends Controller
 
         $request->validate([
             'kandidat_id' => 'required|exists:kandidat,id_kandidat',
-            'user_terkait' => 'required|string|max:100',
-
             'tanggal_penyerahan' => 'required|date',
-            'tanggal_interview_user_ass' => 'nullable|date',
-            'hasil_ass' => 'nullable|in:Lolos,Tidak Lolos',
-
-            'tanggal_interview_user_asm' => 'nullable|date',
-            'hasil_asm' => 'nullable|in:Lolos,Tidak Lolos',
-
             'catatan' => 'nullable|string',
+            'detail_interview' => 'nullable|array',
+            'detail_interview.*.hasil' => 'required|in:Lolos,Tidak Lolos,Pending',
         ]);
+        DB::transaction(function () use ($request, $data) {
+            $detail = $request->input('detail_interview', []);
+            $data->update([
+                'kandidat_id'        => $request->kandidat_id,
+                'tanggal_penyerahan' => $request->tanggal_penyerahan,
+                'catatan'            => $request->catatan,
+                'detail_interview'   => $detail,
+            ]);
 
-        $data->update($request->only([
-            'kandidat_id',
-            'user_terkait',
-            'tanggal_penyerahan',
-            'tanggal_interview_user_ass',
-            'hasil_ass',
-            'tanggal_interview_user_asm',
-            'hasil_asm',
-            'catatan',
-        ]));
-
+            // Update Status Akhir Kandidat
+            $this->updateStatusKandidat($request->kandidat_id, $detail);
+        });
         return redirect()
             ->route('rekrutmen.kandidat_lanjut_user.index')
             ->with('success', 'Data kandidat berhasil diperbarui');
     }
+    private function updateStatusKandidat($kandidat_id, $detail_interview)
+    {
+        $status_akhir = 'Interview HR Lolos'; // Default status awal
+
+        if (!empty($detail_interview)) {
+            $daftar_hasil = collect($detail_interview)->pluck('hasil')->toArray();
+
+            if (in_array('Tidak Lolos', $daftar_hasil)) {
+                $status_akhir = 'Tidak Lolos';
+            } elseif (!in_array('Pending', $daftar_hasil) && !in_array('', $daftar_hasil)) {
+                // Jika semua 'Lolos'
+                $status_akhir = 'Interview User Lolos';
+            }
+        }
+
+        Kandidat::where('id_kandidat', $kandidat_id)->update([
+            'status_akhir' => $status_akhir
+        ]);
+    }
 
     public function destroy($id)
     {
-        KandidatLanjutUser::where('id_kandidat_lanjut_user', $id)->delete();
-
+        $data = KandidatLanjutUser::where('id_kandidat_lanjut_user', $id)->first();
+        if ($data) {
+            // Kembalikan status kandidat ke HR Lolos sebelum data dihapus
+            Kandidat::where('id_kandidat', $data->kandidat_id)->update(['status_akhir' => 'Interview HR Lolos']);
+            $data->delete();
+        }
         return back()->with('success', 'Data berhasil dihapus');
     }
 }

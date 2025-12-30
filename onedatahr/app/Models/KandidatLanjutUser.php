@@ -13,14 +13,16 @@ class KandidatLanjutUser extends Model
 
     protected $fillable = [
         'kandidat_id',
+        'posisi_id',
         'user_terkait',
         'tanggal_interview_hr',
         'tanggal_penyerahan',
-        'tanggal_interview_user_ass',
-        'hasil_ass',
-        'tanggal_interview_user_asm',
-        'hasil_asm',
+        'detail_interview',
         'catatan',
+    ];
+    protected $casts = [
+        'detail_interview' => 'array', // Kunci agar data dinamis tersimpan otomatis
+        // 'tanggal_penyerahan' => 'date',
     ];
 
    public function kandidat() {

@@ -16,6 +16,7 @@ class Pemberkasan extends Model
 
     protected $fillable = [
         'kandidat_id',
+        'posisi_id',
         'follow_up',
         'kandidat_kirim_berkas',
         'selesai_recruitment',

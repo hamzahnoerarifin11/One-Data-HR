@@ -29,7 +29,7 @@
             'nama'           => $row->kandidat?->nama ?? '-',
             'posisi'         => $row->kandidat?->posisi?->nama_posisi ?? '-',
             'tgl_kirim'      => $row->kandidat_kirim_berkas ? date('d/m/Y', strtotime($row->kandidat_kirim_berkas)) : '-',
-            'tgl_ttd_user'   => $row->selesai_ttd_user ? date('d/m/Y', strtotime($row->selesai_ttd_user)) : '-',
+            'tgl_ttd_direktur'   => $row->selesai_ttd_direktur ? date('d/m/Y', strtotime($row->selesai_ttd_direktur)) : '-',
             'jadwal_kontrak' => $row->jadwal_ttd_kontrak ? date('d/m/Y', strtotime($row->jadwal_ttd_kontrak)) : '-',
             'bg_check'       => $row->background_checking ?? '-',
             'show_url'       => route('rekrutmen.pemberkasan.show', $row->id_pemberkasan),
@@ -87,7 +87,7 @@
                         </th>
                         <th class="px-5 py-3 text-sm font-medium text-gray-600 dark:text-gray-400">Posisi</th>
                         <th class="px-5 py-3 text-sm font-medium text-gray-600 dark:text-gray-400 text-center">Tgl Kirim Berkas</th>
-                        <th class="px-5 py-3 text-sm font-medium text-gray-600 dark:text-gray-400 text-center">Selesai TTD User</th>
+                        <th class="px-5 py-3 text-sm font-medium text-gray-600 dark:text-gray-400 text-center">Selesai TTD Direktur</th>
                         <th class="px-5 py-3 text-sm font-medium text-gray-600 dark:text-gray-400 text-center">Jadwal TTD Kontrak</th>
                         <th class="px-5 py-3 text-sm font-medium text-gray-600 dark:text-gray-400 text-center">BG Checking</th>
                         <th class="px-5 py-3 text-sm font-medium text-gray-600 dark:text-gray-400 text-center">Aksi</th>
@@ -103,7 +103,7 @@
                                 <p class="text-sm text-gray-600 dark:text-gray-400" x-text="row.posisi"></p>
                             </td>
                             <td class="px-5 py-4 text-center text-sm text-gray-600 dark:text-gray-400" x-text="row.tgl_kirim"></td>
-                            <td class="px-5 py-4 text-center text-sm text-gray-600 dark:text-gray-400" x-text="row.tgl_ttd_user"></td>
+                            <td class="px-5 py-4 text-center text-sm text-gray-600 dark:text-gray-400" x-text="row.tgl_ttd_direktur"></td>
                             <td class="px-5 py-4 text-center">
                                 <span class="inline-flex rounded-lg bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-600 dark:bg-blue-900/20 dark:text-blue-400" x-text="row.jadwal_kontrak"></span>
                             </td>

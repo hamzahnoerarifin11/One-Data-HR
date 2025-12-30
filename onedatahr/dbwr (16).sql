@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 27 Des 2025 pada 03.26
+-- Waktu pembuatan: 30 Des 2025 pada 03.00
 -- Versi server: 10.4.27-MariaDB
 -- Versi PHP: 8.2.0
 
@@ -47,8 +47,8 @@ CREATE TABLE `bpjs` (
   `id_karyawan` bigint(20) DEFAULT NULL,
   `Status_BPJS_KT` enum('Aktif','Tidak Aktif') DEFAULT NULL,
   `Status_BPJS_KS` enum('Aktif','Tidak Aktif') DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NULL DEFAULT NULL
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -56,11 +56,11 @@ CREATE TABLE `bpjs` (
 --
 
 INSERT INTO `bpjs` (`id_bpjs`, `id_karyawan`, `Status_BPJS_KT`, `Status_BPJS_KS`, `created_at`, `updated_at`) VALUES
-(1, 3, 'Aktif', 'Aktif', '2025-12-10 06:55:33', NULL),
-(2, 5, 'Aktif', 'Aktif', '2025-12-12 03:17:08', NULL),
-(4, 8, 'Aktif', 'Tidak Aktif', '2025-12-14 08:42:52', NULL),
-(5, 9, 'Aktif', 'Aktif', '2025-12-14 10:21:22', NULL),
-(6, 2, 'Aktif', 'Aktif', '2025-12-14 14:03:42', NULL);
+(1, 3, 'Aktif', 'Aktif', '2025-12-10 06:55:33', '2025-12-29 04:16:51'),
+(2, 5, 'Aktif', 'Aktif', '2025-12-12 03:17:08', '2025-12-29 04:16:51'),
+(4, 8, 'Aktif', 'Tidak Aktif', '2025-12-14 08:42:52', '2025-12-29 04:16:51'),
+(5, 9, 'Aktif', 'Aktif', '2025-12-14 10:21:22', '2025-12-29 04:16:51'),
+(6, 2, 'Aktif', 'Aktif', '2025-12-14 14:03:42', '2025-12-29 06:07:59');
 
 -- --------------------------------------------------------
 
@@ -80,8 +80,8 @@ CREATE TABLE `data_keluarga` (
   `Nomor_Telepon_Suami_Istri` varchar(255) DEFAULT NULL,
   `Pendidikan_Terakhir_Suami_Istri` varchar(255) DEFAULT NULL,
   `anak` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NULL DEFAULT NULL
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -89,11 +89,11 @@ CREATE TABLE `data_keluarga` (
 --
 
 INSERT INTO `data_keluarga` (`id_keluarga`, `id_karyawan`, `Nama_Ayah_Kandung`, `Nama_Ibu_Kandung`, `Nama_Lengkap_Suami_Istri`, `NIK_KTP_Suami_Istri`, `Tempat_Lahir_Suami_Istri`, `Tanggal_Lahir_Suami_Istri`, `Nomor_Telepon_Suami_Istri`, `Pendidikan_Terakhir_Suami_Istri`, `anak`, `created_at`, `updated_at`) VALUES
-(1, 3, 'Asep', 'Dini', 'Putri', '66666666666', 'Jakarta', '1985-07-15', '081333333333', 'S1', '[{\"nama\":\"Martin Manewar\",\"tempat_lahir\":\"Jakarta\",\"tanggal_lahir\":\"2000-05-15\",\"jenis_kelamin\":\"L\",\"pendidikan\":\"S1\"}]', '2025-12-10 06:49:53', NULL),
-(2, 5, 'Ahmad Budi', 'Siti', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-12-12 03:17:08', NULL),
-(4, 8, 'Ayah Karyawan 1', 'Ibu Karyawan 1', 'Suami Karyawan 1', '22222222222', 'Pati', '1996-10-14', '081222222222', 'S1', '[{\"nama\":\"Anak 1 Karyawan 1\",\"tempat_lahir\":\"Pati\",\"tanggal_lahir\":\"2020-01-14\",\"jenis_kelamin\":\"L\",\"pendidikan\":\"SD\"},{\"nama\":\"Anak 2 Karyawan 1\",\"tempat_lahir\":\"Pati\",\"tanggal_lahir\":\"2024-01-14\",\"jenis_kelamin\":\"P\",\"pendidikan\":\"Belum Sekolah\"}]', '2025-12-14 08:42:52', NULL),
-(5, 9, 'Ahmad Dahlan', 'Lusi', 'Mirai', '123456', 'Batam', '2002-10-14', '081222222222', 'S1', '[{\"nama\":\"Bas\",\"tempat_lahir\":\"Batam\",\"tanggal_lahir\":\"2024-01-14\",\"jenis_kelamin\":\"L\",\"pendidikan\":\"Belum Sekolah\"}]', '2025-12-14 10:21:21', NULL),
-(6, 2, 'a', 'b', 'moji', '1234', 'Jakarta', '2001-10-28', '081432432432', 'SMA', '[{\"nama\":\"Dewa\",\"tempat_lahir\":\"Kudus\",\"tanggal_lahir\":\"2023-01-16\",\"jenis_kelamin\":\"L\",\"pendidikan\":\"Belum Sekolah\"},{\"nama\":\"Dewi\",\"tempat_lahir\":\"Kudus\",\"tanggal_lahir\":\"2025-02-10\",\"jenis_kelamin\":\"P\",\"pendidikan\":\"Belum Sekolah\"}]', '2025-12-14 14:03:42', NULL);
+(1, 3, 'Asep', 'Dini', 'Putri', '66666666666', 'Jakarta', '1985-07-15', '081333333333', 'S1', '[{\"nama\":\"Martin Manewar\",\"tempat_lahir\":\"Jakarta\",\"tanggal_lahir\":\"2000-05-15\",\"jenis_kelamin\":\"L\",\"pendidikan\":\"S1\"}]', '2025-12-10 06:49:53', '2025-12-29 04:17:24'),
+(2, 5, 'Ahmad Budi', 'Siti', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-12-12 03:17:08', '2025-12-29 04:17:24'),
+(4, 8, 'Ayah Karyawan 1', 'Ibu Karyawan 1', 'Suami Karyawan 1', '22222222222', 'Pati', '1996-10-14', '081222222222', 'S1', '[{\"nama\":\"Anak 1 Karyawan 1\",\"tempat_lahir\":\"Pati\",\"tanggal_lahir\":\"2020-01-14\",\"jenis_kelamin\":\"L\",\"pendidikan\":\"SD\"},{\"nama\":\"Anak 2 Karyawan 1\",\"tempat_lahir\":\"Pati\",\"tanggal_lahir\":\"2024-01-14\",\"jenis_kelamin\":\"P\",\"pendidikan\":\"Belum Sekolah\"}]', '2025-12-14 08:42:52', '2025-12-29 04:17:24'),
+(5, 9, 'Ahmad Dahlan', 'Lusi', 'Mirai', '123456', 'Batam', '2002-10-14', '081222222222', 'S1', '[{\"nama\":\"Bas\",\"tempat_lahir\":\"Batam\",\"tanggal_lahir\":\"2024-01-14\",\"jenis_kelamin\":\"L\",\"pendidikan\":\"Belum Sekolah\"}]', '2025-12-14 10:21:21', '2025-12-29 04:17:24'),
+(6, 2, 'aa', 'bb', 'moji', '1234', 'Jakarta', '2001-10-28', '081432432432', 'SMA', '[{\"nama\":\"Dewa\",\"tempat_lahir\":\"Kudus\",\"tanggal_lahir\":\"2023-01-16\",\"jenis_kelamin\":\"L\",\"pendidikan\":\"Belum Sekolah\"},{\"nama\":\"Dewi\",\"tempat_lahir\":\"Kudus\",\"tanggal_lahir\":\"2025-02-10\",\"jenis_kelamin\":\"P\",\"pendidikan\":\"Belum Sekolah\"}]', '2025-12-14 14:03:42', '2025-12-29 06:07:59');
 
 -- --------------------------------------------------------
 
@@ -104,6 +104,7 @@ INSERT INTO `data_keluarga` (`id_keluarga`, `id_karyawan`, `Nama_Ayah_Kandung`, 
 CREATE TABLE `interview_hr` (
   `id_interview_hr` int(11) NOT NULL,
   `kandidat_id` int(11) NOT NULL,
+  `posisi_id` int(11) DEFAULT NULL,
   `hari_tanggal` date DEFAULT NULL,
   `nama_interviewer` varchar(150) DEFAULT NULL,
   `model_wawancara` enum('Online','Offline') DEFAULT NULL,
@@ -133,10 +134,11 @@ CREATE TABLE `interview_hr` (
 -- Dumping data untuk tabel `interview_hr`
 --
 
-INSERT INTO `interview_hr` (`id_interview_hr`, `kandidat_id`, `hari_tanggal`, `nama_interviewer`, `model_wawancara`, `skor_profesional`, `catatan_profesional`, `skor_spiritual`, `catatan_spiritual`, `skor_learning`, `catatan_learning`, `skor_initiative`, `catatan_initiative`, `skor_komunikasi`, `catatan_komunikasi`, `skor_problem_solving`, `catatan_problem_solving`, `skor_teamwork`, `catatan_teamwork`, `catatan_tambahan`, `keputusan`, `total`, `hasil_akhir`, `created_at`, `updated_at`) VALUES
-(2, 3, '2025-12-24', 'Afiq', 'Online', 4, 'Tes1', 4, 'Tes2', 5, 'Tes3', 5, 'Tes4', 3, 'Tes5', 5, 'Tes6', 4, 'Tes7', 'Lanjut Interview User', 'DITERIMA', 30, 'Lolos Tes Interview HR', '2025-12-23 20:50:19', '2025-12-26 18:10:38'),
-(3, 7, '2025-12-16', 'Rafif', 'Online', 3, 'asda', 3, 'dasdaa', 3, 'sdas', 3, 'asdasd', 3, 'asdad', 3, 'asdad', 3, 'asdasd', 'dasda', 'DITERIMA', 21, 'asda', '2025-12-23 21:15:47', '2025-12-24 00:16:37'),
-(4, 9, '2025-12-19', 'Cinta', 'Online', 5, 'asd', 5, 'fddf', 5, 'bdfbd', 5, 'bdfb', 5, 'bdfbdfb', 5, 'bdfbd', 5, 'bdfbdf', 'Tidak ada', 'DITERIMA', 35, 'Lolos Tes Interview hr', '2025-12-23 21:30:13', '2025-12-24 00:13:34');
+INSERT INTO `interview_hr` (`id_interview_hr`, `kandidat_id`, `posisi_id`, `hari_tanggal`, `nama_interviewer`, `model_wawancara`, `skor_profesional`, `catatan_profesional`, `skor_spiritual`, `catatan_spiritual`, `skor_learning`, `catatan_learning`, `skor_initiative`, `catatan_initiative`, `skor_komunikasi`, `catatan_komunikasi`, `skor_problem_solving`, `catatan_problem_solving`, `skor_teamwork`, `catatan_teamwork`, `catatan_tambahan`, `keputusan`, `total`, `hasil_akhir`, `created_at`, `updated_at`) VALUES
+(2, 3, 3, '2025-12-24', 'Afiq', 'Online', 4, 'Tes1', 4, 'Tes2', 5, 'Tes3', 5, 'Tes4', 4, 'Tes5', 5, 'Tes6', 5, 'Tes7', 'Lanjut Interview User', 'DITERIMA', 32, 'Lolos Tes Interview HR', '2025-12-23 20:50:19', '2025-12-29 07:53:47'),
+(3, 7, 13, '2025-12-16', 'Rafif', 'Online', 3, 'asda', 3, 'dasdaa', 3, 'sdas', 3, 'asdasd', 3, 'asdad', 3, 'asdad', 3, 'asdasd', 'dasda', 'DITERIMA', 21, 'asda', '2025-12-23 21:15:47', '2025-12-29 07:23:24'),
+(4, 9, 2, '2025-12-19', 'Cinta', 'Online', 5, 'asd', 5, 'fddf', 5, 'bdfbd', 5, 'bdfb', 5, 'bdfbdfb', 5, 'bdfbd', 5, 'bdfbdf', 'Tidak ada', 'DITERIMA', 35, 'Lolos Tes Interview hr', '2025-12-23 21:30:13', '2025-12-29 07:23:24'),
+(6, 10, 4, '2025-12-27', 'Lita', 'Online', 4, 'tes', 3, 'tes', 3, 'tes', 3, 'tes', 3, 'tes', 3, 'tes', 3, 'tes', 'LOLOS', 'DITERIMA', 22, 'Lolos Tes Interview HR', '2025-12-26 21:27:50', '2025-12-29 07:23:24');
 
 -- --------------------------------------------------------
 
@@ -160,12 +162,12 @@ CREATE TABLE `kandidat` (
 --
 
 INSERT INTO `kandidat` (`id_kandidat`, `nama`, `posisi_id`, `tanggal_melamar`, `sumber`, `status_akhir`, `created_at`, `updated_at`) VALUES
-(3, 'Joni', 1, NULL, NULL, 'Interview HR Lolos', '2025-12-16 23:45:32', '2025-12-23 20:50:19'),
-(4, 'Isyana', 5, NULL, NULL, 'Diterima', '2025-12-17 00:45:54', '2025-12-21 23:06:07'),
+(3, 'Joni', 1, NULL, NULL, 'Interview HR Lolos', '2025-12-16 23:45:32', '2025-12-29 07:45:58'),
+(4, 'Isyana', 5, NULL, NULL, 'Interview HR Lolos', '2025-12-17 00:45:54', '2025-12-29 06:49:13'),
 (7, 'Rudi', 13, '2025-12-22', 'Glints', 'Interview HR Lolos', '2025-12-21 23:15:27', '2025-12-23 21:15:47'),
-(8, 'Cek', 5, '2025-12-22', 'Glints', 'CV Lolos', '2025-12-21 23:40:45', '2025-12-21 23:56:56'),
+(8, 'Cek', 7, '2025-12-22', 'Glints', 'CV Lolos', '2025-12-21 23:40:45', '2025-12-26 21:23:09'),
 (9, 'Mardi', 2, '2025-12-22', 'Glints', 'Interview HR Lolos', '2025-12-21 23:45:36', '2025-12-24 00:06:54'),
-(10, 'manto', 4, '2025-12-22', 'Glints', 'Interview HR Lolos', '2025-12-21 23:56:31', '2025-12-24 00:06:44');
+(10, 'manto', 4, '2025-12-22', 'Glints', 'Interview HR Lolos', '2025-12-21 23:56:31', '2025-12-26 21:27:52');
 
 -- --------------------------------------------------------
 
@@ -176,6 +178,7 @@ INSERT INTO `kandidat` (`id_kandidat`, `nama`, `posisi_id`, `tanggal_melamar`, `
 CREATE TABLE `kandidat_lanjut_user` (
   `id_kandidat_lanjut_user` int(11) NOT NULL,
   `kandidat_id` int(11) DEFAULT NULL,
+  `posisi_id` int(11) DEFAULT NULL,
   `user_terkait` varchar(100) DEFAULT NULL,
   `tanggal_interview_hr` date DEFAULT NULL,
   `tanggal_penyerahan` date DEFAULT NULL,
@@ -187,6 +190,16 @@ CREATE TABLE `kandidat_lanjut_user` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `kandidat_lanjut_user`
+--
+
+INSERT INTO `kandidat_lanjut_user` (`id_kandidat_lanjut_user`, `kandidat_id`, `posisi_id`, `user_terkait`, `tanggal_interview_hr`, `tanggal_penyerahan`, `tanggal_interview_user_ass`, `hasil_ass`, `tanggal_interview_user_asm`, `hasil_asm`, `catatan`, `created_at`, `updated_at`) VALUES
+(2, 3, 3, 'Pak Aris', '2025-12-24', '2025-12-25', '2025-12-29', 'Lolos', '2025-12-29', 'Lolos', 'Lolos', '2025-12-26 20:01:30', '2025-12-29 07:22:34'),
+(3, 7, 13, 'Pak Bambang H', '2025-12-16', '2025-12-17', '2025-12-22', 'Lolos', '2025-12-22', 'Lolos', 'Lolos Lnjut pemberksn', '2025-12-26 20:24:34', '2025-12-29 07:22:34'),
+(4, 9, 2, 'Pak Rudi', '2025-12-19', '2025-12-27', '2025-12-29', 'Lolos', '2025-12-29', 'Lolos', 'lolos', '2025-12-28 19:03:40', '2025-12-29 07:22:34'),
+(5, 10, NULL, 'Pak Jono', '2025-12-27', '2025-12-29', '2025-12-29', 'Lolos', '2025-12-30', 'Lolos', 'Lolos', '2025-12-29 07:55:10', '2025-12-29 07:56:06');
 
 -- --------------------------------------------------------
 
@@ -225,8 +238,8 @@ CREATE TABLE `karyawan` (
   `Kabupaten_Kota_Sesuai_Domisili` varchar(255) DEFAULT NULL,
   `Provinsi_Sesuai_Domisili` varchar(255) DEFAULT NULL,
   `Alamat_Lengkap` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -234,11 +247,11 @@ CREATE TABLE `karyawan` (
 --
 
 INSERT INTO `karyawan` (`id_karyawan`, `NIK`, `Status`, `Kode`, `Nama_Sesuai_KTP`, `NIK_KTP`, `Nama_Lengkap_Sesuai_Ijazah`, `Tempat_Lahir_Karyawan`, `Tanggal_Lahir_Karyawan`, `Umur_Karyawan`, `Jenis_Kelamin_Karyawan`, `Status_Pernikahan`, `Golongan_Darah`, `Nomor_Telepon_Aktif_Karyawan`, `Email`, `Alamat_KTP`, `RT`, `RW`, `Kelurahan_Desa`, `Kecamatan`, `Kabupaten_Kota`, `Provinsi`, `Alamat_Domisili`, `RT_Sesuai_Domisili`, `RW_Sesuai_Domisili`, `Kelurahan_Desa_Domisili`, `Kecamatan_Sesuai_Domisili`, `Kabupaten_Kota_Sesuai_Domisili`, `Provinsi_Sesuai_Domisili`, `Alamat_Lengkap`, `created_at`, `updated_at`) VALUES
-(2, 111, '1', 'Aktif', 'Mirai', '1111', 'Mirai', 'Kudus', '2001-01-09', '24 Tahun', 'P', 'Menikah', 'AB', '081234234234', 'mirai@gmail.com', 'Jl. Manggis Kudus', '003', '001', 'WERGU WETAN', 'KOTA KUDUS', 'KABUPATEN KUDUS', 'JAWA TENGAH', 'Jl. Manggis Kudus', '003', '001', 'WERGU WETAN', 'KOTA KUDUS', 'KABUPATEN KUDUS', 'JAWA TENGAH', 'Jl. Manggis Kudus', '2025-12-10 06:45:49', NULL),
-(3, 21670004, '1', 'Aktif', 'Marcell Bas', '234', 'Marcell Bas', 'pati', '1980-02-15', '45 Tahun', 'L', 'Menikah', 'O', '081999999999', 'marcellbas@gmail.com', 'Jakarta', '01', '01', 'KEBON SIRIH', 'MENTENG', 'KOTA JAKARTA PUSAT', 'DKI JAKARTA', 'Pati', '01', '02', 'PURI', 'PATI', 'KABUPATEN PATI', 'JAWA TENGAH', 'Puri Pati', '2025-12-10 06:45:49', NULL),
-(5, 123456, '1', 'Aktif', 'Budi Santoso', '3.31123452345234', 'Budi Santoso', 'Pati', '2002-02-12', '23 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '081234567890', 'budi@gmail.com', 'Ds Bumiayu RT 01 RW 02 Kecamatan Wedarijaksa Kabupaten Pati', '001', '002', 'BUMIAYU', 'WEDARIJAKSA', 'KABUPATEN PATI', 'JAWA TENGAH', 'Ds Bumiayu RT 01 RW 02 Kecamatan Wedarijaksa Kabupaten Pati', '001', '002', 'BUMIAYU', 'WEDARIJAKSA', 'KABUPATEN PATI', 'JAWA TENGAH', 'Ds Bumiayu RT 01 RW 02 Kecamatan Wedarijaksa Kabupaten Pati', '2025-12-12 03:17:08', NULL),
-(8, 333333333, '1', 'Aktif', 'Karyawan1', '1', 'Karyawan1', 'Pati', '1996-01-01', '29 Tahun', 'P', 'Menikah', 'B', '081234567890', 'karyawan1@gmail.com', 'Pati', '01', '02', 'WINONG', 'PATI', 'KABUPATEN PATI', 'JAWA TENGAH', 'Pati', '01', '02', 'WINONG', 'PATI', 'KABUPATEN PATI', 'JAWA TENGAH', 'Pati', '2025-12-14 08:42:52', NULL),
-(9, 12345, '1', 'Aktif', 'Tokio', '3311234523452345', 'Tokio', 'Pati', '1999-03-14', '26 Tahun', 'L', 'Menikah', 'Tidak Tahu', '081234567890', 'tokio@gmail.com', 'batam', '001', '002', 'BELIAN', 'BATAM KOTA', 'KOTA B A T A M', 'KEPULAUAN RIAU', 'batam', '001', '002', 'BELIAN', 'BATAM KOTA', 'KOTA B A T A M', 'KEPULAUAN RIAU', 'batam', '2025-12-14 10:21:21', NULL),
+(2, 1111, '1', 'Aktif', 'Mirai', '1111', 'Mirai', 'Kudus', '2001-01-09', '24 Tahun', 'P', 'Menikah', 'AB', '081234234234', 'mirai@gmail.com', 'Jl. Manggis Kudus', '003', '001', 'WERGU WETAN', 'KOTA KUDUS', 'KABUPATEN KUDUS', 'JAWA TENGAH', 'Jl. Manggis Kudus', '003', '001', 'WERGU WETAN', 'KOTA KUDUS', 'KABUPATEN KUDUS', 'JAWA TENGAH', 'Jl. Manggis Kudus', '2025-12-10 06:45:49', '2025-12-29 06:07:59'),
+(3, 21670004, '1', 'Aktif', 'Marcell Bas', '234', 'Marcell Bas', 'pati', '1980-02-15', '45 Tahun', 'L', 'Menikah', 'O', '081999999999', 'marcellbas@gmail.com', 'Jakarta', '01', '01', 'KEBON SIRIH', 'MENTENG', 'KOTA JAKARTA PUSAT', 'DKI JAKARTA', 'Pati', '01', '02', 'PURI', 'PATI', 'KABUPATEN PATI', 'JAWA TENGAH', 'Puri Pati', '2025-12-10 06:45:49', '2025-12-29 04:18:02'),
+(5, 123456, '1', 'Aktif', 'Budi Santoso', '3.31123452345234', 'Budi Santoso', 'Pati', '2002-02-12', '23 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '081234567890', 'budi@gmail.com', 'Ds Bumiayu RT 01 RW 02 Kecamatan Wedarijaksa Kabupaten Pati', '001', '002', 'BUMIAYU', 'WEDARIJAKSA', 'KABUPATEN PATI', 'JAWA TENGAH', 'Ds Bumiayu RT 01 RW 02 Kecamatan Wedarijaksa Kabupaten Pati', '001', '002', 'BUMIAYU', 'WEDARIJAKSA', 'KABUPATEN PATI', 'JAWA TENGAH', 'Ds Bumiayu RT 01 RW 02 Kecamatan Wedarijaksa Kabupaten Pati', '2025-12-12 03:17:08', '2025-12-29 04:18:02'),
+(8, 333333333, '1', 'Aktif', 'Karyawan1', '1', 'Karyawan1', 'Pati', '1996-01-01', '29 Tahun', 'P', 'Menikah', 'B', '081234567890', 'karyawan1@gmail.com', 'Pati', '01', '02', 'WINONG', 'PATI', 'KABUPATEN PATI', 'JAWA TENGAH', 'Pati', '01', '02', 'WINONG', 'PATI', 'KABUPATEN PATI', 'JAWA TENGAH', 'Pati', '2025-12-14 08:42:52', '2025-12-29 04:18:02'),
+(9, 12345, '1', 'Aktif', 'Tokio', '3311234523452345', 'Tokio', 'Pati', '1999-03-14', '26 Tahun', 'L', 'Menikah', 'Tidak Tahu', '081234567890', 'tokio@gmail.com', 'batam', '001', '002', 'BELIAN', 'BATAM KOTA', 'KOTA B A T A M', 'KEPULAUAN RIAU', 'batam', '001', '002', 'BELIAN', 'BATAM KOTA', 'KOTA B A T A M', 'KEPULAUAN RIAU', 'batam', '2025-12-14 10:21:21', '2025-12-29 04:18:02'),
 (10, 120021204036, '1', 'Aktif', 'Abie Surya Fuadi', '3308030604860000', 'Abie Surya Fuadi', 'Magelang', '1986-04-06', '39 Tahun', 'L', 'Menikah', 'O', '82323302600', 'ABIESURYA86@GMAIL.COM', 'Dk Serut Ds Kedungbulus Rt 3 Rw 3 Kec Gembong Kab Pati', '3', '3', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Serut Kedungbulus Gembong Pati', '003', '003', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
 (11, 120021711062, '1', 'Aktif', 'Muhammad Andi Purwanto', '3320091001940000', 'Muhammad Andi Purwanto', 'Jepara', '1994-01-10', '31 Tahun', 'L', 'Menikah', 'O', '85288040012', 'SADIRWKD@GMAIL.COM', 'Karangrejo', '4', '2', 'Clering', 'Donorojo', 'Jepara', 'Jawa Tengah', 'Karangrejo', '004', '002', 'Clering', 'Donorojo', 'Jepara', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
 (12, 220022004761, '0', 'Non Aktif', 'Bayu Aji Prasetyo', '3313012207990000', 'Bayu Aji Prasetyo', 'Wonogiri', '1999-07-22', '26 Tahun', 'L', 'Belum Menikah', 'O', '82135636314', 'BAYUAJIPRASETYO220799@GMAIL.COM', 'Klerong', '7', '3', 'Jatisobo', 'Jatipuro', 'Karanganyar', 'Jawa Tengah', 'Klerong', '007', '003', 'Jatisobo', 'Jatipuro', 'Karanganyar', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
@@ -473,7 +486,7 @@ INSERT INTO `karyawan` (`id_karyawan`, `NIK`, `Status`, `Kode`, `Nama_Sesuai_KTP
 (239, 220021811550, '0', 'Non Aktif', 'Jatmiko', '3302261411870000', 'Jatmiko', 'Banyumas', '1987-11-14', '38 Tahun', 'L', 'Menikah', 'Tidak Tahu', '81298091212', 'JMSIANO001@GMAIL.COM', 'Kalibagor', '2', '3', 'Kalibagor', 'Kalibagor', 'Banyumas', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
 (240, 220021608395, '1', 'Aktif', 'Mukhammad Rindo Setiyawan', '3318132404970000', 'Mukhammad Rindo Setiyawan', 'Pati', '1997-04-24', '28 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85747064249', 'RIDHOSETIAWAN2497@GMAIL.COM', 'Ds. Ketanggan', '1', '3', 'Ketanggan', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Ketanggan', '001', '003', 'Ketanggan', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Ketanggan, Rt. 01/03, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
 (241, 120021402039, '1', 'Aktif', 'Muhammad Shobirin', '3318132010900000', 'Muhammad Shobirin', 'Pati', '1990-10-20', '35 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85747799592', 'MUHAMMADSHOBIRINGL100@GMAIL.COM', 'Gembong', '1', '13', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Gembong', '001', '013', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
-(242, 220021802427, '0', 'Non Aktif', 'A\'An Agus Prasetya', '3318132311980000', 'A\'An Agus Prasetya', 'Pati', '1998-11-23', '27 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82339520512', 'SINCHANAAN7@GMAIL.COM', 'Dk.Bengkal', '1', '6', 'Plukaran', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Bengkal Ds. Plukaran', '001', '006', 'Plukaran', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(242, 220021802427, '0', 'Non Aktif', 'A\'An Agus Prasetya', '3318132311980000', 'A\'An Agus Prasetya', 'Pati', '1998-11-23', '27 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '082339520512', 'SINCHANAAN7@GMAIL.COM', 'Dk.Bengkal', '1', '6', 'Plukaran', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Bengkal Ds. Plukaran', '001', '006', 'Plukaran', 'Gembong', 'Pati', 'Jawa Tengah', NULL, '2025-12-23 03:48:30', '2025-12-27 04:28:35'),
 (243, 220022012843, '0', 'Non Aktif', 'Ni\'Ma Diana', '6474015210980000', 'Ni\'Ma Diana', 'Pati', '1998-10-12', '27 Tahun', 'P', 'Belum Menikah', 'AB', '81292610579', 'NIKMAADIANA@GMAIL.COM', 'Jl. Raya Pati-Tayu Km. 7', '4', '3', 'Sukoharjo', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
 (244, 220022012841, '0', 'Non Aktif', 'Septiana Indriani Kusumaningrum', '3318134609990000', 'Septiana Indriani Kusumaningrum', 'Pati', '1999-09-06', '26 Tahun', 'P', 'Belum Menikah', 'B', '81336703846', 'SEPTIANAINDRIANIKUSUMANINGRUM@GMAIL.COM', 'Ds. Bermi 2/4 Kkec. Gembong Kab. Pati, Kode Pos. 59162', '2', '4', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Bermi 2/4 Kec. Gembong Kab. Pati, Kode Pos. 59162', '002', '004', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Bermi Rt. 02 Rw. 04 Kec. Gembong Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
 (245, 220021412268, '1', 'Aktif', 'Luthfi Al Hakim', '3318132806920000', 'Luthfi Al Hakim', 'Pati', '1992-06-28', '33 Tahun', 'L', 'Menikah', 'B', '82228886452', 'EL_H77@YAHOO.COM', 'Dk.Rambutan', '1', '6', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Rambutan', '001', '006', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Pohgading, Rt. 01/06, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
@@ -1129,8 +1142,8 @@ CREATE TABLE `kontrak` (
   `Masa_Kerja` varchar(255) DEFAULT NULL,
   `NO_PKWT_PERTAMA` varchar(255) DEFAULT NULL,
   `NO_SK_PERTAMA` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NULL DEFAULT NULL
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -1138,10 +1151,10 @@ CREATE TABLE `kontrak` (
 --
 
 INSERT INTO `kontrak` (`id_kontrak`, `id_karyawan`, `Tanggal_Mulai_Tugas`, `PKWT_Berakhir`, `Tanggal_Diangkat_Menjadi_Karyawan_Tetap`, `Riwayat_Penempatan`, `Tanggal_Riwayat_Penempatan`, `Mutasi_Promosi_Demosi`, `Tanggal_Mutasi_Promosi_Demosi`, `Masa_Kerja`, `NO_PKWT_PERTAMA`, `NO_SK_PERTAMA`, `created_at`, `updated_at`) VALUES
-(1, 3, '2021-03-05', '2020-02-15', '2020-03-15', 'Sales', '2017-07-15', 'Promosi', '2021-01-15', '4 Tahun 9 Bulan 10 Hari', '001/PKWT', '001/SK', '2025-12-10 06:58:20', NULL),
-(2, 5, '2025-11-24', '2026-05-02', NULL, NULL, NULL, NULL, NULL, '0 Tahun 0 Bulan 18 Hari', NULL, NULL, '2025-12-12 03:17:08', NULL),
-(6, 2, '2018-03-08', '2026-01-14', '2025-12-15', 'Akuntan', '2025-12-23', 'Promosi', '2025-12-09', '7 Tahun 9 Bulan 7 Hari', 'Npkwt1', 'Nsk1', '2025-12-14 15:19:47', NULL),
-(7, 8, '2021-03-15', NULL, NULL, NULL, NULL, NULL, NULL, '4 Tahun 9 Bulan 1 Hari', NULL, NULL, '2025-12-16 03:25:51', NULL);
+(1, 3, '2021-03-05', '2020-02-15', '2020-03-15', 'Sales', '2017-07-15', 'Promosi', '2021-01-15', '4 Tahun 9 Bulan 10 Hari', '001/PKWT', '001/SK', '2025-12-10 06:58:20', '2025-12-29 04:16:12'),
+(2, 5, '2025-11-24', '2026-05-02', NULL, NULL, NULL, NULL, NULL, '0 Tahun 0 Bulan 18 Hari', NULL, NULL, '2025-12-12 03:17:08', '2025-12-29 04:16:12'),
+(6, 2, '2018-03-08', '2026-01-14', '2025-12-15', 'Akuntan', '2025-12-23', 'Promosi', '2025-12-09', '7 Tahun 9 Bulan 21 Hari', 'Npkwt11', 'Nsk11', '2025-12-14 15:19:47', '2025-12-29 06:07:59'),
+(7, 8, '2021-03-15', NULL, NULL, NULL, NULL, NULL, NULL, '4 Tahun 9 Bulan 1 Hari', NULL, NULL, '2025-12-16 03:25:51', '2025-12-29 04:16:12');
 
 -- --------------------------------------------------------
 
@@ -1333,8 +1346,8 @@ CREATE TABLE `pekerjaan` (
   `Jenis_Kontrak` enum('PKWT','PKWTT') DEFAULT NULL,
   `Perjanjian` enum('Harian Lepas','Kontrak','Tetap') DEFAULT NULL,
   `Lokasi_Kerja` enum('Central Java - Pati','Central Java - Pekalongan','Central Java - Purwokerto','Central Java - Surakarta','Central Java - Magelang','Central Java - Semarang','Central Java - Tegal','West Java - Purwakarta','West Java - Cianjur','West Java - Bandung','West Java - Bogor','West Java - Cirebon','West Java - Tangerang','West Java - Bekasi','West Java - Tasikmalaya','Banten - Serang','East Java - Bojonegoro','East Java - Jember','East Java - Madiun','East Java - Madura','East Java - Sidoarjo','Bali - Bali','East Java - Malang','East Java - Kediri','South Sumatra - Lampung','South Sumatra - Palembang','DIY - Yogyakarta','South Sulawesi - Makassar') DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NULL DEFAULT NULL
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -1342,11 +1355,11 @@ CREATE TABLE `pekerjaan` (
 --
 
 INSERT INTO `pekerjaan` (`id_pekerjaan`, `id_karyawan`, `Jabatan`, `Bagian`, `Departement`, `Divisi`, `Unit`, `Jenis_Kontrak`, `Perjanjian`, `Lokasi_Kerja`, `created_at`, `updated_at`) VALUES
-(1, 3, 'General Manager (GM)', 'Sales & Marketing', 'MARKETING & SALES', 'Marketing', 'Factory 1', 'PKWTT', 'Tetap', 'Central Java - Pati', '2025-12-10 06:54:30', NULL),
-(2, 5, 'Staff', 'Web Dev', 'BUSINESS DEVELOPMENT', 'HRD', 'Factory 1', NULL, 'Kontrak', 'Central Java - Pati', '2025-12-12 03:17:08', NULL),
-(4, 8, 'Staff', 'Marketing', 'FINANCE & ACCOUNTING', 'Finance & Accounting', 'Factory 1', 'PKWT', 'Kontrak', 'Central Java - Pati', '2025-12-14 08:42:52', NULL),
-(5, 9, 'Staff', 'Sales', 'MARKETING & SALES', 'Div. Marketing & Sales', 'Factory 1', 'PKWTT', 'Tetap', 'South Sumatra - Lampung', '2025-12-14 10:21:21', NULL),
-(6, 2, 'Staff', 'finance', 'FINANCE & ACCOUNTING', 'Finance & Accounting', 'Factory 1', 'PKWT', 'Kontrak', 'Central Java - Pati', '2025-12-14 14:03:43', NULL);
+(1, 3, 'General Manager (GM)', 'Sales & Marketing', 'MARKETING & SALES', 'Marketing', 'Factory 1', 'PKWTT', 'Tetap', 'Central Java - Pati', '2025-12-10 06:54:30', '2025-12-29 04:19:04'),
+(2, 5, 'Staff', 'Web Dev', 'BUSINESS DEVELOPMENT', 'HRD', 'Factory 1', NULL, 'Kontrak', 'Central Java - Pati', '2025-12-12 03:17:08', '2025-12-29 04:19:04'),
+(4, 8, 'Staff', 'Marketing', 'FINANCE & ACCOUNTING', 'Finance & Accounting', 'Factory 1', 'PKWT', 'Kontrak', 'Central Java - Pati', '2025-12-14 08:42:52', '2025-12-29 04:19:04'),
+(5, 9, 'Staff', 'Sales', 'MARKETING & SALES', 'Div. Marketing & Sales', 'Factory 1', 'PKWTT', 'Tetap', 'South Sumatra - Lampung', '2025-12-14 10:21:21', '2025-12-29 04:19:04'),
+(6, 2, 'Staff', 'finance', 'FINANCE & ACCOUNTING', 'Finance & Accounting', 'Finance', 'PKWT', 'Kontrak', 'Central Java - Pati', '2025-12-14 14:03:43', '2025-12-29 06:07:59');
 
 -- --------------------------------------------------------
 
@@ -1357,7 +1370,8 @@ INSERT INTO `pekerjaan` (`id_pekerjaan`, `id_karyawan`, `Jabatan`, `Bagian`, `De
 CREATE TABLE `pemberkasan` (
   `id_pemberkasan` int(11) NOT NULL,
   `kandidat_id` int(11) DEFAULT NULL,
-  `follow_up` text DEFAULT NULL,
+  `posisi_id` int(11) DEFAULT NULL,
+  `follow_up` date DEFAULT NULL,
   `kandidat_kirim_berkas` date DEFAULT NULL,
   `selesai_recruitment` date DEFAULT NULL,
   `selesai_skgk_finance` date DEFAULT NULL,
@@ -1374,8 +1388,9 @@ CREATE TABLE `pemberkasan` (
 -- Dumping data untuk tabel `pemberkasan`
 --
 
-INSERT INTO `pemberkasan` (`id_pemberkasan`, `kandidat_id`, `follow_up`, `kandidat_kirim_berkas`, `selesai_recruitment`, `selesai_skgk_finance`, `selesai_ttd_manager_hrd`, `selesai_ttd_user`, `selesai_ttd_direktur`, `jadwal_ttd_kontrak`, `background_checking`, `created_at`, `updated_at`) VALUES
-(1, 4, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-12-17 00:46:58', '2025-12-17 00:46:58');
+INSERT INTO `pemberkasan` (`id_pemberkasan`, `kandidat_id`, `posisi_id`, `follow_up`, `kandidat_kirim_berkas`, `selesai_recruitment`, `selesai_skgk_finance`, `selesai_ttd_manager_hrd`, `selesai_ttd_user`, `selesai_ttd_direktur`, `jadwal_ttd_kontrak`, `background_checking`, `created_at`, `updated_at`) VALUES
+(2, 3, 3, '2025-12-19', '2025-12-22', '2025-12-20', '2025-12-23', '2025-12-23', '2025-12-24', '2025-12-24', '2025-12-25', 'Clear', '2025-12-28 19:49:49', '2025-12-29 07:20:41'),
+(4, 7, NULL, '2025-12-27', '2025-12-29', '2025-12-29', '2025-12-29', '2025-12-29', '2025-12-29', '2025-12-29', '2025-12-31', 'Belum', '2025-12-29 07:57:09', '2025-12-29 07:57:31');
 
 -- --------------------------------------------------------
 
@@ -1389,8 +1404,8 @@ CREATE TABLE `pendidikan` (
   `Pendidikan_Terakhir` enum('SD','SLTP','SLTA','DIPLOMA I','DIPLOMA II','DIPLOMA III','DIPLOMA IV','S1','S2') DEFAULT NULL,
   `Nama_Lengkap_Tempat_Pendidikan_Terakhir` varchar(255) DEFAULT NULL,
   `Jurusan` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NULL DEFAULT NULL
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -1398,11 +1413,11 @@ CREATE TABLE `pendidikan` (
 --
 
 INSERT INTO `pendidikan` (`id_pendidikan`, `id_karyawan`, `Pendidikan_Terakhir`, `Nama_Lengkap_Tempat_Pendidikan_Terakhir`, `Jurusan`, `created_at`, `updated_at`) VALUES
-(1, 3, 'S2', 'Universitas Diponegoro', 'Manajemen', '2025-12-10 06:59:33', NULL),
-(2, 5, 'S1', 'Universitas PGRI Semarang', 'Informatika', '2025-12-12 03:17:08', NULL),
-(4, 8, 'S1', 'Universitas Negeri Semarang', 'Manajemen', '2025-12-14 08:42:52', NULL),
-(5, 9, 'S1', 'Universitas Diponegoro', 'Manajemen', '2025-12-14 10:21:22', NULL),
-(6, 2, 'S1', 'Universitas Sebelas Maret', 'Akuntansi', '2025-12-14 15:11:34', NULL);
+(1, 3, 'S2', 'Universitas Diponegoro', 'Manajemen', '2025-12-10 06:59:33', '2025-12-29 04:19:43'),
+(2, 5, 'S1', 'Universitas PGRI Semarang', 'Informatika', '2025-12-12 03:17:08', '2025-12-29 04:19:43'),
+(4, 8, 'S1', 'Universitas Negeri Semarang', 'Manajemen', '2025-12-14 08:42:52', '2025-12-29 04:19:43'),
+(5, 9, 'S1', 'Universitas Diponegoro', 'Manajemen', '2025-12-14 10:21:22', '2025-12-29 04:19:43'),
+(6, 2, 'S1', 'Universitas Diponegoro', 'Akuntansi', '2025-12-14 15:11:34', '2025-12-29 06:07:59');
 
 -- --------------------------------------------------------
 
@@ -1414,8 +1429,8 @@ CREATE TABLE `perusahaan` (
   `id_perusahaan` bigint(20) NOT NULL,
   `id_karyawan` bigint(20) DEFAULT NULL,
   `Perusahaan` enum('CV BERKAH NEGERI MULIA','PT INTI DUNIA MANDIRI','PT SOCHA INTI INFORMATIKA','PT TIMUR SEMESTA ABADI','PT WADJA INTI MULIA','PT WADJA INTI MULIA PERSADA','PT WADJA KARYA DUNIA','TAMANSARI EQUESTRIAN PARK') DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NULL DEFAULT NULL
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -1423,11 +1438,11 @@ CREATE TABLE `perusahaan` (
 --
 
 INSERT INTO `perusahaan` (`id_perusahaan`, `id_karyawan`, `Perusahaan`, `created_at`, `updated_at`) VALUES
-(1, 3, 'PT WADJA INTI MULIA', '2025-12-10 07:04:07', NULL),
-(2, 5, 'PT WADJA KARYA DUNIA', '2025-12-12 03:17:08', NULL),
-(4, 8, 'PT WADJA INTI MULIA', '2025-12-14 08:42:52', NULL),
-(5, 9, 'PT WADJA KARYA DUNIA', '2025-12-14 10:21:22', NULL),
-(6, 2, 'PT WADJA KARYA DUNIA', '2025-12-14 14:34:16', NULL);
+(1, 3, 'PT WADJA INTI MULIA', '2025-12-10 07:04:07', '2025-12-29 04:20:19'),
+(2, 5, 'PT WADJA KARYA DUNIA', '2025-12-12 03:17:08', '2025-12-29 04:20:19'),
+(4, 8, 'PT WADJA INTI MULIA', '2025-12-14 08:42:52', '2025-12-29 04:20:19'),
+(5, 9, 'PT WADJA KARYA DUNIA', '2025-12-14 10:21:22', '2025-12-29 04:20:19'),
+(6, 2, 'PT WADJA KARYA DUNIA', '2025-12-14 14:34:16', '2025-12-29 04:20:19');
 
 -- --------------------------------------------------------
 
@@ -1459,7 +1474,7 @@ INSERT INTO `posisi` (`id_posisi`, `nama_posisi`, `status`, `created_at`, `updat
 (12, 'Sales Bandung', 'Aktif', '2025-12-17 19:03:24', '2025-12-24 01:45:17'),
 (13, 'Sales Jakarta', 'Aktif', '2025-12-18 20:09:45', '2025-12-18 20:09:45'),
 (15, 'Sales Lampung', 'Aktif', '2025-12-21 20:06:55', '2025-12-21 20:06:55'),
-(21, 'CEK', 'Nonaktif', '2025-12-21 21:03:08', '2025-12-24 00:30:20');
+(21, 'Sales Makassar', 'Aktif', '2025-12-21 21:03:08', '2025-12-26 21:24:34');
 
 -- --------------------------------------------------------
 
@@ -1503,8 +1518,8 @@ CREATE TABLE `rekrutmen_daily` (
   `lolos_user` int(11) NOT NULL DEFAULT 0,
   `notes` text DEFAULT NULL,
   `created_by` bigint(20) UNSIGNED DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -1647,7 +1662,9 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('IREwvj4Uuoove5qncqiHFbdmW9broqJPW5eoMfqP', 3, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiZGdJTEk0b1ZPQ2k4M0tjdVFjV1VNemlER2dWcXlnSG1BRUdDWUV6WiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NTk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9yZWtydXRtZW4va2FuZGlkYXRfbGFuanV0X3VzZXIvY3JlYXRlIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6Mzt9', 1766802265);
+('DfF4TtxXQqIfIcxtI62J7Tw3E31jAHzk3rtkLFhi', 3, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiSkFNR3Z4NzRQOWRKYnhTS0djakN6TlN4cWR3ZFJOd2s3SHkxVjJ5eSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzA6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC90cmFpbmluZyI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjM7fQ==', 1767059807),
+('Pr7ICcyOX4k58zuOPhKcES6DAl5wkGueRINbTmrR', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiMEI1dk9wR2s4Vkx3VVBZZUlBWXp2cHk1TTFGazh4eVhFM3hhdERnUCI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzA6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC90cmFpbmluZyI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1767059850),
+('WwYV3TDKTKoRqHrgm1sQYQzjLXab22AzqP1T6Wzu', 3, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiZGFDcHRQTkpsTUs2RWVuRjc1Mm5UM1dBRXpYVVdNRTdiMTd1NTV5aSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzA6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC90cmFpbmluZyI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjM7fQ==', 1766996168);
 
 -- --------------------------------------------------------
 
@@ -1662,8 +1679,8 @@ CREATE TABLE `status_karyawan` (
   `Alasan_Non_Aktif` varchar(255) DEFAULT NULL,
   `Ijazah_Dikembalikan` varchar(255) DEFAULT NULL,
   `Bulan` double DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NULL DEFAULT NULL
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -1671,9 +1688,28 @@ CREATE TABLE `status_karyawan` (
 --
 
 INSERT INTO `status_karyawan` (`id_status`, `id_karyawan`, `Tanggal_Non_Aktif`, `Alasan_Non_Aktif`, `Ijazah_Dikembalikan`, `Bulan`, `created_at`, `updated_at`) VALUES
-(1, 3, NULL, '-', NULL, NULL, '2025-12-10 07:05:00', NULL),
-(3, 8, '2025-10-16', 'Cuti Melahirkan', 'Tidak', NULL, '2025-12-14 08:42:52', NULL),
-(4, 2, '2025-12-29', 'Cuti', 'Tidak', NULL, '2025-12-14 14:03:42', NULL);
+(1, 3, NULL, '-', NULL, NULL, '2025-12-10 07:05:00', '2025-12-29 04:22:37'),
+(3, 8, '2025-10-16', 'Cuti Melahirkan', 'Tidak', NULL, '2025-12-14 08:42:52', '2025-12-29 04:22:37'),
+(4, 2, NULL, NULL, NULL, NULL, '2025-12-14 14:03:42', '2025-12-29 05:03:24');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `training`
+--
+
+CREATE TABLE `training` (
+  `id_training` int(11) NOT NULL,
+  `kandidat_id` int(11) NOT NULL,
+  `posisi_id` int(11) NOT NULL,
+  `tanggal_mulai` date DEFAULT NULL,
+  `tanggal_selesai` date DEFAULT NULL,
+  `jadwal_ttd_kontrak` date DEFAULT NULL,
+  `hasil_evaluasi` enum('LULUS TRAINING','TIDAK LULUS TRAINING','MENGUNDURKAN DIRI') DEFAULT NULL,
+  `keterangan_tambahan` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -1689,8 +1725,8 @@ CREATE TABLE `users` (
   `jabatan` varchar(200) DEFAULT NULL,
   `role` varchar(80) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NULL DEFAULT NULL
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -1776,7 +1812,8 @@ ALTER TABLE `data_keluarga`
 --
 ALTER TABLE `interview_hr`
   ADD PRIMARY KEY (`id_interview_hr`),
-  ADD KEY `fk_interview_hr_kandidat` (`kandidat_id`);
+  ADD KEY `fk_interview_hr_kandidat` (`kandidat_id`),
+  ADD KEY `fk_interview_hr_posisi` (`posisi_id`);
 
 --
 -- Indeks untuk tabel `kandidat`
@@ -1790,7 +1827,8 @@ ALTER TABLE `kandidat`
 --
 ALTER TABLE `kandidat_lanjut_user`
   ADD PRIMARY KEY (`id_kandidat_lanjut_user`),
-  ADD KEY `kandidat_id` (`kandidat_id`);
+  ADD KEY `kandidat_id` (`kandidat_id`),
+  ADD KEY `fk_lanjut_user_posisi` (`posisi_id`);
 
 --
 -- Indeks untuk tabel `karyawan`
@@ -1844,7 +1882,8 @@ ALTER TABLE `pekerjaan`
 --
 ALTER TABLE `pemberkasan`
   ADD PRIMARY KEY (`id_pemberkasan`),
-  ADD KEY `kandidat_id` (`kandidat_id`);
+  ADD KEY `kandidat_id` (`kandidat_id`),
+  ADD KEY `fk_pemberkasan_posisi` (`posisi_id`);
 
 --
 -- Indeks untuk tabel `pendidikan`
@@ -1896,6 +1935,14 @@ ALTER TABLE `status_karyawan`
   ADD KEY `id_karyawan` (`id_karyawan`);
 
 --
+-- Indeks untuk tabel `training`
+--
+ALTER TABLE `training`
+  ADD PRIMARY KEY (`id_training`),
+  ADD KEY `fk_training_kandidat` (`kandidat_id`),
+  ADD KEY `fk_training_posisi` (`posisi_id`);
+
+--
 -- Indeks untuk tabel `users`
 --
 ALTER TABLE `users`
@@ -1935,7 +1982,7 @@ ALTER TABLE `data_keluarga`
 -- AUTO_INCREMENT untuk tabel `interview_hr`
 --
 ALTER TABLE `interview_hr`
-  MODIFY `id_interview_hr` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_interview_hr` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT untuk tabel `kandidat`
@@ -1947,7 +1994,7 @@ ALTER TABLE `kandidat`
 -- AUTO_INCREMENT untuk tabel `kandidat_lanjut_user`
 --
 ALTER TABLE `kandidat_lanjut_user`
-  MODIFY `id_kandidat_lanjut_user` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_kandidat_lanjut_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT untuk tabel `karyawan`
@@ -1995,7 +2042,7 @@ ALTER TABLE `pekerjaan`
 -- AUTO_INCREMENT untuk tabel `pemberkasan`
 --
 ALTER TABLE `pemberkasan`
-  MODIFY `id_pemberkasan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_pemberkasan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT untuk tabel `pendidikan`
@@ -2013,7 +2060,7 @@ ALTER TABLE `perusahaan`
 -- AUTO_INCREMENT untuk tabel `posisi`
 --
 ALTER TABLE `posisi`
-  MODIFY `id_posisi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id_posisi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT untuk tabel `proses_rekrutmen`
@@ -2032,6 +2079,12 @@ ALTER TABLE `rekrutmen_daily`
 --
 ALTER TABLE `status_karyawan`
   MODIFY `id_status` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT untuk tabel `training`
+--
+ALTER TABLE `training`
+  MODIFY `id_training` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT untuk tabel `users`
@@ -2066,6 +2119,7 @@ ALTER TABLE `data_keluarga`
 --
 ALTER TABLE `interview_hr`
   ADD CONSTRAINT `fk_interview_hr_kandidat` FOREIGN KEY (`kandidat_id`) REFERENCES `kandidat` (`id_kandidat`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_interview_hr_posisi` FOREIGN KEY (`posisi_id`) REFERENCES `posisi` (`id_posisi`) ON DELETE SET NULL,
   ADD CONSTRAINT `interview_hr_ibfk_1` FOREIGN KEY (`kandidat_id`) REFERENCES `kandidat` (`id_kandidat`) ON DELETE CASCADE;
 
 --
@@ -2078,6 +2132,7 @@ ALTER TABLE `kandidat`
 -- Ketidakleluasaan untuk tabel `kandidat_lanjut_user`
 --
 ALTER TABLE `kandidat_lanjut_user`
+  ADD CONSTRAINT `fk_lanjut_user_posisi` FOREIGN KEY (`posisi_id`) REFERENCES `posisi` (`id_posisi`) ON DELETE SET NULL,
   ADD CONSTRAINT `kandidat_lanjut_user_ibfk_1` FOREIGN KEY (`kandidat_id`) REFERENCES `kandidat` (`id_kandidat`);
 
 --
@@ -2114,6 +2169,7 @@ ALTER TABLE `pekerjaan`
 -- Ketidakleluasaan untuk tabel `pemberkasan`
 --
 ALTER TABLE `pemberkasan`
+  ADD CONSTRAINT `fk_pemberkasan_posisi` FOREIGN KEY (`posisi_id`) REFERENCES `posisi` (`id_posisi`) ON DELETE SET NULL,
   ADD CONSTRAINT `pemberkasan_ibfk_1` FOREIGN KEY (`kandidat_id`) REFERENCES `kandidat` (`id_kandidat`);
 
 --
@@ -2145,6 +2201,13 @@ ALTER TABLE `rekrutmen_daily`
 --
 ALTER TABLE `status_karyawan`
   ADD CONSTRAINT `status_karyawan_ibfk_1` FOREIGN KEY (`id_karyawan`) REFERENCES `karyawan` (`id_karyawan`);
+
+--
+-- Ketidakleluasaan untuk tabel `training`
+--
+ALTER TABLE `training`
+  ADD CONSTRAINT `fk_training_kandidat` FOREIGN KEY (`kandidat_id`) REFERENCES `kandidat` (`id_kandidat`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_training_posisi` FOREIGN KEY (`posisi_id`) REFERENCES `posisi` (`id_posisi`) ON DELETE CASCADE;
 
 --
 -- Ketidakleluasaan untuk tabel `wig_rekrutmen`

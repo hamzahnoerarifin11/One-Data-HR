@@ -25,16 +25,20 @@ class TrainingController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'kandidat_id' => 'required',
-            'posisi_id' => 'required',
-            'hasil_evaluasi' => 'required'
-        ]);
+    $validated = $request->validate([
+        'kandidat_id'         => 'required|exists:kandidat,id_kandidat',
+        'posisi_id'           => 'required|exists:posisi,id_posisi',
+        'tanggal_mulai'       => 'nullable|date',
+        'tanggal_selesai'     => 'nullable|date',
+        'jadwal_ttd_kontrak'  => 'nullable|date',
+        'hasil_evaluasi'      => 'required|string',
+        'keterangan_tambahan' => 'nullable|string',
+    ]);
 
-        Training::create($request->all());
-        return redirect()->route('training.index')->with('success', 'Data training berhasil ditambahkan');
+    Training::create($validated); // Gunakan $validated lebih aman daripada $request->all()
+
+    return redirect()->route('training.index')->with('success', 'Data training berhasil ditambahkan');
     }
-
     public function show($id)
     {
         $training = Training::with(['kandidat', 'posisi'])->findOrFail($id);

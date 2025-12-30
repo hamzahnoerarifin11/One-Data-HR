@@ -28,9 +28,8 @@
             'id'             => $row->id_kandidat_lanjut_user,
             'nama'           => $row->kandidat?->nama ?? '-',
             'posisi'         => $row->kandidat?->posisi?->nama_posisi ?? '-',
-            'user_terkait'   => $row->user_terkait ?? '-',
-            'ass'            => $row->hasil_ass ?? '-',
-            'asm'            => $row->hasil_asm ?? '-',
+            // Mengambil data dari kolom JSON detail_interview
+            'detail_interview'  => $row->detail_interview ?? [],
             'show_url'       => route('rekrutmen.kandidat_lanjut_user.show', $row->id_kandidat_lanjut_user),
             'edit_url'       => route('rekrutmen.kandidat_lanjut_user.edit', $row->id_kandidat_lanjut_user),
             'delete_url'     => route('rekrutmen.kandidat_lanjut_user.destroy', $row->id_kandidat_lanjut_user),
@@ -90,14 +89,12 @@
                                 <svg :class="sortCol === 'posisi' ? (sortDir === 'asc' ? 'rotate-0' : 'rotate-180') : 'opacity-20'" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
                             </div>
                         </th>
-                        <th @click="sortBy('user_terkait')" class="px-5 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400 cursor-pointer hover:text-blue-600">
+                        <th @click="sortBy('detail_interview')" class="px-5 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400 cursor-pointer hover:text-blue-600">
                             <div class="flex items-center gap-1">
-                                User Terkait
-                                <svg :class="sortCol === 'user_terkait' ? (sortDir === 'asc' ? 'rotate-0' : 'rotate-180') : 'opacity-20'" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+                                User & Hasil Interview
+                                <svg :class="sortCol === 'detail_interview' ? (sortDir === 'asc' ? 'rotate-0' : 'rotate-180') : 'opacity-20'" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
                             </div>
                         </th>
-                        <th class="px-5 py-3 text-center text-sm font-medium text-gray-600 dark:text-gray-400">Hasil ASS</th>
-                        <th class="px-5 py-3 text-center text-sm font-medium text-gray-600 dark:text-gray-400">Hasil ASM</th>
                         <th class="px-5 py-3 text-center text-sm font-medium text-gray-600 dark:text-gray-400">Aksi</th>
                     </tr>
                 </thead>
@@ -106,36 +103,23 @@
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/20 transition">
                             <td class="px-5 py-4 text-sm font-medium text-gray-900 dark:text-white" x-text="row.nama"></td>
                             <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400" x-text="row.posisi"></td>
-                            <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400" x-text="row.user_terkait"></td>
-                            <td class="px-5 py-4 text-center">
-                                <template x-if="row.ass === 'Lolos'">
-                                    <span class="inline-flex rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                                        LOLOS
-                                    </span>
-                                </template>
-                                <template x-if="row.ass === 'Tidak Lolos'">
-                                    <span class="inline-flex rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700 dark:bg-red-900/30 dark:text-red-400">
-                                        TIDAK LOLOS
-                                    </span>
-                                </template>
-                                <template x-if="row.ass !== 'Lolos' && row.ass !== 'Tidak Lolos'">
-                                    <span class="text-sm text-gray-500 dark:text-gray-400" x-text="row.ass"></span>
-                                </template>
-                            </td>
-                            <td class="px-5 py-4 text-center">
-                                <template x-if="row.asm === 'Lolos'">
-                                    <span class="inline-flex rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                                        LOLOS
-                                    </span>
-                                </template>
-                                <template x-if="row.asm === 'Tidak Lolos'">
-                                    <span class="inline-flex rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700 dark:bg-red-900/30 dark:text-red-400">
-                                        TIDAK LOLOS
-                                    </span>
-                                </template>
-                                <template x-if="row.asm !== 'Lolos' && row.asm !== 'Tidak Lolos'">
-                                    <span class="text-sm text-gray-500 dark:text-gray-400" x-text="row.asm"></span>
-                                </template>
+                            <td class="px-5 py-4">
+                                <div class="flex flex-col gap-2">
+                                    <template x-for="(inter, i) in row.detail_interview" :key="i">
+                                        <div class="flex items-center gap-2 text-xs">
+                                            <span class="font-semibold text-gray-700 dark:text-gray-300" x-text="inter.nama_user + ':'"></span>
+
+                                            <span :class="{
+                                                'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400': inter.hasil === 'Lolos',
+                                                'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400': inter.hasil === 'Tidak Lolos',
+                                                'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400': inter.hasil === 'Pending'
+                                            }" class="rounded-full px-2 py-0.5 font-medium" x-text="inter.hasil"></span>
+                                        </div>
+                                    </template>
+                                    <template x-if="row.detail_interview.length === 0">
+                                        <span class="text-xs text-gray-400 italic">Belum ada tahap interview</span>
+                                    </template>
+                                </div>
                             </td>
                             <td class="px-5 py-4 text-center">
                                 <div class="flex items-center justify-center gap-2">
@@ -158,6 +142,13 @@
                                         </button>
                                     </form>
                                 </div>
+                            </td>
+                        </tr>
+                    </template>
+                    <template x-if="filtered.length === 0">
+                        <tr>
+                            <td colspan="7" class="px-5 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
+                                Tidak ada data kandidat lanjut user HR ditemukan.
                             </td>
                         </tr>
                     </template>

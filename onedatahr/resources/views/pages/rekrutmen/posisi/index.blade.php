@@ -13,7 +13,7 @@
             </p>
         </div>
 
-        <button 
+        <button
             @click="window.dispatchEvent(new CustomEvent('open-modal', { detail: { id: 'add-posisi' } }))"
             class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700 transition">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -28,11 +28,11 @@
         <div class="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
            <div class="flex items-center gap-2">
             <label class="text-sm text-gray-500 dark:text-gray-400">Show</label>
-            
-                <div class="relative z-20 w-20"> 
-                    <select 
-                        x-model.number="perPage" 
-                        @change="resetPage" 
+
+                <div class="relative z-20 w-20">
+                    <select
+                        x-model.number="perPage"
+                        @change="resetPage"
                         class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 pr-9 text-sm text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
                     >
                         <option value="5">5</option>
@@ -74,7 +74,7 @@
                 <thead>
                     <tr class="border-y border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-900">
                         <th class="px-6 py-3 text-left text-md font-medium text-gray-600 dark:text-gray-400">#</th>
-                        
+
                         <th @click="sort('nama_posisi')" class="cursor-pointer px-6 py-3 text-left text-md font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600 transition">
                             <div class="flex items-center gap-1">
                                 Nama Posisi
@@ -88,7 +88,9 @@
                                 <svg class="h-4 w-4" :class="sortCol === 'status' ? (sortAsc ? '' : 'rotate-180') : 'opacity-20'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                             </div>
                         </th>
-
+                        <th class="px-6 py-3 text-left text-md font-medium text-gray-600 dark:text-gray-400">
+                            Progress Rekrutmen
+                        </th>
                         <th class="px-6 py-3 text-right text-md font-medium text-gray-600 dark:text-gray-400">Aksi</th>
                     </tr>
                 </thead>
@@ -101,10 +103,24 @@
                                 <div class="text-md font-medium text-gray-900 dark:text-white" x-text="row.nama_posisi"></div>
                             </td>
                             <td class="px-6 py-4 text-md">
-                                <span :class="row.status === 'Aktif' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'" 
-                                      class="inline-flex rounded-full px-3 py-1 text-xs font-medium" 
+                                <span :class="row.status === 'Aktif' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'"
+                                      class="inline-flex rounded-full px-3 py-1 text-xs font-medium"
                                       x-text="row.status">
                                 </span>
+                            </td>
+                            <td class="px-6 py-4 text-md">
+                                <div class="flex flex-col">
+                                    <span x-text="row.progress_rekrutmen"
+                                        :class="{
+                                            'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400': row.progress_rekrutmen === 'Interview HR' || row.progress_rekrutmen === 'Interview User',
+                                            'text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-400': row.progress_rekrutmen === 'Pemberkasan',
+                                            'text-gray-500 bg-gray-50 dark:bg-gray-800 dark:text-gray-400': row.progress_rekrutmen === 'Menerima Kandidat',
+                                            'text-orange-600 bg-orange-50 dark:bg-orange-900/20 dark:text-orange-400': row.progress_rekrutmen === 'Pre Interview'
+                                        }"
+                                        class="inline-flex w-fit rounded-lg px-2 py-0.5 text-xs font-semibold">
+                                    </span>
+                                    <span class="mt-1 text-xs text-gray-400" x-text="row.total_pelamar + ' Pelamar Aktif'"></span>
+                                </div>
                             </td>
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
@@ -118,9 +134,8 @@
                             </td>
                         </tr>
                     </template>
-
                     <tr x-show="paginated.length === 0">
-                        <td colspan="4" class="py-12 text-center text-gray-500">Data tidak ditemukan</td>
+                        <td colspan="5" class="py-12 text-center text-gray-500">Data tidak ditemukan</td>
                     </tr>
                 </tbody>
             </table>
@@ -172,9 +187,9 @@
             </div>
         </div>
         <div class="flex justify-end gap-3 mt-8">
-            <button 
+            <button
                 type="button"
-                @click="window.dispatchEvent(new CustomEvent('close-modal', { detail: { id: 'add-posisi' } }))" 
+                @click="window.dispatchEvent(new CustomEvent('close-modal', { detail: { id: 'add-posisi' } }))"
                 class="rounded-lg border border-gray-300 px-5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400">
                 Batal
             </button>
@@ -211,9 +226,9 @@
             </div>
         </div>
         <div class="flex justify-end gap-3 mt-8">
-           <button 
+           <button
                 type="button"
-                @click="window.dispatchEvent(new CustomEvent('close-modal', { detail: { id: 'edit-posisi' } }))" 
+                @click="window.dispatchEvent(new CustomEvent('close-modal', { detail: { id: 'edit-posisi' } }))"
                 class="rounded-lg border border-gray-300 px-5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400"
             >
                 Batal
@@ -238,9 +253,10 @@ function posisiTable() {
         resetPage() { this.page = 1; },
 
         get filtered() {
-            let filtered = this.data.filter(d => 
+            let filtered = this.data.filter(d =>
                 d.nama_posisi.toLowerCase().includes(this.search.toLowerCase()) ||
                 d.status.toLowerCase().includes(this.search.toLowerCase())
+                (d.progress_rekrutmen && d.progress_rekrutmen.toLowerCase().includes(this.search.toLowerCase()))
             );
 
             // Sorting logic

@@ -55,9 +55,9 @@
                 <span class="text-sm text-gray-500 dark:text-gray-400">Show</span>
 
                 <div x-data="{ isOptionSelected: false }" class="relative z-20">
-                    <select 
-                        x-model.number="perPage" 
-                        @change="resetPage(); isOptionSelected = true" 
+                    <select
+                        x-model.number="perPage"
+                        @change="resetPage(); isOptionSelected = true"
                         class="h-11 w-20 appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 pr-8 text-sm text-gray-800 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
                         :class="isOptionSelected && 'text-gray-800 dark:text-white/90'"
                     >
@@ -78,7 +78,7 @@
             </div>
 
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <button 
+                <button
                     x-show="selected.length > 0"
                     @click="confirmBatchDelete"
                     class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2.5 text-center text-white font-medium hover:bg-red-700 transition shadow-sm"
@@ -273,7 +273,7 @@ function karyawanTable() {
         page: 1,
         perPage: 10,
         // State baru untuk sorting
-        sortCol: 'nama', 
+        sortCol: 'nama',
         sortDir: 'asc',
         selected: [], // Array untuk menyimpan ID yang dicheck
 
@@ -324,7 +324,7 @@ function karyawanTable() {
 
         get filtered() {
             let filteredData = this.data;
-            
+
             // 1. Logic Search
             if (this.search) {
                 const q = this.search.toLowerCase();
@@ -337,7 +337,7 @@ function karyawanTable() {
             return filteredData.sort((a, b) => {
                 let aVal = a[this.sortCol] || '';
                 let bVal = b[this.sortCol] || '';
-                
+
                 if (typeof aVal === 'string') aVal = aVal.toLowerCase();
                 if (typeof bVal === 'string') bVal = bVal.toLowerCase();
 
@@ -346,7 +346,7 @@ function karyawanTable() {
                 return 0;
             });
         },
-        
+
         // ... (fungsi totalPages, paginated, dll tetap sama seperti kode lama Anda)
         get totalPages() {
             return Math.max(1, Math.ceil(this.filtered.length / this.perPage));
@@ -356,7 +356,7 @@ function karyawanTable() {
             const start = (this.page - 1) * this.perPage;
             return this.filtered.slice(start, start + this.perPage);
         },
-        
+
         prevPage() { if (this.page > 1) this.page--; },
         nextPage() { if (this.page < this.totalPages) this.page++; },
         goToPage(p) { if (typeof p === 'number' && p >= 1 && p <= this.totalPages) this.page = p; },

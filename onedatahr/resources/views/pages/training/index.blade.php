@@ -30,8 +30,8 @@
             'tgl_mulai'      => $row->tanggal_mulai ? date('d/m/Y', strtotime($row->tanggal_mulai)) : '-',
             'tgl_selesai'    => $row->tanggal_selesai ? date('d/m/Y', strtotime($row->tanggal_selesai)) : '-',
             'hasil'          => $row->hasil_evaluasi ?? '-',
-            'show_url'       => route('pages.training.show', $row->id_training),
-            'edit_url'       => route('pages.edit', $row->id_training),
+            'show_url'       => route('training.show', $row->id_training),
+            'edit_url'       => route('training.edit', $row->id_training),
             'delete_url'     => route('training.destroy', $row->id_training),
         ])->values();
     @endphp
