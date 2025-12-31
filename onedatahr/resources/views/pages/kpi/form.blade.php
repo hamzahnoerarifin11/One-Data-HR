@@ -107,7 +107,7 @@
                                         <button type="button" onclick="confirmDelete('{{ route('kpi.delete-item', $item->id_kpi_item) }}')" class="text-gray-400 hover:text-red-600 p-1"><i class="fas fa-trash-alt text-[10px]"></i></button>
                                     </div>
                                 </div>
-                                <div class="text-[10px] text-gray-500 mt-1">{{ $item->units ?? $item->satuan }} | {{ $item->polaritas }}</div>
+                                <div class="text-[15px] text-gray-500 mt-1">{{ $item->units ?? $item->satuan }} | {{ $item->polaritas }}</div>
                                 <input type="hidden" class="input-bobot" value="{{ $item->bobot }}">
                                 <input type="hidden" class="input-polaritas" value="{{ $item->polaritas }}">
                             </td>
@@ -121,41 +121,49 @@
 
                             {{-- SEMESTER 1 --}}
                             @php $bln = 'smt1'; @endphp
-                            <td class="p-1 border-r align-top"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][real_{{ $bln }}]" value="{{ $score->{'real_'.$bln} ?? 0 }}" class="input-real-smt1 w-full h-8 px-1 border rounded text-center"></td>
-                            <td class="p-1 border-r align-top text-center bg-gray-50"><div class="py-1.5 font-medium text-gray-600"><span class="span-skor-smt1">0</span>%</div></td>
-                            <td class="p-1 border-r-2 align-top text-center bg-blue-50/20"><div class="py-1.5 font-bold text-blue-700"><span class="span-nilai-smt1">0</span>%</div></td>
+                            <td class="p-1 border-r align-center">
+                                <input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][real_{{ $bln }}]" value="{{ $score->{'real_'.$bln} ?? 0 }}" class="input-real-smt1 w-full h-8 px-1 border rounded text-center"></td>
+                            <td class="p-1 border-r align-center text-center bg-gray-50">
+                                <div class="py-1.5 font-medium text-gray-600"><span class="span-skor-smt1">0</span>%</div>
+                            </td>
+                            <td class="p-1 border-r-2 align-center text-center bg-blue-50/20">
+                                <div class="py-1.5 font-bold text-blue-700"><span class="span-nilai-smt1">0</span>%</div>
+                            </td>
 
                             {{-- BULANAN --}}
                             @foreach(['jul','aug','sep','okt','nov','des'] as $bln)
-                                <td class="p-1 border-r align-top"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][target_{{ $bln }}]" value="{{ $score->{'target_'.$bln} ?? 0 }}" class="input-target-{{ $bln }} w-full h-8 px-1 border rounded text-center"></td>
-                                <td class="p-1 border-r align-top"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][real_{{ $bln }}]" value="{{ $score->{'real_'.$bln} ?? 0 }}" class="input-real-{{ $bln }} w-full h-8 px-1 border rounded text-center"></td>
-                                <td class="p-1 border-r align-top text-center bg-gray-50"><div class="py-1.5 font-medium text-gray-600"><span class="span-skor-{{ $bln }}">0</span>%</div></td>
-                                <td class="p-1 border-r-2 align-top text-center bg-blue-50/20"><div class="py-1.5 font-bold text-blue-700"><span class="span-nilai-{{ $bln }}">0</span>%</div></td>
+                                <td class="p-1 border-r align center"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][target_{{ $bln }}]" value="{{ $score->{'target_'.$bln} ?? 0 }}" class="input-target-{{ $bln }} w-full h-8 px-1 border rounded text-center"></td>
+                                <td class="p-1 border-r align center"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][real_{{ $bln }}]" value="{{ $score->{'real_'.$bln} ?? 0 }}" class="input-real-{{ $bln }} w-full h-8 px-1 border rounded text-center"></td>
+                                <td class="p-1 border-r align center text-center bg-gray-50"><div class="py-1.5 font-medium text-gray-600"><span class="span-skor-{{ $bln }}">0</span>%</div></td>
+                                <td class="p-1 border-r-2 align center text-center bg-blue-50/20"><div class="py-1.5 font-bold text-blue-700"><span class="span-nilai-{{ $bln }}">0</span>%</div></td>
                             @endforeach
 
                             {{-- TOTAL SEMESTER 2 --}}
-                            <td class="p-1 text-center border-r bg-gray-50 align-top">
+                            <td class="p-1 text-center border-r bg-gray-50 align-center">
                                 <input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][total_target_smt2]" value="{{ old('kpi.'.$item->id_kpi_item.'.total_target_smt2', $score->total_target_smt2 ?? 0) }}" class="input-total-target-smt2 w-full h-8 px-1 bg-white border rounded text-center focus:border-blue-500 outline-none placeholder-gray-400" placeholder="0">
                             </td>
-                            <td class="p-1 text-center border-r bg-gray-50 align-top">
+                            <td class="p-1 text-center  border-r bg-gray-50 align-center">
                                 <input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][total_real_smt2]" value="{{ old('kpi.'.$item->id_kpi_item.'.total_real_smt2', $score->total_real_smt2 ?? 0) }}" class="input-total-real-smt2 w-full h-8 px-1 bg-white border rounded text-center focus:border-green-500 outline-none placeholder-gray-400" placeholder="0">
                             </td>
                             <td class="p-2 text-center border-r bg-gray-50 text-gray-500"><span class="span-total-skor-smt2">0</span>%</td>
-                            <td class="p-2 text-center border-r bg-gray-100 font-bold text-gray-700"><span class="span-total-nilai-smt2">0</span></td>
+                            <td class="p-2 text-center border-r bg-gray-100 font-bold text-gray-700"><span class="span-total-nilai-smt2">0</span>%</td>
 
                             {{-- ADJ S-I --}}
-                            <td class="p-1 border-r bg-orange-50/30 align-top"><input type="number" name="kpi[{{ $item->id_kpi_item }}][adjustment_real_smt1]" value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_real_smt1', $score->adjustment_real_smt1 ?? '') }}" step="0.01" class="input-adj-real-smt1 w-full h-8 px-1 bg-transparent text-center border-b border-orange-200 outline-none" placeholder="Real"></td>
-                            <td class="p-1 border-r bg-orange-50/30 align-top text-center pt-2"><span class="span-adj-skor-smt1 text-[10px] font-bold text-orange-600">0</span>%</td>
-                            <td class="p-1 border-r bg-orange-50/30 align-top"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][adjustment_smt1]" value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_smt1', $score->adjustment_smt1 ?? '') }}" class="input-adj-nilai-smt1 w-full h-8 px-1 bg-transparent text-center font-bold text-orange-600 border-b border-orange-200 outline-none" placeholder="Nilai" readonly></td>
+                            <td class="p-1 text-center border-r bg-orange-50/30 align-center">
+                                <input type="number" name="kpi[{{ $item->id_kpi_item }}][adjustment_real_smt1]" value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_real_smt1', $score->adjustment_real_smt1 ?? '') }}" step="0.01" class="input-adj-real-smt1 w-full h-8 px-1 bg-transparent text-center border-b border-orange-200 outline-none" placeholder="Real"></td>
+                            <td class="p-1 border-r bg-orange-50/30 align-center text-center pt-2">
+                                <span class="span-adj-skor-smt1 font-bold text-orange-600">0</span>%</td>
+                            <td class="p-1 text-center border-r bg-orange-50/30 align-center">
+                                <input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][adjustment_smt1]" value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_smt1', $score->adjustment_smt1 ?? '') }}" class="input-adj-nilai-smt1 w-full h-8 px-1 bg-transparent text-center font-bold text-orange-600 border-b border-orange-200 outline-none" placeholder="Nilai" readonly></td>
 
                             {{-- ADJ S-II --}}
-                            <td class="p-1 border-r bg-orange-50/30 align-top"><input type="number" name="kpi[{{ $item->id_kpi_item }}][adjustment_target_smt2]" value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_target_smt2', $score->adjustment_target_smt2 ?? '') }}" step="0.01" class="input-adj-target-smt2 w-full h-8 px-1 bg-transparent text-center border-b border-orange-200 outline-none" placeholder="Tgt"></td>
-                            <td class="p-1 border-r bg-orange-50/30 align-top"><input type="number" name="kpi[{{ $item->id_kpi_item }}][adjustment_real_smt2]" value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_real_smt2', $score->adjustment_real_smt2 ?? '') }}" step="0.01" class="input-adj-real-smt2 w-full h-8 px-1 bg-transparent text-center border-b border-orange-200 outline-none" placeholder="Real"></td>
-                            <td class="p-1 border-r bg-orange-50/30 align-top text-center pt-2"><span class="span-adj-skor-smt2 text-[10px] font-bold text-orange-600">0</span>%</td>
-                            <td class="p-1 border-r bg-orange-50/30 align-top"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][adjustment_smt2]" value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_smt2', $score->adjustment_smt2 ?? '') }}" class="input-adj-nilai-smt2 w-full h-8 px-1 bg-transparent text-center font-bold text-orange-600 border-b border-orange-200 outline-none" placeholder="Nilai" readonly></td>
+                            <td class="p-1 border-r bg-orange-50/30 align-center"><input type="number" name="kpi[{{ $item->id_kpi_item }}][adjustment_target_smt2]" value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_target_smt2', $score->adjustment_target_smt2 ?? '') }}" step="0.01" class="input-adj-target-smt2 w-full h-8 px-1 bg-transparent text-center border-b border-orange-200 outline-none" placeholder="Tgt"></td>
+                            <td class="p-1 border-r bg-orange-50/30 align-center"><input type="number" name="kpi[{{ $item->id_kpi_item }}][adjustment_real_smt2]" value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_real_smt2', $score->adjustment_real_smt2 ?? '') }}" step="0.01" class="input-adj-real-smt2 w-full h-8 px-1 bg-transparent text-center border-b border-orange-200 outline-none" placeholder="Real"></td>
+                            <td class="p-1 border-r bg-orange-50/30 align-center text-center pt-2"><span class="span-adj-skor-smt2 font-bold text-orange-600">0</span>%</td>
+                            <td class="p-1 border-r bg-orange-50/30 align-center"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][adjustment_smt2]" value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_smt2', $score->adjustment_smt2 ?? '') }}" class="input-adj-nilai-smt2 w-full h-8 px-1 bg-transparent text-center font-bold text-orange-600 border-b border-orange-200 outline-none" placeholder="Nilai" readonly></td>
 
                             {{-- FINAL --}}
-                            <td class="p-2 md:p-3 text-center border-r bg-gray-100 font-bold text-blue-800"><span class="span-final-score">0</span></td>
+                            <td class="p-2 md:p-3 text-center border-r bg-gray-100 font-bold text-blue-800"><span class="span-final-score">0</span>%</td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -165,10 +173,10 @@
                             <td colspan="3" class="border-r bg-gray-50"></td>
                             <td colspan="2" class="border-r"></td><td class="p-2 text-center font-bold text-blue-800 border-r-2"><span id="footer-total-smt1">0</span>%</td>
                             @foreach(['jul','aug','sep','okt','nov','des'] as $bln) <td colspan="3" class="border-r"></td><td class="p-2 text-center font-bold text-blue-800 border-r-2"><span id="footer-total-{{ $bln }}">0</span>%</td> @endforeach
-                            <td colspan="3" class="border-r"></td><td class="p-2 text-center font-bold text-gray-700 border-r"><span id="footer-total-sem">0</span></td>
-                            <td colspan="2" class="border-r bg-orange-50"></td><td class="p-2 border-r bg-orange-50 font-bold text-orange-800 text-center"><span id="footer-adj-smt1">0</span></td>
-                            <td colspan="3" class="border-r bg-orange-50"></td><td class="p-2 border-r bg-orange-50 font-bold text-orange-800 text-center"><span id="footer-adj-smt2">0</span></td>
-                            <td class="p-2 text-center font-extrabold text-blue-900 bg-gray-200"><span id="footer-grand-total">0</span></td>
+                            <td colspan="3" class="border-r"></td><td class="p-2 text-center font-bold text-gray-700 border-r"><span id="footer-total-sem">0</span>%</td>
+                            <td colspan="2" class="border-r bg-orange-50"></td><td class="p-2 border-r bg-orange-50 font-bold text-orange-800 text-center"><span id="footer-adj-smt1">0</span>%</td>
+                            <td colspan="3" class="border-r bg-orange-50"></td><td class="p-2 border-r bg-orange-50 font-bold text-orange-800 text-center"><span id="footer-adj-smt2">0</span>%</td>
+                            <td class="p-2 text-center font-extrabold text-blue-900 bg-gray-200"><span id="footer-grand-total">0</span>%</td>
                         </tr>
                     </tfoot>
                 </table>
