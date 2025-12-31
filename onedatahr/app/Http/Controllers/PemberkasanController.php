@@ -39,8 +39,9 @@ class PemberkasanController extends Controller
             Pemberkasan::create($request->all());
 
             // 2. Update status kandidat menjadi 'Diterima'
-            Kandidat::where('id_kandidat', $request->kandidat_id)
-                ->update(['status_akhir' => 'Diterima']);
+            $kandidat = Kandidat::findOrFail($request->kandidat_id);
+            $kandidat->status_akhir = 'Diterima';
+            $kandidat->save(); // Memacu KandidatObserver@saved -> Progress Posisi jadi 'Pemberkasan'
         });
         return redirect()->route('rekrutmen.pemberkasan.index')->with('success', 'Data pemberkasan berhasil ditambahkan.');
     }
@@ -72,23 +73,27 @@ class PemberkasanController extends Controller
         DB::transaction(function () use ($request, $pemberkasan) {
             // Jika kandidat diganti saat edit, kembalikan status kandidat lama
             if ($pemberkasan->kandidat_id != $request->kandidat_id) {
-                Kandidat::where('id_kandidat', $pemberkasan->kandidat_id)
-                    ->update(['status_akhir' => 'Interview User Lolos']);
+                $kandidatLama = Kandidat::find($pemberkasan->kandidat_id);
+                if ($kandidatLama) {
+                    $kandidatLama->status_akhir = 'Interview User Lolos';
+                    $kandidatLama->save(); // Memacu Observer
+                }
             }
 
             // Update data pemberkasan
             $pemberkasan->update($request->all());
 
             // Pastikan status kandidat baru/tetap menjadi 'Diterima'
-            Kandidat::where('id_kandidat', $request->kandidat_id)
-                ->update(['status_akhir' => 'Diterima']);
+            $kandidatBaru = Kandidat::findOrFail($request->kandidat_id);
+            $kandidatBaru->status_akhir = 'Diterima';
+            $kandidatBaru->save(); // Memacu Observer
         });
         return redirect()->route('rekrutmen.pemberkasan.index')->with('success', 'Data diperbarui.');
     }
     // public function destroy($id)
     // {
     //     $pemberkasan = Pemberkasan::where('id_pemberkasan', $id)->firstOrFail();
-        
+
     //     // Kembalikan status kandidat ke Lolos User jika data pemberkasan dihapus
     //     Kandidat::where('id_kandidat', $pemberkasan->kandidat_id)
     //         ->update(['status_akhir' => 'Interview User Lolos']);
@@ -97,18 +102,35 @@ class PemberkasanController extends Controller
 
     //     return back()->with('success', 'Data berhasil dihapus');
     // }
+    // public function destroy($id)
+    // {
+    //     $pemberkasan = Pemberkasan::where('id_pemberkasan', $id)->firstOrFail();
+
+    //     DB::transaction(function () use ($pemberkasan) {
+    //         // Kembalikan status kandidat ke 'Interview User Lolos' karena batal pemberkasan/dihapus
+    //         Kandidat::where('id_kandidat', $pemberkasan->kandidat_id)
+    //             ->update(['status_akhir' => 'Interview User Lolos']);
+
+    //         $pemberkasan->delete();
+    //     });
+
+    //     return back()->with('success', 'Data berhasil dihapus dan status kandidat dikembalikan ke Interview User Lolos.');
+    // }
     public function destroy($id)
     {
-        $pemberkasan = Pemberkasan::where('id_pemberkasan', $id)->firstOrFail();
+        $pemberkasan = Pemberkasan::findOrFail($id);
 
         DB::transaction(function () use ($pemberkasan) {
-            // Kembalikan status kandidat ke 'Interview User Lolos' karena batal pemberkasan/dihapus
-            Kandidat::where('id_kandidat', $pemberkasan->kandidat_id)
-                ->update(['status_akhir' => 'Interview User Lolos']);
+            // Kembalikan status kandidat menggunakan instance Model
+            $kandidat = Kandidat::find($pemberkasan->kandidat_id);
+            if ($kandidat) {
+                $kandidat->status_akhir = 'Interview User Lolos';
+                $kandidat->save(); // Memacu Observer untuk hitung ulang progress posisi
+            }
 
             $pemberkasan->delete();
         });
 
-        return back()->with('success', 'Data berhasil dihapus dan status kandidat dikembalikan ke Interview User Lolos.');
+        return back()->with('success', 'Data berhasil dihapus dan status kandidat dikembalikan.');
     }
 }

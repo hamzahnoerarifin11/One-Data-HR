@@ -125,8 +125,30 @@ class KandidatLanjutUserController extends Controller
             ->route('rekrutmen.kandidat_lanjut_user.index')
             ->with('success', 'Data kandidat berhasil diperbarui');
     }
+    // private function updateStatusKandidat($kandidat_id, $detail_interview)
+    // {
+    //     $status_akhir = 'Interview HR Lolos'; // Default status awal
+
+    //     if (!empty($detail_interview)) {
+    //         $daftar_hasil = collect($detail_interview)->pluck('hasil')->toArray();
+
+    //         if (in_array('Tidak Lolos', $daftar_hasil)) {
+    //             $status_akhir = 'Tidak Lolos';
+    //         } elseif (!in_array('Pending', $daftar_hasil) && !in_array('', $daftar_hasil)) {
+    //             // Jika semua 'Lolos'
+    //             $status_akhir = 'Interview User Lolos';
+    //         }
+    //     }
+
+    //     Kandidat::where('id_kandidat', $kandidat_id)->update([
+    //         'status_akhir' => $status_akhir
+    //     ]);
+    // }
     private function updateStatusKandidat($kandidat_id, $detail_interview)
     {
+        // 1. Ambil instance model Kandidat
+        $kandidat = Kandidat::findOrFail($kandidat_id);
+
         $status_akhir = 'Interview HR Lolos'; // Default status awal
 
         if (!empty($detail_interview)) {
@@ -134,25 +156,49 @@ class KandidatLanjutUserController extends Controller
 
             if (in_array('Tidak Lolos', $daftar_hasil)) {
                 $status_akhir = 'Tidak Lolos';
-            } elseif (!in_array('Pending', $daftar_hasil) && !in_array('', $daftar_hasil)) {
-                // Jika semua 'Lolos'
+            } elseif (!in_array('Pending', $daftar_hasil) && in_array('Lolos', $daftar_hasil)) {
+                // Jika tidak ada pending dan ada yang lolos, anggap lolos user
                 $status_akhir = 'Interview User Lolos';
             }
         }
 
-        Kandidat::where('id_kandidat', $kandidat_id)->update([
-            'status_akhir' => $status_akhir
-        ]);
+        // 2. Update status_akhir melalui model instance
+        $kandidat->status_akhir = $status_akhir;
+
+        // 3. Simpan. Ini AKAN memicu KandidatObserver@saved dan mengupdate Progress Posisi otomatis
+        $kandidat->save();
     }
 
+    // public function destroy($id)
+    // {
+    //     $data = KandidatLanjutUser::where('id_kandidat_lanjut_user', $id)->first();
+    //     if ($data) {
+    //         // Kembalikan status kandidat ke HR Lolos sebelum data dihapus
+    //         Kandidat::where('id_kandidat', $data->kandidat_id)->update(['status_akhir' => 'Interview HR Lolos']);
+    //         $data->delete();
+    //     }
+    //     return back()->with('success', 'Data berhasil dihapus');
+    // }
     public function destroy($id)
     {
         $data = KandidatLanjutUser::where('id_kandidat_lanjut_user', $id)->first();
+
         if ($data) {
-            // Kembalikan status kandidat ke HR Lolos sebelum data dihapus
-            Kandidat::where('id_kandidat', $data->kandidat_id)->update(['status_akhir' => 'Interview HR Lolos']);
+            // 1. Cari model kandidatnya
+            $kandidat = Kandidat::find($data->kandidat_id);
+
+            if ($kandidat) {
+                // 2. Kembalikan statusnya
+                $kandidat->status_akhir = 'Interview HR Lolos';
+
+                // 3. Simpan agar Observer menghitung ulang progress posisi menjadi 'Interview User'
+                $kandidat->save();
+            }
+
+            // 4. Hapus data lanjut user
             $data->delete();
         }
+
         return back()->with('success', 'Data berhasil dihapus');
     }
 }

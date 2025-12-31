@@ -68,12 +68,15 @@ class InterviewHrController extends Controller
         ]);
 
         // update status kandidat
-        $status = $request->keputusan == 'DITERIMA'
-            ? 'Interview HR Lolos'
-            : 'Tidak Lolos';
+        // $status = $request->keputusan == 'DITERIMA'
+        //     ? 'Interview HR Lolos'
+        //     : 'Tidak Lolos';
 
-        Kandidat::where('id_kandidat',$request->kandidat_id)
-            ->update(['status_akhir'=>$status]);
+        // Kandidat::where('id_kandidat',$request->kandidat_id)
+        //     ->update(['status_akhir'=>$status]);
+        $status = $request->keputusan == 'DITERIMA' ? 'Interview HR Lolos' : 'Tidak Lolos';
+        $kandidat->status_akhir = $status;
+        $kandidat->save();
 
         return redirect()->route('rekrutmen.interview_hr.index')
             ->with('success','Interview HR berhasil disimpan');
@@ -110,25 +113,60 @@ class InterviewHrController extends Controller
             'total'=>$total
         ]);
         // 3. Update status kandidat (jika keputusan berubah saat edit)
-        $status = $request->keputusan == 'DITERIMA'
-            ? 'Interview HR Lolos'
-            : 'Tidak Lolos';
+        // $status = $request->keputusan == 'DITERIMA'
+        //     ? 'Interview HR Lolos'
+        //     : 'Tidak Lolos';
 
-        $kandidat->update(['status_akhir' => $status]);
+        // $kandidat->update(['status_akhir' => $status]);
+        $status = $request->keputusan == 'DITERIMA' ? 'Interview HR Lolos' : 'Tidak Lolos';
+        $kandidat->status_akhir = $status;
+        $kandidat->save();
 
         return redirect()->route('rekrutmen.interview_hr.index')
             ->with('success','Data interview diperbarui');
     }
 
-    public function destroy($id)
-    {
-        // InterviewHr::destroy($id);
-        $interview = InterviewHr::where('id_interview_hr', $id)->first();
-        if ($interview) {
-            // Kembalikan status kandidat ke HR Lolos sebelum data dihapus
-            Kandidat::where('id_kandidat', $interview->kandidat_id)->update(['status_akhir' => 'CV Lolos']);
+    // public function destroy($id)
+    // {
+    //     // InterviewHr::destroy($id);
+    //     $interview = InterviewHr::where('id_interview_hr', $id)->first();
+    //     if ($interview) {
+    //         // Kembalikan status kandidat ke HR Lolos sebelum data dihapus
+    //         Kandidat::where('id_kandidat', $interview->kandidat_id)->update(['status_akhir' => 'CV Lolos']);
+    //         $interview->delete();
+    //     }
+    //     return back()->with('success','Data berhasil dihapus');
+    // }
+//     public function destroy($id)
+// {
+//     $interview = InterviewHr::where('id_interview_hr', $id)->first();
+//     if ($interview) {
+//         // ✅ AMBIL MODEL KANDIDATNYA DULU
+//         $kandidat = Kandidat::find($interview->kandidat_id);
+
+//         if ($kandidat) {
+//             $kandidat->status_akhir = 'CV Lolos';
+//             $kandidat->save(); // Sekarang Observer akan terpanggil dan progress rekrutmen akan turun otomatis
+//         }
+
+//         $interview->delete();
+//     }
+//     return back()->with('success','Data berhasil dihapus');
+//     }
+        public function destroy($id)
+        {
+            $interview = InterviewHr::findOrFail($id);
+            $kandidat = Kandidat::find($interview->kandidat_id);
+
+            if ($kandidat) {
+                // Turunkan status kandidat
+                $kandidat->status_akhir = 'CV Lolos';
+                // Saat save() dipanggil, KandidatObserver akan otomatis
+                // menghitung ulang progress rekrutmen di tabel Posisi
+                $kandidat->save();
+            }
+
             $interview->delete();
+            return back()->with('success', 'Data berhasil dihapus');
         }
-        return back()->with('success','Data berhasil dihapus');
-    }
 }

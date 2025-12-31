@@ -25,7 +25,7 @@ class RekrutmenDaily extends Model
         'lolos_hr' => 'integer',
         'lolos_user' => 'integer',
     ];
-    
+
 
     public function posisi()
     {

@@ -148,10 +148,10 @@
                 <label class="text-xs font-semibold uppercase tracking-wider text-gray-500">Sumber Informasi</label>
                 <p id="show-sumber" class="mt-1 text-gray-700 dark:text-gray-300">-</p>
             </div>
-            <div>
+            <!-- <div>
                 <label class="text-xs font-semibold uppercase tracking-wider text-gray-500">ID Kandidat</label>
                 <p id="show-id" class="mt-1 font-mono text-sm text-gray-500"># -</p>
-            </div>
+            </div> -->
         </div>
 
         <div class="mt-8 flex justify-end">
@@ -367,11 +367,17 @@ function kandidatTable() {
                 }).format(date).replace(/\./g, ':'); // Mengubah titik menjadi titik dua untuk jam
             };
                     // Isi data ke elemen modal
-            document.getElementById('show-id').innerText = '#' + row.id_kandidat;
+            // document.getElementById('show-id').innerText = '#' + row.id_kandidat;
             document.getElementById('show-nama').innerText = row.nama;
             document.getElementById('show-posisi').innerText = row.posisi ? row.posisi.nama_posisi : '-';
             document.getElementById('show-sumber').innerText = row.sumber || '-';
-            document.getElementById('show-tanggal').innerText = row.tanggal_melamar || '-';
+            // document.getElementById('show-tanggal').innerText = row.tanggal_melamar || '-';
+            // PERBAIKAN DI SINI:
+            // Gunakan split('T')[0] untuk hasil "2025-12-29"
+            // document.getElementById('show-tanggal').innerText = row.tanggal_melamar ? row.tanggal_melamar.split('T')[0] : '-';
+            // Jika ingin format Indonesia "29/12/2025", gunakan:
+            document.getElementById('show-tanggal').innerText = row.tanggal_melamar ? row.tanggal_melamar.split('T')[0] : '-';
+            // document.getElementById('show-tanggal').innerText = formatDate(row.tanggal_melamar ? row.tanggal_melamar.split('T')[0] : '-');
             document.getElementById('show-created-at').innerText = formatDate(row.created_at);
             document.getElementById('show-updated-at').innerText = formatDate(row.updated_at);
 
