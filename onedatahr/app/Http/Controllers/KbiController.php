@@ -12,45 +12,69 @@ use Illuminate\Support\Facades\DB;
 
 class KbiController extends Controller
 {
-    public function index()
+    public function index(Request $request)
 {
     $user = Auth::user();
     $tahun = date('Y');
 
-    // 1. Cari Data Karyawan berdasarkan NIK (Sesuai hasil debug yang sukses)
+    // 1. Validasi NIK
     if (empty($user->nik)) {
         return redirect()->back()->with('error', 'Akun Login tidak memiliki NIK.');
     }
 
+    // 2. Cari Data Karyawan (Diri Sendiri)
     $karyawan = Karyawan::where('nik', $user->nik)->first();
-
     if (!$karyawan) {
-        return redirect()->back()->with('error', 'Data Karyawan tidak ditemukan untuk NIK ini.');
+        return redirect()->back()->with('error', 'Data Karyawan tidak ditemukan.');
     }
 
-    // 2. Cek Penilaian Diri Sendiri
-    // Gunakan $karyawan->id_karyawan, BUKAN $user->id
+    // 3. Cek Penilaian Diri Sendiri
     $selfAssessment = KbiAssessment::where('karyawan_id', $karyawan->id_karyawan)
         ->where('tipe_penilai', 'DIRI_SENDIRI')
         ->where('tahun', $tahun)
         ->first();
 
-    // 3. Ambil List Bawahan (Tim Saya)
-    // PERBAIKAN UTAMA DISINI: Gunakan $karyawan->id_karyawan
-    $bawahanList = Karyawan::where('atasan_id', $karyawan->id_karyawan)
-        ->get()
-        ->map(function ($staff) use ($tahun, $user) {
-            $staff->sudah_dinilai = KbiAssessment::where('karyawan_id', $staff->id_karyawan)
-                ->where('penilai_id', $user->id) // Penilai tetap ID User
-                ->where('tipe_penilai', 'ATASAN')
-                ->where('tahun', $tahun)
-                ->exists();
-            return $staff;
-        });
-
-    // 4. Ambil Data Atasan
-    $atasan = $karyawan->atasan; 
+    // ==========================================
+    // 4. LOGIC DAFTAR KARYAWAN (ALL ACCESS)
+    // ==========================================
     
+    $query = Karyawan::query();
+
+    // Filter A: Jangan tampilkan diri sendiri di tabel kanan
+    // (Karena diri sendiri sudah ada di kartu kiri)
+    $query->where('id_karyawan', '!=', $karyawan->id_karyawan);
+
+    // Filter B: Jika ada pencarian
+    if ($request->has('search') && $request->search != '') {
+        $keyword = $request->search;
+        $query->where(function($q) use ($keyword) {
+            $q->where('Nama_Lengkap_Sesuai_Ijazah', 'LIKE', '%' . $keyword . '%')
+              ->orWhere('Nama_Sesuai_KTP', 'LIKE', '%' . $keyword . '%')
+              ->orWhere('NIK', 'LIKE', '%' . $keyword . '%');
+        });
+    }
+    
+    // CATATAN: Saya MENGHAPUS bagian 'else { where atasan_id }'
+    // Jadi sekarang otomatis mengambil SEMUA data.
+
+    // Eksekusi Query
+    // Kita gunakan 'map' untuk mengecek status penilaian satu per satu
+    $bawahanList = $query->paginate(10); 
+
+    // 2. Gunakan 'through' (pengganti map) untuk menyuntikkan status penilaian
+    $bawahanList->through(function ($staff) use ($tahun, $user) {
+        $staff->sudah_dinilai = KbiAssessment::where('karyawan_id', $staff->id_karyawan)
+            ->where('penilai_id', $user->id)
+            ->where('tipe_penilai', 'ATASAN')
+            ->where('tahun', $tahun)
+            ->exists();
+        return $staff;
+    });
+
+    // ==========================================
+
+    // 5. Ambil Data Atasan (Tetap sama, opsional jika ingin menilai bos)
+    $atasan = $karyawan->atasan; 
     $sudahMenilaiAtasan = false;
     if ($atasan) {
         $sudahMenilaiAtasan = KbiAssessment::where('karyawan_id', $atasan->id_karyawan)
