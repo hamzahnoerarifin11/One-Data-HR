@@ -54,6 +54,11 @@ class MenuHelper
                 'name' => 'KPI Karyawan', // Nama menu diperjelas
                 'path' => '/kpi/dashboard', // <-- Link baru ke halaman index
             ],
+            [
+                'icon' => 'chartpie',
+                'name' => 'KBI Karyawan', // Nama menu diperjelas
+                'path' => '/kbi/dashboard', // <-- Link baru ke halaman index
+            ],
         ];
     }
       // --- [BARU] Menambahkan Menu Khusus Performance (KPI) ---
@@ -64,6 +69,16 @@ class MenuHelper
                 'icon' => 'charts',
                 'name' => 'KPI Karyawan', // Nama menu diperjelas
                 'path' => '/kpi/dashboard', // <-- Link baru ke halaman index
+            ],
+        ];
+    }
+    public static function getPerformanceKBItems()
+    {
+        return [
+            [
+                'icon' => 'charts',
+                'name' => 'KBI Karyawan', // Nama menu diperjelas
+                'path' => '/kbi/dashboard', // <-- Link baru ke halaman index
             ],
         ];
     }

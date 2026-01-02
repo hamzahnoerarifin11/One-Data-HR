@@ -9,6 +9,7 @@ use App\Http\Controllers\KandidatController;
 use App\Http\Controllers\ProsesRekrutmenController;
 use App\Http\Controllers\PemberkasanController;
 use App\Http\Controllers\KpiAssessmentController;
+use App\Http\Controllers\KbiController;
 use App\Http\Controllers\WigRekrutmenController;
 use App\Http\Controllers\PosisiController;
 use App\Http\Controllers\RekrutmenDailyController;
@@ -139,31 +140,45 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/kpi/{id}/finalize', [App\Http\Controllers\KpiAssessmentController::class, 'finalize'])->name('kpi.finalize');
 
+    // --- KBI ROUTES ---
+    // 1. Dashboard KBI (Menu Utama untuk memilih siapa yang dinilai)
+    Route::get('/kbi/dashboard', [KbiController::class, 'index'])->name('kbi.index');
+
+    // 2. Form Penilaian (Form yang sudah Anda buat)
+    // Parameter: id karyawan yg dinilai, dan tipe penilai (DIRI_SENDIRI/ATASAN/BAWAHAN)
+    Route::get('/kbi/nilai/{karyawan_id}/{tipe}', [KbiController::class, 'create'])->name('kbi.create');
+
+    // 3. Simpan Data
+    Route::post('/kbi/store', [KbiController::class, 'store'])->name('kbi.store');
+    
+    // 4. Lihat Hasil Detail (Report)
+    Route::get('/kbi/hasil/{id_assessment}', [KbiController::class, 'show'])->name('kbi.show');
 
 
-    // --- SCRIPT SEMENTARA (HAPUS SETELAH DIPAKAI) ---
-    Route::get('/fix-grades-manual', function () {
-        // 1. Ambil semua data KPI
-        $allKpi = \App\Models\KpiAssessment::all();
-        $count = 0;
 
-        foreach ($allKpi as $kpi) {
-            // 2. Tentukan Grade berdasarkan Skor yang sudah ada
-            $skor = $kpi->total_skor_akhir;
-            $grade = 'Poor'; // Default
+    // // --- SCRIPT SEMENTARA (HAPUS SETELAH DIPAKAI) ---
+    // Route::get('/fix-grades-manual', function () {
+    //     // 1. Ambil semua data KPI
+    //     $allKpi = \App\Models\KpiAssessment::all();
+    //     $count = 0;
 
-            if ($skor >= 100) { $grade = 'Outstanding'; }
-            elseif ($skor >= 90) { $grade = 'Great'; }
-            elseif ($skor >= 75) { $grade = 'Good'; }
-            elseif ($skor >= 60) { $grade = 'Enough'; }
+    //     foreach ($allKpi as $kpi) {
+    //         // 2. Tentukan Grade berdasarkan Skor yang sudah ada
+    //         $skor = $kpi->total_skor_akhir;
+    //         $grade = 'Poor'; // Default
 
-            // 3. Update Database
-            $kpi->update(['grade' => $grade]);
-            $count++;
-        }
+    //         if ($skor >= 100) { $grade = 'Outstanding'; }
+    //         elseif ($skor >= 90) { $grade = 'Great'; }
+    //         elseif ($skor >= 75) { $grade = 'Good'; }
+    //         elseif ($skor >= 60) { $grade = 'Enough'; }
 
-        return "Sukses! Berhasil update grade untuk $count data KPI. Silakan kembali ke Dashboard.";
-    });
+    //         // 3. Update Database
+    //         $kpi->update(['grade' => $grade]);
+    //         $count++;
+    //     }
+
+    //     return "Sukses! Berhasil update grade untuk $count data KPI. Silakan kembali ke Dashboard.";
+    // });
 
     // Route khusus untuk menyimpan ITEM KPI baru
     Route::post('/kpi/items/store', [KpiAssessmentController::class, 'storeItem'])->name('kpi.store-item');
