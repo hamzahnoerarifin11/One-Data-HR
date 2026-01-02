@@ -16,6 +16,7 @@ class Pemberkasan extends Model
 
     protected $fillable = [
         'kandidat_id',
+        'posisi_id',
         'follow_up',
         'kandidat_kirim_berkas',
         'selesai_recruitment',
@@ -27,18 +28,23 @@ class Pemberkasan extends Model
         'background_checking',
     ];
 
-    protected $casts = [
-        'kandidat_kirim_berkas' => 'date',
-        'selesai_recruitment' => 'date',
-        'selesai_skgk_finance' => 'date',
-        'selesai_ttd_manager_hrd' => 'date',
-        'selesai_ttd_user' => 'date',
-        'selesai_ttd_direktur' => 'date',
-        'jadwal_ttd_kontrak' => 'date',
-    ];
+    // protected $casts = [
+    //     'kandidat_kirim_berkas' => 'date',
+    //     'selesai_recruitment' => 'date',
+    //     'selesai_skgk_finance' => 'date',
+    //     'selesai_ttd_manager_hrd' => 'date',
+    //     'selesai_ttd_user' => 'date',
+    //     'selesai_ttd_direktur' => 'date',
+    //     'jadwal_ttd_kontrak' => 'date',
+    // ];
 
     public function kandidat()
     {
         return $this->belongsTo(Kandidat::class, 'kandidat_id', 'id_kandidat');
     }
+    public function posisi()
+    {
+        return $this->belongsTo(Posisi::class, 'posisi_id', 'id_posisi');
+    }
+
 }

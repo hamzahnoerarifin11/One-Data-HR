@@ -89,4 +89,10 @@ class Karyawan extends Model
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
+    
+    // Konversi kolom created_at dan updated_at ke format DateTime
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 }

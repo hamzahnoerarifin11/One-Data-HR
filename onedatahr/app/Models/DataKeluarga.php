@@ -18,11 +18,15 @@ class DataKeluarga extends Model
         'Nama_Lengkap_Anak_Kelima','Tempat_Lahir_Anak_Kelima','Tanggal_Lahir_Anak_Kelima','Jenis_Kelamin_Anak_Kelima','Pendidikan_Terakhir_Anak_Kelima',
         'Nama_Lengkap_Anak_Keenam','Tempat_Lahir_Anak_Keenam','Tanggal_Lahir_Anak_Keenam','Jenis_Kelamin_Anak_Keenam', 'Pendidikan_Terakhir_Anak_Keenam'
     ];
+    protected $touches = ['karyawan'];
     protected $casts = [
         'anak' => 'array',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
     public function karyawan()
     {
         return $this->belongsTo(Karyawan::class, 'id_karyawan', 'id_karyawan');
     }
+
 }

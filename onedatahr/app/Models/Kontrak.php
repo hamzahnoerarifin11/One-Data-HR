@@ -12,9 +12,14 @@ class Kontrak extends Model
         'Riwayat_Penempatan','Tanggal_Riwayat_Penempatan','Mutasi_Promosi_Demosi','Tanggal_Mutasi_Promosi_Demosi',
         'Masa_Kerja','NO_PKWT_PERTAMA','NO_SK_PERTAMA'
     ];
+    protected $touches = ['karyawan'];
 
     public function karyawan()
     {
         return $this->belongsTo(Karyawan::class, 'id_karyawan', 'id_karyawan');
     }
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 }

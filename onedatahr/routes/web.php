@@ -21,11 +21,13 @@ use App\Http\Controllers\TesKompetensiController;
 use App\Http\Controllers\InterviewHrController;
 use App\Http\Controllers\InterviewUserController;
 use App\Http\Controllers\SummaryController;
+use App\Http\Controllers\KandidatLanjutUserController;
 
 // Minimal routes for One Data HR
 Route::get('/', function () {
     return auth()->check() ? redirect()->route('dashboard.index') : redirect()->route('signin');
 });
+Route::resource('training', TrainingController::class)->names('training');
 
 //Delete Batch Karyawan
 Route::delete('/karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
@@ -51,56 +53,67 @@ Route::middleware(['auth'])->group(function () {
 
 
     // Recruitment / Kandidat resources and metrics
-    Route::prefix('rekrutmen')->name('rekrutmen.')->group(function(){
+    Route::prefix('rekrutmen')->name('rekrutmen.')->group(function () {
         Route::get('/', [RecruitmentDashboardController::class, 'index'])->name('dashboard');
 
         // PERBAIKAN DI SINI: Nama route diubah agar sesuai dengan yang dipanggil di View [rekrutmen.wig.index]
         Route::get('wig', [WigRekrutmenController::class, 'index'])->name('wig.index');
         Route::put('wig/{posisiId}', [WigRekrutmenController::class, 'update'])->name('wig.update');
 
-        Route::get('pelamar', [PelamarHarianController::class,'index'])->name('pelamar');
-        Route::post('pelamar', [PelamarHarianController::class,'store'])->name('pelamar.store');
+        Route::get('pelamar', [PelamarHarianController::class, 'index'])->name('pelamar');
+        Route::post('pelamar', [PelamarHarianController::class, 'store'])->name('pelamar.store');
 
-        Route::get('screening-cv', [ScreeningCvController::class,'index'])->name('screening-cv');
-        Route::get('tes-kompetensi', [TesKompetensiController::class,'index'])->name('tes-kompetensi');
+        Route::get('screening-cv', [ScreeningCvController::class, 'index'])->name('screening-cv');
+        Route::get('tes-kompetensi', [TesKompetensiController::class, 'index'])->name('tes-kompetensi');
         Route::resource(
-                        'interview_hr',
-                        InterviewHrController::class
-                    )->names('interview_hr');
+            'interview_hr',
+            InterviewHrController::class
+        )->names('interview_hr');
 
-        Route::get('interview-user', [InterviewUserController::class,'index'])->name('interview-user');
+        //Kandidat Lanjut User
+        Route::resource('kandidat_lanjut_user', KandidatLanjutUserController::class)->names('kandidat_lanjut_user');
 
-        Route::get('summary', [SummaryController::class,'index'])->name('summary');
+        //Pemberkasan
+        Route::resource('pemberkasan', PemberkasanController::class)->names('pemberkasan');
+
+
+        Route::get('interview-user', [InterviewUserController::class, 'index'])->name('interview-user');
+
+        Route::get('summary', [SummaryController::class, 'index'])->name('summary');
 
         // Metrics endpoints (JSON)
-        Route::get('/metrics/candidates', [RecruitmentDashboardController::class,'candidatesByPositionMonth'])->name('metrics.candidates');
-        Route::get('/metrics/cv', [RecruitmentDashboardController::class,'cvPassedByPositionMonth'])->name('metrics.cv');
-        Route::get('/metrics/cv/export', [RecruitmentDashboardController::class,'exportCvCsv'])->name('metrics.cv.export');
-        Route::get('/metrics/psikotes', [RecruitmentDashboardController::class,'psikotesPassedByPosition'])->name('metrics.psikotes');
-        Route::get('/metrics/psikotes/export', [RecruitmentDashboardController::class,'exportPsikotesCsv'])->name('metrics.psikotes.export');
-        Route::get('/metrics/kompetensi', [RecruitmentDashboardController::class,'kompetensiPassedByPosition'])->name('metrics.kompetensi');
-        Route::get('/metrics/interview_hr', [RecruitmentDashboardController::class,'interviewHrPassedByPositionMonth'])->name('metrics.hr');
-        Route::get('/metrics/interview-user', [RecruitmentDashboardController::class,'interviewUserPassedByPositionMonth'])->name('metrics.user');
+        Route::get('/metrics/candidates', [RecruitmentDashboardController::class, 'candidatesByPositionMonth'])->name('metrics.candidates');
+        Route::get('/metrics/cv', [RecruitmentDashboardController::class, 'cvPassedByPositionMonth'])->name('metrics.cv');
+        Route::get('/metrics/cv/export', [RecruitmentDashboardController::class, 'exportCvCsv'])->name('metrics.cv.export');
+        Route::get('/metrics/psikotes', [RecruitmentDashboardController::class, 'psikotesPassedByPosition'])->name('metrics.psikotes');
+        Route::get('/metrics/psikotes/export', [RecruitmentDashboardController::class, 'exportPsikotesCsv'])->name('metrics.psikotes.export');
+        Route::get('/metrics/kompetensi', [RecruitmentDashboardController::class, 'kompetensiPassedByPosition'])->name('metrics.kompetensi');
+        Route::get('/metrics/interview_hr', [RecruitmentDashboardController::class, 'interviewHrPassedByPositionMonth'])->name('metrics.hr');
+        Route::get('/metrics/interview-user', [RecruitmentDashboardController::class, 'interviewUserPassedByPositionMonth'])->name('metrics.user');
 
         // Pages for per-stage metrics
-        Route::get('/metrics/cv-page', [RecruitmentDashboardController::class,'cvPage'])->name('metrics.cv.page');
-        Route::get('/metrics/psikotes-page', [RecruitmentDashboardController::class,'psikotesPage'])->name('metrics.psikotes.page');
-        Route::get('/metrics/kompetensi-page', [RecruitmentDashboardController::class,'kompetensiPage'])->name('metrics.kompetensi.page');
-        Route::get('/metrics/interview_hr-page', [RecruitmentDashboardController::class,'interviewHrPage'])->name('metrics.hr.page');
-        Route::get('/metrics/interview-user-page', [RecruitmentDashboardController::class,'interviewUserPage'])->name('metrics.user.page');
-        Route::get('/metrics/progress', [RecruitmentDashboardController::class,'recruitmentProgressByPosition'])->name('metrics.progress');
-        Route::get('/metrics/progress/export', [RecruitmentDashboardController::class,'exportProgressCsv'])->name('metrics.progress.export');
-        Route::get('/metrics/pemberkasan', [RecruitmentDashboardController::class,'pemberkasanProgress'])->name('metrics.pemberkasan');
-        Route::get('/metrics/pemberkasan-page', [RecruitmentDashboardController::class,'pemberkasanPage'])->name('metrics.pemberkasan.page');
-        Route::get('/metrics/candidates/export', [RecruitmentDashboardController::class,'exportCandidatesCsv'])->name('metrics.candidates.export');
+        Route::get('/metrics/cv-page', [RecruitmentDashboardController::class, 'cvPage'])->name('metrics.cv.page');
+        Route::get('/metrics/psikotes-page', [RecruitmentDashboardController::class, 'psikotesPage'])->name('metrics.psikotes.page');
+        Route::get('/metrics/kompetensi-page', [RecruitmentDashboardController::class, 'kompetensiPage'])->name('metrics.kompetensi.page');
+        Route::get('/metrics/interview_hr-page', [RecruitmentDashboardController::class, 'interviewHrPage'])->name('metrics.hr.page');
+        Route::get('/metrics/interview-user-page', [RecruitmentDashboardController::class, 'interviewUserPage'])->name('metrics.user.page');
+        Route::get('/metrics/progress', [RecruitmentDashboardController::class, 'recruitmentProgressByPosition'])->name('metrics.progress');
+        Route::get('/metrics/progress/export', [RecruitmentDashboardController::class, 'exportProgressCsv'])->name('metrics.progress.export');
+        Route::get('/metrics/pemberkasan', [RecruitmentDashboardController::class, 'pemberkasanProgress'])->name('metrics.pemberkasan');
+        Route::get('/metrics/pemberkasan-page', [RecruitmentDashboardController::class, 'pemberkasanPage'])->name('metrics.pemberkasan.page');
+        Route::get('/metrics/candidates/export', [RecruitmentDashboardController::class, 'exportCandidatesCsv'])->name('metrics.candidates.export');
 
         // CRUD
         Route::resource('kandidat', KandidatController::class);
-        Route::get('proses/{kandidat_id}/edit', [ProsesRekrutmenController::class,'edit'])->name('proses.edit');
-        Route::post('proses', [ProsesRekrutmenController::class,'store'])->name('proses.store');
+        Route::get('proses/{kandidat_id}/edit', [ProsesRekrutmenController::class, 'edit'])->name('proses.edit');
+        Route::post('proses', [ProsesRekrutmenController::class, 'store'])->name('proses.store');
+
+        Route::get('/rekrutmen/kandidat/export-pdf/{id}', [KandidatController::class, 'exportExcelToPdf']);
+
+
 
         // Perbaikan: Hindari double naming untuk resource
-        Route::resource('pemberkasan', PemberkasanController::class)->only(['index','create','store','edit','update']);
+        Route::resource('pemberkasan', PemberkasanController::class)->only(['index', 'create', 'store', 'edit', 'update']);
 
         // Posisi management
         Route::get('posisi/list', [PosisiController::class, 'index'])->name('posisi.list');
@@ -150,9 +163,10 @@ Route::middleware(['auth'])->group(function () {
 
     // 3. Simpan Data
     Route::post('/kbi/store', [KbiController::class, 'store'])->name('kbi.store');
-    
+
     // 4. Lihat Hasil Detail (Report)
     Route::get('/kbi/hasil/{id_assessment}', [KbiController::class, 'show'])->name('kbi.show');
+
 
 
 
@@ -161,22 +175,26 @@ Route::middleware(['auth'])->group(function () {
     //     // 1. Ambil semua data KPI
     //     $allKpi = \App\Models\KpiAssessment::all();
     //     $count = 0;
-
-    //     foreach ($allKpi as $kpi) {
-    //         // 2. Tentukan Grade berdasarkan Skor yang sudah ada
-    //         $skor = $kpi->total_skor_akhir;
-    //         $grade = 'Poor'; // Default
-
     //         if ($skor >= 100) { $grade = 'Outstanding'; }
     //         elseif ($skor >= 90) { $grade = 'Great'; }
     //         elseif ($skor >= 75) { $grade = 'Good'; }
     //         elseif ($skor >= 60) { $grade = 'Enough'; }
-
     //         // 3. Update Database
     //         $kpi->update(['grade' => $grade]);
     //         $count++;
     //     }
-
+    //     foreach ($allKpi as $kpi) {
+    //         // 2. Tentukan Grade berdasarkan Skor yang sudah ada
+    //         $skor = $kpi->total_skor_akhir;
+    //         $grade = 'Poor'; // Default
+    //         if ($skor >= 100) { $grade = 'Outstanding'; }
+    //         elseif ($skor >= 90) { $grade = 'Great'; }
+    //         elseif ($skor >= 75) { $grade = 'Good'; }
+    //         elseif ($skor >= 60) { $grade = 'Enough'; }
+    //         // 3. Update Database
+    //         $kpi->update(['grade' => $grade]);
+    //         $count++;
+    //     }
     //     return "Sukses! Berhasil update grade untuk $count data KPI. Silakan kembali ke Dashboard.";
     // });
 

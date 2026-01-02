@@ -34,6 +34,15 @@
                 </div>
             </div>
         @endif
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
 
 
@@ -267,6 +276,7 @@
                     </div>
 
                     <!-- RT / RW -->
+                    <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">RT</label>
                         <input id="RT" name="RT" placeholder="Contoh: 01" value="{{ old('RT', $karyawan->RT) }}"
@@ -280,7 +290,7 @@
                             class="dark:bg-dark-900 shadow-theme-xs h-11 w-full rounded-lg border border-gray-300 bg-transparent
                             px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
                     </div>
-
+                    </div>
                     <!-- Provinsi -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Provinsi</label>
@@ -369,7 +379,7 @@
 
                     <!--  CHECKBOX SAMA DENGAN KTP -->
                     <!-- ========================= -->
-                    <div class="col-span-4 flex items-center gap-2 mt-2">
+                    <div class="col-span-2 flex items-center gap-2 mt-2">
                         <div x-data="{ checkboxToggle: false }">
                         <label for="sameAsKTP"
                             class="flex cursor-pointer items-center text-sm font-medium text-gray-700 select-none dark:text-gray-400">
@@ -1213,7 +1223,7 @@
                     tanggalMulai: '{{ old(
                                         'Tanggal_Mulai_Tugas',
                                         optional($karyawan->kontrak)->Tanggal_Mulai_Tugas
-                                            ? \Carbon\Carbon::parse(optional($karyawan->kontrak)->Tanggal_Mulai_Tugas)->format('Y-m-d')
+                                            ? \Carbon\Carbon::parse(optional($karyawan->kontrak)->Tanggal_Mulai_Tugas)->translatedFormat('Y-m-d')
                                             : ''
                                     ) }}',
                     masaKerja: '{{ old('Masa_Kerja', optional($karyawan->kontrak)->Masa_Kerja) }}',

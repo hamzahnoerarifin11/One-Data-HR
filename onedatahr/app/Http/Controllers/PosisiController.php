@@ -12,7 +12,16 @@ class PosisiController extends Controller
     public function manage()
     {
         // Mengambil semua data posisi untuk ditampilkan di table
-        $pos = Posisi::orderBy('created_at', 'DESC')->get();
+        // $pos = Posisi::orderBy('created_at', 'DESC')->get();
+        // return view('pages.rekrutmen.posisi.index', ['posisis' => $pos]);
+        // Mengambil semua data dari VIEW agar kolom progress_rekrutmen & total_pelamar muncul
+        // $pos = DB::table('view_rekrutmen_dashboard')
+        //         ->orderBy('id_posisi', 'DESC') // Urutkan berdasarkan ID posisi terbaru
+        //         ->get();
+
+        // return view('pages.rekrutmen.posisi.index', ['posisis' => $pos]);
+        // Kembali menggunakan Eloquent Model karena kolom sudah ada di tabel fisik
+        $pos = Posisi::orderBy('id_posisi', 'DESC')->get();
         return view('pages.rekrutmen.posisi.index', ['posisis' => $pos]);
     }
 
@@ -22,6 +31,7 @@ class PosisiController extends Controller
         $pos = Posisi::aktif()->orderBy('nama_posisi')->get(['id_posisi', 'nama_posisi', 'status']);
         return response()->json($pos);
     }
+
 
     // Create via AJAX
     public function store(Request $request)

@@ -28,26 +28,47 @@ class MenuHelper
                     ['name' => 'Interview HR', 'path' => route('rekrutmen.interview_hr.index')],
                     ['name' => 'Database WIG', 'path' => route('rekrutmen.wig.index')],
                     ['name' => 'Pemberkasan Monitor', 'path' => route('rekrutmen.metrics.pemberkasan.page')],
+                    // ['name' => 'Dashboard Rekrutmen', 'path' => route('rekrutmen.dashboard')],
+                    // ['name' => 'Manage Posisi', 'path' => route('rekrutmen.posisi.index')],
+                    // ['name' => 'Manage Kandidat', 'path' => route('rekrutmen.kandidat.index')],
+                    // ['name' => 'Kalender Rekrutmen', 'path' => route('rekrutmen.calendar')],
+                    // ['name' => 'Interview HR', 'path' => route('rekrutmen.interview_hr.index')],
+                    // ['name' => 'Kandidat Lanjut User', 'path' => route('rekrutmen.kandidat_lanjut_user.index')],
+                    // ['name' => 'Pemberkasan', 'path' => route('rekrutmen.pemberkasan.index')],
+                    // ['name' => 'Database WIG', 'path' => route('rekrutmen.wig.index')],
+
+
+                    ['name' => 'Dashboard Rekrutmen',   'path' => '/rekrutmen'],
+                    ['name' => 'Manage Posisi',        'path' => '/rekrutmen/posisi-manage'],
+                    ['name' => 'Manage Kandidat',      'path' => '/rekrutmen/kandidat'],
+                    ['name' => 'Kalender Rekrutmen',   'path' => '/rekrutmen/calendar'],
+                    ['name' => 'Interview HR',         'path' => '/rekrutmen/interview_hr'],
+                    ['name' => 'Kandidat Lanjut User', 'path' => '/rekrutmen/kandidat_lanjut_user'],
+                    ['name' => 'Pemberkasan',          'path' => '/rekrutmen/pemberkasan'],
+                    ['name' => 'Database WIG',         'path' => '/rekrutmen/wig'],
+                    // ['name' => 'Pemberkasan Monitor', 'path' => route('rekrutmen.metrics.pemberkasan.page')],
                 ],
                 // 'path' => '/rekrutmen',
             ],
             [
                 'icon' => 'forms',
-                'name' => 'Kontrak & Pekerjaan',
-                'subItems' => [
-                    ['name' => 'Kontrak', 'path' => '/kontrak'],
-                    ['name' => 'Pekerjaan', 'path' => '/pekerjaan'],
-                ],
+                'name' => 'Training',
+                'path' => '/training',
             ],
-            [
-                'icon' => 'tables',
-                'name' => 'Perusahaan',
-                'path' => '/perusahaan',
-            ],
+            // [
+            //     'icon' => 'tables',
+            //     'name' => 'Perusahaan',
+            //     'path' => '/perusahaan',
+            // ],
+            // [
+            //     'icon' => 'charts',
+            //     'name' => 'Laporan',
+            //     'path' => '/laporan',
+            // ],
             [
                 'icon' => 'charts',
-                'name' => 'Laporan',
-                'path' => '/laporan',
+                'name' => 'KPI Karyawan', // Nama menu diperjelas
+                'path' => '/kpi/dashboard', // <-- Link baru ke halaman index
             ],
             [
                 'icon' => 'charts',
@@ -84,18 +105,19 @@ class MenuHelper
     }
 
 
+
     public static function getOthersItems()
     {
         return [
-            [
-                'icon' => 'support-ticket',
-                'name' => 'Tools',
-                'subItems' => [
-                    ['name' => 'Import Data', 'path' => '/tools/import'],
-                    ['name' => 'Export Data', 'path' => '/tools/export'],
-                    ['name' => 'Settings', 'path' => '/settings'],
-                ],
-            ],
+            // [
+            //     'icon' => 'support-ticket',
+            //     'name' => 'Tools',
+            //     'subItems' => [
+            //         ['name' => 'Import Data', 'path' => '/tools/import'],
+            //         ['name' => 'Export Data', 'path' => '/tools/export'],
+            //         ['name' => 'Settings', 'path' => '/settings'],
+            //     ],
+            // ],
         ];
     }
 
@@ -109,13 +131,19 @@ class MenuHelper
             [
                 'title' => 'Others',
                 'items' => self::getOthersItems()
-            ]
+            ],
+              // --- APAKAH BAGIAN INI SUDAH ADA? ---
+            // [
+            //     'title' => 'Performance',
+            //     'items' => self::getPerformanceItems() // <--- INI WAJIB ADA
+            // ]
         ];
     }
 
     public static function isActive($path)
     {
         return request()->is(ltrim($path, '/'));
+        return request()->is(ltrim($path, 'route'));
     }
 
     public static function getIconSvg($iconName)

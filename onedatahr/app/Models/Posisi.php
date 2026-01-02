@@ -16,8 +16,10 @@ class Posisi extends Model
 
     // Kolom yang boleh diisi secara mass-assignment
     protected $fillable = [
-        'nama_posisi',
-        'status'
+    'nama_posisi',
+    'status',
+    'progress_rekrutmen',
+    'total_pelamar'
     ];
 
     /* ===================== RELATIONSHIPS ===================== */
