@@ -71,11 +71,6 @@ class MenuHelper
                 'path' => '/kpi/dashboard', // <-- Link baru ke halaman index
             ],
             [
-                'icon' => 'charts',
-                'name' => 'KPI Karyawan', // Nama menu diperjelas
-                'path' => '/kpi/dashboard', // <-- Link baru ke halaman index
-            ],
-            [
                 'icon' => 'chartpie',
                 'name' => 'KBI Karyawan', // Nama menu diperjelas
                 'path' => '/kbi/dashboard', // <-- Link baru ke halaman index

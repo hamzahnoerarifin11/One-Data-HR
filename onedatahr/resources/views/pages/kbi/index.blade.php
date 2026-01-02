@@ -1,6 +1,22 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+    /* Paksa warna hijau muncul manual */
+    .bg-green-600 { background-color: #16a34a !important; }
+    .hover\:bg-green-700:hover { background-color: #15803d !important; }
+    .text-white { color: #ffffff !important; }
+    
+    /* Paksa warna biru muncul manual */
+    .bg-blue-600 { background-color: #2563eb !important; }
+    .hover\:bg-blue-700:hover { background-color: #1d4ed8 !important; }
+    
+    /* Perbaikan tombol search yang hilang */
+    button.bg-green-600 {
+        background-color: #16a34a !important;
+        color: white !important;
+    }
+</style>
 <div class="p-4 sm:p-6">
     <h1 class="text-xl sm:text-2xl font-bold mb-6 text-gray-900 dark:text-white">
         PENILAIAN KBI
