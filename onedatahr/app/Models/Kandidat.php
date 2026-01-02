@@ -19,11 +19,19 @@ class Kandidat extends Model
         'posisi_id',
         'tanggal_melamar',
         'sumber',
+        'link_cv',
+        'file_excel',
         'status_akhir',
+        'tgl_lolos_cv', 'tgl_lolos_psikotes', 'tgl_lolos_kompetensi', 'tgl_lolos_hr', 'tgl_lolos_user',
     ];
 
     protected $casts = [
         'tanggal_melamar' => 'date',
+        'tgl_lolos_cv' => 'date',
+        'tgl_lolos_psikotes' => 'date',
+        'tgl_lolos_kompetensi' => 'date',
+        'tgl_lolos_hr' => 'date',
+        'tgl_lolos_user' => 'date',
     ];
 
     public function posisi()
@@ -52,5 +60,11 @@ class Kandidat extends Model
             'kandidat_id',     // FK di tabel kandidat_lanjut_user
             'id_kandidat'      // PK di tabel kandidat
         );
+    }
+    // Di dalam class Kandidat
+    public function training()
+    {
+        // Hubungkan id_kandidat di tabel kandidat dengan kandidat_id di tabel training
+        return $this->hasOne(Training::class, 'kandidat_id', 'id_kandidat');
     }
 }

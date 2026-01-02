@@ -18,7 +18,9 @@ class TrainingController extends Controller
 
     public function create()
     {
-        $kandidat = Kandidat::all();
+        $kandidat = Kandidat::where('status_akhir', 'Interview User Lolos')
+        ->whereDoesntHave('training')
+        ->get();
         $posisi = Posisi::all();
         return view('pages.training.create', compact('kandidat', 'posisi'));
     }
@@ -48,7 +50,12 @@ class TrainingController extends Controller
     public function edit($id)
     {
         $training = Training::findOrFail($id);
-        $kandidat = Kandidat::all();
+        $kandidat = Kandidat::where(function($query) use ($training) {
+            $query->where('status_akhir', 'Interview User Lolos')
+                  ->whereDoesntHave('training');
+        })
+        ->orWhere('id_kandidat', $training->kandidat_id)
+        ->get();
         $posisi = Posisi::all();
         return view('pages.training.edit', compact('training', 'kandidat', 'posisi'));
     }

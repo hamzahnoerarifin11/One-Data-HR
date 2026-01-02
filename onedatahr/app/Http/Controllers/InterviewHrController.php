@@ -94,37 +94,88 @@ class InterviewHrController extends Controller
         return view('pages.rekrutmen.interview_hr.edit', compact('interview'));
     }
 
+    // public function update(Request $request, $id)
+    // {
+    //     $interview = InterviewHr::findOrFail($id);
+    //     $kandidat = Kandidat::findOrFail($request->kandidat_id);
+    //     $total =
+    //         $request->skor_profesional +
+    //         $request->skor_spiritual +
+    //         $request->skor_learning +
+    //         $request->skor_initiative +
+    //         $request->skor_komunikasi +
+    //         $request->skor_problem_solving +
+    //         $request->skor_teamwork;
+
+    //     $interview->update([
+    //         ...$request->all(),
+    //         'posisi_id' => $kandidat->posisi_id,
+    //         'total'=>$total
+    //     ]);
+    //     // 3. Update status kandidat (jika keputusan berubah saat edit)
+    //     // $status = $request->keputusan == 'DITERIMA'
+    //     //     ? 'Interview HR Lolos'
+    //     //     : 'Tidak Lolos';
+
+    //     // $kandidat->update(['status_akhir' => $status]);
+    //     $status = $request->keputusan == 'DITERIMA' ? 'Interview HR Lolos' : 'Tidak Lolos';
+    //     $kandidat->status_akhir = $status;
+    //     $kandidat->save();
+
+    //     return redirect()->route('rekrutmen.interview_hr.index')
+    //         ->with('success','Data interview diperbarui');
+    // }
     public function update(Request $request, $id)
-    {
-        $interview = InterviewHr::findOrFail($id);
-        $kandidat = Kandidat::findOrFail($request->kandidat_id);
-        $total =
-            $request->skor_profesional +
-            $request->skor_spiritual +
-            $request->skor_learning +
-            $request->skor_initiative +
-            $request->skor_komunikasi +
-            $request->skor_problem_solving +
-            $request->skor_teamwork;
+{
+    // 1. Cari data interview
+    $interview = InterviewHr::findOrFail($id);
 
-        $interview->update([
-            ...$request->all(),
-            'posisi_id' => $kandidat->posisi_id,
-            'total'=>$total
-        ]);
-        // 3. Update status kandidat (jika keputusan berubah saat edit)
-        // $status = $request->keputusan == 'DITERIMA'
-        //     ? 'Interview HR Lolos'
-        //     : 'Tidak Lolos';
+    // 2. Ambil kandidat_id dari request (pastikan sudah ada input hidden di blade)
+    $kandidat = Kandidat::findOrFail($request->kandidat_id);
 
-        // $kandidat->update(['status_akhir' => $status]);
-        $status = $request->keputusan == 'DITERIMA' ? 'Interview HR Lolos' : 'Tidak Lolos';
-        $kandidat->status_akhir = $status;
-        $kandidat->save();
+    // 3. Hitung total skor secara manual
+    $total = (int)$request->skor_profesional +
+             (int)$request->skor_spiritual +
+             (int)$request->skor_learning +
+             (int)$request->skor_initiative +
+             (int)$request->skor_komunikasi +
+             (int)$request->skor_problem_solving +
+             (int)$request->skor_teamwork;
 
-        return redirect()->route('rekrutmen.interview_hr.index')
-            ->with('success','Data interview diperbarui');
-    }
+    // 4. Update data interview
+    $interview->update([
+        'hari_tanggal'     => $request->hari_tanggal,
+        'nama_interviewer' => $request->nama_interviewer,
+        'model_wawancara'  => $request->model_wawancara,
+        'skor_profesional' => $request->skor_profesional,
+        'catatan_profesional' => $request->catatan_profesional,
+        'skor_spiritual'   => $request->skor_spiritual,
+        'catatan_spiritual' => $request->catatan_spiritual,
+        'skor_learning'    => $request->skor_learning,
+        'catatan_learning' => $request->catatan_learning,
+        'skor_initiative'  => $request->skor_initiative,
+        'catatan_initiative' => $request->catatan_initiative,
+        'skor_komunikasi'  => $request->skor_komunikasi,
+        'catatan_komunikasi' => $request->catatan_komunikasi,
+        'skor_problem_solving' => $request->skor_problem_solving,
+        'catatan_problem_solving' => $request->catatan_problem_solving,
+        'skor_teamwork'    => $request->skor_teamwork,
+        'catatan_teamwork' => $request->catatan_teamwork,
+        'catatan_tambahan' => $request->catatan_tambahan,
+        'keputusan'        => $request->keputusan,
+        'hasil_akhir'      => $request->hasil_akhir,
+        'total'            => $total,
+        'posisi_id'        => $kandidat->posisi_id, // Tetap sinkronkan posisi_id
+    ]);
+
+    // 5. Update status kandidat sesuai keputusan terbaru
+    $status = ($request->keputusan == 'DITERIMA') ? 'Interview HR Lolos' : 'Tidak Lolos';
+    $kandidat->status_akhir = $status;
+    $kandidat->save();
+
+    return redirect()->route('rekrutmen.interview_hr.index')
+        ->with('success', 'Data interview berhasil diperbarui');
+}
 
     // public function destroy($id)
     // {

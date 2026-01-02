@@ -74,6 +74,17 @@
                             <td class="px-6 py-4">
                                 <div class="text-md font-medium text-gray-900 dark:text-white" x-text="row.nama"></div>
                                 <div class="text-xs text-gray-500" x-text="'Sumber: ' + (row.sumber || '-')"></div>
+                                <template x-if="row.link_cv">
+                                    <a :href="row.link_cv"
+                                    target="_blank"
+                                    class="inline-flex items-center gap-2 text-blue-500 hover:text-blue-700 transition-colors">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"></path>
+                                        </svg>
+                                        <span class="text-xs font-medium">Lihat CV</span>
+                                    </a>
+                                </template>
                             </td>
                             <td class="px-6 py-4 text-md text-gray-600 dark:text-gray-300" x-text="row.posisi ? row.posisi.nama_posisi : '-'"></td>
                             <td class="px-6 py-4">
@@ -140,6 +151,61 @@
                 <label class="text-xs font-semibold uppercase tracking-wider text-gray-500">Posisi yang Dilamar</label>
                 <p id="show-posisi" class="mt-1 text-gray-700 dark:text-gray-300">-</p>
             </div>
+            <!-- <div>
+                <label class="text-xs font-semibold uppercase tracking-wider text-gray-500">Dokumen CV</label>
+                <div id="show-link-container" class="mt-1">
+                    <a id="show-link_cv" href="#" target="_blank" class="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"></path>
+                        </svg>
+                        Lihat CV
+                    </a>
+                    <p id="show-link-empty" class="mt-1 text-gray-400 text-sm hidden">Tidak ada link CV</p>
+                </div>
+            </div> -->
+            <!-- <div>
+                <label class="text-xs font-semibold uppercase tracking-wider text-gray-500">Dokumen CV</label>
+                <div class="mt-1">
+                    <a id="show-link_cv"
+                    target="_blank"
+                    class="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"></path>
+                        </svg>
+                        <span>Buka Link CV</span>
+                    </a>
+
+                    <div id="show-link-empty" class="hidden flex items-center gap-2 text-sm text-gray-400 italic">
+                        <svg class="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                        </svg>
+                        Belum ada link CV
+                    </div>
+                </div>
+            </div> -->
+            <div>
+                <label class="text-xs font-semibold uppercase tracking-wider text-gray-500">Dokumen CV</label>
+                <div class="mt-1">
+                    <a id="show-link_cv"
+                    target="_blank"
+                    class="hidden inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"></path>
+                        </svg>
+                        <span>Lihat CV</span>
+                    </a>
+
+                    <div id="show-link-empty" class="hidden flex items-center gap-2 text-sm text-gray-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                        </svg>
+                        <span>Belum melampirkan link CV</span>
+                    </div>
+                </div>
+            </div>
             <div>
                 <label class="text-xs font-semibold uppercase tracking-wider text-gray-500">Tanggal Melamar</label>
                 <p id="show-tanggal" class="mt-1 text-gray-700 dark:text-gray-300">-</p>
@@ -147,6 +213,15 @@
             <div>
                 <label class="text-xs font-semibold uppercase tracking-wider text-gray-500">Sumber Informasi</label>
                 <p id="show-sumber" class="mt-1 text-gray-700 dark:text-gray-300">-</p>
+            </div>
+            <div class="mt-8 flex justify-end gap-3">
+                <a id="btn-export-pdf" href="#" class="rounded-lg bg-red-600 px-5 py-2 text-sm font-medium text-white hover:bg-red-700 transition flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a2 2 0 00-2 2v8a2 2 0 002 2h6a2 2 0 002-2V6.414A2 2 0 0016.414 5L14 2.586A2 2 0 0012.586 2H9z"></path></svg>
+                    Export PDF
+                </a>
+                <button type="button" @click="window.dispatchEvent(new CustomEvent('close-modal', { detail: { id: 'show-kandidat' } }))" class="rounded-lg bg-gray-100 px-5 py-2 ...">
+                    Tutup
+                </button>
             </div>
             <!-- <div>
                 <label class="text-xs font-semibold uppercase tracking-wider text-gray-500">ID Kandidat</label>
@@ -212,6 +287,14 @@
                 <label class="mb-2.5 block text-sm font-medium text-gray-900 dark:text-white">Sumber Info</label>
                 <input type="text" id="add-sumber" class="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white" placeholder="LinkedIn, Glints, dll" />
             </div>
+            <div>
+                <label class="mb-2.5 block text-sm font-medium text-gray-900 dark:text-white">Link CV (Drive/Dropbox/Portfolio)</label>
+                <input type="url" id="add-link_cv" class="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white" placeholder="https://..." />
+            </div>
+            <div>
+                <label class="mb-2.5 block text-sm font-medium text-gray-900 dark:text-white">Upload Lampiran (Excel)</label>
+                <input type="file" id="add-file_excel" class="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white" accept=".xlsx, .xls" />
+            </div>
         </div>
         <div class="flex justify-end gap-3 mt-8">
             <button type="button" @click="window.dispatchEvent(new CustomEvent('close-modal', { detail: { id: 'add-kandidat' } }))" class="rounded-lg border border-gray-300 px-5 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400">Batal</button>
@@ -271,6 +354,14 @@
                                     </svg>
                         </span>
                     </div>
+                </div>
+                <div>
+                    <label class="mb-2.5 block text-sm font-medium text-gray-900 dark:text-white">Link CV</label>
+                    <input type="url" id="edit-link_cv" class="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white" />
+                </div>
+                <div>
+                    <label class="mb-2.5 block text-sm font-medium text-gray-900 dark:text-white">Upload Lampiran (Excel)</label>
+                    <input type="file" id="edit-file_excel" class="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white" accept=".xlsx, .xls" />
                 </div>
             </div>
         </div>
@@ -381,6 +472,23 @@ function kandidatTable() {
             document.getElementById('show-created-at').innerText = formatDate(row.created_at);
             document.getElementById('show-updated-at').innerText = formatDate(row.updated_at);
 
+            // Ambil kedua elemen kontrol
+            const linkEl = document.getElementById('show-link_cv');
+            const emptyEl = document.getElementById('show-link-empty');
+
+            // Cek apakah link_cv ada, tidak null, dan tidak string kosong
+            if (row.link_cv && row.link_cv.trim() !== "") {
+                // Tampilkan Link, Sembunyikan Pesan Kosong
+                linkEl.setAttribute('href', row.link_cv);
+                linkEl.classList.remove('hidden');
+                emptyEl.classList.add('hidden');
+            } else {
+                // Sembunyikan Link, Tampilkan Pesan Kosong
+                linkEl.removeAttribute('href');
+                linkEl.classList.add('hidden');
+                emptyEl.classList.remove('hidden');
+            }
+
             // Set badge status
             const badge = document.getElementById('show-status-badge');
             badge.innerText = row.status_akhir || 'CV Lolos';
@@ -388,14 +496,17 @@ function kandidatTable() {
             // Gunakan fungsi css class yang sudah Anda buat sebelumnya
             badge.className = 'inline-flex rounded-full px-3 py-1 text-xs font-medium ' + this.getStatusBadgeClass(row.status_akhir);
 
-            // Buka modal
-            window.dispatchEvent(new CustomEvent('open-modal', { detail: { id: 'show-kandidat' } }));
-        },
+            const btnPdf = document.getElementById('btn-export-pdf');
+            btnPdf.href = `/rekrutmen/kandidat/export-pdf/${row.id_kandidat}`;
+                    // Buka modal
+                    window.dispatchEvent(new CustomEvent('open-modal', { detail: { id: 'show-kandidat' } }));
+                },
         openEditModal(row) {
             document.getElementById('edit-id').value = row.id_kandidat;
             document.getElementById('edit-nama').value = row.nama;
             document.getElementById('edit-posisi_id').value = row.posisi_id;
             document.getElementById('edit-status_akhir').value = row.status_akhir || 'CV Lolos';
+            document.getElementById('edit-link_cv').value = row.link_cv || ''; // Tambahkan ini
             window.dispatchEvent(new CustomEvent('open-modal', { detail: { id: 'edit-kandidat' } }));
         },
 
@@ -444,6 +555,7 @@ document.addEventListener('DOMContentLoaded', () => {
             posisi_id: document.getElementById('add-posisi_id').value,
             tanggal_melamar: document.getElementById('add-tanggal_melamar').value,
             sumber: document.getElementById('add-sumber').value,
+            link_cv: document.getElementById('add-link_cv').value,
         };
 
         const res = await fetch("{{ route('rekrutmen.kandidat.store') }}", {
@@ -471,6 +583,7 @@ document.addEventListener('DOMContentLoaded', () => {
             nama: document.getElementById('edit-nama').value,
             posisi_id: document.getElementById('edit-posisi_id').value,
             status_akhir: document.getElementById('edit-status_akhir').value,
+            link_cv: document.getElementById('edit-link_cv').value,
         };
 
         const res = await fetch(`/rekrutmen/kandidat/${id}`, {

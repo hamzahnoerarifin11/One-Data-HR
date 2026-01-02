@@ -64,11 +64,19 @@
                 <!-- Kandidat -->
                  <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Nama Kandidat</label>
-                    <input type="text" type="hidden"
+                    <div class="relative z-20 bg-transparent">
+                    <select id="kandidat_select" name="kandidat_id" required
+                           class="dark:bg-dark-900 shadow-theme-xs h-11 w-full appearance-none rounded-lg border border-gray-300 bg-gray-100 px-4 py-2.5 pr-11 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 cursor-not-allowed" disabled>
+                            <option value="{{ $interview->kandidat_id }}">
+                                {{ $interview->kandidat->nama }}
+                            </option>
+                        </select>
+                    <input type="hidden" name="kandidat_id"
                         class="dark:bg-dark-900 shadow-theme-xs h-11 w-full rounded-lg border border-gray-300 bg-transparent
                             px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 cursor-not-allowed"
-                        value="{{ $interview->kandidat?->nama ?? '-' }}"
+                        value="{{ $interview->kandidat_id }}"
                         readonly>
+                    </div>
                 </div>
 
 

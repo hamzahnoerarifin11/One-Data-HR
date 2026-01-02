@@ -23,6 +23,7 @@ use App\Http\Controllers\SummaryController;
 use App\Http\Controllers\KandidatLanjutUserController;
 use App\Http\Controllers\TrainingController;
 
+
 // Minimal routes for One Data HR
 Route::get('/', function () {
     return auth()->check() ? redirect()->route('dashboard.index') : redirect()->route('signin');
@@ -107,6 +108,7 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('kandidat', KandidatController::class);
         Route::get('proses/{kandidat_id}/edit', [ProsesRekrutmenController::class,'edit'])->name('proses.edit');
         Route::post('proses', [ProsesRekrutmenController::class,'store'])->name('proses.store');
+        Route::get('/rekrutmen/kandidat/export-pdf/{id}', [KandidatController::class, 'exportExcelToPdf']);
 
 
 

@@ -256,7 +256,7 @@ function posisiTable() {
         get filtered() {
             let filtered = this.data.filter(d =>
                 d.nama_posisi.toLowerCase().includes(this.search.toLowerCase()) ||
-                d.status.toLowerCase().includes(this.search.toLowerCase())
+                d.status.toLowerCase().includes(this.search.toLowerCase())  ||
                 (d.progress_rekrutmen && d.progress_rekrutmen.toLowerCase().includes(this.search.toLowerCase()))
             );
 

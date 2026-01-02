@@ -6,41 +6,68 @@ use App\Models\Kandidat;
 use App\Models\Posisi;
 use App\Models\RekrutmenDaily;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class KandidatObserver
 {
+    public function saving(Kandidat $kandidat)
+    {
+        // Jika status_akhir berubah, isi kolom tanggal yang sesuai
+        if ($kandidat->isDirty('status_akhir')) {
+            $status = $kandidat->status_akhir;
+            $today = Carbon::today()->format('Y-m-d');
+
+            $mapStatusTanggal = [
+                'CV Lolos'               => 'tgl_lolos_cv',
+                'Psikotes Lolos'         => 'tgl_lolos_psikotes',
+                'Tes Kompetensi Lolos'   => 'tgl_lolos_kompetensi',
+                'Interview HR Lolos'     => 'tgl_lolos_hr',
+                'Interview User Lolos'   => 'tgl_lolos_user',
+            ];
+
+            if (isset($mapStatusTanggal[$status])) {
+                $kolomTgl = $mapStatusTanggal[$status];
+                // Isi tanggal otomatis hanya jika belum ada isinya (mencegah overwrite tanggal lama)
+                if (empty($kandidat->$kolomTgl)) {
+                    $kandidat->$kolomTgl = $today;
+                }
+            }
+        }
+    }
     public function saved(Kandidat $kandidat)
     {
         $this->refreshPosisiProgress($kandidat->posisi_id);
-        $this->syncStatusOnly($kandidat->posisi_id, $kandidat->tanggal_melamar);
+        $this->syncDailyAllStages($kandidat);
     }
 
     public function deleted(Kandidat $kandidat)
     {
         $this->refreshPosisiProgress($kandidat->posisi_id);
-        $this->syncStatusOnly($kandidat->posisi_id, $kandidat->tanggal_melamar);
+        $this->syncDailyAllStages($kandidat);
     }
 
     public function refreshPosisiProgress($posisiId)
     {
-        // Menggunakan find dan fresh() untuk memastikan data paling update dari DB
         $posisi = Posisi::find($posisiId);
         if (!$posisi) return;
 
         $posisi = $posisi->fresh();
 
-        $totalPelamar = Kandidat::where('posisi_id', $posisiId)->count();
+        // PERBAIKAN: Tambahkan filter agar 'Tidak Lolos' tidak terhitung sebagai pelamar aktif
+        $totalPelamarAktif = Kandidat::where('posisi_id', $posisiId)
+            ->where('status_akhir', '!=', 'Tidak Lolos')
+            ->count();
 
-        // Bandingkan langsung dengan 'Nonaktif' sesuai isi database Anda
+        // Bandingkan status posisi
         if (trim($posisi->status) === 'Nonaktif') {
             $posisi->updateQuietly([
-                'total_pelamar'      => $totalPelamar,
+                'total_pelamar'      => $totalPelamarAktif, // Update dengan jumlah yang aktif
                 'progress_rekrutmen' => 'Tidak Menerima Kandidat'
             ]);
-            return; // Penting: Jangan biarkan kode di bawah menimpa status ini
+            return;
         }
 
-        // Ambil status kandidat yang aktif (Bukan 'Tidak Lolos')
+        // Ambil status kandidat yang aktif saja
         $kandidatAktif = Kandidat::where('posisi_id', $posisiId)
             ->where('status_akhir', '!=', 'Tidak Lolos')
             ->pluck('status_akhir')
@@ -48,7 +75,8 @@ class KandidatObserver
 
         $progress = 'Menerima Kandidat';
 
-        if ($totalPelamar > 0) {
+        // Logika penentuan label progress
+        if ($totalPelamarAktif > 0) {
             if (in_array('Diterima', $kandidatAktif)) {
                 $progress = 'Rekrutmen Selesai';
             }
@@ -64,92 +92,44 @@ class KandidatObserver
             elseif (array_intersect(['Psikotes Lolos', 'Tes Kompetensi Lolos'], $kandidatAktif)) {
                 $progress = 'Pre Interview';
             }
+        } else {
+            // Jika tidak ada pelamar aktif sama sekali (semua tidak lolos atau belum ada pelamar)
+            $progress = 'Menerima Kandidat';
         }
 
         $posisi->updateQuietly([
-            'total_pelamar'      => $totalPelamar,
+            'total_pelamar'      => $totalPelamarAktif,
             'progress_rekrutmen' => $progress
         ]);
     }
-    // private function syncStatusOnly($posisiId, $date)
-    // {
-    //     if (!$posisiId || !$date) return;
 
-    //     // Hitung statistik status saja
-    //     $stats = Kandidat::where('posisi_id', $posisiId)
-    //         ->whereDate('tanggal_melamar', $date)
-    //         ->selectRaw("
-    //             SUM(CASE WHEN status_akhir = 'CV Lolos' THEN 1 ELSE 0 END) as cv,
-    //             SUM(CASE WHEN status_akhir = 'Psikotes Lolos' THEN 1 ELSE 0 END) as psikotes,
-    //             SUM(CASE WHEN status_akhir = 'Tes Kompetensi Lolos' THEN 1 ELSE 0 END) as kompetensi,
-    //             SUM(CASE WHEN status_akhir = 'Interview HR Lolos' THEN 1 ELSE 0 END) as hr,
-    //             SUM(CASE WHEN status_akhir = 'Interview User Lolos' THEN 1 ELSE 0 END) as user
-    //         ")
-    //         ->first();
+    private function syncDailyAllStages(Kandidat $kandidat)
+    {
+        $posisiId = $kandidat->posisi_id;
 
-    //     // Update HANYA kolom status.
-    //     // Jika data harian belum ada (misal blm diinput manual), maka tidak akan terjadi apa-apa.
-    //     RekrutmenDaily::where('posisi_id', $posisiId)
-    //         ->where('date', $date)
-    //         ->update([
-    //             'lolos_cv'         => $stats->cv ?? 0,
-    //             'lolos_psikotes'   => $stats->psikotes ?? 0,
-    //             'lolos_kompetensi' => $stats->kompetensi ?? 0,
-    //             'lolos_hr'         => $stats->hr ?? 0,
-    //             'lolos_user'       => $stats->user ?? 0,
-    //         ]);
-    // }
-    // KandidatObserver.php
+        // Daftar kolom tanggal dan pasangannya di tabel daily
+        $tahapan = [
+            'tgl_lolos_cv'         => 'lolos_cv',
+            'tgl_lolos_psikotes'   => 'lolos_psikotes',
+            'tgl_lolos_kompetensi' => 'lolos_kompetensi',
+            'tgl_lolos_hr'         => 'lolos_hr',
+            'tgl_lolos_user'       => 'lolos_user',
+        ];
 
-// private function syncStatusOnly($posisiId, $date)
-// {
-//     if (!$posisiId || !$date) return;
+        foreach ($tahapan as $kolomTglKandidat => $kolomDaily) {
+            $tanggalStatus = $kandidat->$kolomTglKandidat;
 
-//     $stats = Kandidat::where('posisi_id', $posisiId)
-//         ->whereDate('tanggal_melamar', $date)
-//         ->selectRaw("
-//             SUM(CASE WHEN status_akhir = 'CV Lolos' THEN 1 ELSE 0 END) as cv,
-//             SUM(CASE WHEN status_akhir = 'Psikotes Lolos' THEN 1 ELSE 0 END) as psikotes,
-//             SUM(CASE WHEN status_akhir = 'Tes Kompetensi Lolos' THEN 1 ELSE 0 END) as kompetensi,
-//             SUM(CASE WHEN status_akhir = 'Interview HR Lolos' THEN 1 ELSE 0 END) as hr,
-//             SUM(CASE WHEN status_akhir = 'Interview User Lolos' THEN 1 ELSE 0 END) as user
-//         ")
-//         ->first();
+            if ($tanggalStatus) {
+                // Hitung total kandidat untuk posisi ini, di tanggal tersebut, untuk tahap tersebut
+                $count = Kandidat::where('posisi_id', $posisiId)
+                    ->where($kolomTglKandidat, $tanggalStatus)
+                    ->count();
 
-//     // Gunakan updateOrCreate:
-//     // Jika admin belum pernah input 'total_pelamar' manual untuk tanggal tersebut,
-//     // kita buatkan row-nya dengan total_pelamar = 0.
-//     RekrutmenDaily::updateOrCreate(
-//         ['posisi_id' => $posisiId, 'date' => $date],
-//         [
-//             'lolos_cv'         => $stats->cv ?? 0,
-//             'lolos_psikotes'   => $stats->psikotes ?? 0,
-//             'lolos_kompetensi' => $stats->kompetensi ?? 0,
-//             'lolos_hr'         => $stats->hr ?? 0,
-//             'lolos_user'       => $stats->user ?? 0,
-//         ]
-//     );
-// }
-// Di dalam KandidatObserver.php
-private function syncStatusOnly($posisiId, $date)
-{
-    if (!$posisiId || !$date) return;
-
-    $stats = Kandidat::where('posisi_id', $posisiId)
-        ->whereDate('tanggal_melamar', $date)
-        // ... (query SUM CASE sama seperti di atas) ...
-        ->first();
-
-    // GUNAKAN updateOrCreate agar data TERBUAT di database jika belum ada
-    RekrutmenDaily::updateOrCreate(
-        ['posisi_id' => $posisiId, 'date' => $date],
-        [
-            'lolos_cv'         => $stats->cv ?? 0,
-            'lolos_psikotes'   => $stats->psikotes ?? 0,
-            'lolos_kompetensi' => $stats->kompetensi ?? 0,
-            'lolos_hr'         => $stats->hr ?? 0,
-            'lolos_user'       => $stats->user ?? 0,
-        ]
-    );
-}
+                RekrutmenDaily::updateOrCreate(
+                    ['posisi_id' => $posisiId, 'date' => $tanggalStatus],
+                    [$kolomDaily => $count]
+                );
+            }
+        }
+    }
 }

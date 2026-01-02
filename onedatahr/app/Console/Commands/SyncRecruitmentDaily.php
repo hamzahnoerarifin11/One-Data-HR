@@ -13,75 +13,32 @@ class SyncRecruitmentDaily extends Command
     protected $signature = 'rekrutmen:sync-daily';
     protected $description = 'Sinkronisasi data rekrutmen_daily dari data kandidat yang sudah ada';
 
-//    public function handle()
-//     {
-//         $this->info('Sinkronisasi kolom status (Total Pelamar tidak akan berubah)...');
+    public function handle()
+    {
+        $this->info('Sinkronisasi data harian berdasarkan tanggal riil tiap tahapan...');
 
-//         $groups = Kandidat::select('posisi_id', 'tanggal_melamar')
-//             ->whereNotNull('tanggal_melamar')
-//             ->groupBy('posisi_id', 'tanggal_melamar')
-//             ->get();
+        $tahapan = [
+            'tgl_lolos_cv'         => 'lolos_cv',
+            'tgl_lolos_psikotes'   => 'lolos_psikotes',
+            'tgl_lolos_kompetensi' => 'lolos_kompetensi',
+            'tgl_lolos_hr'         => 'lolos_hr',
+            'tgl_lolos_user'       => 'lolos_user',
+        ];
 
-//         foreach ($groups as $group) {
-//             $stats = Kandidat::where('posisi_id', $group->posisi_id)
-//                 ->whereDate('tanggal_melamar', $group->tanggal_melamar)
-//                 ->selectRaw("
-//                     SUM(CASE WHEN status_akhir = 'CV Lolos' THEN 1 ELSE 0 END) as cv,
-//                     SUM(CASE WHEN status_akhir = 'Psikotes Lolos' THEN 1 ELSE 0 END) as psikotes,
-//                     SUM(CASE WHEN status_akhir = 'Tes Kompetensi Lolos' THEN 1 ELSE 0 END) as kompetensi,
-//                     SUM(CASE WHEN status_akhir = 'Interview HR Lolos' THEN 1 ELSE 0 END) as hr,
-//                     SUM(CASE WHEN status_akhir = 'Interview User Lolos' THEN 1 ELSE 0 END) as user
-//                 ")
-//                 ->first();
+        foreach ($tahapan as $kolomTgl => $kolomDaily) {
+            $data = Kandidat::select('posisi_id', $kolomTgl)
+                ->whereNotNull($kolomTgl)
+                ->groupBy('posisi_id', $kolomTgl)
+                ->selectRaw("count(*) as total")
+                ->get();
 
-//             // Menggunakan update() agar total_pelamar yang sudah diinput manual aman
-//             RekrutmenDaily::where('posisi_id', $group->posisi_id)
-//                 ->where('date', $group->tanggal_melamar)
-//                 ->update([
-//                     'lolos_cv'         => $stats->cv ?? 0,
-//                     'lolos_psikotes'   => $stats->psikotes ?? 0,
-//                     'lolos_kompetensi' => $stats->kompetensi ?? 0,
-//                     'lolos_hr'         => $stats->hr ?? 0,
-//                     'lolos_user'       => $stats->user ?? 0,
-//                 ]);
-//         }
-//         $this->info("Selesai!");
-//     }
-// SyncRecruitmentDaily.php
-
-public function handle()
-{
-    $this->info('Memulai sinkronisasi status kandidat ke data harian...');
-
-    // Ambil semua kombinasi posisi dan tanggal yang ada di tabel kandidat
-    $groups = Kandidat::select('posisi_id', 'tanggal_melamar')
-        ->whereNotNull('tanggal_melamar')
-        ->groupBy('posisi_id', 'tanggal_melamar')
-        ->get();
-
-    foreach ($groups as $group) {
-        $stats = Kandidat::where('posisi_id', $group->posisi_id)
-            ->whereDate('tanggal_melamar', $group->tanggal_melamar)
-            ->selectRaw("
-                SUM(CASE WHEN status_akhir = 'CV Lolos' THEN 1 ELSE 0 END) as cv,
-                SUM(CASE WHEN status_akhir = 'Psikotes Lolos' THEN 1 ELSE 0 END) as psikotes,
-                SUM(CASE WHEN status_akhir = 'Tes Kompetensi Lolos' THEN 1 ELSE 0 END) as kompetensi,
-                SUM(CASE WHEN status_akhir = 'Interview HR Lolos' THEN 1 ELSE 0 END) as hr,
-                SUM(CASE WHEN status_akhir = 'Interview User Lolos' THEN 1 ELSE 0 END) as user
-            ")
-            ->first();
-
-        RekrutmenDaily::updateOrCreate(
-            ['posisi_id' => $group->posisi_id, 'date' => $group->tanggal_melamar],
-            [
-                'lolos_cv'         => $stats->cv ?? 0,
-                'lolos_psikotes'   => $stats->psikotes ?? 0,
-                'lolos_kompetensi' => $stats->kompetensi ?? 0,
-                'lolos_hr'         => $stats->hr ?? 0,
-                'lolos_user'       => $stats->user ?? 0,
-            ]
-        );
+            foreach ($data as $row) {
+                RekrutmenDaily::updateOrCreate(
+                    ['posisi_id' => $row->posisi_id, 'date' => $row->$kolomTgl],
+                    [$kolomDaily => $row->total]
+                );
+            }
+        }
+        $this->info('Selesai!');
     }
-    $this->info("Sinkronisasi Selesai!");
-}
 }

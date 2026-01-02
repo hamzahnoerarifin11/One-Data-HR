@@ -9,7 +9,7 @@
                 Tambah Data Pemberkasan
             </h1>
             <p class="mt-2 text-gray-600 dark:text-gray-400">
-                Input data administrasi untuk kandidat yang telah Lolos Interview User (ASS & ASM)
+                Input data administrasi untuk kandidat yang telah Lolos Interview User
             </p>
         </div>
 
