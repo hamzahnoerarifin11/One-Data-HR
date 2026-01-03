@@ -275,49 +275,81 @@ class KbiController extends Controller
         return redirect()->back()->with('success', 'Data Atasan berhasil direset! Silakan pilih atasan baru.');
     }
 
-    public function monitoring(Request $request)
+   public function monitoring(Request $request)
 {
     $tahun = date('Y');
-    
-    // 1. Ambil Semua Karyawan + Data Assessment-nya tahun ini
-    // Kita pakai 'eager loading' (with) biar query-nya cepat, tidak berat.
-    $listKaryawan = Karyawan::with(['pekerjaan', 'atasan'])
-        ->get()
-        ->map(function ($kry) use ($tahun) {
-            
-            // Cek Status: Sudah Nilai Diri Sendiri?
-            $kry->status_diri = KbiAssessment::where('karyawan_id', $kry->id_karyawan)
-                ->where('tipe_penilai', 'DIRI_SENDIRI')
+
+    // 1. Query Dasar
+    $query = Karyawan::with(['pekerjaan', 'atasan']);
+
+    // 2. Filter Search
+    if ($request->has('search') && $request->search != '') {
+        $keyword = $request->search;
+        $query->where(function($q) use ($keyword) {
+            $q->where('Nama_Lengkap_Sesuai_Ijazah', 'LIKE', '%'.$keyword.'%')
+              ->orWhere('NIK', 'LIKE', '%'.$keyword.'%');
+        });
+    }
+
+    // 3. Filter Jabatan (PERBAIKAN DISINI)
+    if ($request->has('jabatan') && $request->jabatan != '') {
+        $query->whereHas('pekerjaan', function($q) use ($request) {
+            // Ubah 'nama_jabatan' jadi 'Jabatan'
+            $q->where('Jabatan', $request->jabatan); // <--- UBAH INI
+        });
+    }
+
+    $rawList = $query->get();
+
+    // 4. Mapping Status (Sama seperti sebelumnya)
+    $listKaryawan = $rawList->map(function ($kry) use ($tahun) {
+        $kry->status_diri = KbiAssessment::where('karyawan_id', $kry->id_karyawan)
+            ->where('tipe_penilai', 'DIRI_SENDIRI')
+            ->where('tahun', $tahun)
+            ->exists();
+
+        if ($kry->atasan_id) {
+            $sudahNilaiAtasan = KbiAssessment::where('karyawan_id', $kry->atasan_id)
+                ->where('penilai_id', $kry->user_id ?? 0) // Sesuaikan logic user_id
+                ->where('tipe_penilai', 'BAWAHAN')
                 ->where('tahun', $tahun)
                 ->exists();
+            $kry->status_atasan = $sudahNilaiAtasan ? 'DONE' : 'PENDING';
+        } else {
+            $kry->status_atasan = 'NA';
+        }
 
-            // Cek Status: Sudah Nilai Atasan?
-            // (Hanya wajib jika dia punya atasan)
-            if ($kry->atasan_id) {
-                $sudahNilaiAtasan = KbiAssessment::where('karyawan_id', $kry->atasan_id) // Target: Atasannya
-                    ->where('penilai_id', $kry->user_id ?? 0) // Penilai: Dia sendiri (Perlu relasi user_id di tabel karyawan)
-                    // Atau jika pakai NIK login:
-                    // ->where('penilai_id', User::where('nik', $kry->NIK)->first()->id ?? 0)
-                    ->where('tipe_penilai', 'BAWAHAN')
-                    ->where('tahun', $tahun)
-                    ->exists();
-                
-                $kry->status_atasan = $sudahNilaiAtasan ? 'DONE' : 'PENDING';
-            } else {
-                $kry->status_atasan = 'NA'; // N/A (Tidak punya atasan / Direktur)
-            }
+        $kry->is_complete = $kry->status_diri && ($kry->status_atasan == 'DONE' || $kry->status_atasan == 'NA');
+        return $kry;
+    });
 
-            return $kry;
-        });
+    // 5. Filter Status (Sama seperti sebelumnya)
+    if ($request->has('status') && $request->status != '') {
+        if ($request->status == 'sudah') {
+            $listKaryawan = $listKaryawan->where('is_complete', true);
+        } elseif ($request->status == 'belum') {
+            $listKaryawan = $listKaryawan->where('is_complete', false);
+        }
+    }
 
-    // 2. Hitung Statistik Sederhana
+    // 6. List Jabatan untuk Dropdown (PERBAIKAN DISINI)
+    // Ubah 'nama_jabatan' jadi 'Jabatan'
+    $listJabatan = \App\Models\Pekerjaan::distinct()
+                    ->pluck('Jabatan') // <--- UBAH INI
+                    ->filter()
+                    ->sort();
+
     $totalKaryawan = $listKaryawan->count();
-    $sudahSelesaiSemua = $listKaryawan->filter(function($k) {
-        return $k->status_diri && ($k->status_atasan == 'DONE' || $k->status_atasan == 'NA');
-    })->count();
-    
+    $sudahSelesaiSemua = $listKaryawan->where('is_complete', true)->count();
     $belumSelesai = $totalKaryawan - $sudahSelesaiSemua;
 
-    return view('pages.kbi.monitoring', compact('listKaryawan', 'totalKaryawan', 'sudahSelesaiSemua', 'belumSelesai', 'tahun'));
+    return view('pages.kbi.monitoring', compact(
+        'listKaryawan', 
+        'totalKaryawan', 
+        'sudahSelesaiSemua', 
+        'belumSelesai', 
+        'tahun',
+        'listJabatan'
+    ));
 }
 }
