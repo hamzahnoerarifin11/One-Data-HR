@@ -49,68 +49,95 @@
             </div>
 
             {{-- KARTU 3: FEEDBACK KE ATASAN --}}
-            @if($atasan)
+            <div class="bg-white p-5 rounded-xl shadow border border-purple-100 mt-6 relative overflow-hidden">
+                
+                <div class="absolute top-0 right-0 -mt-2 -mr-2 w-16 h-16 bg-purple-50 rounded-full blur-xl opacity-50 pointer-events-none"></div>
 
-                <div class="bg-white p-5 rounded-xl shadow border border-purple-100 mt-6 relative overflow-hidden">
-                    
-                    {{-- Hiasan Background Tipis (Opsional, biar cantik) --}}
-                    <div class="absolute top-0 right-0 -mt-2 -mr-2 w-16 h-16 bg-purple-50 rounded-full blur-xl opacity-50 pointer-events-none"></div>
-
-                    <h3 class="font-bold text-base text-purple-800 mb-1" style="color: #6b21a8;">
-                        Feedback ke Atasan
-                    </h3>
+                <h3 class="font-bold text-base text-purple-800 mb-1" style="color: #6b21a8;">
+                    Feedback ke Atasan
+                </h3>
+                
+                @if($atasan)
+                    {{-- === KONDISI A: SUDAH PUNYA ATASAN === --}}
                     <p class="text-xs text-gray-500 mb-4">
                         Berikan masukan untuk atasan langsung Anda.
                     </p>
-
-                    @if($atasan)
-                        <div class="flex items-start gap-3 mb-4">
-                            {{-- Avatar Inisial --}}
-                            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-bold text-sm border border-purple-200" style="background-color: #f3e8ff; color: #7e22ce;">
-                                {{ substr($atasan->Nama_Lengkap_Sesuai_Ijazah ?? $atasan->Nama_Sesuai_KTP ?? 'A', 0, 1) }}
-                            </div>
-                            
-                            {{-- Info Nama & Jabatan --}}
-                            <div class="overflow-hidden">
-                                <h4 class="font-bold text-gray-800 text-sm truncate" title="{{ $atasan->Nama_Lengkap_Sesuai_Ijazah }}">
-                                    {{ $atasan->Nama_Lengkap_Sesuai_Ijazah ?? $atasan->Nama_Sesuai_KTP }}
-                                </h4>
-                                <p class="text-xs text-gray-500 truncate">
-                                    {{ $atasan->pekerjaan->nama_jabatan ?? 'Atasan Langsung' }}
-                                </p>
-                                <div class="text-[10px] text-gray-400 mt-0.5">
-                                    NIK: {{ $atasan->NIK ?? '-' }}
-                                </div>
-                            </div>
-                        </div>
-
-                        @if($sudahMenilaiAtasan)
-                            {{-- STATUS: SUDAH DINILAI --}}
-                            <div class="w-full bg-green-50 border border-green-200 text-green-700 text-sm py-2 rounded-lg font-semibold text-center flex items-center justify-center gap-2" style="background-color: #f0fdf4; color: #15803d; border-color: #bbf7d0;">
-                                <i class="fas fa-check-circle"></i> Selesai
-                            </div>
-                        @else
-                            {{-- TOMBOL: BERI MASUKAN --}}
-                            {{-- Saya tambahkan style="background-color..." agar pasti muncul warnanya --}}
-                            <a href="{{ route('kbi.create', ['karyawan_id' => $atasan->id_karyawan, 'tipe' => 'BAWAHAN']) }}"
-                            class="block w-full text-center bg-purple-600 hover:bg-purple-700 text-white py-2.5 rounded-lg font-semibold text-sm transition shadow-sm hover:shadow-md group"
-                            style="background-color: #9333ea; color: #ffffff;">
-                            
-                            <span class="group-hover:scale-105 inline-block transition-transform duration-200">
-                                    <i class="fas fa-pen-to-square mr-1"></i> Mulai Menilai
-                            </span>
-                            </a>
-                        @endif
-
-                    @else
-                        {{-- JIKA TIDAK ADA ATASAN --}}
-                        <div class="text-center py-6 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                            <i class="fas fa-user-slash text-gray-300 text-2xl mb-2"></i>
-                            <p class="text-xs text-gray-400">Tidak ada data atasan.</p>
-                        </div>
+                    @if(!$sudahMenilaiAtasan)
+                        <form action="{{ route('kbi.reset-atasan') }}" method="POST" class="absolute top-4 right-4">
+                            @csrf
+                            <input type="hidden" name="karyawan_id" value="{{ $karyawan->id_karyawan }}">
+                            <button type="submit" title="Ubah Atasan" 
+                                    class="text-purple-600 hover:text-purple-800 text-sm">
+                                <i class="fas fa-edit"></i>Ganti
+                            </button>
+                        </form>
                     @endif
-                </div>
-            @endif
+                    
+                    <div class="flex items-start gap-3 mb-4">
+                        {{-- Avatar Inisial --}}
+                        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-bold text-sm border border-purple-200" style="background-color: #f3e8ff; color: #7e22ce;">
+                            {{ substr($atasan->Nama_Lengkap_Sesuai_Ijazah ?? $atasan->Nama_Sesuai_KTP ?? 'A', 0, 1) }}
+                        </div>
+                        
+                        {{-- Info Nama & Jabatan --}}
+                        <div class="overflow-hidden">
+                            <h4 class="font-bold text-gray-800 text-sm truncate">
+                                {{ $atasan->Nama_Lengkap_Sesuai_Ijazah ?? $atasan->Nama_Sesuai_KTP }}
+                            </h4>
+                            <p class="text-xs text-gray-500 truncate">
+                                {{ $atasan->pekerjaan->Jabatan ?? 'Atasan Langsung' }}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    @if($sudahMenilaiAtasan)
+                        <div class="w-full bg-green-50 border border-green-200 text-green-700 text-sm py-2 rounded-lg font-semibold text-center flex items-center justify-center gap-2" style="background-color: #f0fdf4; color: #15803d; border-color: #bbf7d0;">
+                            <i class="fas fa-check-circle"></i> Selesai
+                        </div>
+                    @else
+                        <a href="{{ route('kbi.create', ['karyawan_id' => $atasan->id_karyawan, 'tipe' => 'BAWAHAN']) }}"
+                        class="block w-full text-center bg-purple-600 hover:bg-purple-700 text-white py-2.5 rounded-lg font-semibold text-sm transition shadow-sm hover:shadow-md group"
+                        style="background-color: #9333ea; color: #ffffff;">
+                        <span class="group-hover:scale-105 inline-block transition-transform duration-200">
+                                <i class="fas fa-pen-to-square mr-1"></i> Mulai Menilai
+                        </span>
+                        </a>
+                    @endif
+
+                @else
+                    {{-- === KONDISI B: BELUM PUNYA ATASAN (TAMPILKAN FORM PILIH) === --}}
+                    <p class="text-xs text-red-500 mb-3 italic">
+                        *Data atasan belum disetting. Silakan pilih atasan langsung Anda:
+                    </p>
+
+                    <form action="{{ route('kbi.update-atasan') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="karyawan_id" value="{{ $karyawan->id_karyawan }}">
+
+                        {{-- Dropdown Pilih Atasan --}}
+                        <div class="mb-3">
+                            <select name="atasan_id" required 
+                                    class="w-full text-sm border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-purple-500 bg-gray-50"
+                                    style="border: 1px solid #d1d5db; border-radius: 0.5rem; padding: 0.5rem;">
+                                <option value="">-- Pilih Nama Atasan --</option>
+                                @foreach($listCalonAtasan as $calon)
+                                    <option value="{{ $calon->id_karyawan }}">
+                                        {{ $calon->Nama_Lengkap_Sesuai_Ijazah }} 
+                                        ({{ $calon->pekerjaan->Jabatan ?? '-' }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        {{-- Tombol Simpan --}}
+                        <button type="submit" 
+                                class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded text-sm transition"
+                                style="background-color: #9333ea; color: white;">
+                            <i class="fas fa-save mr-1"></i> Simpan Atasan
+                        </button>
+                    </form>
+                @endif
+            </div>
         </div>
 
         {{-- KONTEN UTAMA --}}
@@ -163,7 +190,7 @@
                             </td>
                             <td class="p-3 text-gray-500 text-center">{{ $staff->NIK }}</td>
                             <td class="p-3 text-gray-500 text-center">
-                                {{ $staff->pekerjaan->nama_jabatan ?? '-' }}
+                                {{ $staff->pekerjaan->Jabatan ?? '-' }}
                             </td>
                             <td class="p-3 text-center">
                                 @if($staff->sudah_dinilai)
@@ -190,7 +217,7 @@
             </div>
 
             {{-- PAGINATION --}}
-            <div class="mt-4">
+            <div class="mt-4 bg-white">
                 {{ $bawahanList->withQueryString()->links('components.pagination-custom') }}
             </div>
 

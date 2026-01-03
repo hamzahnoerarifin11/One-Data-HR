@@ -166,6 +166,12 @@ Route::middleware(['auth'])->group(function () {
 
     // 4. Lihat Hasil Detail (Report)
     Route::get('/kbi/hasil/{id_assessment}', [KbiController::class, 'show'])->name('kbi.show');
+    // 5. Update Atasan yang dinilai oleh Karyawan
+    Route::post('/kbi/update-atasan', [App\Http\Controllers\KbiController::class, 'updateAtasan'])->name('kbi.update-atasan');
+    // 6. Reset Atasan yang dinilai oleh Karyawan
+    Route::post('/kbi/reset-atasan', [App\Http\Controllers\KbiController::class, 'resetAtasan'])->name('kbi.reset-atasan');
+    // 7. monitoring
+    Route::get('/kbi/monitoring', [App\Http\Controllers\KbiController::class, 'monitoring'])->name('kbi.monitoring');
 
 
 

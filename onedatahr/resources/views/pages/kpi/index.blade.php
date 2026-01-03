@@ -185,11 +185,11 @@
                             {{-- Header Card: Nama & Jabatan --}}
                             <div class="flex justify-between items-start mb-3">
                                 <div>
-                                    <div class="font-bold text-gray-900 dark:text-white text-base">{{ $kry->Nama_Lengkap_Sesuai_Ijazah }}</div>
+                                    <div class="font-bold text-gray-200 dark:text-white text-base">{{ $kry->Nama_Lengkap_Sesuai_Ijazah }}</div>
                                     <div class="text-xs text-gray-500">{{ $kry->pekerjaan->jabatan ?? '-' }}</div>
                                     <div class="text-xs text-gray-400 mt-0.5">NIK: {{ $kry->NIK ?? '-' }}</div>
                                 </div>
-                                <div class="text-xs text-gray-400 font-mono">#{{ $index + 1 }}</div>
+                                <div class="text-xs dark:text-white text-gray-400 font-mono">#{{ $index + 1 }}</div>
                             </div>
 
                             {{-- Body Card: Status & Grade --}}
@@ -278,7 +278,7 @@
                         @forelse($karyawanList as $index => $kry)
                         @php $kpi = $kry->kpiAssessment; @endphp
                         <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-200">
                                 {{ $karyawanList->firstItem() + $index }}
                             </td>
                             <td class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
