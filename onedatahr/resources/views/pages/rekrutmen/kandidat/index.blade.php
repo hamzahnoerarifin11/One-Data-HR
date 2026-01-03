@@ -151,53 +151,24 @@
                 <label class="text-xs font-semibold uppercase tracking-wider text-gray-500">Posisi yang Dilamar</label>
                 <p id="show-posisi" class="mt-1 text-gray-700 dark:text-gray-300">-</p>
             </div>
-            <!-- <div>
-                <label class="text-xs font-semibold uppercase tracking-wider text-gray-500">Dokumen CV</label>
-                <div id="show-link-container" class="mt-1">
-                    <a id="show-link_cv" href="#" target="_blank" class="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"></path>
-                        </svg>
-                        Lihat CV
-                    </a>
-                    <p id="show-link-empty" class="mt-1 text-gray-400 text-sm hidden">Tidak ada link CV</p>
-                </div>
-            </div> -->
-            <!-- <div>
-                <label class="text-xs font-semibold uppercase tracking-wider text-gray-500">Dokumen CV</label>
-                <div class="mt-1">
-                    <a id="show-link_cv"
-                    target="_blank"
-                    class="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"></path>
-                        </svg>
-                        <span>Buka Link CV</span>
-                    </a>
-
-                    <div id="show-link-empty" class="hidden flex items-center gap-2 text-sm text-gray-400 italic">
-                        <svg class="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
-                        </svg>
-                        Belum ada link CV
-                    </div>
-                </div>
-            </div> -->
+            <div>
+                <label class="text-xs font-semibold uppercase tracking-wider text-gray-500">Tanggal Melamar</label>
+                <p id="show-tanggal" class="mt-1 text-gray-700 dark:text-gray-300">-</p>
+            </div>
+            <div>
+                <label class="text-xs font-semibold uppercase tracking-wider text-gray-500">Sumber Informasi</label>
+                <p id="show-sumber" class="mt-1 text-gray-700 dark:text-gray-300">-</p>
+            </div>
             <div>
                 <label class="text-xs font-semibold uppercase tracking-wider text-gray-500">Dokumen CV</label>
                 <div class="mt-1">
-                    <a id="show-link_cv"
-                    target="_blank"
-                    class="hidden inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400">
+                    <a id="show-link_cv" target="_blank" class="hidden inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"></path>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"></path>
                         </svg>
                         <span>Lihat CV</span>
                     </a>
-
                     <div id="show-link-empty" class="hidden flex items-center gap-2 text-sm text-gray-400">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
@@ -207,38 +178,46 @@
                 </div>
             </div>
             <div>
-                <label class="text-xs font-semibold uppercase tracking-wider text-gray-500">Tanggal Melamar</label>
-                <p id="show-tanggal" class="mt-1 text-gray-700 dark:text-gray-300">-</p>
+                <label class="text-xs font-semibold uppercase tracking-wider text-gray-500">Hasil Tes (Excel)</label>
+                <div class="mt-1">
+                    <a id="show-file_excel" target="_blank" class="hidden inline-flex items-center gap-2 text-sm font-medium text-green-600 hover:text-green-700 dark:text-green-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <span id="show-file-name">Unduh Excel</span>
+                    </a>
+                    <div id="show-file-empty" class="hidden flex items-center gap-2 text-sm text-gray-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                        <span>File belum diunggah</span>
+                    </div>
+                </div>
             </div>
-            <div>
-                <label class="text-xs font-semibold uppercase tracking-wider text-gray-500">Sumber Informasi</label>
-                <p id="show-sumber" class="mt-1 text-gray-700 dark:text-gray-300">-</p>
+        </div>
+
+        <div class="mt-10 flex flex-col sm:flex-row justify-between items-center gap-4 border-t border-gray-100 pt-6 dark:border-gray-800">
+            <div class="flex flex-col text-xs text-gray-500">
+                <p>Dibuat: <span id="show-created-at">-</span></p>
+                <p>Update: <span id="show-updated-at">-</span></p>
             </div>
-            <div class="mt-8 flex justify-end gap-3">
-                <a id="btn-export-pdf" href="#" class="rounded-lg bg-red-600 px-5 py-2 text-sm font-medium text-white hover:bg-red-700 transition flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a2 2 0 00-2 2v8a2 2 0 002 2h6a2 2 0 002-2V6.414A2 2 0 0016.414 5L14 2.586A2 2 0 0012.586 2H9z"></path></svg>
+            <div class="flex gap-3">
+                <a id="btn-export-pdf"
+                        href="javascript:void(0)"
+                        target="_blank"
+                        class="hidden inline-flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2 text-sm font-medium text-white hover:bg-red-700">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
                     Export PDF
                 </a>
-                <button type="button" @click="window.dispatchEvent(new CustomEvent('close-modal', { detail: { id: 'show-kandidat' } }))" class="rounded-lg bg-gray-100 px-5 py-2 ...">
+
+                <button type="button"
+                    @click="window.dispatchEvent(new CustomEvent('close-modal', { detail: { id: 'show-kandidat' } }))"
+                    class="rounded-lg bg-gray-100 px-5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition">
                     Tutup
                 </button>
             </div>
-            <!-- <div>
-                <label class="text-xs font-semibold uppercase tracking-wider text-gray-500">ID Kandidat</label>
-                <p id="show-id" class="mt-1 font-mono text-sm text-gray-500"># -</p>
-            </div> -->
-        </div>
-
-        <div class="mt-8 flex justify-end">
-            <button type="button"
-                @click="window.dispatchEvent(new CustomEvent('close-modal', { detail: { id: 'show-kandidat' } }))"
-                class="rounded-lg bg-gray-100 px-5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition">
-                Tutup
-            </button>
-        </div>
-        <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row justify-between items-center text-xs text-gray-500 gap-2">
-            <p>Dibuat pada: <span id="show-created-at">-</span></p>
-            <p>Terakhir diperbarui: <span id="show-updated-at">-</span></p>
         </div>
     </div>
 </x-modal>
@@ -293,7 +272,7 @@
             </div>
             <div>
                 <label class="mb-2.5 block text-sm font-medium text-gray-900 dark:text-white">Upload Lampiran (Excel)</label>
-                <input type="file" id="add-file_excel" class="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white" accept=".xlsx, .xls" />
+                <input type="file" id="add-file_excel" name="file_excel" accept=".xlsx, .xls" class="focus:border-ring-brand-300 shadow-theme-xs focus:file:ring-brand-300 h-11 w-full overflow-hidden rounded-lg border border-gray-300 bg-transparent text-sm text-gray-500 transition-colors file:mr-5 file:border-collapse file:cursor-pointer file:rounded-l-lg file:border-0 file:border-r file:border-solid file:border-gray-200 file:bg-gray-50 file:py-3 file:pr-3 file:pl-3.5 file:text-sm file:text-gray-700 placeholder:text-gray-400 hover:file:bg-gray-100 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:text-white/90 dark:file:border-gray-800 dark:file:bg-white/[0.03] dark:file:text-gray-400 dark:placeholder:text-gray-400"/>
             </div>
         </div>
         <div class="flex justify-end gap-3 mt-8">
@@ -361,7 +340,8 @@
                 </div>
                 <div>
                     <label class="mb-2.5 block text-sm font-medium text-gray-900 dark:text-white">Upload Lampiran (Excel)</label>
-                    <input type="file" id="edit-file_excel" class="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white" accept=".xlsx, .xls" />
+                    <input type="file" id="edit-file_excel" name="file_excel" accept=".xlsx, .xls" class="focus:border-ring-brand-300 shadow-theme-xs focus:file:ring-brand-300 h-11 w-full overflow-hidden rounded-lg border border-gray-300 bg-transparent text-sm text-gray-500 transition-colors file:mr-5 file:border-collapse file:cursor-pointer file:rounded-l-lg file:border-0 file:border-r file:border-solid file:border-gray-200 file:bg-gray-50 file:py-3 file:pr-3 file:pl-3.5 file:text-sm file:text-gray-700 placeholder:text-gray-400 hover:file:bg-gray-100 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:text-white/90 dark:file:border-gray-800 dark:file:bg-white/[0.03] dark:file:text-gray-400 dark:placeholder:text-gray-400"/>
+                    <div id="edit-file-info"></div>
                 </div>
             </div>
         </div>
@@ -377,7 +357,6 @@
 <script>
 function kandidatTable() {
     return {
-        // Gunakan koleksi lengkap untuk pencarian client-side yang lancar
         data: @json($kandidats instanceof \Illuminate\Pagination\LengthAwarePaginator ? $kandidats->items() : $kandidats),
         search: '',
         page: 1,
@@ -439,102 +418,117 @@ function kandidatTable() {
             return range;
         },
 
-        get startItem() { return this.filtered.length === 0 ? 0 : (this.page - 1) * this.perPage + 1; },
-        get endItem() { return Math.min(this.page * this.perPage, this.filtered.length); },
-
-        // Letakkan di dalam fungsi kandidatTable() { return { ... } }
-        openShowModal(row) {
+       openShowModal(row) {
             const formatDate = (dateString) => {
                 if (!dateString) return '-';
                 const date = new Date(dateString);
                 return new Intl.DateTimeFormat('id-ID', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: false,
+                    day: '2-digit', month: '2-digit', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit', hour12: false,
                     timeZone: 'Asia/Jakarta'
-                }).format(date).replace(/\./g, ':'); // Mengubah titik menjadi titik dua untuk jam
+                }).format(date).replace(/\./g, ':');
             };
-                    // Isi data ke elemen modal
-            // document.getElementById('show-id').innerText = '#' + row.id_kandidat;
+
             document.getElementById('show-nama').innerText = row.nama;
             document.getElementById('show-posisi').innerText = row.posisi ? row.posisi.nama_posisi : '-';
             document.getElementById('show-sumber').innerText = row.sumber || '-';
-            // document.getElementById('show-tanggal').innerText = row.tanggal_melamar || '-';
-            // PERBAIKAN DI SINI:
-            // Gunakan split('T')[0] untuk hasil "2025-12-29"
-            // document.getElementById('show-tanggal').innerText = row.tanggal_melamar ? row.tanggal_melamar.split('T')[0] : '-';
-            // Jika ingin format Indonesia "29/12/2025", gunakan:
-            document.getElementById('show-tanggal').innerText = row.tanggal_melamar ? row.tanggal_melamar.split('T')[0] : '-';
-            // document.getElementById('show-tanggal').innerText = formatDate(row.tanggal_melamar ? row.tanggal_melamar.split('T')[0] : '-');
+            document.getElementById('show-tanggal').innerText = row.tanggal_melamar || '-';
             document.getElementById('show-created-at').innerText = formatDate(row.created_at);
             document.getElementById('show-updated-at').innerText = formatDate(row.updated_at);
 
-            // Ambil kedua elemen kontrol
-            const linkEl = document.getElementById('show-link_cv');
-            const emptyEl = document.getElementById('show-link-empty');
+            /* ================= RESET SEMUA STATE ================= */
+            const linkCv = document.getElementById('show-link_cv');
+            const linkCvEmpty = document.getElementById('show-link-empty');
+            const excel = document.getElementById('show-file_excel');
+            const excelEmpty = document.getElementById('show-file-empty');
+            const btnPdf = document.getElementById('btn-export-pdf');
 
-            // Cek apakah link_cv ada, tidak null, dan tidak string kosong
-            if (row.link_cv && row.link_cv.trim() !== "") {
-                // Tampilkan Link, Sembunyikan Pesan Kosong
-                linkEl.setAttribute('href', row.link_cv);
-                linkEl.classList.remove('hidden');
-                emptyEl.classList.add('hidden');
+            linkCv.classList.add('hidden');
+            linkCv.removeAttribute('href');
+
+            excel.classList.add('hidden');
+            excel.removeAttribute('href');
+
+            btnPdf.classList.add('hidden');
+            btnPdf.removeAttribute('href');
+
+            linkCvEmpty.classList.add('hidden');
+            excelEmpty.classList.add('hidden');
+
+            /* ================= CV ================= */
+            if (row.link_cv && row.link_cv.trim() !== '') {
+                linkCv.href = row.link_cv;
+                linkCv.classList.remove('hidden');
             } else {
-                // Sembunyikan Link, Tampilkan Pesan Kosong
-                linkEl.removeAttribute('href');
-                linkEl.classList.add('hidden');
-                emptyEl.classList.remove('hidden');
+                linkCvEmpty.classList.remove('hidden');
             }
 
-            // Set badge status
+            /* ================= EXCEL ================= */
+            if (row.file_excel) {
+                excel.href = `/rekrutmen/kandidat/download-excel/${row.id_kandidat}`;
+                excel.classList.remove('hidden');
+
+                btnPdf.href = `/rekrutmen/kandidat/${row.id_kandidat}/laporan`;
+                btnPdf.classList.remove('hidden');
+            } else {
+                excelEmpty.classList.remove('hidden');
+            }
+
+            /* ================= STATUS ================= */
             const badge = document.getElementById('show-status-badge');
-            badge.innerText = row.status_akhir || 'CV Lolos';
+            badge.innerText = row.status_akhir || '-';
+            badge.className =
+                'inline-flex rounded-full px-3 py-1 text-xs font-medium ' +
+                this.getStatusBadgeClass(row.status_akhir);
 
-            // Gunakan fungsi css class yang sudah Anda buat sebelumnya
-            badge.className = 'inline-flex rounded-full px-3 py-1 text-xs font-medium ' + this.getStatusBadgeClass(row.status_akhir);
+            window.dispatchEvent(
+                new CustomEvent('open-modal', { detail: { id: 'show-kandidat' } })
+            );
+        },
 
-            const btnPdf = document.getElementById('btn-export-pdf');
-            btnPdf.href = `/rekrutmen/kandidat/export-pdf/${row.id_kandidat}`;
-                    // Buka modal
-                    window.dispatchEvent(new CustomEvent('open-modal', { detail: { id: 'show-kandidat' } }));
-                },
         openEditModal(row) {
             document.getElementById('edit-id').value = row.id_kandidat;
             document.getElementById('edit-nama').value = row.nama;
             document.getElementById('edit-posisi_id').value = row.posisi_id;
             document.getElementById('edit-status_akhir').value = row.status_akhir || 'CV Lolos';
-            document.getElementById('edit-link_cv').value = row.link_cv || ''; // Tambahkan ini
+            document.getElementById('edit-link_cv').value = row.link_cv || '';
+            document.getElementById('edit-file_excel').value = ''; // Reset input file
+            // Tampilkan info file lama jika ada
+            const fileInfo = document.getElementById('edit-file-info');
+            if (row.file_excel) {
+                fileInfo.innerHTML = `
+                    <div class="mt-2 text-xs text-blue-600 dark:text-blue-400 flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"></path></svg>
+                        File saat ini: <span class="font-semibold ml-1">${row.file_excel}</span>
+                    </div>
+                    <p class="text-[10px] text-gray-500">*Biarkan kosong jika tidak ingin mengganti file</p>
+                `;
+            } else {
+                fileInfo.innerHTML = '<p class="text-[10px] text-gray-500 mt-1">Belum ada file diunggah.</p>';
+            }
             window.dispatchEvent(new CustomEvent('open-modal', { detail: { id: 'edit-kandidat' } }));
         },
 
         confirmDelete(row) {
-            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             Swal.fire({
                 title: 'Hapus Kandidat?',
                 text: `Yakin ingin menghapus: ${row.nama}?`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Ya, Hapus',
-                cancelButtonText: 'Batal'
+                confirmButtonText: 'Ya, Hapus'
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     try {
                         const res = await fetch(`/rekrutmen/kandidat/${row.id_kandidat}`, {
                             method: 'DELETE',
                             headers: {
-                                'X-CSRF-TOKEN': token,
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                                 'Accept': 'application/json'
                             }
                         });
                         if (res.ok) {
                             Swal.fire('Berhasil', 'Data dihapus', 'success').then(() => location.reload());
-                        } else {
-                            throw new Error('Gagal menghapus');
                         }
                     } catch (error) {
                         Swal.fire('Error', 'Terjadi kesalahan sistem', 'error');
@@ -550,59 +544,80 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Action Simpan (Tambah)
     document.getElementById('save-add').onclick = async () => {
-        const payload = {
-            nama: document.getElementById('add-nama').value,
-            posisi_id: document.getElementById('add-posisi_id').value,
-            tanggal_melamar: document.getElementById('add-tanggal_melamar').value,
-            sumber: document.getElementById('add-sumber').value,
-            link_cv: document.getElementById('add-link_cv').value,
-        };
+        const formData = new FormData();
+        formData.append('nama', document.getElementById('add-nama').value);
+        formData.append('posisi_id', document.getElementById('add-posisi_id').value);
+        formData.append('tanggal_melamar', document.getElementById('add-tanggal_melamar').value);
+        formData.append('sumber', document.getElementById('add-sumber').value);
+        formData.append('link_cv', document.getElementById('add-link_cv').value);
 
-        const res = await fetch("{{ route('rekrutmen.kandidat.store') }}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': token,
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        });
+        const fileInput = document.getElementById('add-file_excel');
+        if (fileInput.files[0]) {
+            formData.append('file_excel', fileInput.files[0]);
+        }
 
-        if (res.ok) {
-            Swal.fire('Berhasil', 'Kandidat ditambahkan', 'success').then(() => location.reload());
-        } else {
-            const err = await res.json();
-            Swal.fire('Gagal', err.message || 'Cek kembali isian formulir', 'error');
+        try {
+            const res = await fetch("{{ route('rekrutmen.kandidat.store') }}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json'
+                },
+                body: formData
+            });
+
+            const result = await res.json();
+            if (res.ok) {
+                Swal.fire('Berhasil', 'Kandidat ditambahkan', 'success').then(() => location.reload());
+            } else {
+                Swal.fire('Gagal', result.message || 'Cek kembali inputan Anda', 'error');
+            }
+        } catch (error) {
+            Swal.fire('Error', 'Sistem bermasalah', 'error');
         }
     };
 
-    // Action Update (Edit)
+    // Action Update (Edit) - PERBAIKAN UTAMA DI SINI
     document.getElementById('save-edit').onclick = async () => {
         const id = document.getElementById('edit-id').value;
-        const payload = {
-            nama: document.getElementById('edit-nama').value,
-            posisi_id: document.getElementById('edit-posisi_id').value,
-            status_akhir: document.getElementById('edit-status_akhir').value,
-            link_cv: document.getElementById('edit-link_cv').value,
-        };
+        const formData = new FormData();
 
-        const res = await fetch(`/rekrutmen/kandidat/${id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': token,
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        });
+        // Data teks
+        formData.append('nama', document.getElementById('edit-nama').value);
+        formData.append('posisi_id', document.getElementById('edit-posisi_id').value);
+        formData.append('status_akhir', document.getElementById('edit-status_akhir').value);
+        formData.append('link_cv', document.getElementById('edit-link_cv').value);
 
-        if (res.ok) {
-            Swal.fire('Berhasil', 'Data diperbarui', 'success').then(() => location.reload());
-        } else {
-            const err = await res.json();
-            Swal.fire('Gagal', err.message || 'Gagal memperbarui data', 'error');
+        // METHOD SPOOFING: Sangat penting agar Laravel membaca request sebagai PUT tapi bisa menerima File
+        formData.append('_method', 'PUT');
+
+        const fileInput = document.getElementById('edit-file_excel');
+        if (fileInput.files[0]) {
+            formData.append('file_excel', fileInput.files[0]);
+        }
+
+        try {
+            // Gunakan method POST (karena kita pakai _method PUT di dalam formData)
+            const res = await fetch(`/rekrutmen/kandidat/${id}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json'
+                },
+                body: formData
+            });
+
+            const result = await res.json();
+            if (res.ok) {
+                Swal.fire('Berhasil', 'Data diperbarui', 'success').then(() => location.reload());
+            } else {
+                Swal.fire('Gagal', result.message || 'Gagal memperbarui data', 'error');
+            }
+        } catch (error) {
+            Swal.fire('Error', 'Terjadi kesalahan sistem', 'error');
         }
     };
 });
+
 </script>
 @endsection

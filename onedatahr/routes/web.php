@@ -105,11 +105,16 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/metrics/candidates/export', [RecruitmentDashboardController::class,'exportCandidatesCsv'])->name('metrics.candidates.export');
 
         // CRUD
+       // Pastikan strukturnya seperti ini
+        Route::get(
+                    'kandidat/{id}/laporan',
+                    [KandidatController::class, 'generateLaporan']
+                )->name('kandidat.laporan');
+
+                        Route::get('kandidat/download-excel/{id}', [KandidatController::class, 'downloadExcel'])->name('kandidat.downloadExcel');
         Route::resource('kandidat', KandidatController::class);
         Route::get('proses/{kandidat_id}/edit', [ProsesRekrutmenController::class,'edit'])->name('proses.edit');
         Route::post('proses', [ProsesRekrutmenController::class,'store'])->name('proses.store');
-        Route::get('/rekrutmen/kandidat/export-pdf/{id}', [KandidatController::class, 'exportExcelToPdf']);
-
 
 
         // Perbaikan: Hindari double naming untuk resource
