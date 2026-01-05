@@ -21,6 +21,19 @@
             Tambah Data
         </a>
     </div>
+    <!-- SUCCESS ALERT -->
+    @if(session('success'))
+        <div class="mb-6 rounded-lg border border-green-200 bg-green-50 p-4 text-green-800 dark:border-green-900 dark:bg-green-900/20 dark:text-green-400">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    <!-- ERROR ALERT -->
+    @if(session('error'))
+        <div class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-red-800 dark:border-red-900 dark:bg-red-900/20 dark:text-red-400">
+            {{ session('error') }}
+        </div>
+    @endif
 
     @php
         $tableData = $training->map(fn($row) => [

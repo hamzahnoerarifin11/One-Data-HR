@@ -17,6 +17,7 @@ class MenuHelper
                 'name' => 'Data Karyawan',
                 'path' => '/karyawan',
             ],
+
             [
                 'icon' => 'task',
                 'name' => 'Rekrutmen',
@@ -62,6 +63,11 @@ class MenuHelper
                 'icon' => 'charts',
                 'name' => 'KPI Karyawan', // Nama menu diperjelas
                 'path' => '/kpi/dashboard', // <-- Link baru ke halaman index
+            ],
+            [
+                'icon' => 'authentication',
+                'name' => 'Manajemen User',
+                'path' => '/users',
             ],
         ];
     }

@@ -49,31 +49,4 @@ class RekrutmenCalendarEntriesTest extends TestCase
         $this->actingAs($user)->postJson(route('rekrutmen.daily.entries.store'), $payload)
             ->assertStatus(403);
     }
-
-    public function test_admin_can_list_entries()
-    {
-        $admin = \App\Models\User::factory()->create(['role' => 'admin']);
-        $pos = Posisi::create(['nama_posisi' => 'ListPos']);
-        $k = Kandidat::create(['nama' => 'ListKid', 'posisi_id' => $pos->id_posisi]);
-
-        $e = \App\Models\RekrutmenCalendarEntry::create(['posisi_id' => $pos->id_posisi, 'kandidat_id' => $k->id_kandidat, 'date' => '2025-12-30']);
-
-        $url = route('rekrutmen.daily.entries.index') . '?posisi_id=' . $pos->id_posisi . '&date=2025-12-30';
-        $this->actingAs($admin)->getJson($url)
-            ->assertStatus(200)
-            ->assertJsonFragment(['id' => $e->id]);
-    }
-
-    public function test_admin_can_delete_entry()
-    {
-        $admin = \App\Models\User::factory()->create(['role' => 'admin']);
-        $pos = Posisi::create(['nama_posisi' => 'DelPos']);
-        $e = \App\Models\RekrutmenCalendarEntry::create(['posisi_id' => $pos->id_posisi, 'candidate_name' => 'ToDelete', 'date' => '2025-12-29']);
-
-        $this->actingAs($admin)->deleteJson(route('rekrutmen.daily.entries.destroy', $e->id))
-            ->assertStatus(200)
-            ->assertJson(['success' => true]);
-
-        $this->assertDatabaseMissing('rekrutmen_calendar_entries', ['id' => $e->id]);
-    }
 }

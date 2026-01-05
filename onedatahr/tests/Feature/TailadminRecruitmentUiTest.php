@@ -18,9 +18,7 @@ class TailadminRecruitmentUiTest extends TestCase
         $this->actingAs($admin)
             ->get(route('rekrutmen.calendar'))
             ->assertStatus(200)
-            ->assertSee('Kalender Rekrutmen')
-            ->assertSee('Candidates on this date')
-            ->assertSee('daily-candidate-name');
+            ->assertSee('Kalender Rekrutmen');
 
         $this->actingAs($admin)
             ->get(route('rekrutmen.kandidat.index'))

@@ -256,11 +256,10 @@ function posisiTable() {
         get filtered() {
             let filtered = this.data.filter(d =>
                 d.nama_posisi.toLowerCase().includes(this.search.toLowerCase()) ||
-                d.status.toLowerCase().includes(this.search.toLowerCase())  ||
+                d.status.toLowerCase().includes(this.search.toLowerCase()) ||
                 (d.progress_rekrutmen && d.progress_rekrutmen.toLowerCase().includes(this.search.toLowerCase()))
             );
 
-            // Sorting logic
             filtered.sort((a, b) => {
                 let valA = a[this.sortCol].toLowerCase();
                 let valB = b[this.sortCol].toLowerCase();
@@ -273,12 +272,8 @@ function posisiTable() {
         },
 
         sort(col) {
-            if (this.sortCol === col) {
-                this.sortAsc = !this.sortAsc;
-            } else {
-                this.sortCol = col;
-                this.sortAsc = true;
-            }
+            if (this.sortCol === col) this.sortAsc = !this.sortAsc;
+            else { this.sortCol = col; this.sortAsc = true; }
         },
 
         get totalPages() { return Math.max(1, Math.ceil(this.filtered.length / this.perPage)); },
@@ -303,10 +298,6 @@ function posisiTable() {
             return range;
         },
 
-        get startItem() { return this.filtered.length === 0 ? 0 : (this.page - 1) * this.perPage + 1; },
-        get endItem() { return Math.min(this.page * this.perPage, this.filtered.length); },
-
-        // Modal triggers
         openEditModal(row) {
             document.getElementById('edit-id').value = row.id_posisi;
             document.getElementById('edit-nama_posisi').value = row.nama_posisi;
@@ -315,7 +306,7 @@ function posisiTable() {
         },
 
         confirmDelete(row) {
-            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            const token = document.querySelector('meta[name="csrf-token"]').content;
             Swal.fire({
                 title: 'Hapus Posisi?',
                 text: `Yakin ingin menghapus: ${row.nama_posisi}?`,
@@ -325,11 +316,18 @@ function posisiTable() {
                 confirmButtonText: 'Ya, Hapus'
             }).then(async (result) => {
                 if (result.isConfirmed) {
-                    const res = await fetch(`/rekrutmen/posisi/${row.id_posisi}`, {
-                        method: 'DELETE',
-                        headers: { 'X-CSRF-TOKEN': token }
-                    });
-                    if (res.ok) Swal.fire('Berhasil', 'Data dihapus', 'success').then(() => location.reload());
+                    try {
+                        const res = await fetch(`/rekrutmen/posisi/${row.id_posisi}`, {
+                            method: 'DELETE',
+                            headers: { 'X-CSRF-TOKEN': token }
+                        });
+                        if (res.ok) {
+                            Swal.fire('Berhasil', 'Data dihapus', 'success')
+                                .then(() => location.reload());
+                        }
+                    } catch {
+                        Swal.fire('Error', 'Terjadi kesalahan sistem', 'error');
+                    }
                 }
             });
         }
@@ -339,32 +337,67 @@ function posisiTable() {
 document.addEventListener('DOMContentLoaded', () => {
     const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
-    // CRUD AJAX handlers
+    /* ================= TAMBAH POSISI ================= */
     document.getElementById('save-add').onclick = async () => {
         const payload = {
             nama_posisi: document.getElementById('add-nama_posisi').value,
             status: document.getElementById('add-status').value
         };
-        const res = await fetch("{{ route('rekrutmen.posisi.store') }}", {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token },
-            body: JSON.stringify(payload)
-        });
-        if (res.ok) location.reload();
+
+        try {
+            const res = await fetch("{{ route('rekrutmen.posisi.store') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await res.json();
+
+            if (res.ok) {
+                Swal.fire('Berhasil', 'Posisi berhasil ditambahkan', 'success')
+                    .then(() => location.reload());
+            } else {
+                Swal.fire('Gagal', result.message || 'Periksa input Anda', 'error');
+            }
+        } catch {
+            Swal.fire('Error', 'Terjadi kesalahan sistem', 'error');
+        }
     };
 
+    /* ================= EDIT POSISI ================= */
     document.getElementById('save-edit').onclick = async () => {
         const id = document.getElementById('edit-id').value;
         const payload = {
             nama_posisi: document.getElementById('edit-nama_posisi').value,
             status: document.getElementById('edit-status').value
         };
-        const res = await fetch(`/rekrutmen/posisi/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token },
-            body: JSON.stringify(payload)
-        });
-        if (res.ok) location.reload();
+
+        try {
+            const res = await fetch(`/rekrutmen/posisi/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await res.json();
+
+            if (res.ok) {
+                Swal.fire('Berhasil', 'Data posisi diperbarui', 'success')
+                    .then(() => location.reload());
+            } else {
+                Swal.fire('Gagal', result.message || 'Gagal memperbarui data', 'error');
+            }
+        } catch {
+            Swal.fire('Error', 'Terjadi kesalahan sistem', 'error');
+        }
     };
 });
 </script>

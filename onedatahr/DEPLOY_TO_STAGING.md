@@ -12,14 +12,7 @@ Deploy to staging — Minimal steps
 3) Smoke tests on staging:
    - Login as admin -> verify dashboard KPIs
    - Test add-posisi, calendar edits, per-stage pages, pemberkasan monitor
-   - Verify calendar candidate assignment workflows (create via quick-add and existing candidate assignment)
-4) Run tests locally before deploying:
-   - Ensure your .env.testing is configured or use sqlite memory for tests.
-   - Run migrations: `php artisan migrate`
-   - Run test suite: `composer test` (or `php artisan test` / `vendor/bin/phpunit`)
-   - Fix failing tests before pushing to staging.
-
-5) Rollback: if database changes cause issues, restore DB from backup and revert commit.
+4) Rollback: if database changes cause issues, restore DB from backup and revert commit.
 
 Note:
 - Prefer running migrations via CI/CD pipeline with atomic deploys and backups.

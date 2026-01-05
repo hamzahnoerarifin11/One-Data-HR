@@ -22,6 +22,19 @@
             Tambah Kandidat
         </button>
     </div>
+     <!-- SUCCESS ALERT -->
+    @if(session('success'))
+        <div class="mb-6 rounded-lg border border-green-200 bg-green-50 p-4 text-green-800 dark:border-green-900 dark:bg-green-900/20 dark:text-green-400">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    <!-- ERROR ALERT -->
+    @if(session('error'))
+        <div class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-red-800 dark:border-red-900 dark:bg-red-900/20 dark:text-red-400">
+            {{ session('error') }}
+        </div>
+    @endif
 
     <div x-data="kandidatTable()" class="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
 
@@ -192,6 +205,11 @@
                         </svg>
                         <span>File belum diunggah</span>
                     </div>
+                    <a id="show-preview-excel"
+                        target="_blank"
+                        class="hidden inline-flex items-center gap-2 text-sm font-medium text-purple-600 hover:text-purple-700">
+                        Preview Excel
+                    </a>
                 </div>
             </div>
         </div>
@@ -203,8 +221,9 @@
             </div>
             <div class="flex gap-3">
                 <a id="btn-export-pdf"
-                        href="javascript:void(0)"
-                        target="_blank"
+                        data-route="{{ route('rekrutmen.kandidat.laporan', ':id') }}"
+                         target="_blank"
+                            rel="noopener"
                         class="hidden inline-flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2 text-sm font-medium text-white hover:bg-red-700">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
@@ -442,6 +461,8 @@ function kandidatTable() {
             const excel = document.getElementById('show-file_excel');
             const excelEmpty = document.getElementById('show-file-empty');
             const btnPdf = document.getElementById('btn-export-pdf');
+            const baseRoute = btnPdf.dataset.route;
+            const previewExcel = document.getElementById('show-preview-excel');
 
             linkCv.classList.add('hidden');
             linkCv.removeAttribute('href');
@@ -455,6 +476,10 @@ function kandidatTable() {
             linkCvEmpty.classList.add('hidden');
             excelEmpty.classList.add('hidden');
 
+            previewExcel.classList.add('hidden');
+            previewExcel.removeAttribute('href');
+
+
             /* ================= CV ================= */
             if (row.link_cv && row.link_cv.trim() !== '') {
                 linkCv.href = row.link_cv;
@@ -465,10 +490,12 @@ function kandidatTable() {
 
             /* ================= EXCEL ================= */
             if (row.file_excel) {
-                excel.href = `/rekrutmen/kandidat/download-excel/${row.id_kandidat}`;
+                excel.href = `/rekrutmen/kandidat/${row.id_kandidat}/download-excel`;
                 excel.classList.remove('hidden');
+                previewExcel.href = `/rekrutmen/kandidat/${row.id_kandidat}/preview-excel`;
+                previewExcel.classList.remove('hidden');
 
-                btnPdf.href = `/rekrutmen/kandidat/${row.id_kandidat}/laporan`;
+                btnPdf.href = baseRoute.replace(':id', row.id_kandidat);
                 btnPdf.classList.remove('hidden');
             } else {
                 excelEmpty.classList.remove('hidden');
