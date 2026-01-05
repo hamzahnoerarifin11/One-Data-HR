@@ -300,21 +300,27 @@ class KbiController extends Controller
     }
 
     $rawList = $query->get();
+    $userMap = \App\Models\User::whereNotNull('nik')->pluck('id', 'nik')->toArray();
 
     // 4. Mapping Status (Sama seperti sebelumnya)
-    $listKaryawan = $rawList->map(function ($kry) use ($tahun) {
+    $listKaryawan = $rawList->map(function ($kry) use ($tahun, $userMap) {
         $kry->status_diri = KbiAssessment::where('karyawan_id', $kry->id_karyawan)
             ->where('tipe_penilai', 'DIRI_SENDIRI')
             ->where('tahun', $tahun)
             ->exists();
 
         if ($kry->atasan_id) {
-            $sudahNilaiAtasan = KbiAssessment::where('karyawan_id', $kry->atasan_id)
-                ->where('penilai_id', $kry->user_id ?? 0) // Sesuaikan logic user_id
+            $penilaiUserId = $userMap[$kry->NIK] ?? 0;
+            if ($penilaiUserId > 0) {
+                $sudahNilaiAtasan = KbiAssessment::where('karyawan_id', $kry->atasan_id)
+                ->where('penilai_id', $penilaiUserId) // Sesuaikan logic user_id
                 ->where('tipe_penilai', 'BAWAHAN')
                 ->where('tahun', $tahun)
                 ->exists();
             $kry->status_atasan = $sudahNilaiAtasan ? 'DONE' : 'PENDING';
+        } else {
+            $kry->status_atasan = 'PENDING';
+        }
         } else {
             $kry->status_atasan = 'NA';
         }
