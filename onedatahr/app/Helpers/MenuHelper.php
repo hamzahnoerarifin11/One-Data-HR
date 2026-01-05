@@ -66,38 +66,44 @@ class MenuHelper
             //     'path' => '/laporan',
             // ],
             [
-                'icon' => 'charts',
+                'icon' => 'chartline',
                 'name' => 'KPI Karyawan', // Nama menu diperjelas
                 'path' => '/kpi/dashboard', // <-- Link baru ke halaman index
             ],
             [
-                'icon' => 'chartpie',
+                'icon' => 'speedometer',
                 'name' => 'KBI Karyawan', // Nama menu diperjelas
                 'path' => '/kbi/dashboard', // <-- Link baru ke halaman index
             ],
+            [
+                'icon' => 'desktop', // Ikon Desktop / Layar
+                'name' => 'Monitoring KBI',
+                'path' => '/kbi/monitoring', 
+            ],
+
         ];
     }
       // --- [BARU] Menambahkan Menu Khusus Performance (KPI) ---
-    public static function getPerformanceItems()
-    {
-        return [
-            [
-                'icon' => 'charts',
-                'name' => 'KPI Karyawan', // Nama menu diperjelas
-                'path' => '/kpi/dashboard', // <-- Link baru ke halaman index
-            ],
-        ];
-    }
-    public static function getPerformanceKBItems()
-    {
-        return [
-            [
-                'icon' => 'charts',
-                'name' => 'KBI Karyawan', // Nama menu diperjelas
-                'path' => '/kbi/dashboard', // <-- Link baru ke halaman index
-            ],
-        ];
-    }
+    // public static function getPerformanceItems()
+    // {
+    //     return [
+    //         [
+    //             'icon' => 'charts',
+    //             'name' => 'KPI Karyawan', // Nama menu diperjelas
+    //             'path' => '/kpi/dashboard', // <-- Link baru ke halaman index
+    //         ],
+    //     ];
+    // }
+    // public static function getPerformanceKBItems()
+    // {
+    //     return [
+    //         [
+    //             'icon' => 'charts',
+    //             'name' => 'KBI Karyawan', // Nama menu diperjelas
+    //             'path' => '/kbi/dashboard', // <-- Link baru ke halaman index
+    //         ],
+    //     ];
+    // }
 
 
 
@@ -173,6 +179,21 @@ class MenuHelper
             'support-ticket' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 17.0518V12C20 7.58174 16.4183 4 12 4C7.58168 4 3.99994 7.58174 3.99994 12V17.0518M19.9998 14.041V19.75C19.9998 20.5784 19.3282 21.25 18.4998 21.25H13.9998M6.5 18.75H5.5C4.67157 18.75 4 18.0784 4 17.25V13.75C4 12.9216 4.67157 12.25 5.5 12.25H6.5C7.32843 12.25 8 12.9216 8 13.75V17.25C8 18.0784 7.32843 18.75 6.5 18.75ZM17.4999 18.75H18.4999C19.3284 18.75 19.9999 18.0784 19.9999 17.25V13.75C19.9999 12.9216 19.3284 12.25 18.4999 12.25H17.4999C16.6715 12.25 15.9999 12.9216 15.9999 13.75V17.25C15.9999 18.0784 16.6715 18.75 17.4999 18.75Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>',
 
             'email' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.5 8.187V17.25C3.5 17.6642 3.83579 18 4.25 18H19.75C20.1642 18 20.5 17.6642 20.5 17.25V8.18747L13.2873 13.2171C12.5141 13.7563 11.4866 13.7563 10.7134 13.2171L3.5 8.187ZM20.5 6.2286C20.5 6.23039 20.5 6.23218 20.5 6.23398V6.24336C20.4976 6.31753 20.4604 6.38643 20.3992 6.42905L12.4293 11.9867C12.1716 12.1664 11.8291 12.1664 11.5713 11.9867L3.60116 6.42885C3.538 6.38481 3.50035 6.31268 3.50032 6.23568C3.50028 6.10553 3.60577 6 3.73592 6H20.2644C20.3922 6 20.4963 6.10171 20.5 6.2286ZM22 6.25648V17.25C22 18.4926 20.9926 19.5 19.75 19.5H4.25C3.00736 19.5 2 18.4926 2 17.25V6.23398C2 6.22371 2.00021 6.2135 2.00061 6.20333C2.01781 5.25971 2.78812 4.5 3.73592 4.5H20.2644C21.2229 4.5 22 5.27697 22.0001 6.23549C22.0001 6.24249 22.0001 6.24949 22 6.25648Z" fill="currentColor"></path></svg>',
+            
+            'speedometer' => '<svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 4a.5.5 0 0 1 .5.5V6a.5.5 0 0 1-1 0V4.5A.5.5 0 0 1 8 4zM3.732 5.732a.5.5 0 0 1 .707 0l.915.914a.5.5 0 1 1-.708.708l-.914-.915a.5.5 0 0 1 0-.707zM2 10a.5.5 0 0 1 .5-.5h1.586a.5.5 0 0 1 0 1H2.5A.5.5 0 0 1 2 10zm9.5 0a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 1 0 1H12a.5.5 0 0 1-.5-.5zm.754-4.246a.389.389 0 0 0-.527-.02L7.547 9.31a.91.91 0 1 0 1.302 1.258l3.434-4.297a.389.389 0 0 0-.029-.518z"/><path fill-rule="evenodd" d="M0 10a8 8 0 1 1 15.547 2.661c-.442 1.253-1.845 1.602-2.932 1.25C11.309 13.488 9.475 13 8 13c-1.474 0-3.31.488-4.615.911-1.087.352-2.49.003-2.932-1.25A7.988 7.988 0 0 1 0 10zm8-7a7 7 0 0 0-6.603 9.329c.203.575.923.876 1.68.63C4.397 12.533 6.358 12 8 12s3.604.532 4.923.96c.757.245 1.477-.056 1.68-.631A7 7 0 0 0 8 3z"/></svg>',
+        
+            'desktop' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 21H17M3 17H21V5C21 4.44772 20.5523 4 20 4H4C3.44772 4 3 4.44772 3 5V17Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+
+            'chartline' => '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-graph-up-arrow" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M0 0h1v15h15v1H0V0z"/>
+            <path fill-rule="evenodd" d="M10 3.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0V4.707l-3.646 3.647a.5.5 0 0 1-.708 0L6.5 6.207l-3.146 3.147a.5.5 0 0 1-.708-.708l3.5-3.5a.5.5 0 0 1 .708 0L9 7.293l3.293-3.293H10.5a.5.5 0 0 1-.5-.5z"/>
+            </svg>',
+    
+            // 3. Ikon User Shield / Admin (Alternatif Monitoring)
+            'user-shield' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.1255 18.2745C19.7825 16.9231 18.6635 15.4286 16.5 14.7143C16.5 14.7143 15.2857 16.5 12 16.5C8.71429 16.5 7.5 14.7143 7.5 14.7143C5.33646 15.4286 4.21748 16.9231 3.87445 18.2745C3.59397 19.3795 4.43673 20.4286 5.57659 20.4286H18.4234C19.5633 20.4286 20.406 19.3795 20.1255 18.2745Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+
+            //
+        
         ];
 
         return $icons[$iconName] ?? '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/></svg>';
