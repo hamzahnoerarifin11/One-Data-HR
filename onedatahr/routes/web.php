@@ -173,7 +173,8 @@ Route::middleware(['auth'])->group(function () {
     // 7. monitoring
     Route::get('/kbi/monitoring', [App\Http\Controllers\KbiController::class, 'monitoring'])->name('kbi.monitoring');
 
-
+    // --- rekap PERFORMANCE ROUTES ---
+    Route::get('/performance/rekap', [App\Http\Controllers\PerformanceController::class, 'index'])->name('performance.rekap');
 
 
     // // --- SCRIPT SEMENTARA (HAPUS SETELAH DIPAKAI) ---

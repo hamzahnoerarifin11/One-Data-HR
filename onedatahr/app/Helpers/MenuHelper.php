@@ -80,6 +80,11 @@ class MenuHelper
                 'name' => 'Monitoring KBI',
                 'path' => '/kbi/monitoring', 
             ],
+            [
+                'icon' => 'rekap', // Atau icon lain seperti 'tables'
+                'name' => 'Rekap Performance',
+                'path' => '/performance/rekap',
+            ],
 
         ];
     }
@@ -192,7 +197,21 @@ class MenuHelper
             // 3. Ikon User Shield / Admin (Alternatif Monitoring)
             'user-shield' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.1255 18.2745C19.7825 16.9231 18.6635 15.4286 16.5 14.7143C16.5 14.7143 15.2857 16.5 12 16.5C8.71429 16.5 7.5 14.7143 7.5 14.7143C5.33646 15.4286 4.21748 16.9231 3.87445 18.2745C3.59397 19.3795 4.43673 20.4286 5.57659 20.4286H18.4234C19.5633 20.4286 20.406 19.3795 20.1255 18.2745Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
 
-            //
+            //rekap performance
+            'rekap' => '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                class="bi bi-list-check" viewBox="0 0 16 16"><path fill-rule="evenodd"
+                d="M5 11.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5z"/>
+            <path fill-rule="evenodd"
+                    d="M5 8.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5z"/>
+            <path fill-rule="evenodd"
+                    d="M5 5.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5z"/>
+            <path fill-rule="evenodd"
+                    d="M3.854 11.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/>
+            <path fill-rule="evenodd"
+                    d="M3.854 8.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/>
+            <path fill-rule="evenodd"
+                    d="M3.854 5.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/>
+            </svg>',
         
         ];
 
