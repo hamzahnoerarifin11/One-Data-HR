@@ -10,7 +10,6 @@ use App\Models\Posisi;
 use App\Models\InterviewHr;
 use App\Observers\KandidatObserver;
 use App\Observers\PosisiObserver;
-use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {

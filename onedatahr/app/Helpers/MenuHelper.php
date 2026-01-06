@@ -1,44 +1,60 @@
 <?php
 
 namespace App\Helpers;
+use Illuminate\Support\Facades\Auth;
+
 
 class MenuHelper
 {
+
     public static function getMainNavItems()
     {
-        return [
-            [
-                'icon' => 'dashboard',
-                'name' => 'Dashboard',
-                'path' => '/dashboard',
-            ],
-            [
+        $user = Auth::user();
+        $menu = [];
+
+        // =============================================================
+        // 1. MENU UMUM (Bisa dilihat Semua Role: Staff, Admin, Atasan)
+        // =============================================================
+
+        // Dashboard
+        $menu[] = [
+            'icon' => 'dashboard',
+            'name' => 'Dashboard',
+            'path' => '/dashboard',
+        ];
+
+        // KPI Karyawan (Punya Staff Sendiri)
+        $menu[] = [
+            'icon' => 'chartline', // Saya ikuti icon pilihan Anda
+            'name' => 'KPI Karyawan',
+            'path' => '/kpi/dashboard',
+        ];
+
+        // KBI Karyawan (Punya Staff Sendiri)
+        $menu[] = [
+            'icon' => 'speedometer', // Saya ikuti icon pilihan Anda
+            'name' => 'KBI Karyawan',
+            'path' => '/kbi/dashboard',
+        ];
+
+        // =============================================================
+        // 2. MENU KHUSUS (Hanya Admin, HRD, Manager)
+        // =============================================================
+        // Logika: "Jika User ADA dan User BUKAN Staff"
+        if ($user && !$user->isStaff()) {
+            
+            // Data Karyawan
+            $menu[] = [
                 'icon' => 'user-profile',
                 'name' => 'Data Karyawan',
                 'path' => '/karyawan',
-            ],
+            ];
 
-            [
+            // Rekrutmen
+            $menu[] = [
                 'icon' => 'task',
                 'name' => 'Rekrutmen',
                 'subItems' => [
-                    // ['name' => 'Dashboard Rekrutmen', 'path' => route('rekrutmen.dashboard')],
-                    // ['name' => 'Manage Posisi', 'path' => route('rekrutmen.posisi.index')],
-                    // ['name' => 'Manage Kandidat', 'path' => route('rekrutmen.kandidat.index')],
-                    // ['name' => 'Kalender Rekrutmen', 'path' => route('rekrutmen.calendar')],
-                    // ['name' => 'Interview HR', 'path' => route('rekrutmen.interview_hr.index')],
-                    // ['name' => 'Database WIG', 'path' => route('rekrutmen.wig.index')],
-                    // ['name' => 'Pemberkasan Monitor', 'path' => route('rekrutmen.metrics.pemberkasan.page')],
-                    // ['name' => 'Dashboard Rekrutmen', 'path' => route('rekrutmen.dashboard')],
-                    // ['name' => 'Manage Posisi', 'path' => route('rekrutmen.posisi.index')],
-                    // ['name' => 'Manage Kandidat', 'path' => route('rekrutmen.kandidat.index')],
-                    // ['name' => 'Kalender Rekrutmen', 'path' => route('rekrutmen.calendar')],
-                    // ['name' => 'Interview HR', 'path' => route('rekrutmen.interview_hr.index')],
-                    // ['name' => 'Kandidat Lanjut User', 'path' => route('rekrutmen.kandidat_lanjut_user.index')],
-                    // ['name' => 'Pemberkasan', 'path' => route('rekrutmen.pemberkasan.index')],
-                    // ['name' => 'Database WIG', 'path' => route('rekrutmen.wig.index')],
-
-
                     ['name' => 'Dashboard Rekrutmen',   'path' => '/rekrutmen'],
                     ['name' => 'Manage Posisi',        'path' => '/rekrutmen/posisi-manage'],
                     ['name' => 'Manage Kandidat',      'path' => '/rekrutmen/kandidat'],
@@ -47,52 +63,41 @@ class MenuHelper
                     ['name' => 'Kandidat Lanjut User', 'path' => '/rekrutmen/kandidat_lanjut_user'],
                     ['name' => 'Pemberkasan',          'path' => '/rekrutmen/pemberkasan'],
                     ['name' => 'Database WIG',         'path' => '/rekrutmen/wig'],
-                    // ['name' => 'Pemberkasan Monitor', 'path' => route('rekrutmen.metrics.pemberkasan.page')],
                 ],
-                // 'path' => '/rekrutmen',
-            ],
-            [
+            ];
+
+            // Training
+            $menu[] = [
                 'icon' => 'forms',
                 'name' => 'Training',
                 'path' => '/training',
-            ],
-            // [
-            //     'icon' => 'tables',
-            //     'name' => 'Perusahaan',
-            //     'path' => '/perusahaan',
-            // ],
-            // [
-            //     'icon' => 'charts',
-            //     'name' => 'Laporan',
-            //     'path' => '/laporan',
-            // ],
-            [
-                'icon' => 'chartline',
-                'name' => 'KPI Karyawan', // Nama menu diperjelas
-                'path' => '/kpi/dashboard', // <-- Link baru ke halaman index
-            ],
-            [
-                'icon' => 'speedometer',
-                'name' => 'KBI Karyawan', // Nama menu diperjelas
-                'path' => '/kbi/dashboard', // <-- Link baru ke halaman index
-            ],
-            [
-                'icon' => 'desktop', // Ikon Desktop / Layar
+            ];
+
+            // Monitoring KBI (Khusus HRD memantau Staff)
+            $menu[] = [
+                'icon' => 'desktop',
                 'name' => 'Monitoring KBI',
-                'path' => '/kbi/monitoring', 
-            ],
-            [
-                'icon' => 'rekap', // Atau icon lain seperti 'tables'
+                'path' => '/kbi/monitoring',
+            ];
+
+            // Rekap Performance
+            $menu[] = [
+                'icon' => 'rekap', // Pastikan sudah didaftarkan di getIconSvg
                 'name' => 'Rekap Performance',
                 'path' => '/performance/rekap',
-            ],
-            [
+            ];
+
+            // Manajemen User
+            $menu[] = [
                 'icon' => 'authentication',
                 'name' => 'Manajemen User',
                 'path' => '/users',
-            ],
-        ];
+            ];
+        }
+
+        return $menu;
     }
+
       // --- [BARU] Menambahkan Menu Khusus Performance (KPI) ---
     // public static function getPerformanceItems()
     // {
@@ -114,6 +119,7 @@ class MenuHelper
     //         ],
     //     ];
     // }
+
 
 
 

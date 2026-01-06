@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Karyawan;
-use App\Models\KbiAssessment; 
-use App\Models\KpiAssessment; // Pastikan Model ini di-import
+use App\Models\KbiAssessment;
+use App\Models\KpiAssessment;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class PerformanceController extends Controller
 {
@@ -13,10 +14,10 @@ class PerformanceController extends Controller
     {
         $tahun = date('Y');
 
-        // 1. Ambil Data Karyawan (Plus Filter Search)
+        // 1. Query Data Karyawan (Filter Pencarian Nama/NIK tetap pakai SQL)
         $query = Karyawan::with('pekerjaan');
         
-        if ($request->has('search')) {
+        if ($request->has('search') && $request->search != '') {
             $keyword = $request->search;
             $query->where(function($q) use ($keyword) {
                 $q->where('Nama_Lengkap_Sesuai_Ijazah', 'LIKE', '%'.$keyword.'%')
@@ -26,43 +27,29 @@ class PerformanceController extends Controller
 
         $karyawans = $query->get();
 
-        // 2. Olah Gabungan Nilai KPI & KBI
-        $rekap = $karyawans->map(function($k) use ($tahun) {
+        // 2. HITUNG NILAI (Mapping)
+        // Kita hitung dulu semua karyawan, baru nanti difilter Grade-nya
+        $rekapCollection = $karyawans->map(function($k) use ($tahun) {
             
-            // --- A. AMBIL NILAI KBI (Soft Skill - Skala 4) ---
+            // --- A. Hitung KBI ---
             $nilaiKbi = KbiAssessment::where('karyawan_id', $k->id_karyawan)
                         ->where('tahun', $tahun)
                         ->avg('rata_rata_akhir'); 
             
-            // Jika belum ada nilai, set 0
             $skorKbiAsli = $nilaiKbi ? $nilaiKbi : 0;
-
-            // KONVERSI KBI KE SKALA 100
-            // Rumus: (Nilai / 4) * 100. Contoh: (3.0 / 4) * 100 = 75
             $skorKbi100 = ($skorKbiAsli / 4) * 100;
 
-
-            // --- B. AMBIL NILAI KPI (Hard Skill - Skala 100) ---
-            // [UPDATED] Mengambil dari database Anda (total_skor_akhir)
+            // --- B. Hitung KPI ---
             $kpiRecord = KpiAssessment::where('karyawan_id', $k->id_karyawan)
                         ->where('tahun', $tahun)
-                        ->latest('created_at') // Ambil yang paling baru jika ada duplikat
+                        ->latest('created_at')
                         ->first();
-            
-            // Ambil kolom 'total_skor_akhir', jika null set 0
             $skorKpi = $kpiRecord ? $kpiRecord->total_skor_akhir : 0; 
 
+            // --- C. Hitung Final Score ---
+            $finalScore = ($skorKpi * 0.7) + ($skorKbi100 * 0.3);
 
-            // --- C. HITUNG GRAND TOTAL ---
-            // Bobot: KPI 70%, KBI 30% (Bisa diubah sesuai kebijakan)
-            $bobotKpi = 70;
-            $bobotKbi = 30;
-
-            // Pastikan KPI sudah skala 100 (karena di DB desimal, biasanya sudah 0-100)
-            $finalScore = ($skorKpi * ($bobotKpi/100)) + ($skorKbi100 * ($bobotKbi/100));
-
-
-            // --- D. TENTUKAN GRADE FINAL ---
+            // --- D. Tentukan Grade ---
             if ($finalScore >= 90) $grade = 'A';
             elseif ($finalScore >= 80) $grade = 'B';
             elseif ($finalScore >= 70) $grade = 'C';
@@ -70,19 +57,34 @@ class PerformanceController extends Controller
             else $grade = 'E';
 
             return (object) [
-                'id' => $k->id_karyawan,
                 'nik' => $k->NIK,
                 'nama' => $k->Nama_Lengkap_Sesuai_Ijazah,
-                'jabatan' => $k->pekerjaan->nama_jabatan ?? '-', 
-                
-                // Data untuk ditampilkan di Tabel
-                'skor_kbi_asli' => round($skorKbiAsli, 2), // Tampil 3.50
-                'skor_kbi_100'  => round($skorKbi100, 2),  // Tampil 87.50
-                'skor_kpi'      => round($skorKpi, 2),     // Nilai KPI asli
-                'final_score'   => round($finalScore, 2),
+                'jabatan' => $k->pekerjaan->Jabatan ?? '-', 
+                'skor_kbi_asli' => $skorKbiAsli,
+                'skor_kbi_100'  => $skorKbi100,
+                'skor_kpi'      => $skorKpi,
+                'final_score'   => $finalScore,
                 'grade'         => $grade
             ];
         });
+
+        // ============================================================
+        // 3. BAGIAN INI YANG KEMUNGKINAN ANDA LEWATKAN
+        // Filter Collection berdasarkan Grade yang dipilih di Dropdown
+        // ============================================================
+        if ($request->has('grade') && $request->grade != '') {
+            $rekapCollection = $rekapCollection->where('grade', $request->grade);
+        }
+
+        // 4. BUAT PAGINATION MANUAL (Solusi Masalah Anda)
+        // Karena data sudah berupa Collection, kita harus pagination manual
+        $perPage = 10; // Jumlah per halaman
+        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+        $currentItems = $rekapCollection->slice(($currentPage - 1) * $perPage, $perPage)->all();
+
+        $rekap = new LengthAwarePaginator($currentItems, count($rekapCollection), $perPage);
+        $rekap->setPath($request->url());
+        $rekap->appends($request->all()); // Agar filter tidak hilang saat pindah halaman
 
         return view('pages.performance.rekap', compact('rekap', 'tahun'));
     }

@@ -49,4 +49,15 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function isStaff()
+    {
+        // Cek apakah kolom role isinya 'staff' (huruf kecil sesuai database)
+        return $this->role === 'staff';
+    }
+
+    public function isAdmin()
+    {
+        // Menganggap superadmin dan admin sebagai Admin
+        return in_array($this->role, ['admin', 'superadmin']);
+    }
 }
