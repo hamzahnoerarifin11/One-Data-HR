@@ -18,7 +18,7 @@ class KaryawanController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('role:admin')->only(['create', 'store', 'edit', 'update', 'destroy']);
+        $this->middleware('role:admin|superadmin')->only(['create', 'store', 'edit', 'update', 'destroy']);
     }
 
     public function index()

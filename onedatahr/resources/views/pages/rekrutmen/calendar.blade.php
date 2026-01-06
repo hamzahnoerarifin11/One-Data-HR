@@ -70,7 +70,14 @@
                         <th rowspan="2" class="sticky left-0 z-20 bg-gray-50 border-b border-r p-3 text-center font-bold text-gray-600">No.</th>
                         <th rowspan="2" class="sticky left-[45px] z-20 bg-gray-50 border-b border-r p-3 min-w-[220px] text-left font-bold text-gray-600 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Posisi</th>
                         <th id="month-header" class="border-b border-r p-2 bg-purple-700 uppercase font-bold text-center tracking-wider"></th>
-                        <th rowspan="2" class="sticky right-0 z-20 bg-blue-50 border-b border-l p-3 min-w-[70px] text-center font-bold text-blue-700 shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.1)]">Total</th>
+                        <!-- <th rowspan="2" class="sticky right-0 z-20 bg-blue-50 border-b border-l p-3 min-w-[70px] text-center font-bold text-blue-700 shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.1)]">Total</th> -->
+                         <th rowspan="2" class="sticky right-[70px] z-20 bg-blue-500 border-b border-l p-3 min-w-[70px] text-center font-bold text-white shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+                            Total Bulan
+                        </th>
+                        <th rowspan="2" class="sticky right-0 z-20 bg-yellow-500 border-b border-l p-3 min-w-[90px] text-center font-bold text-white shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.15)]">
+                            Total Tahun
+                        </th>
+
                     </tr>
                     <tr id="header-row-days" class="bg-purple-600 dark:text-white text-center font-medium">
                         </tr>
@@ -203,28 +210,50 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         try {
-            const res = await fetch(`{{ route('rekrutmen.daily.index') }}?month=${month}&year=${year}`, {
+            // const res = await fetch(`{{ route('rekrutmen.daily.index') }}?month=${month}&year=${year}`, {
+            //     headers: { 'Accept': 'application/json' }
+            // });
+            // const apiData = await res.json();
+            const res = await fetch(`{{ route('rekrutmen.daily.index') }}?year=${year}`, {
                 headers: { 'Accept': 'application/json' }
             });
             const apiData = await res.json();
 
+
             // KUNCI PERBAIKAN: Mapping data dengan format YYYY-MM-DD yang konsisten
             const dataMap = {};
-            apiData.forEach(d => {
-                // Potong string tanggal (misal: "2024-05-10 00:00:00" menjadi "2024-05-10")
-                const dateKey = d.date.substring(0, 10);
-                if(!dataMap[d.posisi_id]) dataMap[d.posisi_id] = {};
+            const yearlyMap = {};
 
-                // Simpan object datanya
+            apiData.forEach(d => {
+                const dateKey = d.date.substring(0, 10);
+
+                if (!dataMap[d.posisi_id]) dataMap[d.posisi_id] = {};
                 dataMap[d.posisi_id][dateKey] = d;
+
+                if (!yearlyMap[d.posisi_id]) yearlyMap[d.posisi_id] = 0;
+                yearlyMap[d.posisi_id] += parseInt(d[currentStage]) || 0;
             });
+
+
+            // const dataMap = {};
+            // apiData.forEach(d => {
+            //     // Potong string tanggal (misal: "2024-05-10 00:00:00" menjadi "2024-05-10")
+            //     const dateKey = d.date.substring(0, 10);
+            //     if(!dataMap[d.posisi_id]) dataMap[d.posisi_id] = {};
+
+            //     // Simpan object datanya
+            //     dataMap[d.posisi_id][dateKey] = d;
+            // });
 
             tableBody.innerHTML = '';
             let dailyTotals = Array(daysInMonth).fill(0);
-            let grandTotal = 0;
+            let monthlyGrandTotal = 0;
+            let yearlyGrandTotal = 0;
+
 
             positions.forEach((p, index) => {
                 let rowTotal = 0;
+                let yearlyTotal = yearlyMap[p.id_posisi] || 0;
                 let cellsHtml = '';
 
                 for(let d=1; d<=daysInMonth; d++) {
@@ -270,28 +299,70 @@ document.addEventListener('DOMContentLoaded', function() {
                         <td class="sticky left-0 z-10 border-b border-r p-2 text-center bg-gray-50 text-[10px]">${index + 1}</td>
                         <td class="sticky left-[45px] z-10 border-b border-r p-2 text-left bg-white truncate text-[11px] font-medium shadow-sm">${p.nama_posisi}</td>
                         ${cellsHtml}
-                        <td class="sticky right-0 z-10 border-b border-l p-2 bg-blue-50 font-bold text-center text-blue-700 shadow-sm">${rowTotal}</td>
+                       <td class="sticky right-[70px] z-10 border-b border-l p-2 bg-blue-500 font-bold text-center text-white shadow-sm">
+                            ${rowTotal}
+                        </td>
+                        <td class="sticky right-0 z-10 border-b border-l p-2 bg-yellow-500 text-white font-bold text-center shadow-sm">
+                            ${yearlyTotal}
+                        </td>
+
                     </tr>`;
-                grandTotal += rowTotal;
+                monthlyGrandTotal += rowTotal;
+                yearlyGrandTotal += yearlyTotal;
+
             });
 
-            renderFooter(dailyTotals, grandTotal);
+            renderFooter(dailyTotals, monthlyGrandTotal, yearlyGrandTotal);
+
 
         } catch (e) {
             console.error("Gagal memuat data:", e);
         }
     }
 
-    function renderFooter(dailyTotals, grandTotal) {
-        let footerHtml = `
-            <tr class="bg-gray-100 font-bold">
-                <td colspan="2" class="sticky left-0 z-20 border-r p-3 text-right text-[10px] uppercase">Total Harian</td>`;
-        dailyTotals.forEach(t => {
-            footerHtml += `<td class="border-r p-1 text-center ${t > 0 ? 'text-blue-600' : 'text-gray-400'}">${t}</td>`;
-        });
-        footerHtml += `<td class="sticky right-0 z-20 p-3 text-center bg-blue-500 text-white">${grandTotal}</td></tr>`;
-        tableFooter.innerHTML = footerHtml;
-    }
+    // function renderFooter(dailyTotals, grandTotal, yearlyGrandTotal = 0) {
+    //     let footerHtml = `
+    //         <tr class="bg-gray-100 font-bold">
+    //             <td colspan="2" class="sticky left-0 z-20 border-r p-3 text-right text-[10px] uppercase">Total Harian</td>`;
+    //     dailyTotals.forEach(t => {
+    //         footerHtml += `<td class="border-r p-1 text-center ${t > 0 ? 'text-blue-600' : 'text-gray-400'}">${t}</td>`;
+    //     });
+    //     yearlyGrandTotal += yearlyTotal;
+    //     footerHtml += `<td class="sticky right-0 z-20 p-3 text-center bg-blue-500 text-white">${grandTotal}</td>
+    //     <td class="sticky right-0 z-20 p-3 text-center bg-indigo-700 text-white">
+    //         ${yearlyGrandTotal}
+    //     </td>
+    //     </tr>`;
+    //     tableFooter.innerHTML = footerHtml;
+    // }
+    function renderFooter(dailyTotals, monthlyGrandTotal, yearlyGrandTotal) {
+    let footerHtml = `
+        <tr class="bg-gray-100 font-bold">
+            <td colspan="2" class="sticky left-0 z-20 border-r p-3 text-right text-[10px] uppercase bg-gray-100">
+                Total Harian
+            </td>
+    `;
+
+    dailyTotals.forEach(t => {
+        footerHtml += `
+            <td class="border-r p-1 text-center ${t > 0 ? 'text-blue-700 font-bold' : 'text-gray-400'}">
+                ${t}
+            </td>
+        `;
+    });
+
+    footerHtml += `
+        <td class="sticky right-[70px] z-20 p-3 text-center bg-blue-500 text-white">
+            ${monthlyGrandTotal}
+        </td>
+        <td class="sticky right-0 z-20 p-3 text-center bg-yellow-500 text-white">
+            ${yearlyGrandTotal}
+        </td>
+        </tr>
+    `;
+
+    tableFooter.innerHTML = footerHtml;
+}
 
     // window.openEdit = function(id, name, date, val) {
     //     editingData = { posisi_id: id, date: date };
@@ -303,6 +374,22 @@ document.addEventListener('DOMContentLoaded', function() {
         // ... di dalam <script> Anda ...
 
 // Fungsi untuk membuka modal dengan proteksi
+        // window.openEdit = function(id, name, date, val) {
+        //     editingData = { posisi_id: id, date: date };
+
+        //     const stageSel = document.getElementById('stage-select');
+        //     const currentStage = stageSel.value;
+        //     const stageLabel = stageSel.options[stageSel.selectedIndex].text;
+
+        //     const inputVal = document.getElementById('input_value');
+        //     const btnSubmit = document.getElementById('modal-submit');
+        //     const modalInfo = document.getElementById('modal-info');
+        //     const modalTitle = document.querySelector('#edit-daily h3'); // Asumsi ID modal Anda
+
+        //     // Reset State
+        //     inputVal.disabled = false;
+        //     inputVal.classList.remove('bg-gray-100', 'cursor-not-allowed');
+        //     btnSubmit.style.display = 'block';
         window.openEdit = function(id, name, date, val) {
             editingData = { posisi_id: id, date: date };
 
@@ -313,46 +400,77 @@ document.addEventListener('DOMContentLoaded', function() {
             const inputVal = document.getElementById('input_value');
             const btnSubmit = document.getElementById('modal-submit');
             const modalInfo = document.getElementById('modal-info');
-            const modalTitle = document.querySelector('#edit-daily h3'); // Asumsi ID modal Anda
 
-            // Reset State
+            // 🔴 RESET WAJIB (INI KUNCI)
             inputVal.disabled = false;
+            inputVal.readOnly = false;
             inputVal.classList.remove('bg-gray-100', 'cursor-not-allowed');
-            btnSubmit.style.display = 'block';
+            btnSubmit.style.display = 'inline-flex';
+
 
             // LOGIKA PROTEKSI
+        //     if (currentStage !== 'total_pelamar') {
+        //         // Jika kolom OTOMATIS (Lolos CV, Psikotes, dll)
+        //         inputVal.disabled = true;
+        //         inputVal.classList.add('bg-gray-100', 'cursor-not-allowed');
+        //         btnSubmit.style.display = 'none'; // Sembunyikan tombol simpan
+
+        //         modalInfo.innerHTML = `
+        //             <div class="p-3 bg-red-100 border-l-4 border-red-500 rounded">
+        //                 <p class="text-[11px] font-bold text-red-800 uppercase">${name}</p>
+        //                 <p class="text-[10px] text-red-600">${date}</p>
+        //                 <hr class="my-2 border-red-200">
+        //                 <p class="text-[10px] text-gray-700 leading-relaxed">
+        //                     Angka <strong>${stageLabel}</strong> ditarik secara otomatis dari database <strong>Data Kandidat</strong> berdasarkan status tahapan terakhir mereka.
+        //                 </p>
+        //                 <p class="mt-2 text-[9px] italic text-red-500">*Untuk mengubah angka ini, silakan perbarui status kandidat di menu Manage Kandidat.</p>
+        //             </div>
+        //         `;
+        //     } else {
+        //         // Jika kolom MANUAL (Total Pelamar)
+        //         modalInfo.innerHTML = `
+        //             <div class="p-3 bg-green-100 border-l-4 border-green-500 rounded">
+        //                 <p class="text-[11px] font-bold text-green-800 uppercase">${name}</p>
+        //                 <p class="text-[10px] text-green-600">${date}</p>
+        //                 <hr class="my-2 border-green-200">
+        //                 <p class="text-[10px] text-gray-700 font-medium">Input Manual: <strong>${stageLabel}</strong></p>
+        //             </div>
+        //         `;
+        //     }
+
+        //     inputVal.value = val;
+        //     window.dispatchEvent(new CustomEvent('open-modal', {detail: {id: 'edit-daily'}}));
+        // };
             if (currentStage !== 'total_pelamar') {
-                // Jika kolom OTOMATIS (Lolos CV, Psikotes, dll)
-                inputVal.disabled = true;
-                inputVal.classList.add('bg-gray-100', 'cursor-not-allowed');
-                btnSubmit.style.display = 'none'; // Sembunyikan tombol simpan
+        inputVal.disabled = true;
+        inputVal.classList.add('bg-gray-100', 'cursor-not-allowed');
+        btnSubmit.style.display = 'none';
 
-                modalInfo.innerHTML = `
-                    <div class="p-3 bg-red-100 border-l-4 border-red-500 rounded">
-                        <p class="text-[11px] font-bold text-red-800 uppercase">${name}</p>
-                        <p class="text-[10px] text-red-600">${date}</p>
-                        <hr class="my-2 border-red-200">
-                        <p class="text-[10px] text-gray-700 leading-relaxed">
-                            Angka <strong>${stageLabel}</strong> ditarik secara otomatis dari database <strong>Data Kandidat</strong> berdasarkan status tahapan terakhir mereka.
-                        </p>
-                        <p class="mt-2 text-[9px] italic text-red-500">*Untuk mengubah angka ini, silakan perbarui status kandidat di menu Manage Kandidat.</p>
-                    </div>
-                `;
-            } else {
-                // Jika kolom MANUAL (Total Pelamar)
-                modalInfo.innerHTML = `
-                    <div class="p-3 bg-green-100 border-l-4 border-green-500 rounded">
-                        <p class="text-[11px] font-bold text-green-800 uppercase">${name}</p>
-                        <p class="text-[10px] text-green-600">${date}</p>
-                        <hr class="my-2 border-green-200">
-                        <p class="text-[10px] text-gray-700 font-medium">Input Manual: <strong>${stageLabel}</strong></p>
-                    </div>
-                `;
-            }
+        modalInfo.innerHTML = `
+            <div class="p-3 bg-red-100 border-l-4 border-red-500 rounded">
+                <p class="text-[11px] font-bold text-red-800">${name}</p>
+                <p class="text-[10px] text-red-600">${date}</p>
+                <p class="text-[10px] mt-2 text-gray-700">
+                    Data <strong>${stageLabel}</strong> diambil otomatis dari status kandidat.
+                </p>
+            </div>
+        `;
+    } else {
+        modalInfo.innerHTML = `
+            <div class="p-3 bg-green-100 border-l-4 border-green-500 rounded">
+                <p class="text-[11px] font-bold text-green-800">${name}</p>
+                <p class="text-[10px] text-green-600">${date}</p>
+                <p class="text-[10px] mt-2 text-gray-700">
+                    Input Manual: <strong>${stageLabel}</strong>
+                </p>
+            </div>
+        `;
+    }
 
-            inputVal.value = val;
-            window.dispatchEvent(new CustomEvent('open-modal', {detail: {id: 'edit-daily'}}));
-        };
+    inputVal.value = val;
+    window.dispatchEvent(new CustomEvent('open-modal', { detail: { id: 'edit-daily' } }));
+};
+
 
         // Modifikasi sedikit pada renderTable untuk membedakan warna kolom manual & otomatis
         // Di dalam loop for daysInMonth:
