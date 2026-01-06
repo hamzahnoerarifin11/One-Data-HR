@@ -119,26 +119,26 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Data from PHP
-        const genderLabels = @json(array_keys($genderData));
-        const genderSeries = @json(array_values($genderData));
+        const genderLabels = {!! json_encode(array_keys($genderData)) !!};
+        const genderSeries = {!! json_encode(array_values($genderData)) !!};
 
-        const jabatanLabels = @json(array_keys($jabatanData));
-        const jabatanSeries = @json(array_values($jabatanData));
+        const jabatanLabels = {!! json_encode(array_keys($jabatanData)) !!};
+        const jabatanSeries = {!! json_encode(array_values($jabatanData)) !!};
 
-        const divisiLabels = @json(array_keys($divisiData));
-        const divisiSeries = @json(array_values($divisiData));
+        const divisiLabels = {!! json_encode(array_keys($divisiData)) !!};
+        const divisiSeries = {!! json_encode(array_values($divisiData)) !!};
 
-        const pendidikanLabels = @json(array_keys($pendidikanData));
-        const pendidikanSeries = @json(array_values($pendidikanData));
+        const pendidikanLabels = {!! json_encode(array_keys($pendidikanData)) !!};
+        const pendidikanSeries = {!! json_encode(array_values($pendidikanData)) !!};
 
-        const tenureLabels = @json(array_keys($tenureCounts));
-        const tenureSeries = @json(array_values($tenureCounts));
+        const tenureLabels = {!! json_encode(array_keys($tenureCounts)) !!};
+        const tenureSeries = {!! json_encode(array_values($tenureCounts)) !!};
 
-        const ageLabels = @json(array_keys($ageCounts));
-        const ageSeries = @json(array_values($ageCounts));
+        const ageLabels = {!! json_encode(array_keys($ageCounts)) !!};
+        const ageSeries = {!! json_encode(array_values($ageCounts)) !!};
 
-        const perusahaanLabels = @json(array_keys($perusahaanData));
-        const perusahaanSeries = @json(array_values($perusahaanData));
+        const perusahaanLabels = {!! json_encode(array_keys($perusahaanData)) !!};
+        const perusahaanSeries = {!! json_encode(array_values($perusahaanData)) !!};
         const tailadminColors = [
             '#3C50E0', '#80CAEE', '#A5D8FF', '#06B6D4', '#10B981',
             '#22C55E', '#84CC16', '#FACC15', '#F97316', '#FB7185',
@@ -158,7 +158,7 @@
         // Gender pie
        renderChart('#chart-gender', {
         series: genderSeries,
-        chart: { 
+        chart: {
             type: 'pie', // Donut biasanya terlihat lebih modern daripada Pie standar
             height: 300,   // Sedikit ditambah agar teks tidak berdesakan
             fontFamily: 'Inter, system-ui, sans-serif'
@@ -201,19 +201,19 @@
                 opacity: 0.45
             }
         },
-        legend: { 
+        legend: {
             position: 'bottom',
             fontSize: '14px',
             fontWeight: 500,
             markers: { radius: 12 },
             itemMargin: { horizontal: 10, vertical: 5 }
         },
-        responsive: [{ 
-            breakpoint: 640, 
-            options: { 
+        responsive: [{
+            breakpoint: 640,
+            options: {
                 chart: { height: 280 },
-                legend: { position: 'bottom' } 
-            } 
+                legend: { position: 'bottom' }
+            }
         }]
     });
 

@@ -6,46 +6,56 @@ use Illuminate\Http\Request;
 use App\Models\Kandidat;
 use App\Models\Posisi;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
-// use App\Models\RekrutmenDaily; // Pastikan model ini ada
-// use Carbon\Carbon;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Reader\Csv as CsvReader;
+use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
+
 
 class KandidatController extends Controller
 {
     public function index(Request $request)
     {
-        // Ambil semua data tanpa pagination dulu untuk Alpine.js filter
-        // Atau gunakan ->get() jika datanya belum ribuan
-        $query = Kandidat::with('posisi')->orderBy('created_at','desc');
+        $query = Kandidat::with('posisi')
+            ->orderBy('created_at', 'desc');
 
         if ($request->filled('posisi_id')) {
             $query->where('posisi_id', $request->posisi_id);
         }
 
-        // Tips: Untuk Alpine.js search side-client, kita butuh koleksi data
         $kandidats = $query->get();
-        // $posisis = Posisi::all();
-        $posisis = Posisi::where('status', 'Aktif')->get();
-        // ⬆️ JIKA KOLOM BERBEDA, GANTI BARIS INI SAJA:
-        // $posisis = Posisi::where('is_active', 1)->get()
+        $posisis   = Posisi::where('status', 'Aktif')->get();
 
-
-        return view('pages.rekrutmen.kandidat.index', compact('kandidats','posisis'));
+        return view(
+            'pages.rekrutmen.kandidat.index',
+            compact('kandidats', 'posisis')
+        );
     }
+
+    // public function downloadExcel($id)
+    // {
+    //     $kandidat = Kandidat::findOrFail($id);
+    //     $path = 'uploads/excel/' . $kandidat->file_excel;
+
+    //     if (Storage::disk('public')->exists($path)) {
+    //         return Storage::disk('public')->download($path);
+    //     }
+
+    //     return back()->with('error', 'File tidak ditemukan.');
+    // }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            'nama' => 'required|string|max:150',
-            'posisi_id' => 'required|exists:posisi,id_posisi',
-            'tanggal_melamar' => 'nullable|date',
-            'sumber' => 'nullable|string|max:100',
-            'link_cv' => 'nullable|url',
-            'file_excel' => 'nullable|mimes:xlsx,xls|max:2048',
+            'nama'             => 'required|string|max:150',
+            'posisi_id'        => 'required|exists:posisi,id_posisi',
+            'tanggal_melamar'  => 'nullable|date',
+            'sumber'           => 'nullable|string|max:100',
+            'link_cv'          => 'nullable|url',
+            'file_excel'       => 'nullable|mimes:xlsx,xls|max:10000',
         ]);
 
-            if ($request->hasFile('file_excel')) {
+        if ($request->hasFile('file_excel')) {
             $file = $request->file('file_excel');
             $filename = time() . '_' . $file->getClientOriginalName();
             $file->storeAs('uploads/excel', $filename, 'public');
@@ -54,125 +64,208 @@ class KandidatController extends Controller
 
         $kandidat = Kandidat::create($data);
 
-        // Jika request datang dari AJAX (Fetch)
         if ($request->wantsJson()) {
-            return response()->json(['message' => 'Kandidat berhasil ditambahkan', 'data' => $kandidat]);
+            return response()->json([
+                'message' => 'Kandidat berhasil ditambahkan',
+                'data'    => $kandidat
+            ]);
         }
 
-        return redirect()->route('rekrutmen.kandidat.index')->with('success','Kandidat created');
+        return redirect()
+            ->route('rekrutmen.kandidat.index')
+            ->with('success', 'Kandidat berhasil ditambahkan');
     }
-    // public function exportExcelToPdf($id)
-    // {
-    //     $kandidat = Kandidat::findOrFail($id);
+    public function downloadExcel($id)
+    {
+        $kandidat = Kandidat::findOrFail($id);
 
-    //     // 1. Cek apakah file excel ada
-    //     if (!$kandidat->file_excel || !Storage::disk('public')->exists('uploads/excel/' . $kandidat->file_excel)) {
-    //         return back()->with('error', 'File Excel tidak ditemukan.');
-    //     }
+        if (!$kandidat->excel_path || !Storage::disk('public')->exists($kandidat->excel_path)) {
+            return back()->with('error', 'File Excel tidak ditemukan');
+        }
 
-    //     // 2. Baca isi file Excel menjadi Array
-    //     // Kita asumsikan data ada di Sheet pertama
-    //     $path = storage_path('app/public/uploads/excel/' . $kandidat->file_excel);
-    //     $dataExcel = Excel::toArray([], $path)[0];
+        return Storage::disk('public')->download(
+            $kandidat->excel_path,
+            $kandidat->file_excel
+        );
+    }
+    private function generateCsvPreview($excelPath)
+    {
+        $csvPath = str_replace('.xlsx', '.csv', $excelPath);
 
-    //     // 3. Generate PDF menggunakan view khusus
-    //     // Kita kirim $dataExcel ke dalam view
-    //     $pdf = Pdf::loadView('pages.rekrutmen.kandidat.pdf_preview', [
-    //         'kandidat' => $kandidat,
-    //         'rows' => $dataExcel
-    //     ]);
+        $reader = new Xlsx();
+        $reader->setReadDataOnly(true);
 
-    //     // 4. Download sebagai PDF
-    //     return $pdf->download('Laporan-Excel-' . $kandidat->nama . '.pdf');
-    // }
-    public function exportToPdf($id)
-{
-    $kandidat = Kandidat::findOrFail($id);
-    $path = storage_path('app/public/uploads/excel/' . $kandidat->file_excel);
-    $array = Excel::toArray([], $path)[0]; // Ambil Sheet pertama
+        $spreadsheet = $reader->load($excelPath);
 
-    // MAPPING DATA (Sesuaikan index baris/kolom dengan file excel asli)
-    // Contoh: Baris 7 di Excel adalah index 6 di array
-    $dataLaporan = [
-        [
-            'aspek' => 'STABILITAS EMOSI',
-            'desc_low' => $array[6][1], // Kolom B baris 7
-            'score' => $array[6][2],    // Kolom C (Berisi 'KS' atau tanda centang)
-            'desc_high' => $array[6][7] // Kolom H
-        ],
-        // ... teruskan untuk aspek lainnya sesuai koordinat Excel Anda
-    ];
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Csv($spreadsheet);
+        $writer->setDelimiter(';');
+        $writer->setEnclosure('');
+        $writer->setSheetIndex(0);
+        $writer->save($csvPath);
 
-    $kesimpulan = $array[40][1] ?? 'Data tidak tersedia'; // Contoh koordinat kesimpulan
+        $spreadsheet->disconnectWorksheets();
+        unset($spreadsheet);
 
-    $pdf = Pdf::loadView('pdf.laporan_psikologi', [
-        'rows' => $dataLaporan,
-        'kesimpulan' => $kesimpulan,
-        'kandidat' => $kandidat
-    ])->setPaper('a4', 'portrait');
+        return $csvPath;
+    }
 
-    return $pdf->download('Laporan-Psikologi-'.$kandidat->nama.'.pdf');
-}
+    public function previewExcel($id)
+    {
+        set_time_limit(120);
+        ini_set('memory_limit', '512M');
 
-    // Gunakan $id alih-alih Type-hint Kandidat jika binding bermasalah
+        $kandidat = Kandidat::findOrFail($id);
+
+        if (!$kandidat->excel_path) {
+            abort(404, 'File Excel belum tersedia');
+        }
+
+        $path = Storage::disk('public')->path($kandidat->excel_path);
+
+        if (!file_exists($path)) {
+            abort(404, 'File Excel tidak ditemukan');
+        }
+
+        // ✅ GUNAKAN HTML READER (PALING CEPAT)
+        $reader = IOFactory::createReader('Html');
+        $reader->setReadDataOnly(true);
+
+        $spreadsheet = IOFactory::load($path);
+
+        ob_start();
+        $writer = IOFactory::createWriter($spreadsheet, 'Html');
+        $writer->save('php://output');
+        $html = ob_get_clean();
+
+        return view('pages.rekrutmen.kandidat.preview-excel-html', [
+            'kandidat' => $kandidat,
+            'html'     => $html
+        ]);
+    }
+
+
+
+    public function generateLaporan($id)
+    {
+        set_time_limit(120);
+        ini_set('memory_limit', '512M');
+
+        $kandidat = Kandidat::with('posisi')->findOrFail($id);
+
+        if (!$kandidat->excel_path) {
+            abort(404, 'File Excel belum diupload');
+        }
+
+        $path = Storage::disk('public')->path($kandidat->excel_path);
+
+        if (!file_exists($path)) {
+            abort(404, 'File Excel tidak ditemukan');
+        }
+
+        $reader = IOFactory::createReaderForFile($path);
+        $reader->setReadDataOnly(true);
+        $spreadsheet = $reader->load($path);
+        $sheet = $spreadsheet->getSheet(0);
+
+        $cell = fn ($c) => trim((string) $sheet->getCell($c)->getValue());
+
+        $data = [
+            'kandidat' => $kandidat,
+            'tanggal_tes' => now()->format('d/m/Y'),
+            'psikogram' => [
+                ['aspek' => 'Stabilitas Emosi', 'score' => $cell('M5') ?: '-', 'desc' => $cell('N5') ?: '-'],
+                ['aspek' => 'Relasi Sosial', 'score' => $cell('M6') ?: '-', 'desc' => $cell('N6') ?: '-'],
+            ],
+            'kesimpulan' => $cell('B45') ?: '-',
+            'saran'      => $cell('B41') ?: '-',
+        ];
+
+        return Pdf::loadView('pages.rekrutmen.kandidat.pdf_preview', $data)
+            ->setPaper('A4', 'portrait')
+            ->download('Laporan_' . str_replace(' ', '_', $kandidat->nama) . '.pdf');
+    }
+
+
+
     public function update(Request $request, $id)
     {
         $kandidat = Kandidat::findOrFail($id);
 
         $data = $request->validate([
-            'nama' => 'required|string|max:150',
-            'posisi_id' => 'required|exists:posisi,id_posisi',
-            'tanggal_melamar' => 'nullable|date',
-            'sumber' => 'nullable|string|max:100',
-            'status_akhir' => 'required|string',
-            'link_cv' => 'nullable|url',
-            'file_excel' => 'nullable|mimes:xlsx,xls|max:2048',
+            'nama'             => 'required|string|max:150',
+            'posisi_id'        => 'required|exists:posisi,id_posisi',
+            'tanggal_melamar'  => 'nullable|date',
+            'sumber'           => 'nullable|string|max:100',
+            'status_akhir'     => 'required|string',
+            'link_cv'          => 'nullable|url',
+            'file_excel'       => 'nullable|mimes:xlsx,xls|max:10000',
         ]);
 
-            if ($request->hasFile('file_excel')) {
+        if ($request->hasFile('file_excel')) {
+            if ($kandidat->file_excel) {
+                Storage::disk('public')->delete(
+                    'uploads/excel/' . $kandidat->file_excel
+                );
+            }
+
             $file = $request->file('file_excel');
             $filename = time() . '_' . $file->getClientOriginalName();
             $file->storeAs('uploads/excel', $filename, 'public');
             $data['file_excel'] = $filename;
+        } else {
+            unset($data['file_excel']);
         }
 
         $kandidat->update($data);
 
         if ($request->wantsJson()) {
-            return response()->json(['message' => 'Data berhasil diperbarui']);
+            return response()->json([
+                'message' => 'Data berhasil diperbarui'
+            ]);
         }
 
-        return redirect()->route('rekrutmen.kandidat.index')->with('success','Kandidat updated');
+        return redirect()
+            ->route('rekrutmen.kandidat.index')
+            ->with('success', 'Kandidat berhasil diperbarui');
     }
 
     public function destroy($id)
     {
         $kandidat = Kandidat::findOrFail($id);
+
+        if ($kandidat->file_excel) {
+            Storage::disk('public')->delete(
+                'uploads/excel/' . $kandidat->file_excel
+            );
+        }
+
         $kandidat->delete();
 
         if (request()->wantsJson()) {
-            return response()->json(['message' => 'Kandidat berhasil dihapus']);
+            return response()->json([
+                'message' => 'Kandidat berhasil dihapus'
+            ]);
         }
 
-        return redirect()->route('rekrutmen.kandidat.index')->with('success','Kandidat deleted');
+        return redirect()
+            ->route('rekrutmen.kandidat.index')
+            ->with('success', 'Kandidat berhasil dihapus');
     }
 
-    // Method lainnya tetap sama...
-
-    /**
-     * Return a JSON list of candidates for use in ajax selects (filtered by posisi or q)
-     */
     public function list(Request $request)
     {
-        $query = Kandidat::orderBy('created_at','desc');
+        $query = Kandidat::orderBy('created_at', 'desc');
+
         if ($request->filled('posisi_id')) {
             $query->where('posisi_id', $request->posisi_id);
         }
+
         if ($request->filled('q')) {
-            $query->where('nama', 'like', '%'.$request->q.'%');
+            $query->where('nama', 'like', '%' . $request->q . '%');
         }
-        $c = $query->limit(50)->get(['id_kandidat','nama']);
-        return response()->json($c);
+
+        return response()->json(
+            $query->limit(50)->get(['id_kandidat', 'nama'])
+        );
     }
 }
-

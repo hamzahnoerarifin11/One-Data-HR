@@ -67,4 +67,10 @@ class Kandidat extends Model
         // Hubungkan id_kandidat di tabel kandidat dengan kandidat_id di tabel training
         return $this->hasOne(Training::class, 'kandidat_id', 'id_kandidat');
     }
+    public function getExcelPathAttribute()
+    {
+        return $this->file_excel
+            ? 'uploads/excel/' . $this->file_excel
+            : null;
+    }
 }

@@ -22,6 +22,9 @@ use App\Http\Controllers\InterviewHrController;
 use App\Http\Controllers\InterviewUserController;
 use App\Http\Controllers\SummaryController;
 use App\Http\Controllers\KandidatLanjutUserController;
+use App\Http\Controllers\TrainingController;
+use App\Http\Controllers\UserController;
+
 
 // Minimal routes for One Data HR
 Route::get('/', function () {
@@ -42,13 +45,48 @@ Route::post('/signout', [AuthController::class, 'logout'])->name('signout');
 // Dashboard home (require auth)
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
-
+    Route::delete('/users/batch-delete', [UserController::class, 'batchDelete'])->name('users.batchDelete');
+    Route::resource('users', UserController::class);
     // Karyawan resource
     Route::resource('karyawan', KaryawanController::class);
+
+    // User management resource
+    Route::resource('users', UserController::class);
 
     Route::resource('wig-rekrutmen', WigRekrutmenController::class);
 
     // Route::resource('interview_hr', InterviewHrController::class);
+    // routes/web.php
+    // Route::prefix('rekrutmen/kandidat')->name('rekrutmen.kandidat.')->group(function () {
+    //     Route::get('{id}/preview-excel', [KandidatController::class, 'previewExcel'])
+    //         ->name('previewExcel');
+
+    //     Route::get('{id}/laporan', [KandidatController::class, 'generateLaporan'])
+    //         ->name('laporan');
+    // });
+// routes/web.php
+        Route::prefix('rekrutmen/kandidat')
+            ->name('rekrutmen.kandidat.')
+            ->group(function () {
+
+                Route::get('/', [KandidatController::class, 'index'])
+                    ->name('index');
+
+                Route::post('/', [KandidatController::class, 'store'])
+                    ->name('store');
+
+                Route::delete('{id}', [KandidatController::class, 'destroy'])
+                    ->name('destroy');
+
+                Route::get('{id}/download-excel', [KandidatController::class, 'downloadExcel'])
+                    ->name('downloadExcel');
+
+                Route::get('{id}/preview-excel', [KandidatController::class, 'previewExcel'])
+                    ->name('previewExcel');
+
+                Route::get('{id}/laporan', [KandidatController::class, 'generateLaporan'])
+                    ->name('laporan');
+            });
 
 
 
@@ -104,12 +142,27 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/metrics/candidates/export', [RecruitmentDashboardController::class, 'exportCandidatesCsv'])->name('metrics.candidates.export');
 
         // CRUD
+       // Pastikan strukturnya seperti ini
+        Route::get(
+                    'kandidat/{id}/laporan',
+                    [KandidatController::class, 'generateLaporan']
+                )->name('kandidat.laporan');
+        // Preview Excel ke HTML
+        Route::get(
+            'kandidat/{id}/preview-excel',
+            [KandidatController::class, 'previewExcel']
+        )->name('kandidat.previewExcel');
+
+
+        Route::get('kandidat/download-excel/{id}', [KandidatController::class, 'downloadExcel'])->name('kandidat.downloadExcel');
         Route::resource('kandidat', KandidatController::class);
         Route::get('proses/{kandidat_id}/edit', [ProsesRekrutmenController::class, 'edit'])->name('proses.edit');
         Route::post('proses', [ProsesRekrutmenController::class, 'store'])->name('proses.store');
 
         Route::get('/rekrutmen/kandidat/export-pdf/{id}', [KandidatController::class, 'exportExcelToPdf']);
 
+        Route::get('proses/{kandidat_id}/edit', [ProsesRekrutmenController::class,'edit'])->name('proses.edit');
+        Route::post('proses', [ProsesRekrutmenController::class,'store'])->name('proses.store');
 
 
         // Perbaikan: Hindari double naming untuk resource

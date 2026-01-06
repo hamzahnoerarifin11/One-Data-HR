@@ -17,6 +17,7 @@ class MenuHelper
                 'name' => 'Data Karyawan',
                 'path' => '/karyawan',
             ],
+
             [
                 'icon' => 'task',
                 'name' => 'Rekrutmen',
@@ -85,7 +86,11 @@ class MenuHelper
                 'name' => 'Rekap Performance',
                 'path' => '/performance/rekap',
             ],
-
+            [
+                'icon' => 'authentication',
+                'name' => 'Manajemen User',
+                'path' => '/users',
+            ],
         ];
     }
       // --- [BARU] Menambahkan Menu Khusus Performance (KPI) ---

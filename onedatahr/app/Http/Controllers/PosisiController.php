@@ -37,7 +37,7 @@ class PosisiController extends Controller
     public function store(Request $request)
     {
         // Validasi akses (Pastikan user login & admin)
-        if (!auth()->user() || auth()->user()->role !== 'admin') {
+        if (!auth()->user() || !in_array(auth()->user()->role, ['admin', 'superadmin'])) {
             return response()->json(['message' => 'Unauthorized. Hanya admin yang diperbolehkan.'], 403);
         }
 
@@ -65,7 +65,7 @@ class PosisiController extends Controller
     // Update via AJAX
     public function update(Request $request, $id)
     {
-        if (!auth()->user() || auth()->user()->role !== 'admin') {
+        if (!auth()->user() || !in_array(auth()->user()->role, ['admin', 'superadmin'])) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -94,7 +94,7 @@ class PosisiController extends Controller
     // Destroy via AJAX
     public function destroy(Request $request, $id)
     {
-        if (!auth()->user() || auth()->user()->role !== 'admin') {
+        if (!auth()->user() || !in_array(auth()->user()->role, ['admin', 'superadmin'])) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 

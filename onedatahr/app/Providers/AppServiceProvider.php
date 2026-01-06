@@ -10,6 +10,7 @@ use App\Models\Posisi;
 use App\Models\InterviewHr;
 use App\Observers\KandidatObserver;
 use App\Observers\PosisiObserver;
+use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -34,5 +35,6 @@ class AppServiceProvider extends ServiceProvider
         date_default_timezone_set('Asia/Jakarta');
         Kandidat::observe(KandidatObserver::class);
         Posisi::observe(PosisiObserver::class);
+        Paginator::useTailwind();
     }
 }
