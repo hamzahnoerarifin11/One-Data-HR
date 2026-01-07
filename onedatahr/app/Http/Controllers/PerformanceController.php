@@ -12,7 +12,7 @@ class PerformanceController extends Controller
 {
     public function index(Request $request)
     {
-        $tahun = date('Y');
+        $tahun = request()->get('tahun', date('Y'));
 
         // 1. Query Data Karyawan (Filter Pencarian Nama/NIK tetap pakai SQL)
         $query = Karyawan::with('pekerjaan');
