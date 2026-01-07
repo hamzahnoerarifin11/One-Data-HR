@@ -12,7 +12,6 @@
         body, div, table, tr, td, th { transition: background-color 0.3s ease, color 0.3s ease; }
     </style>
 </head>
-{{-- UBAH: p-6 menjadi p-4 sm:p-6 agar tidak terlalu lebar di HP --}}
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 p-4 sm:p-6">
 
     <div class="max-w-7xl mx-auto">
@@ -28,7 +27,8 @@
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
             <div>
                 <h2 class="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white">Performance Dashboard</h2>
-                <p class="text-gray-500 dark:text-gray-400 text-sm">Monitoring Penilaian Kinerja Karyawan</p>
+                {{-- Menampilkan Tahun yang sedang dipilih --}}
+                <p class="text-gray-500 dark:text-gray-400 text-sm">Monitoring Penilaian Kinerja Karyawan Tahun {{ $tahun ?? date('Y') }}</p>
             </div>
             
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
@@ -41,27 +41,44 @@
                 </div>
 
                 {{-- FORM FILTER & SEARCH --}}
-                <div class="mb-6 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
+                <div class="mb-6 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 w-full">
                     <form method="GET" action="{{ route('kpi.index') }}">
-                        {{-- Pertahankan Input Tahun yang mungkin hidden atau dropdown lain --}}
-                        <input type="hidden" name="tahun" value="{{ $tahun }}">
-
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                        
+                        {{-- GRID FILTER DIGANTI DARI 4 KOLOM JADI 5 KOLOM (ATAU SESUAI KEBUTUHAN) --}}
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
                             
-                            {{-- 1. SEARCH --}}
+                            {{-- [BARU] 1. FILTER TAHUN --}}
+                            <div class="md:col-span-1">
+                                <label class="block text-xs font-bold text-gray-500 mb-1">Tahun</label>
+                                <select name="tahun" class="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600">
+                                    @php
+                                        $currentYear = date('Y');
+                                        // Pilihan Tahun: Tahun ini + 1 tahun ke depan, mundur 4 tahun ke belakang
+                                        $startYear = $currentYear - 4; 
+                                        $endYear = $currentYear + 1;
+                                    @endphp
+                                    @for($y = $endYear; $y >= $startYear; $y--)
+                                        <option value="{{ $y }}" {{ (request('tahun') ?? $tahun) == $y ? 'selected' : '' }}>
+                                            {{ $y }}
+                                        </option>
+                                    @endfor
+                                </select>
+                            </div>
+
+                            {{-- 2. SEARCH --}}
                             <div class="md:col-span-1">
                                 <label class="block text-xs font-bold text-gray-500 mb-1">Cari Nama / NIK</label>
                                 <div class="relative">
                                     <input type="text" name="search" value="{{ request('search') }}" 
-                                        class="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600" 
-                                        placeholder="Cari karyawan...">
+                                           class="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600" 
+                                           placeholder="Cari karyawan...">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <i class="fas fa-search text-gray-400"></i>
                                     </div>
                                 </div>
                             </div>
 
-                            {{-- 2. FILTER JABATAN --}}
+                            {{-- 3. FILTER JABATAN --}}
                             <div class="md:col-span-1">
                                 <label class="block text-xs font-bold text-gray-500 mb-1">Jabatan</label>
                                 <select name="filter_jabatan" class="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600">
@@ -74,7 +91,7 @@
                                 </select>
                             </div>
 
-                            {{-- 3. FILTER STATUS KPI --}}
+                            {{-- 4. FILTER STATUS KPI --}}
                             <div class="md:col-span-1">
                                 <label class="block text-xs font-bold text-gray-500 mb-1">Status KPI</label>
                                 <select name="filter_status" class="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600">
@@ -85,14 +102,14 @@
                                 </select>
                             </div>
 
-                            {{-- 4. TOMBOL ACTION --}}
+                            {{-- 5. TOMBOL ACTION --}}
                             <div class="md:col-span-1 flex gap-2">
                                 <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition shadow-sm">
                                     <i class="fas fa-filter mr-1"></i> Terapkan
                                 </button>
                                 
                                 {{-- Tombol Reset --}}
-                                @if(request('search') || request('filter_jabatan') || request('filter_status'))
+                                @if(request('search') || request('filter_jabatan') || request('filter_status') || (request('tahun') && request('tahun') != date('Y')))
                                     <a href="{{ route('kpi.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-600 font-bold py-2 px-3 rounded-lg text-sm transition" title="Reset Filter">
                                         <i class="fas fa-undo"></i>
                                     </a>
@@ -105,7 +122,8 @@
             </div>
         </div>
 
-        {{-- STATS CARDS (Grid responsive sudah bagus di kode asli) --}}
+        {{-- STATS CARDS (Kode card statistik tetap sama) --}}
+        {{-- ... (Bagian card statistik tidak perlu diubah karena datanya ($stats) dikirim dari controller berdasarkan filter tahun ini) ... --}}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
             {{-- Card 1 --}}
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6 border-l-4 border-blue-500">
@@ -149,7 +167,7 @@
             </div>
         </div>
 
-        {{-- ALERT SECTION --}}
+        {{-- ALERT SECTION (Tetap sama) --}}
         <div class="mb-4">
             @if(session('success'))
                 <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-2" role="alert">
@@ -168,21 +186,16 @@
         {{-- CONTAINER DATA --}}
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-gray-700">
             <div class="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 flex justify-between items-center">
-                <h3 class="font-bold text-gray-700 dark:text-gray-200">Daftar Status Karyawan ({{ $tahun }})</h3>
+                {{-- Update Judul Tahun --}}
+                <h3 class="font-bold text-gray-700 dark:text-gray-200">Daftar Status Karyawan ({{ $tahun ?? date('Y') }})</h3>
             </div>
 
-            {{-- 
-                ============================================
-                TAMPILAN MOBILE (CARD VIEW)
-                Muncul di layar kecil (md:hidden)
-                ============================================
-            --}}
+            {{-- TAMPILAN MOBILE (Tetap sama) --}}
             <div class="block md:hidden">
                 <div class="divide-y divide-gray-200 dark:divide-gray-700">
                     @forelse($karyawanList as $index => $kry)
                         @php $kpi = $kry->kpiAssessment; @endphp
                         <div class="p-4 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
-                            {{-- Header Card: Nama & Jabatan --}}
                             <div class="flex justify-between items-start mb-3">
                                 <div>
                                     <div class="font-bold text-gray-200 dark:text-white text-base">{{ $kry->Nama_Lengkap_Sesuai_Ijazah }}</div>
@@ -192,7 +205,6 @@
                                 <div class="text-xs dark:text-white text-gray-400 font-mono">#{{ $index + 1 }}</div>
                             </div>
 
-                            {{-- Body Card: Status & Grade --}}
                             <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-900/50 p-3 rounded-lg mb-3">
                                 <div class="text-center">
                                     <span class="text-xs text-gray-500 dark:text-gray-400 block mb-1">Status</span>
@@ -201,7 +213,7 @@
                                             <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-0.5 rounded border border-green-400">FINAL</span>
                                         @elseif($kpi->status == 'SUBMITTED')
                                             <span class="bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-0.5 rounded border border-yellow-400">SUBMITTED</span>
-                                        @else($kpi->status == 'DRAFT')
+                                        @else
                                             <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-0.5 rounded border border-blue-400">DRAFT</span>
                                         @endif
                                     @else
@@ -221,7 +233,6 @@
                                 </div>
                             </div>
 
-                            {{-- Footer Card: Aksi --}}
                             <div class="flex items-center justify-end gap-2">
                                 @if($kpi)
                                     <a href="{{ route('kpi.show', ['karyawan_id' => $kry->id_karyawan, 'tahun' => $tahun]) }}" 
@@ -238,6 +249,7 @@
                                     <form action="{{ route('kpi.store') }}" method="POST" class="w-full">
                                         @csrf
                                         <input type="hidden" name="karyawan_id" value="{{ $kry->id_karyawan }}">
+                                        {{-- Pastikan tahun yang dikirim adalah tahun yang dipilih di filter --}}
                                         <input type="hidden" name="tahun" value="{{ $tahun }}">
                                         <button type="submit" class="w-full justify-center font-medium text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-sm flex items-center gap-2 transition shadow">
                                             <i class="fas fa-plus-circle"></i> Buat KPI Baru
@@ -255,12 +267,7 @@
                 </div>
             </div>
 
-            {{-- 
-                ============================================
-                TAMPILAN DESKTOP (TABEL BIASA)
-                Disembunyikan di mobile (hidden md:block)
-                ============================================
-            --}}
+            {{-- TAMPILAN DESKTOP (Tetap sama, hanya penyesuaian variabel $tahun) --}}
             <div class="hidden md:block overflow-x-auto">
                 <table class="w-full text-left text-sm text-gray-500 dark:text-gray-400">
                     <thead class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 uppercase text-xs">
@@ -286,6 +293,7 @@
                                 <div class="font-normal text-gray-500 text-xs">{{ $kry->NIK ?? '-' }}</div>
                             </td>
                             <td class="px-6 py-4">{{ $kry->pekerjaan->jabatan ?? '-' }}</td>
+                            {{-- Tampilkan Tahun sesuai filter --}}
                             <td class="px-6 py-4 text-center">{{ $tahun }}</td>
                             <td class="px-6 py-4 text-center whitespace-nowrap">
                                 @if($kpi)
@@ -334,6 +342,7 @@
                                     <form action="{{ route('kpi.store') }}" method="POST">
                                         @csrf
                                         <input type="hidden" name="karyawan_id" value="{{ $kry->id_karyawan }}">
+                                        {{-- Pastikan tahun input sesuai filter --}}
                                         <input type="hidden" name="tahun" value="{{ $tahun }}">
                                         <button type="submit" class="font-medium text-blue-600 dark:text-blue-500 hover:underline flex items-center gap-1 mx-auto">
                                             <i class="fas fa-plus-circle"></i> Buat
@@ -361,7 +370,7 @@
         </div>
     </div>
 
-    {{-- SCRIPT DARK MODE (Sama seperti sebelumnya) --}}
+    {{-- SCRIPT DARK MODE (Tetap sama) --}}
     <script>
         const themeToggleBtn = document.getElementById('theme-toggle');
         const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');

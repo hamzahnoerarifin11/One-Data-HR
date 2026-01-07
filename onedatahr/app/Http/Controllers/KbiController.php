@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\KbiAssessment; 
 use App\Models\Karyawan;      
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class KbiController extends Controller
 {
@@ -276,86 +277,94 @@ class KbiController extends Controller
     }
 
    public function monitoring(Request $request)
-{
-    $tahun = date('Y');
+    {
+        $tahun = date('Y');
 
-    // 1. Query Dasar
-    $query = Karyawan::with(['pekerjaan', 'atasan']);
+        // 1. Query Dasar
+        $query = Karyawan::with(['pekerjaan', 'atasan']);
 
-    // 2. Filter Search
-    if ($request->has('search') && $request->search != '') {
-        $keyword = $request->search;
-        $query->where(function($q) use ($keyword) {
-            $q->where('Nama_Lengkap_Sesuai_Ijazah', 'LIKE', '%'.$keyword.'%')
-              ->orWhere('NIK', 'LIKE', '%'.$keyword.'%');
-        });
-    }
+        // 2. Filter Search
+        if ($request->has('search') && $request->search != '') {
+            $keyword = $request->search;
+            $query->where(function($q) use ($keyword) {
+                $q->where('Nama_Lengkap_Sesuai_Ijazah', 'LIKE', '%'.$keyword.'%')
+                ->orWhere('NIK', 'LIKE', '%'.$keyword.'%');
+            });
+        }
 
-    // 3. Filter Jabatan (PERBAIKAN DISINI)
-    if ($request->has('jabatan') && $request->jabatan != '') {
-        $query->whereHas('pekerjaan', function($q) use ($request) {
-            // Ubah 'nama_jabatan' jadi 'Jabatan'
-            $q->where('Jabatan', $request->jabatan); // <--- UBAH INI
-        });
-    }
+        // 3. Filter Jabatan (PERBAIKAN DISINI)
+        if ($request->has('jabatan') && $request->jabatan != '') {
+            $query->whereHas('pekerjaan', function($q) use ($request) {
+                // Ubah 'nama_jabatan' jadi 'Jabatan'
+                $q->where('Jabatan', $request->jabatan); // <--- UBAH INI
+            });
+        }
 
-    $rawList = $query->get();
-    $userMap = \App\Models\User::whereNotNull('nik')->pluck('id', 'nik')->toArray();
+        $rawList = $query->get();
+        $userMap = \App\Models\User::whereNotNull('nik')->pluck('id', 'nik')->toArray();
 
-    // 4. Mapping Status (Sama seperti sebelumnya)
-    $listKaryawan = $rawList->map(function ($kry) use ($tahun, $userMap) {
-        $kry->status_diri = KbiAssessment::where('karyawan_id', $kry->id_karyawan)
-            ->where('tipe_penilai', 'DIRI_SENDIRI')
-            ->where('tahun', $tahun)
-            ->exists();
-
-        if ($kry->atasan_id) {
-            $penilaiUserId = $userMap[$kry->NIK] ?? 0;
-            if ($penilaiUserId > 0) {
-                $sudahNilaiAtasan = KbiAssessment::where('karyawan_id', $kry->atasan_id)
-                ->where('penilai_id', $penilaiUserId) // Sesuaikan logic user_id
-                ->where('tipe_penilai', 'BAWAHAN')
+        // 4. Mapping Status (Sama seperti sebelumnya)
+        $listKaryawan = $rawList->map(function ($kry) use ($tahun, $userMap) {
+            $kry->status_diri = KbiAssessment::where('karyawan_id', $kry->id_karyawan)
+                ->where('tipe_penilai', 'DIRI_SENDIRI')
                 ->where('tahun', $tahun)
                 ->exists();
-            $kry->status_atasan = $sudahNilaiAtasan ? 'DONE' : 'PENDING';
-        } else {
-            $kry->status_atasan = 'PENDING';
-        }
-        } else {
-            $kry->status_atasan = 'NA';
+
+            if ($kry->atasan_id) {
+                $penilaiUserId = $userMap[$kry->NIK] ?? 0;
+                if ($penilaiUserId > 0) {
+                    $sudahNilaiAtasan = KbiAssessment::where('karyawan_id', $kry->atasan_id)
+                    ->where('penilai_id', $penilaiUserId) // Sesuaikan logic user_id
+                    ->where('tipe_penilai', 'BAWAHAN')
+                    ->where('tahun', $tahun)
+                    ->exists();
+                $kry->status_atasan = $sudahNilaiAtasan ? 'DONE' : 'PENDING';
+            } else {
+                $kry->status_atasan = 'PENDING';
+            }
+            } else {
+                $kry->status_atasan = 'NA';
+            }
+
+            $kry->is_complete = $kry->status_diri && ($kry->status_atasan == 'DONE' || $kry->status_atasan == 'NA');
+            return $kry;
+        });
+
+        // 5. Filter Status (Sama seperti sebelumnya)
+        if ($request->has('status') && $request->status != '') {
+            if ($request->status == 'sudah') {
+                $listKaryawan = $listKaryawan->where('is_complete', true);
+            } elseif ($request->status == 'belum') {
+                $listKaryawan = $listKaryawan->where('is_complete', false);
+            }
         }
 
-        $kry->is_complete = $kry->status_diri && ($kry->status_atasan == 'DONE' || $kry->status_atasan == 'NA');
-        return $kry;
-    });
+        // 6. List Jabatan untuk Dropdown (PERBAIKAN DISINI)
+        // Ubah 'nama_jabatan' jadi 'Jabatan'
+        $listJabatan = \App\Models\Pekerjaan::distinct()
+                        ->pluck('Jabatan') // <--- UBAH INI
+                        ->filter()
+                        ->sort();
 
-    // 5. Filter Status (Sama seperti sebelumnya)
-    if ($request->has('status') && $request->status != '') {
-        if ($request->status == 'sudah') {
-            $listKaryawan = $listKaryawan->where('is_complete', true);
-        } elseif ($request->status == 'belum') {
-            $listKaryawan = $listKaryawan->where('is_complete', false);
-        }
+        $totalKaryawan = $listKaryawan->count();
+        $sudahSelesaiSemua = $listKaryawan->where('is_complete', true)->count();
+        $belumSelesai = $totalKaryawan - $sudahSelesaiSemua;
+        // 7. PAGINASI MANUAL
+        $page = LengthAwarePaginator::resolveCurrentPage();
+        $perPage = 10;
+        $results = $listKaryawan->slice(($page - 1) * $perPage, $perPage)->all();
+        
+        $paginatedKaryawan = new LengthAwarePaginator($results, count($listKaryawan), $perPage);
+        $paginatedKaryawan->setPath($request->url());
+        $paginatedKaryawan->appends($request->all());
+        $paginatedKaryawan->onEachSide(1);
+
+        return view('pages.kbi.monitoring', compact( 
+            'totalKaryawan', 
+            'sudahSelesaiSemua', 
+            'belumSelesai', 
+            'tahun',
+            'listJabatan'
+        ) + ['listKaryawan' => $paginatedKaryawan]);
     }
-
-    // 6. List Jabatan untuk Dropdown (PERBAIKAN DISINI)
-    // Ubah 'nama_jabatan' jadi 'Jabatan'
-    $listJabatan = \App\Models\Pekerjaan::distinct()
-                    ->pluck('Jabatan') // <--- UBAH INI
-                    ->filter()
-                    ->sort();
-
-    $totalKaryawan = $listKaryawan->count();
-    $sudahSelesaiSemua = $listKaryawan->where('is_complete', true)->count();
-    $belumSelesai = $totalKaryawan - $sudahSelesaiSemua;
-
-    return view('pages.kbi.monitoring', compact(
-        'listKaryawan', 
-        'totalKaryawan', 
-        'sudahSelesaiSemua', 
-        'belumSelesai', 
-        'tahun',
-        'listJabatan'
-    ));
-}
 }
