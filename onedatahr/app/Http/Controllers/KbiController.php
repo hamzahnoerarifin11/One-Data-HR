@@ -155,99 +155,99 @@ class KbiController extends Controller
     // ==========================================================
     // 4. DATABASE SOAL (HARDCODE)
     // ==========================================================
-    private function getDaftarPertanyaan()
-    {
-        return [
-            [
-                'kategori' => 'KOMUNIKATIF',
-                'soal' => [
-                    1 => 'Sopan dan santun dalam berkomunikasi serta menghargai perbedaan.',
-                    2 => 'Menyampaikan informasi secara sistematis, akurat, dan mudah dipahami.',
-                    3 => 'Mudah bersinergi dan berkolaborasi baik dengan sesama tim, lintas fungsi, maupun pihak eksternal.',
-                ]
-            ],
-            [
-                'kategori' => 'UNGGUL',
-                'soal' => [
-                    4 => 'Menetapkan standar kinerja tinggi dan konsisten mencapainya.',
-                    5 => 'Selalu mencari solusi inovatif dalam bekerja.',
-                    6 => 'Berkontribusi pada pencapaian kinerja yang lebih tinggi dibanding standar.',
-                ]
-            ],
-            [
-                'kategori' => 'AGAMIS',
-                'soal' => [
-                    7 => 'Menjalankan nilai spiritual dalam bekerja secara konsisten.',
-                    8 => 'Mengedepankan kejujuran dan keberkahan sebagai fondasi keputusan kerja.',
-                    9 => 'Menjaga perilaku sesuai etika dan ajaran agama.',
-                ]
-            ],
-            [
-                'kategori' => 'TANGGUNG JAWAB',
-                'soal' => [
-                    10 => 'Menyelesaikan tugas dengan tepat waktu, sesuai target perusahaan.',
-                    11 => 'Bertanggung jawab atas dampak kualitas produk dan layanan ke pelanggan.',
-                    12 => 'Berani mengakui kesalahan dan mengambil inisiatif perbaikan.',
-                ]
-            ],
-            [
-                'kategori' => 'MANFAAT',
-                'soal' => [
-                    13 => 'Selalu mempertimbangkan nilai tambah produk atau proses bagi pelanggan atau pengguna akhir.',
-                    14 => 'Berkontribusi terhadap proyek atau program yang berdampak luas.',
-                    15 => 'Menghindari aktivitas yang tidak berdampak pada efisiensi atau kualitas kerja.',
-                ]
-            ],
-            [
-                'kategori' => 'EMPATI',
-                'soal' => [
-                    16 => 'Tanggap terhadap kebutuhan rekan kerja maupun customer.',
-                    17 => 'Bersedia membantu saat ada anggota tim atau mitra dalam kesulitan.',
-                    18 => 'Menunjukkan kepedulian dalam komunikasi dan tindakan sehari-hari.',
-                ]
-            ],
-            [
-                'kategori' => 'MORAL',
-                'soal' => [
-                    19 => 'Memperlakukan semua orang secara adil tanpa memandang jabatan atau latar belakang.',
-                    20 => 'Menolak segala bentuk perilaku tidak etis, manipulatif, atau diskriminatif.',
-                    21 => 'Menjunjung tinggi integritas dalam pengambilan keputusan.',
-                ]
-            ],
-            [
-                'kategori' => 'BELAJAR',
-                'soal' => [
-                    22 => 'Proaktif mencari ilmu, teknologi, dan best practice terbaru untuk pekerjaan maupun tentang industri global.',
-                    23 => 'Menerapkan pembelajaran dalam proyek nyata untuk peningkatan berkelanjutan.',
-                    24 => 'Berbagi pengetahuan dan keahlian ke anggota tim.',
-                ]
-            ],
-            [
-                'kategori' => 'AMANAH',
-                'soal' => [
-                    25 => 'Menjaga kerahasiaan data, dokumen, dan keputusan strategis dalam lingkup divisi maupun perusahaan.',
-                    26 => 'Menjalankan amanah dari atasan, pelanggan, dan mitra tanpa penyimpangan.',
-                    27 => 'Dipercaya untuk menangani pekerjaan penting atau sensitif.',
-                ]
-            ],
-            [
-                'kategori' => 'JUJUR',
-                'soal' => [
-                    28 => 'Tidak memanipulasi data, laporan, atau hasil kerja.',
-                    29 => 'Menyampaikan kendala yang dihadapi dengan transparan.',
-                    30 => 'Konsisten antara ucapan dan tindakan, terutama dalam kerja tim.',
-                ]
-            ],
-            [
-                'kategori' => 'ANTUSIAS',
-                'soal' => [
-                    31 => 'Selalu terlihat bersemangat menghadapi tugas baru atau proyek lintas tim.',
-                    32 => 'Menunjukkan energi positif meski dalam tekanan atau tantangan pekerjaan.',
-                    33 => 'Menjadi penyemangat dan pendorong semangat tim.',
-                ]
-            ],
-        ];
-    }
+    // private function getDaftarPertanyaan()
+    // {
+    //     return [
+    //         [
+    //             'kategori' => 'KOMUNIKATIF',
+    //             'soal' => [
+    //                 1 => 'Sopan dan santun dalam berkomunikasi serta menghargai perbedaan.',
+    //                 2 => 'Menyampaikan informasi secara sistematis, akurat, dan mudah dipahami.',
+    //                 3 => 'Mudah bersinergi dan berkolaborasi baik dengan sesama tim, lintas fungsi, maupun pihak eksternal.',
+    //             ]
+    //         ],
+    //         [
+    //             'kategori' => 'UNGGUL',
+    //             'soal' => [
+    //                 4 => 'Menetapkan standar kinerja tinggi dan konsisten mencapainya.',
+    //                 5 => 'Selalu mencari solusi inovatif dalam bekerja.',
+    //                 6 => 'Berkontribusi pada pencapaian kinerja yang lebih tinggi dibanding standar.',
+    //             ]
+    //         ],
+    //         [
+    //             'kategori' => 'AGAMIS',
+    //             'soal' => [
+    //                 7 => 'Menjalankan nilai spiritual dalam bekerja secara konsisten.',
+    //                 8 => 'Mengedepankan kejujuran dan keberkahan sebagai fondasi keputusan kerja.',
+    //                 9 => 'Menjaga perilaku sesuai etika dan ajaran agama.',
+    //             ]
+    //         ],
+    //         [
+    //             'kategori' => 'TANGGUNG JAWAB',
+    //             'soal' => [
+    //                 10 => 'Menyelesaikan tugas dengan tepat waktu, sesuai target perusahaan.',
+    //                 11 => 'Bertanggung jawab atas dampak kualitas produk dan layanan ke pelanggan.',
+    //                 12 => 'Berani mengakui kesalahan dan mengambil inisiatif perbaikan.',
+    //             ]
+    //         ],
+    //         [
+    //             'kategori' => 'MANFAAT',
+    //             'soal' => [
+    //                 13 => 'Selalu mempertimbangkan nilai tambah produk atau proses bagi pelanggan atau pengguna akhir.',
+    //                 14 => 'Berkontribusi terhadap proyek atau program yang berdampak luas.',
+    //                 15 => 'Menghindari aktivitas yang tidak berdampak pada efisiensi atau kualitas kerja.',
+    //             ]
+    //         ],
+    //         [
+    //             'kategori' => 'EMPATI',
+    //             'soal' => [
+    //                 16 => 'Tanggap terhadap kebutuhan rekan kerja maupun customer.',
+    //                 17 => 'Bersedia membantu saat ada anggota tim atau mitra dalam kesulitan.',
+    //                 18 => 'Menunjukkan kepedulian dalam komunikasi dan tindakan sehari-hari.',
+    //             ]
+    //         ],
+    //         [
+    //             'kategori' => 'MORAL',
+    //             'soal' => [
+    //                 19 => 'Memperlakukan semua orang secara adil tanpa memandang jabatan atau latar belakang.',
+    //                 20 => 'Menolak segala bentuk perilaku tidak etis, manipulatif, atau diskriminatif.',
+    //                 21 => 'Menjunjung tinggi integritas dalam pengambilan keputusan.',
+    //             ]
+    //         ],
+    //         [
+    //             'kategori' => 'BELAJAR',
+    //             'soal' => [
+    //                 22 => 'Proaktif mencari ilmu, teknologi, dan best practice terbaru untuk pekerjaan maupun tentang industri global.',
+    //                 23 => 'Menerapkan pembelajaran dalam proyek nyata untuk peningkatan berkelanjutan.',
+    //                 24 => 'Berbagi pengetahuan dan keahlian ke anggota tim.',
+    //             ]
+    //         ],
+    //         [
+    //             'kategori' => 'AMANAH',
+    //             'soal' => [
+    //                 25 => 'Menjaga kerahasiaan data, dokumen, dan keputusan strategis dalam lingkup divisi maupun perusahaan.',
+    //                 26 => 'Menjalankan amanah dari atasan, pelanggan, dan mitra tanpa penyimpangan.',
+    //                 27 => 'Dipercaya untuk menangani pekerjaan penting atau sensitif.',
+    //             ]
+    //         ],
+    //         [
+    //             'kategori' => 'JUJUR',
+    //             'soal' => [
+    //                 28 => 'Tidak memanipulasi data, laporan, atau hasil kerja.',
+    //                 29 => 'Menyampaikan kendala yang dihadapi dengan transparan.',
+    //                 30 => 'Konsisten antara ucapan dan tindakan, terutama dalam kerja tim.',
+    //             ]
+    //         ],
+    //         [
+    //             'kategori' => 'ANTUSIAS',
+    //             'soal' => [
+    //                 31 => 'Selalu terlihat bersemangat menghadapi tugas baru atau proyek lintas tim.',
+    //                 32 => 'Menunjukkan energi positif meski dalam tekanan atau tantangan pekerjaan.',
+    //                 33 => 'Menjadi penyemangat dan pendorong semangat tim.',
+    //             ]
+    //         ],
+    //     ];
+    // }
 
     // [BARU] Fungsi untuk menyimpan pilihan atasan
     public function updateAtasan(Request $request)
@@ -278,7 +278,7 @@ class KbiController extends Controller
 
    public function monitoring(Request $request)
     {
-        $tahun = date('Y');
+        $tahun = request()->get('tahun', date('Y'));
 
         // 1. Query Dasar
         $query = Karyawan::with(['pekerjaan', 'atasan']);
@@ -363,8 +363,10 @@ class KbiController extends Controller
             'totalKaryawan', 
             'sudahSelesaiSemua', 
             'belumSelesai', 
-            'tahun',
             'listJabatan'
-        ) + ['listKaryawan' => $paginatedKaryawan]);
+        ) + [
+            'listKaryawan' => $paginatedKaryawan,
+            'tahun' => $tahun
+        ]);
     }
 }

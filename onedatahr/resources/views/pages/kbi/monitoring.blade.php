@@ -4,7 +4,7 @@
 <div class="p-4 sm:p-6">
     
     {{-- HEADER --}}
-    <div class="flex flex-col md:flex-row justify-between items-center text-center mb-6 gap-4">
+    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <div>
             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Monitoring KBI {{ $tahun }}</h1>
             <p class="text-gray-500 dark:text-gray-400 text-sm">Pantau progres pengisian penilaian karyawan.</p>
@@ -19,16 +19,32 @@
     {{-- BAR FILTER --}}
     <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 mb-6 transition-colors">
         <form action="{{ route('kbi.monitoring') }}" method="GET">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
                 
-                {{-- 1. Cari Nama --}}
+                {{-- [BARU] 1. Filter Tahun --}}
                 <div>
+                    <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Tahun</label>
+                    <select name="tahun" class="w-full text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors">
+                        @php
+                            $startYear = date('Y') - 4; 
+                            $endYear = date('Y') + 1;
+                        @endphp
+                        @for($y = $endYear; $y >= $startYear; $y--)
+                            <option value="{{ $y }}" {{ (request('tahun') ?? $tahun) == $y ? 'selected' : '' }}>
+                                {{ $y }}
+                            </option>
+                        @endfor
+                    </select>
+                </div>
+
+                {{-- 2. Cari Nama --}}
+                <div class="md:col-span-1">
                     <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Cari Nama / NIK</label>
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Contoh: Budi..." 
                            class="w-full text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-colors">
                 </div>
 
-                {{-- 2. Filter Jabatan --}}
+                {{-- 3. Filter Jabatan --}}
                 <div>
                     <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Jabatan</label>
                     <select name="jabatan" class="w-full text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors">
@@ -41,7 +57,7 @@
                     </select>
                 </div>
 
-                {{-- 3. Filter Status --}}
+                {{-- 4. Filter Status --}}
                 <div>
                     <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-1">Status Pengerjaan</label>
                     <select name="status" class="w-full text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors">
@@ -51,13 +67,13 @@
                     </select>
                 </div>
 
-                {{-- 4. Tombol Aksi --}}
+                {{-- 5. Tombol Aksi --}}
                 <div class="flex gap-2">
                     <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition shadow-md">
                         <i class="fas fa-filter mr-1"></i> Filter
                     </button>
-                    @if(request()->hasAny(['search', 'jabatan', 'status']))
-                        <a href="{{ route('kbi.monitoring') }}" class="bg-gray-800 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 font-bold py-2 px-3 rounded-lg text-sm transition" title="Reset Filter">
+                    @if(request()->hasAny(['search', 'jabatan', 'status']) || (request('tahun') && request('tahun') != date('Y')))
+                        <a href="{{ route('kbi.monitoring') }}" class="bg-gray-800 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 font-bold py-2 px-3 rounded-lg text-sm transition flex items-center justify-center" title="Reset Filter">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                             </svg>
@@ -69,7 +85,7 @@
         </form>
     </div>
 
-    {{-- KARTU STATISTIK (Angkanya akan berubah mengikuti Filter di atas) --}}
+    {{-- KARTU STATISTIK (Tetap sama) --}}
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border-l-4 border-blue-500 dark:border-blue-600 flex justify-between items-center transition-colors">
             <div>
@@ -94,7 +110,7 @@
         </div>
     </div>
 
-    {{-- TABEL MONITORING --}}
+    {{-- TABEL MONITORING (Tetap sama) --}}
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-200 dark:border-gray-700 overflow-hidden transition-colors">
         <div class="overflow-x-auto">
             <table class="w-full text-sm text-left">
@@ -185,7 +201,7 @@
         </div>
         
         {{-- Footer Pagination --}}
-        <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700  dark:bg-gray-800/50 flex justify-end">
+        <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 dark:bg-gray-800/50 flex justify-end">
             {{ $listKaryawan->links('components.pagination-custom') }}
         </div>
     </div>
