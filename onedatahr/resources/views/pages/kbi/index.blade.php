@@ -21,13 +21,20 @@
     /* Mode Gelap */
     .dark .bg-blue-600 { background-color: #1e40af !important; color: #e2e8f0 !important; } /* Blue-800 */
     .dark .hover\:bg-blue-700:hover { background-color: #1e3a8a !important; } /* Blue-900 */
+    /* Mode Terang */
+    .bg-purple-600 { background-color: #9810fa !important; color: white !important; }
+    .hover\:bg-purple-700:hover { background-color: #7e22ce !important; }
+
+    /* Mode Gelap */
+    .dark .bg-purple-600 { background-color: #7e22ce !important; color: #e2e8f0 !important; } /* Purple-800 */
+    .dark .hover\:bg-purple-700:hover { background-color: #6b21a8 !important; } /* Purple-900 */
 
     /* 3. PERBAIKAN UMUM */
     /* Pastikan teks putih tetap putih/terang di tombol */
-    button.bg-green-600, a.bg-green-600, a.bg-blue-600 {
+    button.bg-green-600, a.bg-green-600, a.bg-blue-600, a.bg-purple-600 {
         color: #ffffff !important;
     }
-    .dark button.bg-green-600, .dark a.bg-green-600, .dark a.bg-blue-600 {
+    .dark button.bg-green-600, .dark a.bg-green-600, .dark a.bg-blue-600, .dark a.bg-purple-600 {
         color: #f1f5f9 !important; /* Slate-100 */
     }
 </style>
