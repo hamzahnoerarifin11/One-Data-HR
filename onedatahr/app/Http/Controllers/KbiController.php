@@ -51,7 +51,7 @@ class KbiController extends Controller
         }
 
         // Eksekusi Pagination (10 per halaman)
-        $bawahanList = $query->paginate(10); 
+        $bawahanList = $query->paginate(10)->onEachSide(1); 
         
         // Cek Status Penilaian untuk setiap karyawan di list
         $bawahanList->through(function ($staff) use ($tahun, $user) {

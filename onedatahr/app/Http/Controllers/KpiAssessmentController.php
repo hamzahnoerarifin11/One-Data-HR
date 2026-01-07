@@ -84,8 +84,12 @@ class KpiAssessmentController extends Controller
         foreach ($allKaryawanForStats as $kry) {
             $kpi = $kry->kpiAssessment;
             if ($kpi) {
-                if ($kpi->status == 'FINAL') $stats['sudah_final']++;
-                else $stats['draft']++; 
+                if (in_array(strtoupper($kpi->status), ['FINAL', 'SELESAI', 'SUBMITTED', 'APPROVED', 'DONE'])) {
+                    $stats['sudah_final']++;
+                }
+                else {
+                    $stats['draft']++; 
+                }
 
                 if ($kpi->total_skor_akhir > 0) {
                     $totalSkor += $kpi->total_skor_akhir;
