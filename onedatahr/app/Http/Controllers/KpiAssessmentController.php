@@ -10,6 +10,9 @@ use App\Models\KpiScore;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon; // Tambahan wajib
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\SingleKpiExport; // Jika pakai class export terpisah
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class KpiAssessmentController extends Controller
 {
@@ -105,24 +108,28 @@ class KpiAssessmentController extends Controller
         return view('pages.kpi.index', compact('karyawanList', 'tahun', 'stats', 'listJabatan'));
     }
 
-    // --- 2. STORE (KODE ASLI ANDA - TIDAK ADA YANG DIHILANGKAN) ---
     public function store(Request $request)
     {
+        // 1. Validasi Input
         $request->validate([
             'karyawan_id' => 'required|exists:karyawan,id_karyawan',
             'tahun'       => 'required|integer'
         ]);
 
+        // 2. Cek apakah sudah ada KPI untuk karyawan & tahun tersebut
         $cek = KpiAssessment::where('karyawan_id', $request->karyawan_id)
                             ->where('tahun', $request->tahun)
                             ->first();
 
+        // Jika sudah ada, langsung buka (jangan buat baru)
         if ($cek) {
-            return redirect()->route('kpi.show', ['karyawan_id' => $request->karyawan_id, 'tahun' => $request->tahun]);
+            return redirect()->route('kpi.show', ['karyawan_id' => $request->karyawan_id, 'tahun' => $request->tahun])
+                             ->with('info', 'Data KPI untuk tahun ini sudah ada.');
         }
 
         DB::beginTransaction();
         try {
+            // 3. Buat Header KPI (Wadah Penilaian)
             $newKpi = KpiAssessment::create([
                 'karyawan_id'       => $request->karyawan_id,
                 'tahun'             => $request->tahun,
@@ -133,83 +140,21 @@ class KpiAssessmentController extends Controller
                 'penilai_id'        => Auth::id() ?? 1
             ]);
 
-            // DATA TEMPLATE ASLI ANDA (SAYA PERTAHANKAN)
-            $templateItems = [
-                [
-                    'perspektif' => 'Internal Business Process',
-                    'kra'        => 'Kualitas produk',
-                    'kpi'        => 'Presentase Barang Defect Pada Semeseter 1 Tahun 2025',
-                    'bobot'      => 30,
-                    'polaritas'  => 'Negatif',
-                    'target'     => 100,
-                    'satuan'     => '%'
-                ],
-                [
-                    'perspektif' => 'Financial',
-                    'kra'        => 'Produktivitas karyawan',
-                    'kpi'        => 'Presentase Capaian Produksi Factory 1 pada semester 1 Tahun 2025',
-                    'bobot'      => 40,
-                    'polaritas'  => 'Positif',
-                    'target'     => 4.5,
-                    'satuan'     => 'Skala'
-                ],
-                [
-                    'perspektif' => 'Learning & Growth',
-                    'kra'        => 'Kepatuhan dan keselamatan kerja',
-                    'kpi'        => 'Tingkat Kedisiplinan Penggunaan APD Factory 1 pada semseter 1 Tahun 2025',
-                    'bobot'      => 20,
-                    'polaritas'  => 'Positif',
-                    'target'     => 0,
-                    'satuan'     => 'Kasus'
-                ],
-                [
-                    'perspektif' => 'Learning & Growth',
-                    'kra'        => 'Pengembangan Kompetensi & Keterlibatan Karyawan',
-                    'kpi'        => 'Presentease Kehadiran Kegiatan TEMPA',
-                    'bobot'      => 10,
-                    'polaritas'  => 'Positif',
-                    'target'     => 100,
-                    'satuan'     => '%'
-                ]
-            ];
-
-            foreach ($templateItems as $item) {
-                $kpiItem = KpiItem::create([
-                    'kpi_assessment_id'         => $newKpi->id_kpi_assessment,
-                    'perspektif'                => $item['perspektif'],
-                    'key_result_area'           => $item['kra'],
-                    'key_performance_indicator' => $item['kpi'],
-                    'bobot'                     => $item['bobot'],
-                    'target'                    => $item['target'],
-                    'realisasi'                 => 0,
-                    'skor'                      => 0,
-                    'skor_akhir'                => 0,
-                    'polaritas'                 => $item['polaritas'],
-                    'satuan'                    => $item['satuan'],
-                ]);
-
-                // Simpan Score (Saya tambahkan kolom target_smt1 agar sinkron)
-                KpiScore::create([
-                    'kpi_item_id'  => $kpiItem->id_kpi_item,
-                    'nama_periode' => 'Semester 1', // Tetap Semester 1 sesuai kode asli
-                    'target'       => $item['target'],
-                    'target_smt1'  => $item['target'], // Default Smt 1
-                    'realisasi'    => 0,
-                    'skor'         => 0,
-                    'skor_akhir'   => 0
-                ]);
-            }
-
+            // --- BAGIAN TEMPLATE DIHAPUS DISINI ---
+            // Sistem tidak akan membuat KpiItem atau KpiScore apapun secara otomatis.
+            
             DB::commit();
+
+            // 4. Redirect ke halaman Form dengan pesan sukses
             return redirect()->route('kpi.show', ['karyawan_id' => $request->karyawan_id, 'tahun' => $request->tahun])
-                             ->with('success', 'KPI berhasil dibuat dengan Template Standar.');
+                             ->with('success', 'Dokumen KPI berhasil dibuat. Silakan tambah indikator kinerja secara manual.');
 
         } catch (\Exception $e) {
             DB::rollback();
             return redirect()->back()->with('error', 'Gagal membuat KPI: ' . $e->getMessage());
-            dd($e->getMessage());
         }
     }
+      
 
     // --- 3. SHOW (FIX ERROR $ITEMS) ---
     public function show($karyawanId, $tahun)
@@ -523,4 +468,50 @@ class KpiAssessmentController extends Controller
 
         return redirect()->back()->with('success', 'KPI berhasil diperbarui!');
     }
+
+    public function exportExcel(Request $request)
+    {
+        // Validasi input
+        $request->validate([
+            'karyawan_id' => 'required|exists:karyawan,id_karyawan',
+            'tahun'       => 'required|integer'
+        ]);
+
+        // Opsional: Cek apakah data KPI ada
+        $cek = KpiAssessment::where('karyawan_id', $request->karyawan_id)
+                            ->where('tahun', $request->tahun)
+                            ->first();
+
+        if (!$cek) {
+            return redirect()->back()->with('error', 'Data KPI tidak ditemukan untuk diexport.');
+        }
+
+        // Panggil class Export (Cara paling rapi)
+        return Excel::download(new SingleKpiExport($request->karyawan_id, $request->tahun), 'KPI-'.$request->tahun.'.xlsx');
+    }
+
+    // --- TAMBAHAN: EXPORT PDF ---
+    public function exportPdf(Request $request)
+    {
+        $karyawanId = $request->input('karyawan_id');
+        $tahun = $request->input('tahun');
+
+        // Ambil data yang sama persis dengan method SHOW
+        $karyawan = Karyawan::findOrFail($karyawanId);
+        $kpi = KpiAssessment::where('karyawan_id', $karyawanId)
+                            ->where('tahun', $tahun)
+                            ->firstOrFail();
+        
+        $items = KpiItem::where('kpi_assessment_id', $kpi->id_kpi_assessment)
+                        ->with('scores')
+                        ->get(); // Gunakan get() bukan paginate() untuk PDF
+
+        // Load View PDF (Anda perlu buat file view baru: pages.kpi.pdf)
+        $pdf = Pdf::loadView('pages.kpi.pdf', compact('karyawan', 'kpi', 'items'));
+        
+        // Atur orientasi landscape karena tabel KPI lebar
+        $pdf->setPaper('a4', 'landscape');
+
+        return $pdf->download('KPI-'.$karyawan->Nama_Lengkap_Sesuai_Ijazah.'-'.$tahun.'.pdf');
+    } 
 }

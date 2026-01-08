@@ -229,6 +229,8 @@ Route::middleware(['auth'])->group(function () {
     // --- rekap PERFORMANCE ROUTES ---
     Route::get('/performance/rekap', [App\Http\Controllers\PerformanceController::class, 'index'])->name('performance.rekap');
 
+    Route::get('/kpi/export/excel', [KpiAssessmentController::class, 'exportExcel'])->name('performance.export.excel');
+    Route::get('/kpi/export/pdf', [KpiAssessmentController::class, 'exportPdf'])->name('performance.export.pdf');
 
     // // --- SCRIPT SEMENTARA (HAPUS SETELAH DIPAKAI) ---
     // Route::get('/fix-grades-manual', function () {

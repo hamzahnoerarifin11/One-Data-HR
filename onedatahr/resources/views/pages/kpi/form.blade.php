@@ -46,12 +46,44 @@
     <div class="mb-6 flex flex-col lg:flex-row justify-between items-start lg:items-center bg-white dark:bg-gray-800 p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 gap-4">
         <div class="w-full lg:w-auto">
             <h1 class="text-xl md:text-2xl font-bold mb-1 text-gray-800 dark:text-white">Form Penilaian Kinerja (KPI)</h1>
-            <p class="text-xs md:text-sm text-gray-500">Karyawan: <span class="font-semibold text-blue-600">{{ $karyawan->Nama_Lengkap_Sesuai_Ijazah }}</span> | Periode: {{ $kpi->tahun }}</p>
+            <p class="text-xs md:text-sm text-gray-500">
+                Karyawan: <span class="font-semibold text-blue-600">{{ $karyawan->Nama_Lengkap_Sesuai_Ijazah }}</span> 
+                | Periode: {{ $kpi->tahun }}
+            </p>
         </div>
-        <div class="flex flex-wrap gap-2 w-full lg:w-auto justify-start lg:justify-end">
-            <a href="{{ route('kpi.index') }}" class="px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition flex-1 lg:flex-none text-center">Kembali</a>
-            {{-- TOMBOL SIMPAN FIX --}}
-            <button id="btnSimpan" type="button" onclick="submitKpiForm()" class="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition shadow-lg flex items-center justify-center gap-2 flex-1 lg:flex-none">
+        
+        <div class="flex flex-wrap gap-2 w-full lg:w-auto justify-start lg:justify-end items-center">
+            {{-- 1. Tombol Kembali --}}
+            <a href="{{ route('kpi.index') }}" class="px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition flex-1 lg:flex-none text-center text-gray-600 dark:text-gray-300">
+                Kembali
+            </a>
+
+            {{-- 2. [BARU] Tombol Export Dropdown --}}
+            <div class="relative group">
+                <button type="button" class="px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition flex items-center gap-2 border border-gray-200 dark:border-gray-600">
+                    <i class="fas fa-download"></i> 
+                    <span class="hidden sm:inline font-medium">Export</span>
+                    <i class="fas fa-chevron-down text-xs ml-1"></i>
+                </button>
+                
+                {{-- Isi Dropdown (Muncul saat Hover) --}}
+                <div class="absolute right-0 mt-1 w-40 bg-white dark:bg-gray-800 rounded-md shadow-xl border border-gray-100 dark:border-gray-700 hidden group-hover:block z-50 overflow-hidden">
+                    {{-- Link Excel --}}
+                    <a href="{{ route('performance.export.excel', ['karyawan_id' => $karyawan->id_karyawan, 'tahun' => $kpi->tahun]) }}" 
+                       class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-green-50 hover:text-green-700 dark:hover:bg-gray-700 flex items-center gap-2 transition">
+                        <i class="fas fa-file-excel text-green-600 w-4"></i> Export Excel
+                    </a>
+                    
+                    {{-- Link PDF --}}
+                    <a href="{{ route('performance.export.pdf', ['karyawan_id' => $karyawan->id_karyawan, 'tahun' => $kpi->tahun]) }}" 
+                       class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-red-50 hover:text-red-700 dark:hover:bg-gray-700 flex items-center gap-2 transition border-t border-gray-100 dark:border-gray-700">
+                        <i class="fas fa-file-pdf text-red-600 w-4"></i> Export PDF
+                    </a>
+                </div>
+            </div>
+
+            {{-- 3. Tombol Simpan --}}
+            <button id="btnSimpan" type="button" onclick="submitKpiForm()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition shadow-lg flex items-center justify-center gap-2 flex-1 lg:flex-none font-semibold">
                 <i class="fas fa-save"></i> <span class="hidden sm:inline">Simpan</span>
             </button>
         </div>
