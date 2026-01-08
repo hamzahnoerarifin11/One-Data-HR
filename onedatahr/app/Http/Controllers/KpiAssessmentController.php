@@ -181,7 +181,8 @@ class KpiAssessmentController extends Controller
     // --- 4. UPDATE (LOGIKA BARU ADJUSTMENT + SMT 1 & 2) ---
     public function update(Request $request, $id_kpi_assessment)
 {
-    $assessment = KpiAssessment::findOrFail($id_kpi_assessment);
+    // 1. Ambil Data Assessment & Eager Load Karyawan (untuk cek atasan nanti)
+    $assessment = KpiAssessment::with('karyawan')->findOrFail($id_kpi_assessment);
     $inputs = $request->input('kpi');
 
     if (!$inputs) {
@@ -190,6 +191,7 @@ class KpiAssessmentController extends Controller
 
     DB::beginTransaction();
     try {
+        // 2. Loop & Update Item/Score (Logika Perhitungan)
         foreach ($inputs as $itemId => $data) {
             $item = KpiItem::find($itemId);
             if (!$item) continue;
@@ -197,76 +199,49 @@ class KpiAssessmentController extends Controller
             $scoreRecord = KpiScore::where('kpi_item_id', $itemId)->first();
 
             if ($scoreRecord) {
-                // ==========================================
-                // 1. DATA TARGET & REALISASI SMT 1
-                // ==========================================
-                $target1 = $this->cleanInput($data['target_smt1'] ?? $item->target); // Target Smt 1 = Target Tahunan
+                // --- SMT 1 ---
+                $target1 = $this->cleanInput($data['target_smt1'] ?? $item->target);
                 $real1   = $this->cleanInput($data['real_smt1'] ?? 0);
                 
-                // --- SMT 1 ---
-                $skorMurni1 = $this->hitungSkor($target1, $real1, $item->polaritas); // Cukup 3 parameter
-                $nilaiSmt1  = ($skorMurni1 * $item->bobot) / 100; // Aman dikali karena $skorMurni1 sekarang adalah angka
+                $skorMurni1 = $this->hitungSkor($target1, $real1, $item->polaritas);
+                $nilaiSmt1  = ($skorMurni1 * $item->bobot) / 100;
 
-
-
-                // Cek Adjustment Smt 1
-                // Di JS, input adjustment berisi NILAI AKHIR (sudah dikali bobot), jadi kita ambil langsung
+                // Adjustment Smt 1
                 $adjSmt1 = isset($data['adjustment_smt1']) ? $this->cleanInput($data['adjustment_smt1']) : null;
-                
-                // Jika ada adjustment, pakai itu. Jika tidak, pakai hitungan rumus.
                 $finalSmt1 = ($adjSmt1 !== null && $data['adjustment_smt1'] !== '') ? $adjSmt1 : $nilaiSmt1;
 
-
-                // ==========================================
-                // 2. DATA TARGET & REALISASI SMT 2 (MANUAL)
-                // ==========================================
-                // Ambil input manual Total Smt 2
+                // --- SMT 2 ---
                 $target2 = $this->cleanInput($data['total_target_smt2'] ?? 0);
                 $real2   = $this->cleanInput($data['total_real_smt2'] ?? 0);
 
-                // --- SMT 2 ---
                 $skorMurni2 = $this->hitungSkor($target2, $real2, $item->polaritas);
                 $nilaiSmt2  = ($skorMurni2 * $item->bobot) / 100;
 
-                // Cek Adjustment Smt 2
+                // Adjustment Smt 2
                 $adjSmt2 = isset($data['adjustment_smt2']) ? $this->cleanInput($data['adjustment_smt2']) : null;
-                
                 $finalSmt2 = ($adjSmt2 !== null && $data['adjustment_smt2'] !== '') ? $adjSmt2 : $nilaiSmt2;
 
-
-                // ==========================================
-                // 3. FINAL SCORE
-                // ==========================================
-                // Final = Nilai Smt 1 + Nilai Smt 2
+                // --- FINAL ---
                 $grandFinal = $finalSmt1 + $finalSmt2;
 
-
-                // ==========================================
-                // 4. SIMPAN KE DATABASE
-                // ==========================================
+                // Prepare Update Data
                 $updateData = [
-                    // Smt 1
-                    'target_smt1'     => $target1,
-                    'real_smt1'       => $real1,
-                    'adjustment_smt1' => $adjSmt1, // Simpan nilai adj jika ada
+                    'target_smt1'          => $target1,
+                    'real_smt1'            => $real1,
+                    'adjustment_smt1'      => $adjSmt1,
                     'adjustment_real_smt1' => $this->cleanInput($data['adjustment_real_smt1'] ?? 0),
-
-                    // Smt 2 (Simpan Input Manualnya)
-                    'total_target_smt2' => $target2,
-                    'total_real_smt2'   => $real2,
-                    'adjustment_smt2'   => $adjSmt2,
+                    'total_target_smt2'    => $target2,
+                    'total_real_smt2'      => $real2,
+                    'adjustment_smt2'      => $adjSmt2,
                     'adjustment_target_smt2' => $this->cleanInput($data['adjustment_target_smt2'] ?? 0),
                     'adjustment_real_smt2'   => $this->cleanInput($data['adjustment_real_smt2'] ?? 0),
-
-                    // Data Global
-                    'target'     => $target1 + $target2, // Total Target (Opsional)
-                    'realisasi'  => $real1 + $real2,     // Total Real (Opsional)
-                    'skor'       => ($skorMurni1 + $skorMurni2) / 2, // Rata-rata skor murni (Opsional)
-                    'skor_akhir' => $grandFinal, // INI YANG PENTING
+                    'target'               => $target1 + $target2,
+                    'realisasi'            => $real1 + $real2,
+                    'skor'                 => ($skorMurni1 + $skorMurni2) / 2, // Rata-rata
+                    'skor_akhir'           => $grandFinal,
                 ];
 
-                // Simpan juga data bulanan (Target & Real) agar form tidak kosong saat di-load ulang
-                // Walaupun tidak dipakai perhitungan, tetap harus disimpan
+                // Simpan data bulanan (Target & Real)
                 $months = ['jul','aug','sep','okt','nov','des'];
                 foreach($months as $bln) {
                     $updateData['target_'.$bln] = $this->cleanInput($data['target_'.$bln] ?? 0);
@@ -277,25 +252,51 @@ class KpiAssessmentController extends Controller
             }
         }
 
-        // Hitung Ulang Total Skor Assessment (Sum dari semua item)
-        $totalSkorAkhir = KpiScore::where('kpi_assessment_id', $id_kpi_assessment) // Pastikan relasi benar atau gunakan join
-            ->join('kpi_items', 'kpi_scores.kpi_item_id', '=', 'kpi_items.id_kpi_item')
+        // 3. Hitung Ulang Total Skor Akhir
+        $totalSkorAkhir = KpiScore::join('kpi_items', 'kpi_scores.kpi_item_id', '=', 'kpi_items.id_kpi_item')
             ->where('kpi_items.kpi_assessment_id', $id_kpi_assessment)
             ->sum('kpi_scores.skor_akhir');
 
-        // Tentukan Grade
-        $grade = $this->determineGrade($totalSkorAkhir);
+        // 4. [PERBAIKAN UTAMA] Logika Penentuan Status
+        $user = Auth::user();
+        $userKaryawan = Karyawan::where('nik', $user->nik)->first();
+        
+        // Status default (jika staff mengisi sendiri)
+        $statusBaru = 'SUBMITTED'; 
+        $tanggalVerif = null;
 
-        // Update Header
+        // Cek 1: Jika user adalah ATASAN dari pemilik KPI
+        if ($userKaryawan && $assessment->karyawan->atasan_id == $userKaryawan->id_karyawan) {
+            $statusBaru = 'FINAL';
+            $tanggalVerif = now();
+        }
+        // Cek 2: Jika user adalah ADMIN / SUPERADMIN
+        elseif (in_array($user->role, ['superadmin', 'admin'])) {
+            $statusBaru = 'FINAL';
+            $tanggalVerif = now();
+        }
+        // Cek 3: Jika status sebelumnya sudah FINAL, jangan ubah jadi SUBMITTED lagi (kecuali direset)
+        elseif ($assessment->status == 'FINAL') {
+            $statusBaru = 'FINAL';
+            $tanggalVerif = $assessment->tanggal_verifikasi; // Pertahankan tanggal lama
+        }
+
+        // 5. Update Header Assessment
         $assessment->update([
-            'total_skor_akhir' => $totalSkorAkhir,
-            'grade'            => $grade,
-            'status'           => 'SUBMITTED' // Atau sesuaikan logika status Anda
+            'total_skor_akhir'   => $totalSkorAkhir,
+            'grade'              => $this->determineGrade($totalSkorAkhir),
+            'status'             => $statusBaru,
+            'tanggal_verifikasi' => $tanggalVerif
         ]);
 
         DB::commit();
 
-        return redirect()->back()->with('success', 'Data berhasil disimpan. Skor Akhir: ' . number_format($totalSkorAkhir, 2));
+        // 6. Pesan Feedback yang Dinamis
+        $pesan = ($statusBaru == 'FINAL') 
+            ? 'Data berhasil disimpan dan disetujui (Approved).' 
+            : 'Data berhasil disimpan (Menunggu Approval).';
+
+        return redirect()->back()->with('success', $pesan . ' Skor Akhir: ' . number_format($totalSkorAkhir, 2));
 
     } catch (\Exception $e) {
         DB::rollback();

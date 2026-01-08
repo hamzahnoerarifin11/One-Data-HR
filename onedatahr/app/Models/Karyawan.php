@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\KpiAssessment;
 use App\Models\Pekerjaan;
 use App\Models\User;
+use App\Models\KbiAssessment;
 
 class Karyawan extends Model
 {
@@ -72,6 +73,14 @@ class Karyawan extends Model
     {
         return $this->hasOne(KpiAssessment::class, 'karyawan_id', 'id_karyawan');
     }
+    /**
+     * Relasi ke KBI (Key Behavior Indicator / Perilaku)  
+     * Satu karyawan punya banyak history penilaian perilaku
+     */
+    public function kbiAssessment()
+    {
+        return $this->hasMany(KbiAssessment::class, 'karyawan_id', 'id_karyawan');
+    }
 
     // Struktur Organisasi (Atasan & Bawahan)
     public function atasan()
@@ -89,6 +98,7 @@ class Karyawan extends Model
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
+
     
     // Konversi kolom created_at dan updated_at ke format DateTime
     protected $casts = [

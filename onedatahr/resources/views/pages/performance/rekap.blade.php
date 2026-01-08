@@ -131,9 +131,6 @@
                             <span class="inline-flex items-center rounded-md bg-purple-50 px-2.5 py-1 text-xs font-bold text-purple-700 ring-1 ring-inset ring-purple-700/10 dark:bg-purple-900/30 dark:text-purple-400">
                                 {{ number_format($data->skor_kbi_asli, 2) }}
                             </span>
-                            <div class="text-[10px] text-gray-400 mt-1">
-                                (Konversi: {{ number_format($data->skor_kbi_100, 0) }})
-                            </div>
                         </td>
                         <td class="px-4 py-4 text-center">
                             <h5 class="text-base font-black text-gray-800 dark:text-white">

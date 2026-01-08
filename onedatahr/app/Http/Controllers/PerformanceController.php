@@ -27,7 +27,7 @@ class PerformanceController extends Controller
 
         $karyawans = $query->get();
 
-        // PAGINA
+
 
         // 2. HITUNG NILAI (Mapping)
         // Kita hitung dulu semua karyawan, baru nanti difilter Grade-nya
@@ -39,7 +39,6 @@ class PerformanceController extends Controller
                         ->avg('rata_rata_akhir'); 
             
             $skorKbiAsli = $nilaiKbi ? $nilaiKbi : 0;
-            $skorKbi100 = ($skorKbiAsli / 4) * 100;
 
             // --- B. Hitung KPI ---
             $kpiRecord = KpiAssessment::where('karyawan_id', $k->id_karyawan)
@@ -49,7 +48,7 @@ class PerformanceController extends Controller
             $skorKpi = $kpiRecord ? $kpiRecord->total_skor_akhir : 0; 
 
             // --- C. Hitung Final Score ---
-            $finalScore = ($skorKpi * 0.7) + ($skorKbi100 * 0.3);
+            $finalScore = ($skorKpi * 0.7) + ($skorKbiAsli * 0.3);
 
             // --- D. Tentukan Grade ---
             if ($finalScore >= 90) $grade = 'A';
@@ -63,7 +62,6 @@ class PerformanceController extends Controller
                 'nama' => $k->Nama_Lengkap_Sesuai_Ijazah,
                 'jabatan' => $k->pekerjaan->Jabatan ?? '-', 
                 'skor_kbi_asli' => $skorKbiAsli,
-                'skor_kbi_100'  => $skorKbi100,
                 'skor_kpi'      => $skorKpi,
                 'final_score'   => $finalScore,
                 'grade'         => $grade

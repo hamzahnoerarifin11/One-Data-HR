@@ -81,10 +81,23 @@
                     </a>
                 </div>
             </div>
-
+@php
+    $isManager = false;
+    // Asumsi user sudah terhubung ke data karyawan lewat auth
+    $loggedInKaryawan = \App\Models\Karyawan::where('nik', auth()->user()->nik)->first();
+    if($loggedInKaryawan && $karyawan->atasan_id == $loggedInKaryawan->id_karyawan) {
+        $isManager = true;
+    }
+@endphp
             {{-- 3. Tombol Simpan --}}
-            <button id="btnSimpan" type="button" onclick="submitKpiForm()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 transition shadow-lg flex items-center justify-center gap-2 flex-1 lg:flex-none font-semibold">
-                <i class="fas fa-save"></i> <span class="hidden sm:inline">Simpan</span>
+            <button id="btnSimpan" type="button" onclick="submitKpiForm()" 
+                class="px-3 py-2 {{ $isManager ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700' }} text-white rounded-lg text-sm transition shadow-lg flex items-center justify-center gap-2 flex-1 lg:flex-none">
+                
+                @if($isManager)
+                    <i class="fas fa-check-double"></i> <span class="hidden sm:inline">Simpan & Approve</span>
+                @else
+                    <i class="fas fa-save"></i> <span class="hidden sm:inline">Simpan</span>
+                @endif
             </button>
         </div>
     </div>
