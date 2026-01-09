@@ -4,7 +4,7 @@
 <div class="p-4 sm:p-8 max-w-5xl mx-auto space-y-6">
 
     {{-- Welcome Banner --}}
-    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg">
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg dark:from-blue-500 dark:to-indigo-500">
         <h1 class="text-2xl font-bold">Halo, {{ $karyawan->Nama_Lengkap_Sesuai_Ijazah }}! 👋</h1>
         <p class="opacity-90 mt-1">Selamat datang di Dashboard Kinerja. Berikut adalah status penilaian Anda untuk tahun <strong>{{ $tahun }}</strong>.</p>
     </div>
@@ -88,7 +88,7 @@
                 @else
                     <div class="text-center py-6">
                         <p class="text-gray-500 mb-4">Silakan isi penilaian perilaku diri sendiri (Self Assessment).</p>
-                        <a href="#" class="inline-block bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-lg shadow transition">
+                        <a href="{{ route('kbi.index') }}" class="inline-block bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-lg shadow transition">
                             Mulai Penilaian Diri
                         </a>
                     </div>

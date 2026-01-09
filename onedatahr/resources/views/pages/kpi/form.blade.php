@@ -260,7 +260,7 @@
                     <input type="text" name="key_result_area" class="border p-2 w-full rounded text-sm" placeholder="KRA" required>
                 </div>
                 <div>
-                    <label for="units" class="block text-sm font-medium text-gray-700">Satuan</label>
+                    <label for="units" class="block text-sm font-medium text-gray-700">Units</label>
                     <input type="text" name="units" class="border p-2 w-full rounded text-sm" placeholder="Satuan" required>
                 </div>
                 <div>
