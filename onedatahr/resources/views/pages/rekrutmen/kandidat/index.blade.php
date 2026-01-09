@@ -191,13 +191,13 @@
                 </div>
             </div>
             <div>
-                <label class="text-xs font-semibold uppercase tracking-wider text-gray-500">Hasil Tes (Excel)</label>
+                <label class="text-xs font-semibold uppercase tracking-wider text-gray-500">Data Kandidat</label>
                 <div class="mt-1">
-                    <a id="show-file_excel" target="_blank" class="hidden inline-flex items-center gap-2 text-sm font-medium text-green-600 hover:text-green-700 dark:text-green-400">
+                    <a id="show-file_pdf" target="_blank" class="hidden inline-flex items-center gap-2 text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
-                        <span id="show-file-name">Unduh Excel</span>
+                        <span id="show-file-name">Unduh PDF</span>
                     </a>
                     <div id="show-file-empty" class="hidden flex items-center gap-2 text-sm text-gray-400">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -205,12 +205,6 @@
                         </svg>
                         <span>File belum diunggah</span>
                     </div>
-                    <!-- <a id="show-preview-excel"
-                        data-route="{{ route('rekrutmen.kandidat.preview-excel', ':id') }}"
-                        target="_blank"
-                        class="inline-flex items-center gap-2 text-sm font-medium text-purple-600 hover:text-purple-700">
-                            Preview Excel
-                        </a> -->
                 </div>
             </div>
         </div>
@@ -221,17 +215,6 @@
                 <p>Update: <span id="show-updated-at">-</span></p>
             </div>
             <div class="flex gap-3">
-                <!-- <a id="btn-export-pdf"
-                        data-route="{{ route('rekrutmen.kandidat.laporan', ':id') }}"
-                         target="_blank"
-                            rel="noopener"
-                        class="hidden inline-flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2 text-sm font-medium text-white hover:bg-red-700">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-                    </svg>
-                    Export PDF
-                </a> -->
-
                 <button type="button"
                     @click="window.dispatchEvent(new CustomEvent('close-modal', { detail: { id: 'show-kandidat' } }))"
                     class="rounded-lg bg-gray-100 px-5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 transition">
@@ -291,8 +274,10 @@
                 <input type="url" id="add-link_cv" class="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white" placeholder="https://..." />
             </div>
             <div>
-                <label class="mb-2.5 block text-sm font-medium text-gray-900 dark:text-white">Upload Lampiran (Excel)</label>
-                <input type="file" id="add-file_excel" name="file_excel" accept=".xlsx, .xls" class="focus:border-ring-brand-300 shadow-theme-xs focus:file:ring-brand-300 h-11 w-full overflow-hidden rounded-lg border border-gray-300 bg-transparent text-sm text-gray-500 transition-colors file:mr-5 file:border-collapse file:cursor-pointer file:rounded-l-lg file:border-0 file:border-r file:border-solid file:border-gray-200 file:bg-gray-50 file:py-3 file:pr-3 file:pl-3.5 file:text-sm file:text-gray-700 placeholder:text-gray-400 hover:file:bg-gray-100 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:text-white/90 dark:file:border-gray-800 dark:file:bg-white/[0.03] dark:file:text-gray-400 dark:placeholder:text-gray-400"/>
+                <label class="mb-2.5 block text-sm font-medium text-gray-900 dark:text-white">
+                    Upload Data Kandidat (PDF)
+                </label>
+                <input type="file" id="add-file_pdf" name="file_pdf" accept=".pdf" class="focus:border-ring-brand-300 shadow-theme-xs focus:file:ring-brand-300 h-11 w-full overflow-hidden rounded-lg border border-gray-300 bg-transparent text-sm text-gray-500 transition-colors file:mr-5 file:border-collapse file:cursor-pointer file:rounded-l-lg file:border-0 file:border-r file:border-solid file:border-gray-200 file:bg-gray-50 file:py-3 file:pr-3 file:pl-3.5 file:text-sm file:text-gray-700 placeholder:text-gray-400 hover:file:bg-gray-100 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:text-white/90 dark:file:border-gray-800 dark:file:bg-white/[0.03] dark:file:text-gray-400 dark:placeholder:text-gray-400"/>
             </div>
         </div>
         <div class="flex justify-end gap-3 mt-8">
@@ -359,8 +344,10 @@
                     <input type="url" id="edit-link_cv" class="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white" />
                 </div>
                 <div>
-                    <label class="mb-2.5 block text-sm font-medium text-gray-900 dark:text-white">Upload Lampiran (Excel)</label>
-                    <input type="file" id="edit-file_excel" name="file_excel" accept=".xlsx, .xls" class="focus:border-ring-brand-300 shadow-theme-xs focus:file:ring-brand-300 h-11 w-full overflow-hidden rounded-lg border border-gray-300 bg-transparent text-sm text-gray-500 transition-colors file:mr-5 file:border-collapse file:cursor-pointer file:rounded-l-lg file:border-0 file:border-r file:border-solid file:border-gray-200 file:bg-gray-50 file:py-3 file:pr-3 file:pl-3.5 file:text-sm file:text-gray-700 placeholder:text-gray-400 hover:file:bg-gray-100 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:text-white/90 dark:file:border-gray-800 dark:file:bg-white/[0.03] dark:file:text-gray-400 dark:placeholder:text-gray-400"/>
+                    <label class="mb-2.5 block text-sm font-medium text-gray-900 dark:text-white">
+                    Upload Data Kandidat (PDF)
+                </label>
+                <input type="file" id="edit-file_pdf" name="file_pdf" accept=".pdf" class="focus:border-ring-brand-300 shadow-theme-xs focus:file:ring-brand-300 h-11 w-full overflow-hidden rounded-lg border border-gray-300 bg-transparent text-sm text-gray-500 transition-colors file:mr-5 file:border-collapse file:cursor-pointer file:rounded-l-lg file:border-0 file:border-r file:border-solid file:border-gray-200 file:bg-gray-50 file:py-3 file:pr-3 file:pl-3.5 file:text-sm file:text-gray-700 placeholder:text-gray-400 hover:file:bg-gray-100 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:text-white/90 dark:file:border-gray-800 dark:file:bg-white/[0.03] dark:file:text-gray-400 dark:placeholder:text-gray-400"/>
                     <div id="edit-file-info"></div>
                 </div>
             </div>
@@ -452,34 +439,21 @@ function kandidatTable() {
             document.getElementById('show-nama').innerText = row.nama;
             document.getElementById('show-posisi').innerText = row.posisi ? row.posisi.nama_posisi : '-';
             document.getElementById('show-sumber').innerText = row.sumber || '-';
-            document.getElementById('show-tanggal').innerText = row.tanggal_melamar || '-';
+            document.getElementById('show-tanggal').innerText =
+                row.tanggal_melamar
+                    ? new Date(row.tanggal_melamar).toLocaleDateString('id-ID')
+                    : '-';
             document.getElementById('show-created-at').innerText = formatDate(row.created_at);
             document.getElementById('show-updated-at').innerText = formatDate(row.updated_at);
 
             /* ================= RESET SEMUA STATE ================= */
             const linkCv = document.getElementById('show-link_cv');
             const linkCvEmpty = document.getElementById('show-link-empty');
-            const excel = document.getElementById('show-file_excel');
-            const excelEmpty = document.getElementById('show-file-empty');
-            // const btnPdf = document.getElementById('btn-export-pdf');
-            // const baseRoute = btnPdf.dataset.route;
-            // const previewExcel = document.getElementById('show-preview-excel');
-            // const previewRoute = previewExcel.dataset.route;
+
 
             linkCv.classList.add('hidden');
             linkCv.removeAttribute('href');
 
-            excel.classList.add('hidden');
-            excel.removeAttribute('href');
-
-            // btnPdf.classList.add('hidden');
-            // btnPdf.removeAttribute('href');
-
-            linkCvEmpty.classList.add('hidden');
-            excelEmpty.classList.add('hidden');
-
-            // previewExcel.classList.add('hidden');
-            // previewExcel.removeAttribute('href');
 
 
             /* ================= CV ================= */
@@ -490,21 +464,21 @@ function kandidatTable() {
                 linkCvEmpty.classList.remove('hidden');
             }
 
-            /* ================= EXCEL ================= */
-            if (row.file_excel) {
-               const excelPath = `/storage/uploads/excel/${row.file_excel}`;
+            /* ================= PDF ================= */
+            const pdf = document.getElementById('show-file_pdf');
+            const pdfEmpty = document.getElementById('show-file-empty');
+            const pdfName = document.getElementById('show-file-name');
 
-                excel.href = excelPath;
-                excel.classList.remove('hidden');
-                // previewExcel.href = previewRoute.replace(':id', row.id_kandidat);
-                // const excelUrl = `${window.location.origin}/storage/uploads/excel/${row.file_excel}`;
-                // previewExcel.href = `https://docs.google.com/gview?url=${encodeURIComponent(excelUrl)}&embedded=true`;
-                // previewExcel.classList.remove('hidden');
+            pdf.classList.add('hidden');
+            pdfEmpty.classList.add('hidden');
+            pdf.removeAttribute('href');
 
-                // btnPdf.href = baseRoute.replace(':id', row.id_kandidat);
-                // btnPdf.classList.remove('hidden');
+            if (row.file_pdf) {
+                pdf.href = `/storage/uploads/pdf/${row.file_pdf}`;
+                pdfName.innerText = row.file_pdf;
+                pdf.classList.remove('hidden');
             } else {
-                excelEmpty.classList.remove('hidden');
+                pdfEmpty.classList.remove('hidden');
             }
 
             /* ================= STATUS ================= */
@@ -525,20 +499,22 @@ function kandidatTable() {
             document.getElementById('edit-posisi_id').value = row.posisi_id;
             document.getElementById('edit-status_akhir').value = row.status_akhir || 'CV Lolos';
             document.getElementById('edit-link_cv').value = row.link_cv || '';
-            document.getElementById('edit-file_excel').value = ''; // Reset input file
-            // Tampilkan info file lama jika ada
+            document.getElementById('edit-file_pdf').value = '';
             const fileInfo = document.getElementById('edit-file-info');
-            if (row.file_excel) {
+            if (row.file_pdf) {
                 fileInfo.innerHTML = `
-                    <div class="mt-2 text-xs text-blue-600 dark:text-blue-400 flex items-center">
-                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"></path></svg>
-                        File saat ini: <span class="font-semibold ml-1">${row.file_excel}</span>
+                    <div class="mt-2 text-xs text-green-600 dark:text-green-400 flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z"></path>
+                        </svg>
+                        File saat ini: <span class="font-semibold ml-1">${row.file_pdf}</span>
                     </div>
-                    <p class="text-[10px] text-gray-500">*Biarkan kosong jika tidak ingin mengganti file</p>
+                    <p class="text-[10px] text-gray-500">*Kosongkan jika tidak ingin mengganti PDF</p>
                 `;
             } else {
-                fileInfo.innerHTML = '<p class="text-[10px] text-gray-500 mt-1">Belum ada file diunggah.</p>';
+                fileInfo.innerHTML = '<p class="text-[10px] text-gray-500 mt-1">Belum ada file PDF.</p>';
             }
+
             window.dispatchEvent(new CustomEvent('open-modal', { detail: { id: 'edit-kandidat' } }));
         },
 
@@ -584,9 +560,9 @@ document.addEventListener('DOMContentLoaded', () => {
         formData.append('sumber', document.getElementById('add-sumber').value);
         formData.append('link_cv', document.getElementById('add-link_cv').value);
 
-        const fileInput = document.getElementById('add-file_excel');
+        const fileInput = document.getElementById('add-file_pdf');
         if (fileInput.files[0]) {
-            formData.append('file_excel', fileInput.files[0]);
+            formData.append('file_pdf', fileInput.files[0]);
         }
 
         try {
@@ -624,9 +600,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // METHOD SPOOFING: Sangat penting agar Laravel membaca request sebagai PUT tapi bisa menerima File
         formData.append('_method', 'PUT');
 
-        const fileInput = document.getElementById('edit-file_excel');
+        const fileInput = document.getElementById('edit-file_pdf');
         if (fileInput.files[0]) {
-            formData.append('file_excel', fileInput.files[0]);
+            formData.append('file_pdf', fileInput.files[0]);
         }
 
         try {

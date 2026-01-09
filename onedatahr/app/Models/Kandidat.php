@@ -20,7 +20,7 @@ class Kandidat extends Model
         'tanggal_melamar',
         'sumber',
         'link_cv',
-        'file_excel',
+        'file_pdf',
         'status_akhir',
         'tgl_lolos_cv', 'tgl_lolos_psikotes', 'tgl_lolos_kompetensi', 'tgl_lolos_hr', 'tgl_lolos_user',
     ];

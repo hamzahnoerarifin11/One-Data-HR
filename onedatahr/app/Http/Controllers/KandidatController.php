@@ -5,11 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Kandidat;
 use App\Models\Posisi;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
-use PhpOffice\PhpSpreadsheet\IOFactory;
-use PhpOffice\PhpSpreadsheet\Reader\Csv as CsvReader;
-use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
+
 
 
 class KandidatController extends Controller
@@ -32,18 +29,6 @@ class KandidatController extends Controller
         );
     }
 
-    // public function downloadExcel($id)
-    // {
-    //     $kandidat = Kandidat::findOrFail($id);
-    //     $path = 'uploads/excel/' . $kandidat->file_excel;
-
-    //     if (Storage::disk('public')->exists($path)) {
-    //         return Storage::disk('public')->download($path);
-    //     }
-
-    //     return back()->with('error', 'File tidak ditemukan.');
-    // }
-
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -52,122 +37,25 @@ class KandidatController extends Controller
             'tanggal_melamar'  => 'nullable|date',
             'sumber'           => 'nullable|string|max:100',
             'link_cv'          => 'nullable|url',
-            'file_excel'       => 'nullable|mimes:xlsx,xls|max:10000',
+            'file_pdf'        => 'nullable|file|mimes:pdf|max:10240',
         ]);
 
-        if ($request->hasFile('file_excel')) {
-            $file = $request->file('file_excel');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->storeAs('uploads/excel', $filename, 'public');
-            $data['file_excel'] = $filename;
+        if ($request->file('file_pdf')) {
+            $file = $request->file('file_pdf');
+            $filename = time() . '_' . preg_replace('/\s+/', '_', $file->getClientOriginalName());
+            $file->storeAs('uploads/pdf', $filename, 'public');
+            $data['file_pdf'] = $filename;
         }
 
         $kandidat = Kandidat::create($data);
 
-        if ($request->wantsJson()) {
-            return response()->json([
-                'message' => 'Kandidat berhasil ditambahkan',
-                'data'    => $kandidat
-            ]);
-        }
-
-        return redirect()
-            ->route('rekrutmen.kandidat.index')
-            ->with('success', 'Kandidat berhasil ditambahkan');
+        // 🔥 FETCH-FRIENDLY RESPONSE
+        return response()->json([
+            'success' => true,
+            'message' => 'Kandidat berhasil ditambahkan',
+            'data'    => $kandidat
+        ]);
     }
-    public function downloadExcel($id)
-    {
-        $kandidat = Kandidat::findOrFail($id);
-
-        if (!$kandidat->excel_path || !Storage::disk('public')->exists($kandidat->excel_path)) {
-            return back()->with('error', 'File Excel tidak ditemukan');
-        }
-
-        return Storage::disk('public')->download(
-            $kandidat->excel_path,
-            $kandidat->file_excel
-        );
-    }
-    private function generateCsvPreview($excelPath)
-    {
-        $csvPath = str_replace('.xlsx', '.csv', $excelPath);
-
-        $reader = new Xlsx();
-        $reader->setReadDataOnly(true);
-
-        $spreadsheet = $reader->load($excelPath);
-
-        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Csv($spreadsheet);
-        $writer->setDelimiter(';');
-        $writer->setEnclosure('');
-        $writer->setSheetIndex(0);
-        $writer->save($csvPath);
-
-        $spreadsheet->disconnectWorksheets();
-        unset($spreadsheet);
-
-        return $csvPath;
-    }
-
-    public function previewExcel($id)
-{
-    $kandidat = Kandidat::findOrFail($id);
-
-    if (!$kandidat->file_excel) {
-        abort(404);
-    }
-
-    $path = storage_path('app/public/uploads/excel/' . $kandidat->file_excel);
-
-    if (!file_exists($path)) {
-        abort(404);
-    }
-
-    return response()->file($path);
-}
-
-
-    public function generateLaporan($id)
-    {
-        set_time_limit(120);
-        ini_set('memory_limit', '512M');
-
-        $kandidat = Kandidat::with('posisi')->findOrFail($id);
-
-        if (!$kandidat->excel_path) {
-            abort(404, 'File Excel belum diupload');
-        }
-
-        $path = Storage::disk('public')->path($kandidat->excel_path);
-
-        if (!file_exists($path)) {
-            abort(404, 'File Excel tidak ditemukan');
-        }
-
-        $reader = IOFactory::createReaderForFile($path);
-        $reader->setReadDataOnly(true);
-        $spreadsheet = $reader->load($path);
-        $sheet = $spreadsheet->getSheet(0);
-
-        $cell = fn ($c) => trim((string) $sheet->getCell($c)->getValue());
-
-        $data = [
-            'kandidat' => $kandidat,
-            'tanggal_tes' => now()->format('d/m/Y'),
-            'psikogram' => [
-                ['aspek' => 'Stabilitas Emosi', 'score' => $cell('M5') ?: '-', 'desc' => $cell('N5') ?: '-'],
-                ['aspek' => 'Relasi Sosial', 'score' => $cell('M6') ?: '-', 'desc' => $cell('N6') ?: '-'],
-            ],
-            'kesimpulan' => $cell('B45') ?: '-',
-            'saran'      => $cell('B41') ?: '-',
-        ];
-
-        return Pdf::loadView('pages.rekrutmen.kandidat.pdf_preview', $data)
-            ->setPaper('A4', 'portrait')
-            ->download('Laporan_' . str_replace(' ', '_', $kandidat->nama) . '.pdf');
-    }
-
-
 
     public function update(Request $request, $id)
     {
@@ -180,58 +68,42 @@ class KandidatController extends Controller
             'sumber'           => 'nullable|string|max:100',
             'status_akhir'     => 'required|string',
             'link_cv'          => 'nullable|url',
-            'file_excel'       => 'nullable|mimes:xlsx,xls|max:10000',
+            'file_pdf'        => 'nullable|file|mimes:pdf|max:10240',
         ]);
 
-        if ($request->hasFile('file_excel')) {
-            if ($kandidat->file_excel) {
-                Storage::disk('public')->delete(
-                    'uploads/excel/' . $kandidat->file_excel
-                );
+        if ($request->file('file_pdf')) {
+            if ($kandidat->file_pdf) {
+                Storage::disk('public')->delete('uploads/pdf/' . $kandidat->file_pdf);
             }
 
-            $file = $request->file('file_excel');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->storeAs('uploads/excel', $filename, 'public');
-            $data['file_excel'] = $filename;
-        } else {
-            unset($data['file_excel']);
+            $file = $request->file('file_pdf');
+            $filename = time() . '_' . preg_replace('/\s+/', '_', $file->getClientOriginalName());
+            $file->storeAs('uploads/pdf', $filename, 'public');
+            $data['file_pdf'] = $filename;
         }
 
         $kandidat->update($data);
 
-        if ($request->wantsJson()) {
-            return response()->json([
-                'message' => 'Data berhasil diperbarui'
-            ]);
-        }
-
-        return redirect()
-            ->route('rekrutmen.kandidat.index')
-            ->with('success', 'Kandidat berhasil diperbarui');
+        return response()->json([
+            'success' => true,
+            'message' => 'Data kandidat berhasil diperbarui'
+        ]);
     }
 
     public function destroy($id)
     {
         $kandidat = Kandidat::findOrFail($id);
 
-        if ($kandidat->file_excel) {
-            Storage::disk('public')->delete(
-                'uploads/excel/' . $kandidat->file_excel
-            );
+        if ($kandidat->file_pdf) {
+            Storage::disk('public')->delete('uploads/pdf/' . $kandidat->file_pdf);
         }
 
         $kandidat->delete();
 
-        if (request()->wantsJson()) {
-            return response()->json([
-                'message' => 'Kandidat berhasil dihapus'
-            ]);
-        }
-
-        return redirect()
-            ->route('rekrutmen.kandidat.index')
-            ->with('success', 'Kandidat berhasil dihapus');
+        return response()->json([
+            'success' => true,
+            'message' => 'Kandidat berhasil dihapus'
+        ]);
     }
 
     public function list(Request $request)
