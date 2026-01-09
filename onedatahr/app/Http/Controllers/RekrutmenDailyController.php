@@ -87,8 +87,8 @@ class RekrutmenDailyController extends Controller
 
     public function store(Request $request)
     {
-        if (Auth::user()->role !== 'admin') {
-            return response()->json(['message' => 'Unauthorized'], 403);
+        if (!in_array(Auth::user()->role, ['admin', 'superadmin'])) {
+        return response()->json(['message' => 'Unauthorized'], 403);
         }
 
         $validated = $request->validate([
@@ -120,8 +120,8 @@ class RekrutmenDailyController extends Controller
 
     public function destroy($id)
     {
-        if (Auth::user()->role !== 'admin') {
-            return response()->json(['message' => 'Unauthorized'], 403);
+        if (!in_array(Auth::user()->role, ['admin', 'superadmin'])) {
+        return response()->json(['message' => 'Unauthorized'], 403);
         }
 
         $e = RekrutmenDaily::findOrFail($id);

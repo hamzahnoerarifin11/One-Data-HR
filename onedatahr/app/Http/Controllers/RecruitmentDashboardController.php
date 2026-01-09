@@ -395,6 +395,102 @@ class RecruitmentDashboardController extends Controller
         return view('pages.rekrutmen.pemberkasan.monitor');
     }
 
+    public function exportKompetensiCsv(Request $request)
+    {
+        $rows = DB::table('proses_rekrutmen')
+            ->join('kandidat','proses_rekrutmen.kandidat_id','kandidat.id_kandidat')
+            ->join('posisi','kandidat.posisi_id','posisi.id_posisi')
+            ->where('proses_rekrutmen.tes_kompetensi_lolos', 1)
+            ->select('posisi.id_posisi','posisi.nama_posisi', DB::raw('COUNT(*) as total'))
+            ->groupBy('posisi.id_posisi','posisi.nama_posisi');
+
+        if ($request->filled('posisi_id')) {
+            $rows->where('posisi.id_posisi', $request->posisi_id);
+        }
+        if ($request->filled('from') && $request->filled('to')) {
+            $rows->whereBetween('proses_rekrutmen.tanggal_tes_kompetensi', [$request->from, $request->to]);
+        }
+
+        $data = $rows->get();
+
+        $filename = 'kompetensi_passed_'.now()->format('Ymd_His').'.csv';
+        $callback = function() use ($data) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['id_posisi','nama_posisi','total']);
+            foreach($data as $row){
+                fputcsv($handle, [(int)$row->id_posisi, $row->nama_posisi, $row->total]);
+            }
+            fclose($handle);
+        };
+
+        return response()->streamDownload($callback, $filename, ['Content-Type' => 'text/csv']);
+    }
+
+    public function exportInterviewHrCsv(Request $request)
+    {
+        $rows = DB::table('proses_rekrutmen')
+            ->join('kandidat','proses_rekrutmen.kandidat_id','kandidat.id_kandidat')
+            ->join('posisi','kandidat.posisi_id','posisi.id_posisi')
+            ->where('proses_rekrutmen.interview_hr_lolos', 1)
+            ->select('posisi.id_posisi','posisi.nama_posisi', DB::raw('YEAR(proses_rekrutmen.tanggal_interview_hr) as year'), DB::raw('MONTH(proses_rekrutmen.tanggal_interview_hr) as month'), DB::raw('COUNT(*) as total'))
+            ->groupBy('posisi.id_posisi','posisi.nama_posisi','year','month')
+            ->orderBy('year','desc')->orderBy('month','desc');
+
+        if ($request->filled('posisi_id')) {
+            $rows->where('posisi.id_posisi', $request->posisi_id);
+        }
+        if ($request->filled('from') && $request->filled('to')) {
+            $rows->whereBetween('proses_rekrutmen.tanggal_interview_hr', [$request->from, $request->to]);
+        }
+
+        $data = $rows->get();
+
+        $filename = 'interview_hr_passed_'.now()->format('Ymd_His').'.csv';
+        $callback = function() use ($data) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['id_posisi','nama_posisi','year','month','total']);
+            foreach($data as $row){
+                fputcsv($handle, [(int)$row->id_posisi, $row->nama_posisi, $row->year, $row->month, $row->total]);
+            }
+            fclose($handle);
+        };
+
+        return response()->streamDownload($callback, $filename, ['Content-Type' => 'text/csv']);
+    }
+
+    public function exportInterviewUserCsv(Request $request)
+    {
+        $rows = DB::table('proses_rekrutmen')
+            ->join('kandidat','proses_rekrutmen.kandidat_id','kandidat.id_kandidat')
+            ->join('posisi','kandidat.posisi_id','posisi.id_posisi')
+            ->where('proses_rekrutmen.interview_user_lolos', 1)
+            ->select('posisi.id_posisi','posisi.nama_posisi', DB::raw('YEAR(proses_rekrutmen.tanggal_interview_user) as year'), DB::raw('MONTH(proses_rekrutmen.tanggal_interview_user) as month'), DB::raw('COUNT(*) as total'))
+            ->groupBy('posisi.id_posisi','posisi.nama_posisi','year','month')
+            ->orderBy('year','desc')->orderBy('month','desc');
+
+        if ($request->filled('posisi_id')) {
+            $rows->where('posisi.id_posisi', $request->posisi_id);
+        }
+        if ($request->filled('from') && $request->filled('to')) {
+            $rows->whereBetween('proses_rekrutmen.tanggal_interview_user', [$request->from, $request->to]);
+        }
+
+        $data = $rows->get();
+
+        $filename = 'interview_user_passed_'.now()->format('Ymd_His').'.csv';
+        $callback = function() use ($data) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['id_posisi','nama_posisi','year','month','total']);
+            foreach($data as $row){
+                fputcsv($handle, [(int)$row->id_posisi, $row->nama_posisi, $row->year, $row->month, $row->total]);
+            }
+            fclose($handle);
+        };
+
+        return response()->streamDownload($callback, $filename, ['Content-Type' => 'text/csv']);
+    }
+
+
     /**
      * Validate common filters used across metrics
      */

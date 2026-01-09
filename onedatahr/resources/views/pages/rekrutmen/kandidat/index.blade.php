@@ -205,11 +205,12 @@
                         </svg>
                         <span>File belum diunggah</span>
                     </div>
-                    <a id="show-preview-excel"
+                    <!-- <a id="show-preview-excel"
+                        data-route="{{ route('rekrutmen.kandidat.preview-excel', ':id') }}"
                         target="_blank"
-                        class="hidden inline-flex items-center gap-2 text-sm font-medium text-purple-600 hover:text-purple-700">
-                        Preview Excel
-                    </a>
+                        class="inline-flex items-center gap-2 text-sm font-medium text-purple-600 hover:text-purple-700">
+                            Preview Excel
+                        </a> -->
                 </div>
             </div>
         </div>
@@ -220,7 +221,7 @@
                 <p>Update: <span id="show-updated-at">-</span></p>
             </div>
             <div class="flex gap-3">
-                <a id="btn-export-pdf"
+                <!-- <a id="btn-export-pdf"
                         data-route="{{ route('rekrutmen.kandidat.laporan', ':id') }}"
                          target="_blank"
                             rel="noopener"
@@ -229,7 +230,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
                     </svg>
                     Export PDF
-                </a>
+                </a> -->
 
                 <button type="button"
                     @click="window.dispatchEvent(new CustomEvent('close-modal', { detail: { id: 'show-kandidat' } }))"
@@ -460,9 +461,10 @@ function kandidatTable() {
             const linkCvEmpty = document.getElementById('show-link-empty');
             const excel = document.getElementById('show-file_excel');
             const excelEmpty = document.getElementById('show-file-empty');
-            const btnPdf = document.getElementById('btn-export-pdf');
-            const baseRoute = btnPdf.dataset.route;
-            const previewExcel = document.getElementById('show-preview-excel');
+            // const btnPdf = document.getElementById('btn-export-pdf');
+            // const baseRoute = btnPdf.dataset.route;
+            // const previewExcel = document.getElementById('show-preview-excel');
+            // const previewRoute = previewExcel.dataset.route;
 
             linkCv.classList.add('hidden');
             linkCv.removeAttribute('href');
@@ -470,14 +472,14 @@ function kandidatTable() {
             excel.classList.add('hidden');
             excel.removeAttribute('href');
 
-            btnPdf.classList.add('hidden');
-            btnPdf.removeAttribute('href');
+            // btnPdf.classList.add('hidden');
+            // btnPdf.removeAttribute('href');
 
             linkCvEmpty.classList.add('hidden');
             excelEmpty.classList.add('hidden');
 
-            previewExcel.classList.add('hidden');
-            previewExcel.removeAttribute('href');
+            // previewExcel.classList.add('hidden');
+            // previewExcel.removeAttribute('href');
 
 
             /* ================= CV ================= */
@@ -490,13 +492,17 @@ function kandidatTable() {
 
             /* ================= EXCEL ================= */
             if (row.file_excel) {
-                excel.href = `/rekrutmen/kandidat/${row.id_kandidat}/download-excel`;
-                excel.classList.remove('hidden');
-                previewExcel.href = `/rekrutmen/kandidat/${row.id_kandidat}/preview-excel`;
-                previewExcel.classList.remove('hidden');
+               const excelPath = `/storage/uploads/excel/${row.file_excel}`;
 
-                btnPdf.href = baseRoute.replace(':id', row.id_kandidat);
-                btnPdf.classList.remove('hidden');
+                excel.href = excelPath;
+                excel.classList.remove('hidden');
+                // previewExcel.href = previewRoute.replace(':id', row.id_kandidat);
+                // const excelUrl = `${window.location.origin}/storage/uploads/excel/${row.file_excel}`;
+                // previewExcel.href = `https://docs.google.com/gview?url=${encodeURIComponent(excelUrl)}&embedded=true`;
+                // previewExcel.classList.remove('hidden');
+
+                // btnPdf.href = baseRoute.replace(':id', row.id_kandidat);
+                // btnPdf.classList.remove('hidden');
             } else {
                 excelEmpty.classList.remove('hidden');
             }

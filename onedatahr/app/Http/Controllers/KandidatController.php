@@ -110,39 +110,21 @@ class KandidatController extends Controller
     }
 
     public function previewExcel($id)
-    {
-        set_time_limit(120);
-        ini_set('memory_limit', '512M');
+{
+    $kandidat = Kandidat::findOrFail($id);
 
-        $kandidat = Kandidat::findOrFail($id);
-
-        if (!$kandidat->excel_path) {
-            abort(404, 'File Excel belum tersedia');
-        }
-
-        $path = Storage::disk('public')->path($kandidat->excel_path);
-
-        if (!file_exists($path)) {
-            abort(404, 'File Excel tidak ditemukan');
-        }
-
-        // ✅ GUNAKAN HTML READER (PALING CEPAT)
-        $reader = IOFactory::createReader('Html');
-        $reader->setReadDataOnly(true);
-
-        $spreadsheet = IOFactory::load($path);
-
-        ob_start();
-        $writer = IOFactory::createWriter($spreadsheet, 'Html');
-        $writer->save('php://output');
-        $html = ob_get_clean();
-
-        return view('pages.rekrutmen.kandidat.preview-excel-html', [
-            'kandidat' => $kandidat,
-            'html'     => $html
-        ]);
+    if (!$kandidat->file_excel) {
+        abort(404);
     }
 
+    $path = storage_path('app/public/uploads/excel/' . $kandidat->file_excel);
+
+    if (!file_exists($path)) {
+        abort(404);
+    }
+
+    return response()->file($path);
+}
 
 
     public function generateLaporan($id)

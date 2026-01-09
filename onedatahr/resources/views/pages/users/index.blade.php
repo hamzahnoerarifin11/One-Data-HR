@@ -7,7 +7,7 @@
     <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-                User Management
+                Manajemen User
             </h1>
             <p class="mt-1 text-gray-600 dark:text-gray-400">
                 Kelola seluruh data pengguna sistem

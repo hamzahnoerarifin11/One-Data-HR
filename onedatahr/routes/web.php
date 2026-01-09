@@ -65,28 +65,28 @@ Route::middleware(['auth'])->group(function () {
     //         ->name('laporan');
     // });
 // routes/web.php
-        Route::prefix('rekrutmen/kandidat')
-            ->name('rekrutmen.kandidat.')
-            ->group(function () {
+        // Route::prefix('rekrutmen/kandidat')
+        //     ->name('rekrutmen.kandidat.')
+        //     ->group(function () {
 
-                Route::get('/', [KandidatController::class, 'index'])
-                    ->name('index');
+        //         Route::get('/', [KandidatController::class, 'index'])
+        //             ->name('index');
 
-                Route::post('/', [KandidatController::class, 'store'])
-                    ->name('store');
+        //         Route::post('/', [KandidatController::class, 'store'])
+        //             ->name('store');
 
-                Route::delete('{id}', [KandidatController::class, 'destroy'])
-                    ->name('destroy');
+        //         Route::delete('{id}', [KandidatController::class, 'destroy'])
+        //             ->name('destroy');
 
-                Route::get('{id}/download-excel', [KandidatController::class, 'downloadExcel'])
-                    ->name('downloadExcel');
+        //         Route::get('{id}/download-excel', [KandidatController::class, 'downloadExcel'])
+        //             ->name('downloadExcel');
 
-                Route::get('{id}/preview-excel', [KandidatController::class, 'previewExcel'])
-                    ->name('previewExcel');
+        //         Route::get('{id}/preview-excel', [KandidatController::class, 'previewExcel'])
+        //             ->name('previewExcel');
 
-                Route::get('{id}/laporan', [KandidatController::class, 'generateLaporan'])
-                    ->name('laporan');
-            });
+        //         Route::get('{id}/laporan', [KandidatController::class, 'generateLaporan'])
+        //             ->name('laporan');
+        //     });
 
 
 
@@ -120,14 +120,18 @@ Route::middleware(['auth'])->group(function () {
         Route::get('summary', [SummaryController::class, 'index'])->name('summary');
 
         // Metrics endpoints (JSON)
-        Route::get('/metrics/candidates', [RecruitmentDashboardController::class, 'candidatesByPositionMonth'])->name('metrics.candidates');
-        Route::get('/metrics/cv', [RecruitmentDashboardController::class, 'cvPassedByPositionMonth'])->name('metrics.cv');
-        Route::get('/metrics/cv/export', [RecruitmentDashboardController::class, 'exportCvCsv'])->name('metrics.cv.export');
-        Route::get('/metrics/psikotes', [RecruitmentDashboardController::class, 'psikotesPassedByPosition'])->name('metrics.psikotes');
-        Route::get('/metrics/psikotes/export', [RecruitmentDashboardController::class, 'exportPsikotesCsv'])->name('metrics.psikotes.export');
-        Route::get('/metrics/kompetensi', [RecruitmentDashboardController::class, 'kompetensiPassedByPosition'])->name('metrics.kompetensi');
-        Route::get('/metrics/interview_hr', [RecruitmentDashboardController::class, 'interviewHrPassedByPositionMonth'])->name('metrics.hr');
-        Route::get('/metrics/interview-user', [RecruitmentDashboardController::class, 'interviewUserPassedByPositionMonth'])->name('metrics.user');
+        Route::get('/metrics/candidates', [RecruitmentDashboardController::class,'candidatesByPositionMonth'])->name('metrics.candidates');
+        Route::get('/metrics/cv', [RecruitmentDashboardController::class,'cvPassedByPositionMonth'])->name('metrics.cv');
+        Route::get('/metrics/cv/export', [RecruitmentDashboardController::class,'exportCvCsv'])->name('metrics.cv.export');
+        Route::get('/metrics/psikotes', [RecruitmentDashboardController::class,'psikotesPassedByPosition'])->name('metrics.psikotes');
+        Route::get('/metrics/psikotes/export', [RecruitmentDashboardController::class,'exportPsikotesCsv'])->name('metrics.psikotes.export');
+        Route::get('/metrics/kompetensi', [RecruitmentDashboardController::class,'kompetensiPassedByPosition'])->name('metrics.kompetensi');
+        Route::get(
+                        '/metrics/kompetensi/export',
+                        [RecruitmentDashboardController::class, 'exportKompetensiCsv']
+                    )->name('metrics.kompetensi.export');
+        Route::get('/metrics/interview_hr', [RecruitmentDashboardController::class,'interviewHrPassedByPositionMonth'])->name('metrics.hr');
+        Route::get('/metrics/interview-user', [RecruitmentDashboardController::class,'interviewUserPassedByPositionMonth'])->name('metrics.user');
 
         // Pages for per-stage metrics
         Route::get('/metrics/cv-page', [RecruitmentDashboardController::class, 'cvPage'])->name('metrics.cv.page');
@@ -143,15 +147,14 @@ Route::middleware(['auth'])->group(function () {
 
         // CRUD
        // Pastikan strukturnya seperti ini
+         Route::get('/kandidat/{id}/preview-excel',
+                [KandidatController::class, 'previewExcel']
+            )->name('kandidat.preview-excel');
+
         Route::get(
-                    'kandidat/{id}/laporan',
-                    [KandidatController::class, 'generateLaporan']
-                )->name('kandidat.laporan');
-        // Preview Excel ke HTML
-        Route::get(
-            'kandidat/{id}/preview-excel',
-            [KandidatController::class, 'previewExcel']
-        )->name('kandidat.previewExcel');
+            'kandidat/{id}/laporan',
+            [KandidatController::class, 'generateLaporan']
+        )->name('kandidat.laporan');
 
 
         Route::get('kandidat/download-excel/{id}', [KandidatController::class, 'downloadExcel'])->name('kandidat.downloadExcel');
