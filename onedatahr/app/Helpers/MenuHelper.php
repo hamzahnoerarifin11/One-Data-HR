@@ -3,45 +3,43 @@
 namespace App\Helpers;
 use Illuminate\Support\Facades\Auth;
 
-
 class MenuHelper
 {
-
     public static function getMainNavItems()
     {
         $user = Auth::user();
+        $role = $user->role ?? 'staff'; // Ambil role dari database
         $menu = [];
 
         // =============================================================
-        // 1. MENU UMUM (Bisa dilihat Semua Role: Staff, Admin, Atasan)
+        // 1. MENU UMUM (SEMUA ROLE BISA LIHAT)
         // =============================================================
 
-        // Dashboard
         $menu[] = [
             'icon' => 'dashboard',
             'name' => 'Dashboard',
             'path' => '/dashboard',
         ];
 
-        // KPI Karyawan (Punya Staff Sendiri)
+        // Menu KPI & KBI untuk Staff (Agar bisa isi punya sendiri)
         $menu[] = [
-            'icon' => 'chartline', // Saya ikuti icon pilihan Anda
+            'icon' => 'chartline', 
             'name' => 'KPI Karyawan',
-            'path' => '/kpi/dashboard',
+            'path' => '/kpi/dashboard', // Pastikan route ini benar
         ];
 
-        // KBI Karyawan (Punya Staff Sendiri)
         $menu[] = [
-            'icon' => 'speedometer', // Saya ikuti icon pilihan Anda
+            'icon' => 'speedometer', 
             'name' => 'KBI Karyawan',
-            'path' => '/kbi/dashboard',
+            'path' => '/kbi/dashboard', // Pastikan route ini benar
         ];
 
         // =============================================================
-        // 2. MENU KHUSUS (Hanya Admin, HRD, Manager)
+        // 2. MENU KHUSUS (HANYA ADMIN, SUPERADMIN, MANAGER)
         // =============================================================
-        // Logika: "Jika User ADA dan User BUKAN Staff"
-        if ($user && !$user->isStaff()) {
+        // Staff tidak boleh lihat menu di bawah ini
+        
+        if (in_array($role, ['superadmin', 'admin', 'manager'])) {
             
             // Data Karyawan
             $menu[] = [
@@ -73,7 +71,7 @@ class MenuHelper
                 'path' => '/training',
             ];
 
-            // Monitoring KBI (Khusus HRD memantau Staff)
+            // Monitoring KBI
             $menu[] = [
                 'icon' => 'desktop',
                 'name' => 'Monitoring KBI',
@@ -82,12 +80,18 @@ class MenuHelper
 
             // Rekap Performance
             $menu[] = [
-                'icon' => 'rekap', // Pastikan sudah didaftarkan di getIconSvg
+                'icon' => 'rekap', 
                 'name' => 'Rekap Performance',
                 'path' => '/performance/rekap',
             ];
+        }
 
-            // Manajemen User
+        // =============================================================
+        // 3. MENU SUPER KHUSUS (HANYA SUPERADMIN & ADMIN)
+        // =============================================================
+        // Manager & Staff TIDAK BOLEH LIHAT "Manajemen User"
+        
+        if (in_array($role, ['superadmin', 'admin'])) {
             $menu[] = [
                 'icon' => 'authentication',
                 'name' => 'Manajemen User',
@@ -98,44 +102,11 @@ class MenuHelper
         return $menu;
     }
 
-      // --- [BARU] Menambahkan Menu Khusus Performance (KPI) ---
-    // public static function getPerformanceItems()
-    // {
-    //     return [
-    //         [
-    //             'icon' => 'charts',
-    //             'name' => 'KPI Karyawan', // Nama menu diperjelas
-    //             'path' => '/kpi/dashboard', // <-- Link baru ke halaman index
-    //         ],
-    //     ];
-    // }
-    // public static function getPerformanceKBItems()
-    // {
-    //     return [
-    //         [
-    //             'icon' => 'charts',
-    //             'name' => 'KBI Karyawan', // Nama menu diperjelas
-    //             'path' => '/kbi/dashboard', // <-- Link baru ke halaman index
-    //         ],
-    //     ];
-    // }
-
-
-
-
+    // ... (Sisa function getOthersItems, getMenuGroups, getIconSvg tetap sama) ...
+    
     public static function getOthersItems()
     {
-        return [
-            // [
-            //     'icon' => 'support-ticket',
-            //     'name' => 'Tools',
-            //     'subItems' => [
-            //         ['name' => 'Import Data', 'path' => '/tools/import'],
-            //         ['name' => 'Export Data', 'path' => '/tools/export'],
-            //         ['name' => 'Settings', 'path' => '/settings'],
-            //     ],
-            // ],
-        ];
+        return [];
     }
 
     public static function getMenuGroups()
@@ -149,13 +120,9 @@ class MenuHelper
                 'title' => 'Others',
                 'items' => self::getOthersItems()
             ],
-              // --- APAKAH BAGIAN INI SUDAH ADA? ---
-            // [
-            //     'title' => 'Performance',
-            //     'items' => self::getPerformanceItems() // <--- INI WAJIB ADA
-            // ]
         ];
     }
+    
 
     public static function isActive($path)
     {

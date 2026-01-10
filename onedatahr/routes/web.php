@@ -199,11 +199,11 @@ Route::middleware(['auth'])->group(function () {
     // Hapus KPI
     Route::delete('/kpi/delete/{id}', [KpiAssessmentController::class, 'destroy'])->name('kpi.destroy');
 
+    Route::get('/kpi/form/{karyawan_id}', [KpiAssessmentController::class, 'create'])->name('kpi.create');
     // Generate KPI Baru
     Route::post('/kpi/store', [KpiAssessmentController::class, 'store'])->name('kpi.store');
 
     // KPI Assessment Routes
-    // Contoh URL: /kpi/penilaian/5/2025 (Karyawan ID 5, Tahun 2025)
     Route::get('/kpi/penilaian/{karyawan_id}/{tahun}', [KpiAssessmentController::class, 'show'])->name('kpi.show');
     Route::post('/kpi/update/{id}', [KpiAssessmentController::class, 'update'])->name('kpi.update');
 

@@ -31,7 +31,7 @@ class Karyawan extends Model
     public function pekerjaan()
     {
         // hasOne(ModelTujuan, 'Foreign_Key_di_Tabel_Tujuan', 'Local_Key_di_Sini')
-        return $this->hasOne(Pekerjaan::class, 'id_karyawan', 'id_karyawan')
+        return $this->hasMany(Pekerjaan::class, 'id_karyawan', 'id_karyawan')
                     ->latest('id_pekerjaan'); // Opsional: Ambil yang paling baru diinput
     }
 

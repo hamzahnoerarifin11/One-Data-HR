@@ -188,7 +188,7 @@
     </div>
 
     <!-- Data Pekerjaan -->
-    @if($karyawan->pekerjaan && $karyawan->pekerjaan->count() > 0)
+    @if($karyawan->pekerjaan && $karyawan->first()?->pekerjaan->count() > 0)
     <div class="mb-6 rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-800 dark:bg-white/[0.03] p-6">
         <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Informasi Pekerjaan</h2>
         @if($karyawan->perusahaan)

@@ -8,7 +8,7 @@
     $restrictedMenus = ['Manajemen User', 'Training', 'Rekrutmen', 'Data Karyawan']; 
     
     // Ambil role user
-    $userRole = auth()->user()->role ?? 'staff'; // Default staff jika null
+    $userRole = auth()->user()->role ?? 'staff'; 
     $allowedRoles = ['superadmin', 'admin'];
 @endphp
 

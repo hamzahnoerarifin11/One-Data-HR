@@ -7,47 +7,77 @@ use App\Models\Karyawan;
 use App\Models\KbiAssessment;
 use App\Models\KpiAssessment;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 
 class PerformanceController extends Controller
 {
     public function index(Request $request)
     {
+        $user = Auth::user();
         $tahun = request()->get('tahun', date('Y'));
 
-        // 1. Query Data Karyawan (Filter Pencarian Nama/NIK tetap pakai SQL)
-        $query = Karyawan::with('pekerjaan');
-        
+        // ======================================================
+        // 0. PENGAMAN DATA DIRI (PENTING!)
+        // ======================================================
+        // Kita cari dulu data karyawan milik user yang login.
+        // Asumsi relasi di model User: public function karyawan() { return $this->hasOne(Karyawan::class, 'nik', 'nik'); }
+        $me = Karyawan::where('nik', $user->nik)->first();
+
+        // Jika user BUKAN admin, tapi data karyawannya tidak ada -> TENDANG KELUAR
+        if (!$me && !in_array($user->role, ['superadmin', 'admin'])) {
+            return redirect()->back()->with('error', 'Data profil karyawan Anda belum terhubung. Silakan hubungi HRD.');
+        }
+
+        // ======================================================
+        // 1. QUERY UTAMA
+        // ======================================================
+        $query = Karyawan::with('pekerjaan'); // Eager load pekerjaan biar cepat
+
+        // A. Filter Search (Nama/NIK)
         if ($request->has('search') && $request->search != '') {
             $keyword = $request->search;
-            $query->where(function($q) use ($keyword) {
-                $q->where('Nama_Lengkap_Sesuai_Ijazah', 'LIKE', '%'.$keyword.'%')
-                  ->orWhere('NIK', 'LIKE', '%'.$keyword.'%');
+            $query->where(function ($q) use ($keyword) {
+                $q->where('Nama_Lengkap_Sesuai_Ijazah', 'LIKE', '%' . $keyword . '%')
+                    ->orWhere('NIK', 'LIKE', '%' . $keyword . '%');
             });
         }
 
+        // B. Filter Role (Manager hanya lihat bawahan)
+        if ($user->role === 'manager') {
+            // PERBAIKAN: Gunakan $me->id_karyawan (Aman karena sudah dicek diatas)
+            // PERBAIKAN: Typo 'atasa_id' jadi 'atasan_id'
+            $query->where('atasan_id', $me->id_karyawan); 
+        
+        } elseif ($user->role === 'staff') {
+            // Staff hanya lihat diri sendiri
+            $query->where('id_karyawan', $me->id_karyawan);
+        }
+
+        // Eksekusi Query
         $karyawans = $query->get();
 
+        // ======================================================
+        // 2. HITUNG NILAI & MAPPING
+        // ======================================================
+        $rekapCollection = $karyawans->map(function ($k) use ($tahun) {
 
-
-        // 2. HITUNG NILAI (Mapping)
-        // Kita hitung dulu semua karyawan, baru nanti difilter Grade-nya
-        $rekapCollection = $karyawans->map(function($k) use ($tahun) {
-            
             // --- A. Hitung KBI ---
+            // Tips Optimasi: Gunakan Eager Loading 'kbiAssessment' di query atas agar lebih cepat
             $nilaiKbi = KbiAssessment::where('karyawan_id', $k->id_karyawan)
-                        ->where('tahun', $tahun)
-                        ->avg('rata_rata_akhir'); 
-            
+                ->where('tahun', $tahun)
+                ->avg('rata_rata_akhir'); // Ambil rata-rata jika ada banyak penilai
+
             $skorKbiAsli = $nilaiKbi ? $nilaiKbi : 0;
 
             // --- B. Hitung KPI ---
             $kpiRecord = KpiAssessment::where('karyawan_id', $k->id_karyawan)
-                        ->where('tahun', $tahun)
-                        ->latest('created_at')
-                        ->first();
-            $skorKpi = $kpiRecord ? $kpiRecord->total_skor_akhir : 0; 
+                ->where('tahun', $tahun)
+                ->latest('created_at') // Ambil yang paling baru
+                ->first();
+            
+            $skorKpi = $kpiRecord ? $kpiRecord->total_skor_akhir : 0;
 
-            // --- C. Hitung Final Score ---
+            // --- C. Hitung Final Score (Bobot 70:30) ---
             $finalScore = ($skorKpi * 0.7) + ($skorKbiAsli * 0.3);
 
             // --- D. Tentukan Grade ---
@@ -57,49 +87,48 @@ class PerformanceController extends Controller
             elseif ($finalScore >= 60) $grade = 'D';
             else $grade = 'E';
 
+            // Return Object Bersih
             return (object) [
-                'nik' => $k->NIK,
-                'nama' => $k->Nama_Lengkap_Sesuai_Ijazah,
-                'jabatan' => $k->pekerjaan->Jabatan ?? '-', 
+                'id_karyawan' => $k->id_karyawan, // Penting untuk link detail
+                'nik'         => $k->NIK,
+                'nama'        => $k->Nama_Lengkap_Sesuai_Ijazah,
+                // PERBAIKAN: Gunakan safe navigation operator
+                'jabatan'     => $k->pekerjaan->first()?->Jabatan ?? '-', 
                 'skor_kbi_asli' => $skorKbiAsli,
-                'skor_kpi'      => $skorKpi,
-                'final_score'   => $finalScore,
-                'grade'         => $grade
+                'skor_kbi'    => number_format($skorKbiAsli, 2),
+                'skor_kpi'    => number_format($skorKpi, 2),
+                'final_score' => number_format($finalScore, 2),
+                'grade'       => $grade
             ];
         });
 
-        // ============================================================
-        // 3. BAGIAN INI YANG KEMUNGKINAN ANDA LEWATKAN
-        // Filter Collection berdasarkan Grade yang dipilih di Dropdown
-        // ============================================================
+        // ======================================================
+        // 3. FILTER GRADE (Dropdown)
+        // ======================================================
         if ($request->has('grade') && $request->grade != '') {
             $rekapCollection = $rekapCollection->where('grade', $request->grade);
         }
 
-        // A. Tentukan halaman saat ini
+        // ======================================================
+        // 4. PAGINASI MANUAL (Karena Data dari Collection)
+        // ======================================================
         $page = LengthAwarePaginator::resolveCurrentPage();
+        $perPage = 10;
         
-        // B. Tentukan jumlah data per halaman
-        $perPage = 10; 
-
-        // C. Potong data Collection sesuai halaman (Slice)
-        // Logika: Ambil data mulai dari (halaman_skrg - 1) * 10, sebanyak 10 item
+        // Potong data sesuai halaman
         $currentItems = $rekapCollection->slice(($page - 1) * $perPage, $perPage)->all();
 
-        // D. Buat Object Paginator Baru
+        // Buat Object Paginator
         $rekap = new LengthAwarePaginator(
-            $currentItems,              // Data potongannya
-            count($rekapCollection),    // Total data keseluruhan (sebelum dipotong)
-            $perPage,                   // Limit per halaman
-            $page,                      // Halaman aktif
-            ['path' => LengthAwarePaginator::resolveCurrentPath()] // URL dasar
+            $currentItems, 
+            count($rekapCollection), 
+            $perPage, 
+            $page, 
+            ['path' => LengthAwarePaginator::resolveCurrentPath()]
         );
 
-        // E. Tambahkan query string (search/grade) agar tidak hilang saat klik next page
+        // Tambahkan query string agar filter tidak hilang saat ganti halaman
         $rekap->appends($request->all());
-        
-        // F. (Opsional) Batasi jumlah link pagination biar tidak panjang (1 ... 40)
-        $rekap->onEachSide(1);
 
         return view('pages.performance.rekap', compact('rekap', 'tahun'));
     }
