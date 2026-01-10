@@ -1,7 +1,6 @@
 import './bootstrap';
 import Alpine from 'alpinejs';
 import ApexCharts from 'apexcharts';
-import Alpine from 'alpinejs'
 import focus from '@alpinejs/focus'
  
 Alpine.plugin(focus)

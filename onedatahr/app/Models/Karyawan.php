@@ -1,30 +1,43 @@
 <?php
+
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\KpiAssessment;
+use App\Models\Pekerjaan;
+use App\Models\User;
+use App\Models\KbiAssessment;
 
 class Karyawan extends Model
 {
+    use HasFactory; // Trait dipasang di paling atas class
+
     protected $table = 'karyawan';
-    protected $primaryKey = 'id_karyawan';
+    protected $primaryKey = 'id_karyawan'; // Sesuai database Anda
     public $incrementing = true;
     public $timestamps = false;
 
-    protected $fillable = [
-        'NIK','Status','Kode','Nama_Sesuai_KTP','NIK_KTP','Nama_Lengkap_Sesuai_Ijazah',
-        'Tempat_Lahir_Karyawan','Tanggal_Lahir_Karyawan','Umur_Karyawan','Jenis_Kelamin_Karyawan',
-        'Status_Pernikahan','Golongan_Darah','Nomor_Telepon_Aktif_Karyawan','Email','Alamat_KTP',
-        'RT','RW','Kelurahan_Desa','Kecamatan','Kabupaten_Kota','Provinsi','Alamat_Domisili',
-        'RT_Sesuai_Domisili','RW_Sesuai_Domisili','Kelurahan_Desa_Domisili','Kecamatan_Sesuai_Domisili',
-        'Kabupaten_Kota_Sesuai_Domisili','Provinsi_Sesuai_Domisili','Alamat_Lengkap'
-    ];
+    // Gunakan guarded kosong agar semua kolom bisa diisi (lebih praktis)
+    // protected $fillable = [ ... ]; // Ini bisa dihapus jika sudah pakai guarded
+    protected $guarded = []; 
 
-    // relasi: satu karyawan memiliki satu data keluarga, bpjs, perusahaan, status
+    // =========================================================
+    // PERBAIKAN UTAMA: RELASI KE PEKERJAAN (JABATAN)
+    // =========================================================
+    
+    // Karena di tabel 'pekerjaan' ada kolom 'id_karyawan', 
+    // kita pakai hasOne (untuk mengambil 1 jabatan aktif).
     public function pekerjaan()
     {
-        return $this->hasMany(Pekerjaan::class, 'id_karyawan', 'id_karyawan');
+        // hasOne(ModelTujuan, 'Foreign_Key_di_Tabel_Tujuan', 'Local_Key_di_Sini')
+        return $this->hasOne(Pekerjaan::class, 'id_karyawan', 'id_karyawan')
+                    ->latest('id_pekerjaan'); // Opsional: Ambil yang paling baru diinput
     }
+
+    // =========================================================
+    // RELASI LAINNYA
+    // =========================================================
 
     public function pendidikan()
     {
@@ -58,9 +71,36 @@ class Karyawan extends Model
 
     public function kpiAssessment()
     {
-        // Kita pakai hasOne karena logic dashboard adalah "Satu Karyawan punya Satu KPI di tahun yang dipilih"
         return $this->hasOne(KpiAssessment::class, 'karyawan_id', 'id_karyawan');
     }
+    /**
+     * Relasi ke KBI (Key Behavior Indicator / Perilaku)  
+     * Satu karyawan punya banyak history penilaian perilaku
+     */
+    public function kbiAssessment()
+    {
+        return $this->hasMany(KbiAssessment::class, 'karyawan_id', 'id_karyawan');
+    }
+
+    // Struktur Organisasi (Atasan & Bawahan)
+    public function atasan()
+    {
+        return $this->belongsTo(Karyawan::class, 'atasan_id', 'id_karyawan');
+    }
+
+    public function bawahan()
+    {
+        return $this->hasMany(Karyawan::class, 'atasan_id', 'id_karyawan');
+    }
+
+    // Relasi ke User Login (Opsional, jika ada kolom user_id)
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    
+    // Konversi kolom created_at dan updated_at ke format DateTime
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',

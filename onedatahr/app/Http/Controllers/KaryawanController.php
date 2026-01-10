@@ -12,6 +12,7 @@ use App\Models\Bpjs;
 use App\Models\Perusahaan;
 use App\Models\StatusKaryawan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class KaryawanController extends Controller
 {
@@ -150,7 +151,7 @@ class KaryawanController extends Controller
             ]);
 
             DB::commit();
-            return redirect()->route('pages.karyawan.index')->with('success', 'Karyawan berhasil dibuat');
+            return redirect()->route('karyawan.index')->with('success', 'Karyawan berhasil dibuat');
         } catch (\Throwable $e) {
             DB::rollBack();
             return back()->withErrors(['error' => $e->getMessage()])->withInput();

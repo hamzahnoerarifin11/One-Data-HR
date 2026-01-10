@@ -8,15 +8,18 @@
     },
     "devDependencies": {
         "@tailwindcss/vite": "^4.1.12",
+        "autoprefixer": "^10.4.23",
         "axios": "^1.11.0",
         "concurrently": "^9.0.1",
         "laravel-vite-plugin": "^2.0.0",
-        "tailwindcss": "^4.1.12",
+        "postcss": "^8.5.6",
+        "tailwindcss": "^4.1.18",
         "vite": "^7.0.4"
     },
     "dependencies": {
         "@alpinejs/focus": "^3.15.3",
         "@floating-ui/dom": "^1.7.4",
+        "@fortawesome/fontawesome-free": "^7.1.0",
         "@fullcalendar/core": "^6.1.19",
         "@fullcalendar/daygrid": "^6.1.19",
         "@fullcalendar/interaction": "^6.1.19",

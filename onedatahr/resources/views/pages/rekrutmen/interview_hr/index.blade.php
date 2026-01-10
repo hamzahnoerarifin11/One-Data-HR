@@ -196,11 +196,11 @@
             </div>
 
             <div class="flex items-center gap-2">
-                <button @click="prevPage" :disabled="page === 1" class="rounded-lg border px-3 py-1.5 text-sm dark:text-white disabled:opacity-50">Prev</button>
+                <button @click="prevPage" :disabled="page === 1" class="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white disabled:opacity-50">Prev</button>
                 <template x-for="p in displayedPages" :key="p">
-                    <button @click="goToPage(p)" :class="page === p ? 'bg-blue-600 text-white' : 'hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-white'" class="px-3 py-1 text-sm rounded-lg" x-text="p"></button>
+                    <button @click="goToPage(p)" :class="page === p ? 'bg-blue-600 text-white' : 'hover:bg-blue-500/[0.08] hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-500 dark:text-white'" class="px-3 py-1 text-sm rounded-lg" x-text="p"></button>
                 </template>
-                <button @click="nextPage" :disabled="page === totalPages" class="rounded-lg border px-3 py-1.5 text-sm dark:text-white disabled:opacity-50">Next</button>
+                <button @click="nextPage" :disabled="page === totalPages" class="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white disabled:opacity-50">Next</button>
             </div>
         </div>
     </div>
