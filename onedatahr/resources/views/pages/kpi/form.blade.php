@@ -89,14 +89,14 @@
                     </a>
                 </div>
             </div>
-@php
-    $isManager = false;
-    // Asumsi user sudah terhubung ke data karyawan lewat auth
-    $loggedInKaryawan = \App\Models\Karyawan::where('nik', auth()->user()->nik)->first();
-    if($loggedInKaryawan && $karyawan->atasan_id == $loggedInKaryawan->id_karyawan) {
-        $isManager = true;
-    }
-@endphp
+            @php
+                $isManager = false;
+                // Asumsi user sudah terhubung ke data karyawan lewat auth
+                $loggedInKaryawan = \App\Models\Karyawan::where('nik', auth()->user()->nik)->first();
+                if($loggedInKaryawan && $karyawan->atasan_id == $loggedInKaryawan->id_karyawan) {
+                    $isManager = true;
+                }
+            @endphp
             {{-- 3. Tombol Simpan --}}
             <button id="btnSimpan" type="button" onclick="submitKpiForm()" 
                 class="px-3 py-2 {{ $isManager ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700' }} text-white rounded-lg text-sm transition shadow-lg flex items-center justify-center gap-2 flex-1 lg:flex-none">
@@ -117,6 +117,15 @@
             <i class="fas fa-plus"></i> Tambah KPI Baru
         </button>
     </div>
+
+    @php
+    // Cek apakah user yang login berhak melakukan adjustment?
+    // Staff TIDAK BOLEH (False), Manager/Admin BOLEH (True)
+    $isStaff = auth()->user()->role == 'staff';
+    
+    // Class CSS untuk input yang dikunci (Abu-abu & tidak bisa diklik)
+    $readonlyClass = $isStaff ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-transparent text-orange-700 font-bold border-b border-orange-300';
+    @endphp
 
     {{-- FORM UTAMA --}}
     <form id="kpiForm" action="{{ route('kpi.update', $kpi->id_kpi_assessment) }}" method="POST">
@@ -203,15 +212,30 @@
 
                             {{-- ADJ S-I --}}
                             <td class="p-1 text-center border-r bg-orange-50/30 align-center">
-                                <input type="number" name="kpi[{{ $item->id_kpi_item }}][adjustment_real_smt1]" value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_real_smt1', $score->adjustment_real_smt1 ?? '') }}" step="0.01" class="input-adj-real-smt1 w-full h-8 px-1 bg-transparent text-center border-b border-orange-200 outline-none" placeholder="Real"></td>
+                                <input 
+                                type="number" 
+                                name="kpi[{{ $item->id_kpi_item }}][adjustment_real_smt1]" 
+                                value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_real_smt1', $score->adjustment_real_smt1 ?? '') }}"
+                                {{ $isStaff ? 'readonly' : '' }} 
+                                step="0.01" class="input-adj-real-smt1 w-full h-8 px-1 bg-transparent text-center border-b border-orange-200 outline-none" placeholder="Real"></td>
                             <td class="p-1 border-r bg-orange-50/30 align-center text-center pt-2">
                                 <span class="span-adj-skor-smt1 font-bold text-orange-600">0</span>%</td>
                             <td class="p-1 text-center border-r bg-orange-50/30 align-center">
                                 <input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][adjustment_smt1]" value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_smt1', $score->adjustment_smt1 ?? '') }}" class="input-adj-nilai-smt1 w-full h-8 px-1 bg-transparent text-center font-bold text-orange-600 border-b border-orange-200 outline-none" placeholder="Nilai" readonly></td>
 
                             {{-- ADJ S-II --}}
-                            <td class="p-1 border-r bg-orange-50/30 align-center"><input type="number" name="kpi[{{ $item->id_kpi_item }}][adjustment_target_smt2]" value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_target_smt2', $score->adjustment_target_smt2 ?? '') }}" step="0.01" class="input-adj-target-smt2 w-full h-8 px-1 bg-transparent text-center border-b border-orange-200 outline-none" placeholder="Tgt"></td>
-                            <td class="p-1 border-r bg-orange-50/30 align-center"><input type="number" name="kpi[{{ $item->id_kpi_item }}][adjustment_real_smt2]" value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_real_smt2', $score->adjustment_real_smt2 ?? '') }}" step="0.01" class="input-adj-real-smt2 w-full h-8 px-1 bg-transparent text-center border-b border-orange-200 outline-none" placeholder="Real"></td>
+                            <td class="p-1 border-r bg-orange-50/30 align-center">
+                                <input type="number" 
+                                name="kpi[{{ $item->id_kpi_item }}][adjustment_target_smt2]" 
+                                value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_target_smt2', $score->adjustment_target_smt2 ?? '') }}"
+                                {{ $isStaff ? 'readonly' : '' }}
+                                step="0.01" class="input-adj-target-smt2 w-full h-8 px-1 bg-transparent text-center border-b border-orange-200 outline-none" placeholder="Tgt"></td>
+                            <td class="p-1 border-r bg-orange-50/30 align-center">
+                                <input type="number" 
+                                name="kpi[{{ $item->id_kpi_item }}][adjustment_real_smt2]" 
+                                value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_real_smt2', $score->adjustment_real_smt2 ?? '') }}"
+                                {{ $isStaff ? 'readonly' : '' }} 
+                                step="0.01" class="input-adj-real-smt2 w-full h-8 px-1 bg-transparent text-center border-b border-orange-200 outline-none" placeholder="Real"></td>
                             <td class="p-1 border-r bg-orange-50/30 align-center text-center pt-2"><span class="span-adj-skor-smt2 font-bold text-orange-600">0</span>%</td>
                             <td class="p-1 border-r bg-orange-50/30 align-center"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][adjustment_smt2]" value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_smt2', $score->adjustment_smt2 ?? '') }}" class="input-adj-nilai-smt2 w-full h-8 px-1 bg-transparent text-center font-bold text-orange-600 border-b border-orange-200 outline-none" placeholder="Nilai" readonly></td>
 
@@ -317,13 +341,13 @@
         const form = document.getElementById('kpiForm');
         const btn = document.getElementById('btnSimpan');
         
-        // Validasi Bobot Sebelum Simpan
-        const totalBobotText = document.getElementById('total-bobot-alert').innerText;
-        if(totalBobotText.includes('Harus 100%')) {
-            alert('Perhatian: Total Bobot KPI belum 100%. Mohon perbaiki sebelum menyimpan.');
+        // Cek Total Bobot
+        const alertBobot = document.getElementById('total-bobot-alert');
+        if(alertBobot && alertBobot.innerText.includes('Harus 100%')) {
+            alert('Total Bobot belum 100%. Silakan perbaiki sebelum menyimpan.');
             return;
         }
-
+        
         if(!form) { alert('Error: Form tidak ditemukan!'); return; }
         
         if(btn) { 
@@ -334,7 +358,7 @@
         form.submit();
     }
 
-    // Fungsi Modal & Delete (Tetap Sama)
+    // Fungsi Modal & Delete
     function openEditModal(data, updateUrl) {
         document.getElementById('formEditKPI').action = updateUrl;
         document.getElementById('edit_perspektif').value = data.perspektif;
@@ -355,7 +379,7 @@
         }
     }
 
-    // --- LOGIKA UTAMA PERHITUNGAN (REVISI) ---
+    // --- LOGIKA PERHITUNGAN (FULL MANUAL SEMESTER 2) ---
     document.addEventListener('DOMContentLoaded', function() {
         const rows = document.querySelectorAll('.row-kpi');
         const monthsSmt2 = ['jul', 'aug', 'sep', 'okt', 'nov', 'des'];
@@ -377,14 +401,11 @@
             if (p.includes('positif') || p.includes('maximize')) {
                 score = (real / target) * 100;
             } else if (p.includes('negatif') || p.includes('minimize')) {
-                // Rumus Minimize: (Target / Real) * 100 
-                // Atau rumus lama Anda: (2 - (real/target)) * 100? 
-                // Saya gunakan rumus umum (Target/Real) agar aman jika real > target skor turun.
-                score = (real === 0) ? 100 : (target / real) * 100; 
-            } else {
+                score = (real === 0) ? 100 : (target / real) * 100;
+            } else if (p.includes('yes') || p.includes('no')) {
                 score = (real >= target) ? 100 : 0;
             }
-            return Math.max(0, score);
+            return Math.max(0, score); 
         }
 
         function calculateAll() {
@@ -393,16 +414,19 @@
             let footerGrandTotal = 0;
             let footerAdjSmt1 = 0; 
             let footerAdjSmt2 = 0;
-            
-            // [FIX 2] Deklarasi Footer di LUAR loop baris
             let footerMonthly = { jul:0, aug:0, sep:0, okt:0, nov:0, des:0 };
 
             rows.forEach(row => {
-                const bobot = parseNumber(row.querySelector('.input-bobot').value);
-                const polaritas = row.querySelector('.input-polaritas').value;
+                const bobotInput = row.querySelector('.input-bobot');
+                const polaritasInput = row.querySelector('.input-polaritas');
+                
+                if (!bobotInput || !polaritasInput) return;
+
+                const bobot = parseNumber(bobotInput.value);
+                const polaritas = polaritasInput.value;
                 const targetTahunan = parseNumber(row.querySelector('.input-target-smt1').value);
 
-                // --- 1. SEMESTER 1 ---
+                // --- 1. HITUNG SEMESTER 1 ---
                 const rSmt1 = parseNumber(row.querySelector('.input-real-smt1').value);
                 let skorSmt1 = calculateSingleScore(targetTahunan, rSmt1, polaritas);
                 let nilaiSmt1 = (skorSmt1 * bobot) / 100;
@@ -410,10 +434,8 @@
                 row.querySelector('.span-skor-smt1').textContent = formatNumber(skorSmt1);
                 row.querySelector('.span-nilai-smt1').textContent = formatNumber(nilaiSmt1);
 
-                // --- 2. SEMESTER 2 (AUTO SUM BULANAN) ---
-                let totalTargetSmt2 = 0;
-                let totalRealSmt2 = 0;
-
+                // --- 2. HITUNG BULANAN (Hanya untuk Footer & Tampilan Bulan) ---
+                // Tidak ada lagi logika penjumlahan ke Semester 2 disini
                 monthsSmt2.forEach(bln => {
                     const inputTgt = row.querySelector(`.input-target-${bln}`);
                     const inputReal = row.querySelector(`.input-real-${bln}`);
@@ -422,108 +444,103 @@
                         const t = parseNumber(inputTgt.value);
                         const r = parseNumber(inputReal.value);
                         
-                        totalTargetSmt2 += t; // Auto Sum Target
-                        totalRealSmt2 += r;   // Auto Sum Real
-
-                        let skorBln = (t !== 0) ? calculateSingleScore(t, r, polaritas) : 0;
-                        let nilaiBln = (skorBln * bobot) / 100;
+                        let skor = (t !== 0) ? calculateSingleScore(t, r, polaritas) : 0;
+                        let nilai = (skor * bobot) / 100;
                         
-                        row.querySelector(`.span-skor-${bln}`).textContent = formatNumber(skorBln);
-                        row.querySelector(`.span-nilai-${bln}`).textContent = formatNumber(nilaiBln);
+                        const spanSkor = row.querySelector(`.span-skor-${bln}`);
+                        const spanNilai = row.querySelector(`.span-nilai-${bln}`);
+                        if(spanSkor) spanSkor.textContent = formatNumber(skor);
+                        if(spanNilai) spanNilai.textContent = formatNumber(nilai);
                         
-                        footerMonthly[bln] += nilaiBln; // [FIX 2] Akumulasi benar
+                        footerMonthly[bln] += nilai;
                     }
                 });
 
-                // [FIX 1] Update Input Total Smt 2 Secara Otomatis
+                // --- 3. TOTAL SEMESTER 2 (MURNI MANUAL) ---
+                // Kita HAPUS semua logika otomatisasi disini.
+                // Sistem hanya membaca apa yang Anda ketik.
                 const inputTotalTgt2 = row.querySelector('.input-total-target-smt2');
                 const inputTotalReal2 = row.querySelector('.input-total-real-smt2');
-                
-                // Cek apakah user input manual atau auto? 
-                // Logika: Jika input bulanan ada isinya, pakai hasil penjumlahan. Jika kosong semua, biarkan manual.
-                if (totalTargetSmt2 > 0 || totalRealSmt2 > 0) {
-                    inputTotalTgt2.value = totalTargetSmt2;
-                    inputTotalReal2.value = totalRealSmt2;
-                } else {
-                    // Ambil nilai manual user
-                    totalTargetSmt2 = parseNumber(inputTotalTgt2.value);
-                    totalRealSmt2 = parseNumber(inputTotalReal2.value);
-                }
 
-                // Hitung Skor Total Smt 2
-                let skorTotalSmt2 = calculateSingleScore(totalTargetSmt2, totalRealSmt2, polaritas);
+                const tSmt2 = parseNumber(inputTotalTgt2.value); // Baca Input Manual Target
+                const rSmt2 = parseNumber(inputTotalReal2.value); // Baca Input Manual Realisasi
+
+                // Hitung Skor berdasarkan input manual tersebut
+                let skorTotalSmt2 = calculateSingleScore(tSmt2, rSmt2, polaritas);
                 let nilaiTotalSmt2 = (skorTotalSmt2 * bobot) / 100;
-
+                
                 row.querySelector('.span-total-skor-smt2').textContent = formatNumber(skorTotalSmt2);
                 row.querySelector('.span-total-nilai-smt2').textContent = formatNumber(nilaiTotalSmt2);
 
-                // --- 3. ADJUSTMENT (OVERRIDE LOGIC) ---
-                // SMT 1
-                const adjReal1 = row.querySelector('.input-adj-real-smt1').value;
-                const adjNilai1Input = row.querySelector('.input-adj-nilai-smt1');
-                
-                let finalSmt1 = nilaiSmt1;
-                if (adjReal1 !== "") {
-                    // Jika ada realisasi baru, hitung ulang skor
-                    let adjSkor = calculateSingleScore(targetTahunan, parseNumber(adjReal1), polaritas);
-                    let adjNilai = (adjSkor * bobot) / 100;
-                    
-                    row.querySelector('.span-adj-skor-smt1').textContent = formatNumber(adjSkor);
-                    adjNilai1Input.value = formatNumber(adjNilai);
-                    finalSmt1 = adjNilai;
+                // --- 4. ADJUSTMENT SMT 1 ---
+                const adjReal1Input = row.querySelector('.input-adj-real-smt1');
+                const adjNilaiInput1 = row.querySelector('.input-adj-nilai-smt1');
+                let finalSmt1 = nilaiSmt1; 
+
+                if (adjReal1Input && adjReal1Input.value !== "") {
+                    let adjSkor1 = calculateSingleScore(targetTahunan, parseNumber(adjReal1Input.value), polaritas);
+                    let adjNilai1 = (adjSkor1 * bobot) / 100;
+                    row.querySelector('.span-adj-skor-smt1').textContent = formatNumber(adjSkor1);
+                    adjNilaiInput1.value = formatNumber(adjNilai1);
+                    finalSmt1 = adjNilai1;
                 } else {
-                    // Reset UI jika kosong
-                    row.querySelector('.span-adj-skor-smt1').textContent = '-';
-                    adjNilai1Input.value = '';
+                    row.querySelector('.span-adj-skor-smt1').textContent = '0';
+                    adjNilaiInput1.value = '';
                 }
 
-                // SMT 2
-                const adjTgt2 = row.querySelector('.input-adj-target-smt2').value;
-                const adjReal2 = row.querySelector('.input-adj-real-smt2').value;
-                const adjNilai2Input = row.querySelector('.input-adj-nilai-smt2');
-
+                // --- 5. ADJUSTMENT SMT 2 ---
+                const adjTarget2Input = row.querySelector('.input-adj-target-smt2');
+                const adjReal2Input = row.querySelector('.input-adj-real-smt2');
+                const adjNilaiInput2 = row.querySelector('.input-adj-nilai-smt2');
                 let finalSmt2 = nilaiTotalSmt2;
-                if (adjTgt2 !== "" && adjReal2 !== "") {
-                    let adjSkor = calculateSingleScore(parseNumber(adjTgt2), parseNumber(adjReal2), polaritas);
-                    let adjNilai = (adjSkor * bobot) / 100;
 
-                    row.querySelector('.span-adj-skor-smt2').textContent = formatNumber(adjSkor);
-                    adjNilai2Input.value = formatNumber(adjNilai);
-                    finalSmt2 = adjNilai;
+                if (adjTarget2Input && adjReal2Input && adjTarget2Input.value !== "" && adjReal2Input.value !== "") {
+                    let adjSkor2 = calculateSingleScore(parseNumber(adjTarget2Input.value), parseNumber(adjReal2Input.value), polaritas);
+                    let adjNilai2 = (adjSkor2 * bobot) / 100;
+                    row.querySelector('.span-adj-skor-smt2').textContent = formatNumber(adjSkor2);
+                    adjNilaiInput2.value = formatNumber(adjNilai2);
+                    finalSmt2 = adjNilai2;
                 } else {
-                    row.querySelector('.span-adj-skor-smt2').textContent = '-';
-                    adjNilai2Input.value = '';
+                    row.querySelector('.span-adj-skor-smt2').textContent = '0';
+                    adjNilaiInput2.value = '';
                 }
 
-                // --- 4. FINAL CALCULATION ---
-                // Rumus Final: (Nilai Smt 1 + Nilai Smt 2) / 2
-                let grandFinal = (finalSmt1 + finalSmt2) / 2; // [FIX 3] Dibagi 2 karena semesteran
-                
-                // Atau jika maunya penjumlahan murni (akumulasi bobot)
-                // let grandFinal = finalSmt1 + finalSmt2; // Gunakan ini jika bobot 100% dibagi rata
-
-                row.querySelector('.span-final-score').textContent = formatNumber(grandFinal);
-
-                // --- 5. FOOTER ACCUMULATION ---
+                // --- 6. AKUMULASI FOOTER ---
                 footerSmt1 += nilaiSmt1;
                 footerSmt2 += nilaiTotalSmt2;
-                footerAdjSmt1 += finalSmt1;
-                footerAdjSmt2 += finalSmt2;
+                
+                if(adjReal1Input && adjReal1Input.value !== "") footerAdjSmt1 += finalSmt1;
+                else footerAdjSmt1 += nilaiSmt1;
+
+                if(adjTarget2Input && adjReal2Input.value !== "") footerAdjSmt2 += finalSmt2;
+                else footerAdjSmt2 += nilaiTotalSmt2;
+                
+                let grandFinal = (finalSmt1 + finalSmt2) / 2; 
+                row.querySelector('.span-final-score').textContent = formatNumber(grandFinal);
                 footerGrandTotal += grandFinal;
             });
 
-            // Update UI Footer
-            document.getElementById('footer-total-smt1').textContent = formatNumber(footerSmt1);
-            document.getElementById('footer-total-sem').textContent = formatNumber(footerSmt2);
-            document.getElementById('footer-grand-total').textContent = formatNumber(footerGrandTotal);
-            
-            document.getElementById('footer-adj-smt1').textContent = formatNumber(footerAdjSmt1);
-            document.getElementById('footer-adj-smt2').textContent = formatNumber(footerAdjSmt2);
+            // Update Footer UI
+            const setFooterText = (id, val) => {
+                const el = document.getElementById(id);
+                if(el) el.textContent = formatNumber(val);
+            };
 
+            setFooterText('footer-total-smt1', footerSmt1);
+            setFooterText('footer-total-sem', footerSmt2);
+            setFooterText('footer-grand-total', footerGrandTotal);
+            
             monthsSmt2.forEach(bln => {
-                document.getElementById(`footer-total-${bln}`).textContent = formatNumber(footerMonthly[bln]);
+                setFooterText(`footer-total-${bln}`, footerMonthly[bln]);
             });
 
+            if(document.getElementById('footer-adj-smt1')) {
+                document.getElementById('footer-adj-smt1').textContent = formatNumber(footerAdjSmt1);
+            }
+            if(document.getElementById('footer-adj-smt2')) {
+                document.getElementById('footer-adj-smt2').textContent = formatNumber(footerAdjSmt2);
+            }
+            
             checkBobot();
         }
 
@@ -535,21 +552,19 @@
             const alertBox = document.getElementById('total-bobot-alert');
             if (alertBox) {
                 if (totalBobot != 100) {
-                    alertBox.innerHTML = `<span class="text-red-600 bg-red-100 px-3 py-1 rounded-full text-sm border border-red-200"><i class="fas fa-exclamation-triangle mr-1"></i> Total Bobot: ${totalBobot}% (Wajib 100%)</span>`;
+                    alertBox.innerHTML = `<span class="text-red-600 bg-red-100 px-2 py-1 rounded border border-red-200"><i class="fas fa-exclamation-triangle"></i> Total Bobot: ${totalBobot}% (Harus 100%)</span>`;
                 } else {
-                    alertBox.innerHTML = `<span class="text-green-600 bg-green-100 px-3 py-1 rounded-full text-sm border border-green-200"><i class="fas fa-check-circle mr-1"></i> Total Bobot: 100% (Sempurna)</span>`;
+                    alertBox.innerHTML = `<span class="text-green-600 bg-green-100 px-2 py-1 rounded border border-green-200"><i class="fas fa-check-circle"></i> Total Bobot: 100% (OK)</span>`;
                 }
             }
         }
 
-        // Attach Event Listeners
         const inputs = document.querySelectorAll('input');
         inputs.forEach(input => {
             input.addEventListener('input', calculateAll);
-            input.addEventListener('change', calculateAll); // Backup untuk paste/autofill
+            input.addEventListener('change', calculateAll);
         });
 
-        // Run Initial Calculation
         calculateAll();
     });
 </script>

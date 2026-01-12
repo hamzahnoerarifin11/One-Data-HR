@@ -50,7 +50,7 @@
                     <select name="jabatan" class="w-full text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors">
                         <option value="">- Semua Jabatan -</option>
                         @foreach($listJabatan as $jab)
-                            <option value="{{ $jab }}" {{ request('jabatan') == $jab ? 'selected' : '' }}>
+                            <option value="{{ $jab }}" {{ request('Jabatan') == $jab ? 'selected' : '' }}>
                                 {{ $jab }}
                             </option>
                         @endforeach

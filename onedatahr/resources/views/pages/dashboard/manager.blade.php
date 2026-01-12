@@ -74,7 +74,7 @@
                     @forelse($teamMonitoring as $member)
                         @php 
                             $kpi = $member->kpiAssessment; 
-                            $kbi = $member->kbiAssessment; // Ini cek KBI yang dinilai oleh manager (tipe_penilai=ATASAN)
+                            $kbi = $member->kbiAssessment;
                         @endphp
                         <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td class="px-6 py-4">
@@ -85,12 +85,25 @@
                             {{-- STATUS KPI --}}
                             <td class="px-6 py-4 text-center">
                                 @if($kpi)
-                                    @if($kpi->status == 'FINAL')
-                                        <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full font-bold">Final: {{ $kpi->total_skor_akhir }}</span>
-                                    @elseif($kpi->status == 'SUBMITTED')
-                                        <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full font-bold animate-pulse">Butuh Approval</span>
+                                    @php $status = strtoupper($kpi->status); @endphp
+
+                                    {{-- 1. FINAL / APPROVED --}}
+                                    @if(in_array($status, ['FINAL', 'APPROVED', 'DONE']))
+                                        <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full font-bold">
+                                            Final: {{ $kpi->total_skor_akhir }}
+                                        </span>
+
+                                    {{-- 2. SUBMITTED (Butuh Approval Manager) --}}
+                                    @elseif($status == 'SUBMITTED')
+                                        <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full font-bold animate-pulse">
+                                            Butuh Approval
+                                        </span>
+
+                                    {{-- 3. DRAFT (Masih diisi karyawan) --}}
                                     @else
-                                        <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">Draft / Proses</span>
+                                        <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full font-bold">
+                                            Draft / Proses
+                                        </span>
                                     @endif
                                 @else
                                     <span class="text-xs text-gray-400 italic">Belum Dibuat</span>
@@ -99,10 +112,48 @@
 
                             {{-- STATUS KBI --}}
                             <td class="px-6 py-4 text-center">
-                                @if($kbi)
-                                    <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-bold"><i class="fas fa-check"></i> Sudah Dinilai</span>
+                                @php
+                                    // 1. CARI DATA DIRI MANAGER (Current User)
+                                    // Kita cari manual biar aman, tidak tergantung variabel controller
+                                    $meManager = \App\Models\Karyawan::where('nik', auth()->user()->nik)->first();
+
+                                    // 2. CARI ID USER STAFF (Penilai)
+                                    // Gunakan DB Query biar tidak kena error "Class User not found" lagi
+                                    $idUserStaff = \Illuminate\Support\Facades\DB::table('users')
+                                                    ->where('nik', $member->NIK)
+                                                    ->value('id');
+                                    
+                                    $statusNilaiAtasan = false;
+
+                                    // 3. CEK DATABASE (Hanya jika data lengkap)
+                                    if($meManager && $idUserStaff) {
+                                        $cekKbi = \Illuminate\Support\Facades\DB::table('kbi_assessments')
+                                                    ->where('penilai_id', $idUserStaff) // Penilainya si Staff
+                                                    ->where('karyawan_id', $meManager->id_karyawan) // Targetnya Saya (Manager)
+                                                    ->where('tipe_penilai', 'BAWAHAN') // Tipe Bawahan
+                                                    ->where('tahun', $tahun)
+                                                    ->exists(); // Cukup cek ada/tidak (True/False)
+                                        
+                                        if($cekKbi) {
+                                            $statusNilaiAtasan = true;
+                                        }
+                                    }
+                                @endphp
+
+                                @if($statusNilaiAtasan)
+                                    {{-- Jika Data KBI Ditemukan --}}
+                                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full font-bold">
+                                        <i class="fas fa-check-double mr-1"></i> Sudah Menilai
+                                    </span>
                                 @else
-                                    <span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full font-bold">Belum Dinilai</span>
+                                    {{-- Jika Data KBI Tidak Ada --}}
+                                    <div class="flex flex-col items-center gap-1">
+                                        <span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full font-bold">
+                                            <i class="fas fa-times-circle mr-1"></i> Belum Menilai
+                                        </span>
+                                        {{-- Opsional: Info tambahan --}}
+                                        <span class="text-[10px] text-gray-400 italic">Menunggu Staff</span>
+                                    </div>
                                 @endif
                             </td>
 
