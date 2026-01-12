@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class OnboardingKaryawan extends Model
 {
@@ -25,6 +26,10 @@ class OnboardingKaryawan extends Model
 
         'tanggal_resign',
         'alasan_resign',
+
+        'masa_kerja_hari',
+        'status_turnover',
+        'tanggal_lolos_probation',
 
         'id_card_status',
         'id_card_proses',
@@ -56,15 +61,82 @@ class OnboardingKaryawan extends Model
     ];
 
     protected $casts = [
-    'visi_misi' => 'integer',
-    'wadja_philosophy' => 'integer',
-    'sejarah_perusahaan' => 'integer',
-    'kondisi_perizinan' => 'integer',
-    'tata_tertib' => 'integer',
-    'bpjs' => 'integer',
-    'k3' => 'integer',
+        'visi_misi' => 'boolean',
+        'wadja_philosophy' => 'boolean',
+        'sejarah_perusahaan' => 'boolean',
+        'kondisi_perizinan' => 'boolean',
+        'tata_tertib' => 'boolean',
+        'bpjs' => 'boolean',
+        'k3' => 'boolean',
     ];
 
+    /* ================= HELPER ================= */
+
+    public function formatTanggal($field)
+    {
+        return $this->$field
+            ? Carbon::parse($this->$field)->translatedFormat('d F Y')
+            : '-';
+    }
+    /* ================= MASA KERJA ================= */
+
+    /**
+     * Masa kerja dalam HARI
+     * Mulai: jadwal_ttd_kontrak
+     * Akhir: tanggal_resign / hari ini
+     */
+    public function getMasaKerjaHariAttribute()
+    {
+        if (!$this->jadwal_ttd_kontrak) {
+            return 0;
+        }
+
+        $mulai = Carbon::parse($this->jadwal_ttd_kontrak);
+
+        $akhir = $this->tanggal_resign
+            ? Carbon::parse($this->tanggal_resign)
+            : Carbon::now();
+
+        if ($akhir->lt($mulai)) {
+            return 0;
+        }
+
+        return (int) $mulai->diffInDays($akhir);
+    }
+
+
+    /**
+     * Masa kerja dalam BULAN (estimasi HR)
+     */
+    public function getMasaKerjaBulanAttribute()
+    {
+        return (int) floor($this->masa_kerja_hari / 30);
+    }
+
+
+    /* ================= SCOPE ================= */
+
+    public function getStatusTurnoverAutoAttribute()
+    {
+        if (!$this->jadwal_ttd_kontrak) {
+            return 'belum';
+        }
+
+        $tanggalKontrak = Carbon::parse($this->jadwal_ttd_kontrak);
+        $batasProbation = $tanggalKontrak->copy()->addMonths(3);
+
+        // JIKA SUDAH RESIGN
+        if ($this->tanggal_resign) {
+            return Carbon::parse($this->tanggal_resign)->lt($batasProbation)
+                ? 'turnover'
+                : 'lolos';
+        }
+
+        // JIKA BELUM RESIGN
+        return now()->lt($batasProbation)
+            ? 'belum'
+            : 'lolos';
+    }
 
     /* ================= RELATION ================= */
 

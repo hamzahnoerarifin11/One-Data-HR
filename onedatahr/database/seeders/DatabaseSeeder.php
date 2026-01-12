@@ -51,5 +51,8 @@ class DatabaseSeeder extends Seeder
 
         // Seed some daily recruitment demo metrics (calendar)
         $this->call(\Database\Seeders\RekrutmenDailySeeder::class);
+
+        // Seed onboarding demo data
+        $this->call(\Database\Seeders\OnboardingKaryawanSeeder::class);
     }
 }
