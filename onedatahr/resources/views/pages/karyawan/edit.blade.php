@@ -812,7 +812,7 @@
 
                                 @foreach ($jabatanOptions as $jabatan)
                                     <option value="{{ $jabatan }}"
-                                        {{ old('Jabatan', optional($karyawan->pekerjaan->first())->Jabatan) === $jabatan ? 'selected' : '' }}>
+                                        {{ old('Jabatan', optional($karyawan->pekerjaan)->Jabatan) === $jabatan ? 'selected' : '' }}>
                                         {{ $jabatan }}
                                     </option>
                                 @endforeach
@@ -836,7 +836,7 @@
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Bagian</label>
                         <input name="Bagian"
                             placeholder="Contoh: Administrasi / Operasional"
-                            value="{{ old('Bagian', optional($karyawan->pekerjaan->first())->Bagian) }}"
+                            value="{{ old('Bagian', optional($karyawan->pekerjaan)->Bagian) }}"
                              class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10
                             dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent
                             px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden
@@ -860,10 +860,10 @@
 
                                 @foreach ($departementOptions as $departement)
                                     <option value="{{ $departement }}"
-                                        {{ old('Departement', optional($karyawan->pekerjaan->first())->Departement) === $departement ? 'selected' : '' }}>
+                                        {{ old('Departement', optional($karyawan->pekerjaan)->Departement) === $departement ? 'selected' : '' }}>
                                         {{ $departement }}
                                     </option>
-                                        {{ old('Departement', optional($karyawan->pekerjaan->first())->Departement) === $departement ? 'selected' : '' }}>
+                                        {{ old('Departement', optional($karyawan->pekerjaan)->Departement) === $departement ? 'selected' : '' }}>
                                         {{ $departement }}
                                     </option>
                                 @endforeach
@@ -898,10 +898,10 @@
 
                                 @foreach ($divisiOptions as $divisi)
                                     <option value="{{ $divisi }}"
-                                        {{ old('Divisi', optional($karyawan->pekerjaan->first())->Divisi) === $divisi ? 'selected' : '' }}>
+                                        {{ old('Divisi', optional($karyawan->pekerjaan)->Divisi) === $divisi ? 'selected' : '' }}>
                                         {{ $divisi }}
                                     </option>
-                                        {{ old('Divisi', optional($karyawan->pekerjaan->first())->Divisi) === $divisi ? 'selected' : '' }}>
+                                        {{ old('Divisi', optional($karyawan->pekerjaan)->Divisi) === $divisi ? 'selected' : '' }}>
                                         {{ $divisi }}
                                     </option>
                                 @endforeach
@@ -936,10 +936,10 @@
 
                                 @foreach ($unitOptions as $unit)
                                     <option value="{{ $unit }}"
-                                        {{ old('Unit', optional($karyawan->pekerjaan->first())->Unit) === $unit ? 'selected' : '' }}>
+                                        {{ old('Unit', optional($karyawan->pekerjaan)->Unit) === $unit ? 'selected' : '' }}>
                                         {{ $unit }}
                                     </option>
-                                        {{ old('Unit', optional($karyawan->pekerjaan->first())->Unit) === $unit ? 'selected' : '' }}>
+                                        {{ old('Unit', optional($karyawan->pekerjaan)->Unit) === $unit ? 'selected' : '' }}>
                                         {{ $unit }}
                                     </option>
                                 @endforeach
@@ -976,10 +976,10 @@
                                     dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
                             >
                                 <option value="">-- Pilih Jenis Kontrak --</option>
-                                <option value="PKWT" {{ old('Jenis_Kontrak', optional($karyawan->pekerjaan->first())->Jenis_Kontrak) == 'PKWT' ? 'selected' : '' }}>
+                                <option value="PKWT" {{ old('Jenis_Kontrak', optional($karyawan->pekerjaan)->Jenis_Kontrak) == 'PKWT' ? 'selected' : '' }}>
                                     PKWT
                                 </option>
-                                <option value="PKWTT" {{ old('Jenis_Kontrak', optional($karyawan->pekerjaan->first())->Jenis_Kontrak) == 'PKWTT' ? 'selected' : '' }}>
+                                <option value="PKWTT" {{ old('Jenis_Kontrak', optional($karyawan->pekerjaan)->Jenis_Kontrak) == 'PKWTT' ? 'selected' : '' }}>
                                     PKWTT
                                 </option>
                             </select>
@@ -1011,13 +1011,13 @@
                                     dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
                             >
                                 <option value="">-- Pilih Perjanjian --</option>
-                                <option value="Harian Lepas" {{ old('Perjanjian', optional($karyawan->pekerjaan->first())->Perjanjian) == 'Harian Lepas' ? 'selected' : '' }}>
+                                <option value="Harian Lepas" {{ old('Perjanjian', optional($karyawan->pekerjaan)->Perjanjian) == 'Harian Lepas' ? 'selected' : '' }}>
                                     Harian Lepas
                                 </option>
-                                <option value="Kontrak" {{ old('Perjanjian', optional($karyawan->pekerjaan->first())->Perjanjian) == 'Kontrak' ? 'selected' : '' }}>
+                                <option value="Kontrak" {{ old('Perjanjian', optional($karyawan->pekerjaan)->Perjanjian) == 'Kontrak' ? 'selected' : '' }}>
                                     Kontrak
                                 </option>
-                                <option value="Tetap" {{ old('Perjanjian', optional($karyawan->pekerjaan->first())->Perjanjian) == 'Tetap' ? 'selected' : '' }}>
+                                <option value="Tetap" {{ old('Perjanjian', optional($karyawan->pekerjaan)->Perjanjian) == 'Tetap' ? 'selected' : '' }}>
                                     Tetap
                                 </option>
                             </select>
@@ -1054,10 +1054,10 @@
 
                                 @foreach ($lokasikerjaOptions as $lokasikerja)
                                     <option value="{{ $lokasikerja }}"
-                                        {{ old('Lokasi_Kerja', optional($karyawan->pekerjaan->first())->Lokasi_Kerja) === $lokasikerja ? 'selected' : '' }}>
+                                        {{ old('Lokasi_Kerja', optional($karyawan->pekerjaan)->Lokasi_Kerja) === $lokasikerja ? 'selected' : '' }}>
                                         {{ $lokasikerja }}
                                     </option>
-                                        {{ old('Lokasi_Kerja', optional($karyawan->pekerjaan->first())->Lokasi_Kerja) === $lokasikerja ? 'selected' : '' }}>
+                                        {{ old('Lokasi_Kerja', optional($karyawan->pekerjaan)->Lokasi_Kerja) === $lokasikerja ? 'selected' : '' }}>
                                         {{ $lokasikerja }}
                                     </option>
                                 @endforeach

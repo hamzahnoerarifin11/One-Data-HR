@@ -24,6 +24,9 @@ use App\Http\Controllers\SummaryController;
 use App\Http\Controllers\KandidatLanjutUserController;
 use App\Http\Controllers\TrainingController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\OnboardingKaryawanController;
+use App\Http\Controllers\TurnoverController;
+
 
 
 // Minimal routes for One Data HR
@@ -49,6 +52,9 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('users', UserController::class);
     // Karyawan resource
     Route::resource('karyawan', KaryawanController::class);
+    Route::resource('onboarding', OnboardingKaryawanController::class);
+    Route::get('/turnover', [TurnoverController::class, 'index'])
+    ->name('turnover.index');
 
     // User management resource
     Route::resource('users', UserController::class);

@@ -191,55 +191,73 @@
     @if($karyawan->pekerjaan && $karyawan->first()?->pekerjaan->count() > 0)
     <div class="mb-6 rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-800 dark:bg-white/[0.03] p-6">
         <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Informasi Pekerjaan</h2>
+
         @if($karyawan->perusahaan)
         <div class="mb-4 p-4 rounded-lg border border-gray-100 dark:border-gray-700">
             <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Perusahaan</p>
-            <p class="text-base font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->perusahaan->Perusahaan ?? '-' }}</p>
+            <p class="text-base font-semibold text-gray-900 dark:text-white mt-1">
+                {{ $karyawan->perusahaan->Perusahaan ?? '-' }}
+            </p>
         </div>
         @endif
-        @foreach($karyawan->pekerjaan as $p)
+
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-            <!-- grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 -->
+
             <div>
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Jabatan</p>
-                <p class="text-base font-semibold text-gray-900 dark:text-white mt-1">{{ $p->Jabatan ?? '-' }}</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaan->Jabatan ?? '-' }}</p>
             </div>
+
             <div>
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Bagian</p>
-                <p class="text-base font-semibold text-gray-900 dark:text-white mt-1">{{ $p->Bagian ?? '-' }}</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaan->Bagian ?? '-' }}</p>
             </div>
+
             <div>
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Departement</p>
-                <p class="text-base font-semibold text-gray-900 dark:text-white mt-1">{{ $p->Departement ?? '-' }}</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaan->Departement ?? '-' }}</p>
             </div>
+
             <div>
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Divisi</p>
-                <p class="text-base font-semibold text-gray-900 dark:text-white mt-1">{{ $p->Divisi ?? '-' }}</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaan->Divisi ?? '-' }}</p>
             </div>
+
             <div>
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Unit</p>
-                <p class="text-base font-semibold text-gray-900 dark:text-white mt-1">{{ $p->Unit ?? '-' }}</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaan->Unit ?? '-' }}</p>
             </div>
+
             <div>
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Jenis Kontrak</p>
-                <p class="text-base font-semibold text-gray-900 dark:text-white mt-1">{{ $p->Jenis_Kontrak ?? '-' }}</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaan->Jenis_Kontrak ?? '-' }}</p>
             </div>
+
             <div>
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Perjanjian Kerja</p>
-                <p class="text-base font-semibold text-gray-900 dark:text-white mt-1">{{ $p->Perjanjian ?? '-' }}</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaan->Perjanjian ?? '-' }}</p>
             </div>
+
             <div>
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Lokasi Kerja</p>
-                <p class="text-base font-semibold text-gray-900 dark:text-white mt-1">{{ $p->Lokasi_Kerja ?? '-' }}</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaan->Lokasi_Kerja ?? '-' }}</p>
             </div>
+
         </div>
-        @endforeach
+
         <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center text-xs text-gray-500">
-                <p>Dibuat pada: {{ $p->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}</p>
-                <p>Terakhir diperbarui: {{ $p->updated_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}</p>
+            <span>
+                Dibuat pada:
+                {{ $karyawan->pekerjaan->created_at?->timezone('Asia/Jakarta')->format('d/m/Y H:i') ?? '-' }}
+            </span>
+            <span>
+                Terakhir diperbarui:
+                {{ $karyawan->pekerjaan->updated_at?->timezone('Asia/Jakarta')->format('d/m/Y H:i') ?? '-' }}
+            </span>
         </div>
     </div>
     @endif
+
 
     <!-- ================= DATA PENDIDIKAN ================= -->
     @if($karyawan->pendidikan)
@@ -517,8 +535,8 @@
 
         </div>
         <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center text-xs text-gray-500">
-                <p>Dibuat pada: {{ $karyawan->kontrak->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}</p>
-                <p>Terakhir diperbarui: {{ $karyawan->kontrak->updated_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}</p>
+                <p>Dibuat pada: {{ $karyawan->kontrak?->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}</p>
+                <p>Terakhir diperbarui: {{ $karyawan->kontrak?->updated_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}</p>
         </div>
     </div>
     @endif

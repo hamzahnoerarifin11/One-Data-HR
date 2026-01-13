@@ -68,7 +68,7 @@
 
     {{-- 2. Statistik Detail (Grid 2 Kolom) --}}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        
+
         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
             <h4 class="font-bold text-gray-800 dark:text-white mb-4 border-b pb-2 dark:border-gray-700">Masa Kerja</h4>
             <div class="space-y-3">
@@ -86,6 +86,34 @@
                 @endforeach
             </div>
         </div>
+        {{-- 5. Kelompok Umur --}}
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+            <h4 class="font-bold text-gray-800 dark:text-white mb-4 border-b pb-2 dark:border-gray-700">
+                Kelompok Umur Karyawan
+            </h4>
+
+            <div class="space-y-4">
+                @foreach($ageCounts as $label => $count)
+                    @php
+                        $percent = $totalKaryawan > 0 ? ($count / $totalKaryawan) * 100 : 0;
+                    @endphp
+
+                    <div>
+                        <div class="flex justify-between text-sm mb-1 dark:text-gray-300">
+                            <span>{{ $label }} Tahun</span>
+                            <span class="font-semibold">{{ $count }} Org</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
+                            <div
+                                class="bg-green-500 h-2 rounded-full transition-all duration-300"
+                                style="width: {{ $percent }}%">
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
 
         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
             <h4 class="font-bold text-gray-800 dark:text-white mb-4 border-b pb-2 dark:border-gray-700">Pendidikan Terakhir</h4>
@@ -114,6 +142,26 @@
                     </span>
                 @endforeach
             </div>
+        </div>
+    </div>
+    {{-- 4. Statistik Divisi --}}
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <h4 class="font-bold text-gray-800 dark:text-white mb-4 border-b pb-2 dark:border-gray-700">
+            Sebaran Divisi
+        </h4>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            @foreach($divisiData as $divisi => $count)
+                <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg border border-gray-100 dark:border-gray-600 hover:shadow transition">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                        {{ $divisi }}
+                    </p>
+                    <p class="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1">
+                        {{ $count }}
+                    </p>
+                    <p class="text-xs text-gray-400">Karyawan</p>
+                </div>
+            @endforeach
         </div>
     </div>
 </div>

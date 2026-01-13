@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+
 <div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
 
     <!-- HEADER -->
@@ -48,9 +49,9 @@
             'nama'       => $k->Nama_Sesuai_KTP,
             'nik'        => $k->NIK,
             'phone'      => $k->Nomor_Telepon_Aktif_Karyawan,
-            'jabatan'    => $k->pekerjaan->first()?->Jabatan ?? '-',
-            'lokasi'     => $k->pekerjaan->first()?->Lokasi_Kerja ?? '-',
-            'divisi'     => $k->pekerjaan->first()?->Divisi ?? '-',
+            'jabatan'    => $k->pekerjaan->Jabatan ?? '-',
+            'lokasi'     => $k->pekerjaan->Lokasi_Kerja ?? '-',
+            'divisi'     => $k->pekerjaan->Divisi ?? '-',
             'perusahaan' => $k->perusahaan?->Perusahaan ?? '-',
         ])->values();
     @endphp
@@ -256,14 +257,14 @@
             </div>
 
             <div class="flex items-center gap-2">
-                <button @click="prevPage" :disabled="page === 1" class="rounded-lg border px-3 py-2 text-sm dark:text-white disabled:opacity-50">Prev</button>
+                <button @click="prevPage" :disabled="page === 1" class="rounded-lg border px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white disabled:opacity-50">Prev</button>
 
                 <template x-for="p in displayedPages" :key="p">
                     <button x-show="p !== '...'" @click="goToPage(p)" :class="page === p ? 'bg-blue-500 text-white' : 'text-gray-700 hover:bg-blue-500/[0.08] hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-500'" class="flex h-8 w-8 items-center justify-center rounded-lg text-theme-sm font-medium" x-text="p"></button>
                     <span x-show="p === '...'" class="flex h-8 w-8 items-center justify-center text-gray-500">...</span>
                 </template>
 
-                <button @click="nextPage" :disabled="page === totalPages" class="rounded-lg border px-3 py-2 text-sm dark:text-white disabled:opacity-50">Next</button>
+                <button @click="nextPage" :disabled="page === totalPages" class="rounded-lg border px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white disabled:opacity-50">Next</button>
             </div>
         </div>
     </div>
