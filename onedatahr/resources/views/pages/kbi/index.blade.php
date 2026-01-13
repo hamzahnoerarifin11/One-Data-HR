@@ -44,41 +44,57 @@
         PENILAIAN KBI
     </h1>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-        {{-- SIDEBAR --}}
-        <div class="space-y-4">
-
+    {{-- LAYOUT RESPONSIF: Kartu horizontal --}}
+    <div class="grid grid-cols-1 gap-4 sm:gap-6">
+        
+        {{-- KARTU-KARTU PENILAIAN (HORIZONTAL) --}}
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             {{-- KARTU 1: PENILAIAN DIRI --}}
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow border border-blue-100 dark:border-gray-700">
-                <h3 class="font-bold text-base text-blue-800 dark:text-blue-400 mb-1">
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow border border-blue-100 dark:border-gray-700 flex flex-col h-full">
+
+            <div class="flex items-center gap-3 mb-3 w-full">
+                <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                    <i class="fas fa-user text-blue-600 dark:text-blue-400"></i>
+                </div>
+                <h3 class="font-bold text-base text-blue-800 dark:text-blue-400">
                     Penilaian Diri
                 </h3>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">
-                    Wajib tiap semester
-                </p>
+            </div>
 
+            <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                Wajib tiap semester
+            </p>
+
+            <div class="mt-auto">
                 @if($selfAssessment)
                     <div class="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-sm px-3 py-2 rounded font-semibold text-center border border-green-200 dark:border-green-800">
-                        ✔ Selesai ({{ $selfAssessment->rata_rata_akhir }})
+                        <i class="fas fa-check-circle mr-1"></i>Selesai ({{ $selfAssessment->rata_rata_akhir }})
                     </div>
                 @else
                     <a href="{{ route('kbi.create', ['karyawan_id' => $karyawan->id_karyawan, 'tipe' => 'DIRI_SENDIRI']) }}"
-                       class="block text-center bg-blue-600 hover:bg-blue-700 text-white py-2 rounded font-semibold text-sm transition-colors duration-200">
-                        Mulai Menilai
+                    class="block text-center bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-4 rounded-lg font-semibold text-sm transition-all duration-200 hover:shadow-md">
+                        <i class="fas fa-pen-to-square mr-1"></i>Mulai Menilai
                     </a>
                 @endif
             </div>
+        </div>
+
 
             {{-- KARTU 3: FEEDBACK KE ATASAN --}}
-            <div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow border border-purple-100 dark:border-gray-700 mt-6 relative overflow-hidden">
+            <div class="bg-white dark:bg-gray-800 p-5 sm:p-6 rounded-xl shadow border border-purple-100 dark:border-gray-700 relative overflow-hidden transition-transform hover:shadow-lg">
                 
                 {{-- Dekorasi Blob --}}
                 <div class="absolute top-0 right-0 -mt-2 -mr-2 w-16 h-16 bg-purple-50 dark:bg-purple-900/20 rounded-full blur-xl opacity-50 pointer-events-none"></div>
 
-                <h3 class="font-bold text-base text-purple-800 dark:text-purple-400 mb-1">
-                    Feedback ke Atasan
-                </h3>
+                <!-- header -->
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                        <i class="fas fa-star text-purple-600 dark:text-purple-400"></i>
+                    </div>
+                    <h3 class="font-bold text-base text-purple-800 dark:text-purple-400">
+                        Feedback ke Atasan
+                    </h3>
+                </div>
                 
                 @if($atasan)
                     {{-- === KONDISI A: SUDAH PUNYA ATASAN === --}}
@@ -86,24 +102,24 @@
                         Berikan masukan untuk atasan langsung Anda.
                     </p>
                     @if(!$sudahMenilaiAtasan)
-                        <form action="{{ route('kbi.reset-atasan') }}" method="POST" class="absolute top-4 right-4">
+                        <form action="{{ route('kbi.reset-atasan') }}" method="POST" class="absolute top-6 right-4">
                             @csrf
                             <input type="hidden" name="karyawan_id" value="{{ $karyawan->id_karyawan }}">
                             <button type="submit" title="Ubah Atasan" 
                                     class="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 text-sm transition-colors">
-                                <i class="fas fa-edit"></i> Ganti
+                                <i class="fas fa-edit"></i>
                             </button>
                         </form>
                     @endif
                     
-                    <div class="flex items-start gap-3 mb-4">
+                    <div class="m-auto mb-6 flex items-center gap-4">
                         {{-- Avatar Inisial --}}
-                        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center text-purple-700 dark:text-purple-300 font-bold text-sm border border-purple-200 dark:border-purple-700">
+                        <div class="flex-shrink-0 w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center text-purple-700 dark:text-purple-300 font-bold text-sm border border-purple-200 dark:border-purple-700">
                             {{ substr($atasan->Nama_Lengkap_Sesuai_Ijazah ?? $atasan->Nama_Sesuai_KTP ?? 'A', 0, 1) }}
                         </div>
                         
                         {{-- Info Nama & Jabatan --}}
-                        <div class="overflow-hidden">
+                        <div class="flex-1 min-w-0">
                             <h4 class="font-bold text-gray-800 dark:text-white text-sm truncate">
                                 {{ $atasan->Nama_Lengkap_Sesuai_Ijazah ?? $atasan->Nama_Sesuai_KTP }}
                             </h4>
@@ -119,7 +135,7 @@
                         </div>
                     @else
                         <a href="{{ route('kbi.create', ['karyawan_id' => $atasan->id_karyawan, 'tipe' => 'BAWAHAN']) }}"
-                        class="block w-full text-center bg-purple-600 hover:bg-purple-700 text-white py-2.5 rounded-lg font-semibold text-sm transition shadow-sm hover:shadow-md group">
+                        class="block w-full text-center bg-purple-600 hover:bg-purple-700 text-white py-2.5 px-4 rounded-lg font-semibold text-sm transition-all duration-200 shadow-sm hover:shadow-md group">
                         <span class="group-hover:scale-105 inline-block transition-transform duration-200">
                                 <i class="fas fa-pen-to-square mr-1"></i> Mulai Menilai
                         </span>
@@ -128,7 +144,7 @@
 
                 @else
                     {{-- === KONDISI B: BELUM PUNYA ATASAN (TAMPILKAN FORM PILIH) === --}}
-                    <p class="text-xs text-red-500 dark:text-red-400 mb-3 italic">
+                    <p class="text-xs text-red-500 dark:text-red-400 mb-4 italic">
                         *Data atasan belum disetting. Silakan pilih atasan langsung Anda:
                     </p>
 
@@ -152,7 +168,7 @@
 
                         {{-- Tombol Simpan --}}
                         <button type="submit" 
-                                class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded text-sm transition">
+                                class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition-all duration-200">
                             <i class="fas fa-save mr-1"></i> Simpan Atasan
                         </button>
                     </form>
@@ -160,33 +176,37 @@
             </div>
         </div>
 
-        {{-- KONTEN UTAMA --}}
-        <div class="md:col-span-2 bg-white dark:bg-gray-800 p-5 rounded-xl shadow border border-green-100 dark:border-gray-700">
 
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-                <h3 class="font-bold text-lg text-green-800 dark:text-green-400">
-                    Daftar Karyawan ({{ $karyawan->count() }})
+
+        {{-- KONTEN UTAMA: DAFTAR KARYAWAN --}}
+        {{-- Tampilkan table hanya jika role bukan staff --}}
+        @if(auth()->user()->role !== 'staff')
+        <div class="bg-white dark:bg-gray-800 p-5 sm:p-6 rounded-xl shadow border border-green-100 dark:border-gray-700">
+
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+                <h3 class="font-bold text-lg text-green-800 dark:text-green-400 flex items-center gap-2">
+                    <i class="fas fa-users"></i>Daftar Karyawan ({{ $karyawan->count() }})
                 </h3>
             </div>
 
             {{-- SEARCH --}}
-            <form action="{{ route('kbi.index') }}" method="GET" class="mb-4">
+            <form action="{{ route('kbi.index') }}" method="GET" class="mb-5">
                 <div class="flex flex-col sm:flex-row gap-2">
                     <input type="text"
                         name="search"
                         value="{{ request('search') }}"
                         placeholder="Cari Nama / NIK..."
-                        class="w-full border border-gray-300 dark:border-gray-600 rounded px-4 py-2 text-sm focus:outline-none focus:border-green-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                        class="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200 dark:focus:ring-green-800 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition"
                     >
-                    {{-- TOMBOL CARI (Menggunakan Style Manual .bg-green-600) --}}
-                    <button class="bg-green-600 text-white px-5 py-2 rounded text-sm hover:bg-green-700 transition-colors">
-                        Cari
+                    {{-- TOMBOL CARI --}}
+                    <button class="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-lg font-semibold text-sm transition-all duration-200 hover:shadow-md whitespace-nowrap">
+                        <i class="fas fa-search mr-1"></i>Cari
                     </button>
 
                     @if(request('search'))
                         <a href="{{ route('kbi.index') }}"
-                           class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm text-center transition-colors">
-                            Reset
+                           class="bg-gray-400 hover:bg-gray-500 text-white px-6 py-2.5 rounded-lg font-semibold text-sm text-center transition-all duration-200 hover:shadow-md whitespace-nowrap">
+                            <i class="fas fa-redo mr-1"></i>Reset
                         </a>
                     @endif
                 </div>
@@ -194,43 +214,44 @@
 
             {{-- TABLE --}}
             <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
-                <table class="min-w-[640px] w-full text-sm">
-                    <thead class="bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 uppercase text-xs">
+                <table class="min-w-full w-full text-sm">
+                    <thead class="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-600 text-gray-700 dark:text-gray-300 uppercase text-xs font-semibold">
                         <tr>
-                            <th class="p-3 text-left">Nama</th>
-                            <th class="p-3 text-center">NIK</th>
-                            <th class="p-3 text-center">Jabatan</th>
-                            <th class="p-3 text-center">Aksi</th>
+                            <th class="p-4 text-left">Nama</th>
+                            <th class="p-4 text-center">NIK</th>
+                            <th class="p-4 text-center hidden sm:table-cell">Jabatan</th>
+                            <th class="p-4 text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
                         @forelse($bawahanList as $staff)
-                        <tr class=" dark:hover:bg-gray-700/50 transition-colors">
-                            <td class="p-3 font-medium text-gray-900 dark:text-white">
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
+                            <td class="p-4 font-medium text-gray-900 dark:text-white">
                                 {{ $staff->Nama_Lengkap_Sesuai_Ijazah ?? $staff->Nama_Sesuai_KTP }}
                             </td>
-                            <td class="p-3 text-gray-500 dark:text-gray-400 text-center">{{ $staff->NIK }}</td>
-                            <td class="p-3 text-gray-500 dark:text-gray-400 text-center">
+                            <td class="p-4 text-gray-600 dark:text-gray-400 text-center font-mono text-xs">{{ $staff->NIK }}</td>
+                            <td class="p-4 text-gray-600 dark:text-gray-400 text-center hidden sm:table-cell">
                                 {{ $staff->pekerjaan->first()?->Jabatan ?? '-' }}
                             </td>
-                            <td class="p-3 text-center">
+                            <td class="p-4 text-center">
                                 @if($staff->sudah_dinilai)
-                                    <span class="text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800 px-2 py-1 rounded text-xs font-semibold">
-                                        Selesai
+                                    <span class="inline-flex items-center gap-1 text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800 px-3 py-1.5 rounded-lg text-xs font-semibold">
+                                        <i class="fas fa-check-circle"></i> Selesai
                                     </span>
                                 @else
-                                    {{-- TOMBOL NILAI (Menggunakan Style Manual .bg-green-600) --}}
+                                    {{-- TOMBOL NILAI --}}
                                     <a href="{{ route('kbi.create', ['karyawan_id' => $staff->id_karyawan, 'tipe' => 'ATASAN']) }}"
-                                       class="inline-block bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-xs transition duration-200">
-                                        Nilai
+                                       class="inline-flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 hover:shadow-md">
+                                        <i class="fas fa-pen-to-square"></i>Nilai
                                     </a>
                                 @endif
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="4" class="p-6 text-center text-gray-400 dark:text-gray-500">
-                                Data tidak ditemukan
+                            <td colspan="4" class="p-8 text-center text-gray-400 dark:text-gray-500">
+                                <i class="fas fa-inbox text-3xl mb-3 opacity-50"></i>
+                                <p>Data tidak ditemukan</p>
                             </td>
                         </tr>
                         @endforelse
@@ -238,11 +259,12 @@
                 </table>
             </div>
              {{-- PAGINATION --}}
-             <div class="mt-4 flex justify-end">
+             <div class="mt-6 flex justify-end">
                 {{ $bawahanList->links('components.pagination-custom') }}
             </div>
 
         </div>
+        @endif
     </div>
 </div>
 @endsection
