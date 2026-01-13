@@ -9,15 +9,28 @@
             <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Manager Dashboard</h1>
             <p class="text-sm text-gray-500">Monitoring Kinerja Tim: <span class="font-semibold text-blue-600">{{ $manager->Nama_Lengkap_Sesuai_Ijazah }}</span></p>
         </div>
-        <form method="GET" class="flex items-center gap-2">
-            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Periode:</label>
-            <select name="tahun" onchange="this.form.submit()" class="border-gray-300 rounded-lg text-sm focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                @for($y = date('Y'); $y >= date('Y')-2; $y--)
-                    <option value="{{ $y }}" {{ $tahun == $y ? 'selected' : '' }}>{{ $y }}</option>
-                @endfor
-            </select>
+        {{-- Filter Tahun (Opsional, jika ingin lihat history) --}}
+        <form method="GET" class="flex justify-end">
+            <div class="flex flex-col items-end gap-1">
+                <div class="flex items-center gap-2">
+                    <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        <i class="fas fa-calendar-alt mr-1 text-blue-600"></i>Pilih Tahun:
+                    </label>
+                    <select name="tahun" onchange="this.form.submit()" class="px-3 py-2 border border-blue-300 dark:border-blue-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm">
+                        @for($y = date('Y'); $y >= date('Y')-5; $y--)
+                            <option value="{{ $y }}" {{ $tahun == $y ? 'selected' : '' }}>Tahun {{ $y }}</option>
+                        @endfor
+                    </select>
+                </div>
+                <p class="text-xs text-gray-600 dark:text-gray-400 italic">
+                    Menampilkan tahun <strong class="text-blue-600 dark:text-blue-400">{{ $tahun }}</strong>
+                </p>
+            </div>
         </form>
     </div>
+    {{-- <div class="mt-1 text-xs text-gray-600 dark:text-gray-400 italic">
+        Menampilkan tahun <strong class="text-blue-600 dark:text-blue-400">{{ $tahun }}</strong>
+    </div> --}}
 
     {{-- Action Cards --}}
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">

@@ -40,29 +40,30 @@
 </style>
 
 <div class="p-4 sm:p-6">
-    <div class="mb-6 flex flex-col lg:flex-row justify-between items-start lg:items-center bg-white dark:bg-gray-800 p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 gap-4">
+    <div class="mb-6 flex flex-col lg:flex-row justify-between items-start lg:items-center p-4 md:p-6 rounded-xl shadow-sm gap-4">
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
             PENILAIAN KBI
         </h1>
         
         {{-- FILTER TAHUN --}}
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
-            <div class="flex items-center gap-2 w-full sm:w-auto">
-                <label class="text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                    <i class="fas fa-calendar-alt mr-1 text-blue-600"></i>Pilih Tahun:
-                </label>
-                <select id="yearFilterKbi" onchange="filterKbiByYear(this.value)" class="flex-1 sm:flex-none px-3 py-2 border border-blue-300 dark:border-blue-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm transition cursor-pointer">
-                    @for($y = date('Y'); $y >= date('Y')-5; $y--)
-                        <option value="{{ $y }}" {{ $tahun == $y ? 'selected' : '' }}>
-                            Tahun {{ $y }}
-                        </option>
-                    @endfor
-                </select>
+        <form method="GET" class="flex justify-end">
+            <div class="flex flex-col items-end gap-1">
+                <div class="flex items-center gap-2">
+                    <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        <i class="fas fa-calendar-alt mr-1 text-blue-600"></i>Pilih Tahun:
+                    </label>
+                    <select name="tahun" onchange="this.form.submit()" class="px-3 py-2 border border-blue-300 dark:border-blue-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm">
+                        @for($y = date('Y'); $y >= date('Y')-5; $y--)
+                            <option value="{{ $y }}" {{ $tahun == $y ? 'selected' : '' }}>Tahun {{ $y }}</option>
+                        @endfor
+                    </select>
+                </div>
+                <p class="text-xs text-gray-600 dark:text-gray-400 italic">
+                    Menampilkan tahun <strong class="text-blue-600 dark:text-blue-400">{{ $tahun }}</strong>
+                </p>
             </div>
-            <div class="text-xs text-gray-600 dark:text-gray-400 italic">
-                Menampilkan KBI tahun <strong class="text-blue-600 dark:text-blue-400" id="currentYearDisplayKbi">{{ $tahun }}</strong>
-            </div>
-        </div>
+        </form>
+        
     </div>
 
     {{-- LAYOUT RESPONSIF: Kartu horizontal --}}

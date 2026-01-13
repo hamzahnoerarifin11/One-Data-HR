@@ -10,8 +10,8 @@
     </div>
 
     {{-- Filter Tahun (Opsional, jika ingin lihat history) --}}
-    <form method="GET">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+    <form method="GET" class="flex justify-end">
+        <div class="flex flex-col items-end gap-1">
             <div class="flex items-center gap-2">
                 <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">
                     <i class="fas fa-calendar-alt mr-1 text-blue-600"></i>Pilih Tahun:
@@ -22,9 +22,9 @@
                     @endfor
                 </select>
             </div>
-            <div class="text-xs text-gray-600 dark:text-gray-400 italic">
+            <p class="text-xs text-gray-600 dark:text-gray-400 italic">
                 Menampilkan tahun <strong class="text-blue-600 dark:text-blue-400">{{ $tahun }}</strong>
-            </div>
+            </p>
         </div>
     </form>
 
