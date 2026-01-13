@@ -26,8 +26,8 @@ class KpiAssessmentController extends Controller
 
         // --- SKENARIO 1: ADMIN & SUPERADMIN (Lihat Semua Data) ---
         if (in_array($user->role, ['superadmin', 'admin'])) {
-            
-            $query = Karyawan::with(['pekerjaan', 'kpiAssessment' => function($q) use ($tahun) {
+
+            $query = Karyawan::with(['pekerjaan', 'kpiAssessment' => function ($q) use ($tahun) {
                 $q->where('tahun', $tahun);
             }]);
 
@@ -35,12 +35,12 @@ class KpiAssessmentController extends Controller
             if ($request->has('search') && $request->search != '') {
                 $search = $request->search;
                 $query->where('Nama_Lengkap_Sesuai_Ijazah', 'LIKE', "%{$search}%")
-                      ->orWhere('NIK', 'LIKE', "%{$search}%");
+                    ->orWhere('NIK', 'LIKE', "%{$search}%");
             }
 
             // Filter Jabatan
             if ($request->has('filter_jabatan') && $request->filter_jabatan != '') {
-                $query->whereHas('pekerjaan', function($q) use ($request) {
+                $query->whereHas('pekerjaan', function ($q) use ($request) {
                     $q->where('jabatan', $request->filter_jabatan);
                 });
             }
@@ -73,7 +73,7 @@ class KpiAssessmentController extends Controller
         }
 
         // --- SKENARIO 2: STAFF & MANAGER (Redirect ke Punya Sendiri) ---
-        
+
         $me = Karyawan::where('nik', $user->nik)->first();
 
         if (!$me) {
@@ -82,20 +82,20 @@ class KpiAssessmentController extends Controller
 
         // Cek apakah KPI tahun ini sudah ada?
         $existingKpi = KpiAssessment::where('karyawan_id', $me->id_karyawan)
-                                    ->where('tahun', $tahun)
-                                    ->first();
+            ->where('tahun', $tahun)
+            ->first();
 
         if ($existingKpi) {
             // Jika sudah ada, langsung BUKA (Show)
             return redirect()->route('kpi.show', [
-                'karyawan_id' => $me->id_karyawan, 
+                'karyawan_id' => $me->id_karyawan,
                 'tahun' => $tahun
             ]);
         } else {
             // Jika belum ada, BUAT BARU OTOMATIS (Store)
             // Kita panggil method store manual atau redirect ke route store dengan hidden input
             // Cara paling aman: Tampilkan view konfirmasi "Buat KPI Baru" atau auto-create di sini.
-            
+
             // Auto Create Header KPI
             $newKpi = KpiAssessment::create([
                 'karyawan_id'       => $me->id_karyawan,
@@ -108,9 +108,9 @@ class KpiAssessmentController extends Controller
             ]);
 
             return redirect()->route('kpi.show', [
-                'karyawan_id' => $me->id_karyawan, 
+                'karyawan_id' => $me->id_karyawan,
                 'tahun' => $tahun
-            ])->with('success', 'Dokumen KPI Tahun '.$tahun.' berhasil dibuat. Silakan isi indikator.');
+            ])->with('success', 'Dokumen KPI Tahun ' . $tahun . ' berhasil dibuat. Silakan isi indikator.');
         }
     }
 
@@ -132,19 +132,28 @@ class KpiAssessmentController extends Controller
         }
 
         $kpi = KpiAssessment::where('karyawan_id', $karyawanId)
-                            ->where('tahun', $tahun)
-                            ->first();
+            ->where('tahun', $tahun)
+            ->first();
 
+        // Jika KPI belum ada, buat baru dengan status DRAFT
         if (!$kpi) {
-            return redirect()->route('kpi.index')->with('error', 'Data KPI tidak ditemukan.');
+            $kpi = KpiAssessment::create([
+                'karyawan_id' => $karyawanId,
+                'tahun' => $tahun,
+                'periode' => 'Tahunan',
+                'status' => 'DRAFT',
+                'total_skor_akhir' => 0,
+                'nama_periode' => "KPI Tahun {$tahun}",
+            ]);
         }
 
         $items = KpiItem::where('kpi_assessment_id', $kpi->id_kpi_assessment)
-                        ->with('scores')
-                        ->paginate(10); // Pagination untuk item
+            ->with('scores')
+            ->paginate(10); // Pagination untuk item
 
-        return view('pages.kpi.form', compact('karyawan', 'kpi', 'items'));
+        return view('pages.kpi.form', compact('karyawan', 'kpi', 'items', 'tahun'));
     }
+    
 
     // =================================================================
     // 3. STORE HEADER (Opsional, karena sudah dihandle di Index)
@@ -166,6 +175,7 @@ class KpiAssessmentController extends Controller
         KpiAssessment::create([
             'karyawan_id' => $request->karyawan_id,
             'tahun' => $request->tahun,
+            'periode' => 'Tahunan',
             'status' => 'DRAFT',
             'total_skor_akhir' => 0,
             'nama_periode' => 'Tahunan',
@@ -177,7 +187,7 @@ class KpiAssessmentController extends Controller
     // =================================================================
     // 4. CRUD ITEM & SCORE (Sangat Penting)
     // =================================================================
-    
+
     // Tambah Indikator Baru
     public function storeItem(Request $request)
     {
@@ -196,7 +206,7 @@ class KpiAssessmentController extends Controller
             'perspektif'                => $request->perspektif,
             'key_result_area'           => $request->key_result_area,
             'key_performance_indicator' => $request->key_performance_indicator,
-            'units'                     => $request->units, 
+            'units'                     => $request->units,
             'polaritas'                 => $request->polaritas,
             'bobot'                     => $request->bobot,
             'target'                    => $cleanTarget,
@@ -207,10 +217,10 @@ class KpiAssessmentController extends Controller
             'kpi_item_id'  => $item->id_kpi_item,
             'target'       => $cleanTarget,
             'target_smt1'  => $cleanTarget,
-            
+
             // PERBAIKAN DISINI: Jangan pakai $request->nama_periode
             'nama_periode' => 'Semester 1', // <--- ISI MANUAL AGAR TIDAK EROR
-            
+
             'realisasi'    => 0
         ]);
 
@@ -219,102 +229,114 @@ class KpiAssessmentController extends Controller
 
     // Update Nilai / Realisasi (Dipanggil saat tombol Simpan di form ditekan)
     public function update(Request $request, $id_kpi_assessment)
-{
-    $assessment = KpiAssessment::with('karyawan')->findOrFail($id_kpi_assessment);
-    $inputs = $request->input('kpi'); // Array dari form
+    {
+        $assessment = KpiAssessment::with('karyawan')->findOrFail($id_kpi_assessment);
+        $inputs = $request->input('kpi'); // Array dari form
 
-    if (!$inputs) return redirect()->back()->with('error', 'Tidak ada data dikirim.');
+        if (!$inputs) return redirect()->back()->with('error', 'Tidak ada data dikirim.');
 
-    DB::beginTransaction();
-    try {
-        foreach ($inputs as $itemId => $data) {
-            
-            $item = KpiItem::find($itemId);
-            if (!$item) continue;
+        DB::beginTransaction();
+        try {
+            foreach ($inputs as $itemId => $data) {
 
-            $score = KpiScore::where('kpi_item_id', $itemId)->first();
-            
-            if ($score) {
-                // ====================================================
-                // 1. AMBIL SEMUA INPUT (BERSIHKAN DARI KOMA/PERSEN)
-                // ====================================================
+                $item = KpiItem::find($itemId);
+                if (!$item) continue;
 
-                // --- Semester 1 ---
-                $target1 = $this->cleanInput($data['target_smt1'] ?? $item->target);
-                $real1   = $this->cleanInput($data['real_smt1'] ?? 0);
-                // Tangkap Adjustment Smt 1
-                $adjReal1 = isset($data['adjustment_real_smt1']) ? $this->cleanInput($data['adjustment_real_smt1']) : null;
-                
-                // --- Bulanan (Juli - Desember) ---
-                // WAJIB DITANGKAP AGAR TIDAK HILANG
-                $t_jul = $this->cleanInput($data['target_jul'] ?? 0); $r_jul = $this->cleanInput($data['real_jul'] ?? 0);
-                $t_aug = $this->cleanInput($data['target_aug'] ?? 0); $r_aug = $this->cleanInput($data['real_aug'] ?? 0);
-                $t_sep = $this->cleanInput($data['target_sep'] ?? 0); $r_sep = $this->cleanInput($data['real_sep'] ?? 0);
-                $t_okt = $this->cleanInput($data['target_okt'] ?? 0); $r_okt = $this->cleanInput($data['real_okt'] ?? 0);
-                $t_nov = $this->cleanInput($data['target_nov'] ?? 0); $r_nov = $this->cleanInput($data['real_nov'] ?? 0);
-                $t_des = $this->cleanInput($data['target_des'] ?? 0); $r_des = $this->cleanInput($data['real_des'] ?? 0);
+                $score = KpiScore::where('kpi_item_id', $itemId)->first();
 
-                // --- Semester 2 (Manual) ---
-                $target2 = $this->cleanInput($data['total_target_smt2'] ?? 0);
-                $real2   = $this->cleanInput($data['total_real_smt2'] ?? 0);
-                // Tangkap Adjustment Smt 2
-                $adjReal2   = isset($data['adjustment_real_smt2']) ? $this->cleanInput($data['adjustment_real_smt2']) : null;
-                $adjTarget2 = isset($data['adjustment_target_smt2']) ? $this->cleanInput($data['adjustment_target_smt2']) : null;
+                if ($score) {
+                    // ====================================================
+                    // 1. AMBIL SEMUA INPUT (BERSIHKAN DARI KOMA/PERSEN)
+                    // ====================================================
 
-                // ====================================================
-                // 2. HITUNG SKOR DI BACKEND (LOGIKA PENILAIAN)
-                // ====================================================
-                
-                // --- Hitung SMT 1 ---
-                // Gunakan Adjustment Real jika ada, jika tidak pakai Real biasa
-                $real1Final = ($adjReal1 !== null && $data['adjustment_real_smt1'] !== "") ? $adjReal1 : $real1;
-                $skor1      = $this->hitungSkor($target1, $real1Final, $item->polaritas);
-                
-                // --- Hitung SMT 2 ---
-                // Gunakan Adjustment Target/Real jika ada
-                $target2Final = ($adjTarget2 !== null && $data['adjustment_target_smt2'] !== "") ? $adjTarget2 : $target2;
-                $real2Final   = ($adjReal2 !== null && $data['adjustment_real_smt2'] !== "") ? $adjReal2 : $real2;
-                $skor2        = $this->hitungSkor($target2Final, $real2Final, $item->polaritas);
+                    // --- Semester 1 ---
+                    $target1 = $this->cleanInput($data['target_smt1'] ?? $item->target);
+                    $real1   = $this->cleanInput($data['real_smt1'] ?? 0);
+                    // Tangkap Adjustment Smt 1
+                    $adjReal1 = isset($data['adjustment_real_smt1']) ? $this->cleanInput($data['adjustment_real_smt1']) : null;
 
-                // --- Final Score Item ---
-                $pencapaianTotal = ($skor1 + $skor2) / 2; 
-                $finalSkorItem   = ($pencapaianTotal * $item->bobot) / 100;
+                    // --- Bulanan (Juli - Desember) ---
+                    // WAJIB DITANGKAP AGAR TIDAK HILANG
+                    $t_jul = $this->cleanInput($data['target_jul'] ?? 0);
+                    $r_jul = $this->cleanInput($data['real_jul'] ?? 0);
+                    $t_aug = $this->cleanInput($data['target_aug'] ?? 0);
+                    $r_aug = $this->cleanInput($data['real_aug'] ?? 0);
+                    $t_sep = $this->cleanInput($data['target_sep'] ?? 0);
+                    $r_sep = $this->cleanInput($data['real_sep'] ?? 0);
+                    $t_okt = $this->cleanInput($data['target_okt'] ?? 0);
+                    $r_okt = $this->cleanInput($data['real_okt'] ?? 0);
+                    $t_nov = $this->cleanInput($data['target_nov'] ?? 0);
+                    $r_nov = $this->cleanInput($data['real_nov'] ?? 0);
+                    $t_des = $this->cleanInput($data['target_des'] ?? 0);
+                    $r_des = $this->cleanInput($data['real_des'] ?? 0);
 
-                // ====================================================
-                // 3. SIMPAN KE DATABASE (UPDATE LENGKAP)
-                // ====================================================
-                $score->update([
-                    // Data Semester 1
-                    'target_smt1' => $target1,
-                    'real_smt1'   => $real1,
-                    'adjustment_real_smt1' => $adjReal1, // <--- Jangan Lupa Disimpan
-                    
-                    // Data Bulanan (AGAR TIDAK HILANG)
-                    'target_jul' => $t_jul, 'real_jul' => $r_jul,
-                    'target_aug' => $t_aug, 'real_aug' => $r_aug,
-                    'target_sep' => $t_sep, 'real_sep' => $r_sep,
-                    'target_okt' => $t_okt, 'real_okt' => $r_okt,
-                    'target_nov' => $t_nov, 'real_nov' => $r_nov,
-                    'target_des' => $t_des, 'real_des' => $r_des,
+                    // --- Semester 2 (Manual) ---
+                    $target2 = $this->cleanInput($data['total_target_smt2'] ?? 0);
+                    $real2   = $this->cleanInput($data['total_real_smt2'] ?? 0);
+                    // Tangkap Adjustment Smt 2
+                    $adjReal2   = isset($data['adjustment_real_smt2']) ? $this->cleanInput($data['adjustment_real_smt2']) : null;
+                    $adjTarget2 = isset($data['adjustment_target_smt2']) ? $this->cleanInput($data['adjustment_target_smt2']) : null;
 
-                    // Data Semester 2
-                    'total_target_smt2' => $target2,
-                    'total_real_smt2'   => $real2,
-                    'adjustment_target_smt2' => $adjTarget2, // <--- Jangan Lupa Disimpan
-                    'adjustment_real_smt2'   => $adjReal2,   // <--- Jangan Lupa Disimpan
-                    
-                    // Skor Akhir
-                    'skor_akhir' => $finalSkorItem
-                ]);
+                    // ====================================================
+                    // 2. HITUNG SKOR DI BACKEND (LOGIKA PENILAIAN)
+                    // ====================================================
+
+                    // --- Hitung SMT 1 ---
+                    // Gunakan Adjustment Real jika ada, jika tidak pakai Real biasa
+                    $real1Final = ($adjReal1 !== null && $data['adjustment_real_smt1'] !== "") ? $adjReal1 : $real1;
+                    $skor1      = $this->hitungSkor($target1, $real1Final, $item->polaritas);
+
+                    // --- Hitung SMT 2 ---
+                    // Gunakan Adjustment Target/Real jika ada
+                    $target2Final = ($adjTarget2 !== null && $data['adjustment_target_smt2'] !== "") ? $adjTarget2 : $target2;
+                    $real2Final   = ($adjReal2 !== null && $data['adjustment_real_smt2'] !== "") ? $adjReal2 : $real2;
+                    $skor2        = $this->hitungSkor($target2Final, $real2Final, $item->polaritas);
+
+                    // --- Final Score Item ---
+                    $pencapaianTotal = ($skor1 + $skor2) / 2;
+                    $finalSkorItem   = ($pencapaianTotal * $item->bobot) / 100;
+
+                    // ====================================================
+                    // 3. SIMPAN KE DATABASE (UPDATE LENGKAP)
+                    // ====================================================
+                    $score->update([
+                        // Data Semester 1
+                        'target_smt1' => $target1,
+                        'real_smt1'   => $real1,
+                        'adjustment_real_smt1' => $adjReal1, // <--- Jangan Lupa Disimpan
+
+                        // Data Bulanan (AGAR TIDAK HILANG)
+                        'target_jul' => $t_jul,
+                        'real_jul' => $r_jul,
+                        'target_aug' => $t_aug,
+                        'real_aug' => $r_aug,
+                        'target_sep' => $t_sep,
+                        'real_sep' => $r_sep,
+                        'target_okt' => $t_okt,
+                        'real_okt' => $r_okt,
+                        'target_nov' => $t_nov,
+                        'real_nov' => $r_nov,
+                        'target_des' => $t_des,
+                        'real_des' => $r_des,
+
+                        // Data Semester 2
+                        'total_target_smt2' => $target2,
+                        'total_real_smt2'   => $real2,
+                        'adjustment_target_smt2' => $adjTarget2, // <--- Jangan Lupa Disimpan
+                        'adjustment_real_smt2'   => $adjReal2,   // <--- Jangan Lupa Disimpan
+
+                        // Skor Akhir
+                        'skor_akhir' => $finalSkorItem
+                    ]);
+                }
             }
-        }
 
-        // Hitung Total Header
-        $grandTotal = KpiScore::join('kpi_items', 'kpi_scores.kpi_item_id', '=', 'kpi_items.id_kpi_item')
-            ->where('kpi_items.kpi_assessment_id', $id_kpi_assessment)
-            ->sum('kpi_scores.skor_akhir');
+            // Hitung Total Header
+            $grandTotal = KpiScore::join('kpi_items', 'kpi_scores.kpi_item_id', '=', 'kpi_items.id_kpi_item')
+                ->where('kpi_items.kpi_assessment_id', $id_kpi_assessment)
+                ->sum('kpi_scores.skor_akhir');
 
-           $user = Auth::user();
+            $user = Auth::user();
             $statusSekarang = $assessment->status;
             $statusBaru = $statusSekarang; // Default tidak berubah
 
@@ -323,7 +345,7 @@ class KpiAssessmentController extends Controller
             if ($user->role == 'staff') {
                 $statusBaru = 'SUBMITTED';
             }
-            
+
             // SKENARIO 2: MANAGER / ADMIN KLIK SIMPAN
             // Jika Manager/Admin yang simpan, otomatis jadi "FINAL" (Approved)
             elseif (in_array($user->role, ['manager', 'admin', 'superadmin'])) {
@@ -338,22 +360,21 @@ class KpiAssessmentController extends Controller
             ]);
 
             DB::commit();
-            
+
             // Pesan Feedback Disesuaikan
             $pesan = ($statusBaru == 'FINAL') ? 'Data disetujui & difinalisasi.' : 'Data berhasil dikirim ke Atasan.';
-            
-            return redirect()->back()->with('success', $pesan . ' Skor Akhir: ' . number_format($grandTotal, 2));
 
+            return redirect()->back()->with('success', $pesan . ' Skor Akhir: ' . number_format($grandTotal, 2));
         } catch (\Exception $e) {
-        DB::rollback();
-        return redirect()->back()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
+            DB::rollback();
+            return redirect()->back()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
+        }
     }
-}
 
     // =================================================================
     // 5. HELPER FUNCTION
     // =================================================================
-    
+
     private function cleanInput($value)
     {
         if (is_null($value)) return 0;
@@ -364,7 +385,7 @@ class KpiAssessmentController extends Controller
     {
         $t = $this->cleanInput($target);
         $r = $this->cleanInput($realisasi);
-        
+
         if ($t == 0) return 0;
 
         $p = strtolower($polaritas);
@@ -393,10 +414,10 @@ class KpiAssessmentController extends Controller
     public function destroyItem($id)
     {
         $item = KpiItem::findOrFail($id);
-        
+
         // Hapus skor terkait dulu agar bersih
         KpiScore::where('kpi_item_id', $id)->delete();
-        
+
         // Hapus itemnya
         $item->delete();
 
@@ -410,11 +431,11 @@ class KpiAssessmentController extends Controller
         $request->validate([
             'key_performance_indicator' => 'required|string',
             'bobot'                     => 'required|numeric',
-            'target'                    => 'required', 
+            'target'                    => 'required',
         ]);
 
         $item = KpiItem::findOrFail($id);
-        
+
         // 2. Bersihkan Input Target
         $cleanTarget = $this->cleanInput($request->target);
 
@@ -431,8 +452,8 @@ class KpiAssessmentController extends Controller
 
         // 4. Update Tabel Score juga (agar Target di tabel berubah)
         $score = KpiScore::where('kpi_item_id', $id)->first();
-        
-        if($score) {
+
+        if ($score) {
             $score->update([
                 'target'      => $cleanTarget,
                 'target_smt1' => $cleanTarget,

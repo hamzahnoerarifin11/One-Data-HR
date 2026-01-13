@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\KbiAssessment; 
-use App\Models\Karyawan;      
+use App\Models\KbiAssessment;
+use App\Models\Karyawan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -16,7 +16,8 @@ class KbiController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $tahun = date('Y');
+        // Ambil tahun dari request, jika tidak ada gunakan tahun berjalan
+        $tahun = $request->input('tahun', date('Y'));
 
         // A. Validasi NIK User Login
         if (empty($user->nik)) {
@@ -37,23 +38,23 @@ class KbiController extends Controller
 
         // D. Logic Daftar Karyawan (Tabel Kanan)
         $query = Karyawan::query();
-        
+
         // Filter: Jangan tampilkan diri sendiri di tabel
         $query->where('id_karyawan', '!=', $karyawan->id_karyawan);
 
         // Filter Search
         if ($request->has('search') && $request->search != '') {
             $keyword = $request->search;
-            $query->where(function($q) use ($keyword) {
+            $query->where(function ($q) use ($keyword) {
                 $q->where('Nama_Lengkap_Sesuai_Ijazah', 'LIKE', '%' . $keyword . '%')
-                  ->orWhere('Nama_Sesuai_KTP', 'LIKE', '%' . $keyword . '%')
-                  ->orWhere('NIK', 'LIKE', '%' . $keyword . '%');
+                    ->orWhere('Nama_Sesuai_KTP', 'LIKE', '%' . $keyword . '%')
+                    ->orWhere('NIK', 'LIKE', '%' . $keyword . '%');
             });
         }
 
         // Eksekusi Pagination (10 per halaman)
-        $bawahanList = $query->paginate(10)->onEachSide(1); 
-        
+        $bawahanList = $query->paginate(10)->onEachSide(1)->appends(['tahun' => $tahun]);
+
         // Cek Status Penilaian untuk setiap karyawan di list
         $bawahanList->through(function ($staff) use ($tahun, $user) {
             $staff->sudah_dinilai = KbiAssessment::where('karyawan_id', $staff->id_karyawan)
@@ -65,7 +66,7 @@ class KbiController extends Controller
         });
 
         // E. Ambil Data Atasan (Kotak Kiri Bawah)
-        $atasan = $karyawan->atasan; 
+        $atasan = $karyawan->atasan;
         $sudahMenilaiAtasan = false;
         if ($atasan) {
             $sudahMenilaiAtasan = KbiAssessment::where('karyawan_id', $atasan->id_karyawan)
@@ -77,17 +78,18 @@ class KbiController extends Controller
         // [BARU] Ambil List Semua Karyawan untuk Dropdown Pilihan Atasan
         // Kita kecualikan diri sendiri, biar gak milih diri sendiri jadi bos
         $listCalonAtasan = Karyawan::where('id_karyawan', '!=', $karyawan->id_karyawan)
-                                    ->orderBy('Nama_Lengkap_Sesuai_Ijazah', 'ASC')
-                                    ->get();
+            ->orderBy('Nama_Lengkap_Sesuai_Ijazah', 'ASC')
+            ->get();
 
         // Kirim semua variabel ke View
         return view('pages.kbi.index', compact(
-            'karyawan', 
-            'selfAssessment', 
-            'bawahanList', 
-            'atasan', 
+            'karyawan',
+            'selfAssessment',
+            'bawahanList',
+            'atasan',
             'sudahMenilaiAtasan',
-            'listCalonAtasan'
+            'listCalonAtasan',
+            'tahun'
         ));
     }
 
@@ -97,14 +99,14 @@ class KbiController extends Controller
     public function create(Request $request)
     {
         $targetId = $request->karyawan_id;
-        $tipe = $request->tipe; 
+        $tipe = $request->tipe;
 
         if (!$targetId || !$tipe) {
             return redirect()->route('kbi.index')->with('error', 'Data tidak lengkap.');
         }
 
         $targetKaryawan = Karyawan::with('pekerjaan')->where('id_karyawan', $targetId)->first();
-        
+
         if (!$targetKaryawan) {
             return redirect()->route('kbi.index')->with('error', 'Karyawan tidak ditemukan.');
         }
@@ -132,19 +134,19 @@ class KbiController extends Controller
         $skorInput = $request->skor;
         $totalSkor = array_sum($skorInput);
         $jumlahSoal = count($skorInput);
-        
+
         $rataRata = $jumlahSoal > 0 ? round($totalSkor / $jumlahSoal, 2) : 0;
 
         KbiAssessment::updateOrCreate(
             [
-                'karyawan_id' => $request->karyawan_id, 
-                'penilai_id' => $user->id,              
+                'karyawan_id' => $request->karyawan_id,
+                'penilai_id' => $user->id,
                 'tipe_penilai' => $request->tipe_penilai,
                 'tahun' => $tahun,
             ],
             [
                 'rata_rata_akhir' => $rataRata,
-                'status' => 'FINAL', 
+                'status' => 'FINAL',
                 'tanggal_penilaian' => now(),
             ]
         );
@@ -276,7 +278,7 @@ class KbiController extends Controller
         return redirect()->back()->with('success', 'Data Atasan berhasil direset! Silakan pilih atasan baru.');
     }
 
-   public function monitoring(Request $request)
+    public function monitoring(Request $request)
     {
         $tahun = request()->get('tahun', date('Y'));
 
@@ -286,15 +288,15 @@ class KbiController extends Controller
         // 2. Filter Search
         if ($request->has('search') && $request->search != '') {
             $keyword = $request->search;
-            $query->where(function($q) use ($keyword) {
-                $q->where('Nama_Lengkap_Sesuai_Ijazah', 'LIKE', '%'.$keyword.'%')
-                ->orWhere('NIK', 'LIKE', '%'.$keyword.'%');
+            $query->where(function ($q) use ($keyword) {
+                $q->where('Nama_Lengkap_Sesuai_Ijazah', 'LIKE', '%' . $keyword . '%')
+                    ->orWhere('NIK', 'LIKE', '%' . $keyword . '%');
             });
         }
 
         // 3. Filter Jabatan (PERBAIKAN DISINI)
         if ($request->has('jabatan') && $request->jabatan != '') {
-            $query->whereHas('pekerjaan', function($q) use ($request) {
+            $query->whereHas('pekerjaan', function ($q) use ($request) {
                 // Ubah 'nama_jabatan' jadi 'Jabatan'
                 $q->where('Jabatan', $request->jabatan); // <--- UBAH INI
             });
@@ -314,14 +316,14 @@ class KbiController extends Controller
                 $penilaiUserId = $userMap[$kry->NIK] ?? 0;
                 if ($penilaiUserId > 0) {
                     $sudahNilaiAtasan = KbiAssessment::where('karyawan_id', $kry->atasan_id)
-                    ->where('penilai_id', $penilaiUserId) // Sesuaikan logic user_id
-                    ->where('tipe_penilai', 'BAWAHAN')
-                    ->where('tahun', $tahun)
-                    ->exists();
-                $kry->status_atasan = $sudahNilaiAtasan ? 'DONE' : 'PENDING';
-            } else {
-                $kry->status_atasan = 'PENDING';
-            }
+                        ->where('penilai_id', $penilaiUserId) // Sesuaikan logic user_id
+                        ->where('tipe_penilai', 'BAWAHAN')
+                        ->where('tahun', $tahun)
+                        ->exists();
+                    $kry->status_atasan = $sudahNilaiAtasan ? 'DONE' : 'PENDING';
+                } else {
+                    $kry->status_atasan = 'PENDING';
+                }
             } else {
                 $kry->status_atasan = 'NA';
             }
@@ -342,9 +344,9 @@ class KbiController extends Controller
         // 6. List Jabatan untuk Dropdown (PERBAIKAN DISINI)
         // Ubah 'nama_jabatan' jadi 'Jabatan'
         $listJabatan = \App\Models\Pekerjaan::distinct()
-                        ->pluck('Jabatan') // <--- UBAH INI
-                        ->filter()
-                        ->sort();
+            ->pluck('Jabatan') // <--- UBAH INI
+            ->filter()
+            ->sort();
 
         $totalKaryawan = $listKaryawan->count();
         $sudahSelesaiSemua = $listKaryawan->where('is_complete', true)->count();
@@ -353,16 +355,16 @@ class KbiController extends Controller
         $page = LengthAwarePaginator::resolveCurrentPage();
         $perPage = 10;
         $results = $listKaryawan->slice(($page - 1) * $perPage, $perPage)->all();
-        
+
         $paginatedKaryawan = new LengthAwarePaginator($results, count($listKaryawan), $perPage);
         $paginatedKaryawan->setPath($request->url());
         $paginatedKaryawan->appends($request->all());
         $paginatedKaryawan->onEachSide(1);
 
-        return view('pages.kbi.monitoring', compact( 
-            'totalKaryawan', 
-            'sudahSelesaiSemua', 
-            'belumSelesai', 
+        return view('pages.kbi.monitoring', compact(
+            'totalKaryawan',
+            'sudahSelesaiSemua',
+            'belumSelesai',
             'listJabatan'
         ) + [
             'listKaryawan' => $paginatedKaryawan,

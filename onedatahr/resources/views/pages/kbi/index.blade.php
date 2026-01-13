@@ -40,9 +40,30 @@
 </style>
 
 <div class="p-4 sm:p-6">
-    <h1 class="text-xl sm:text-2xl font-bold mb-6 text-gray-900 dark:text-white">
-        PENILAIAN KBI
-    </h1>
+    <div class="mb-6 flex flex-col lg:flex-row justify-between items-start lg:items-center bg-white dark:bg-gray-800 p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 gap-4">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+            PENILAIAN KBI
+        </h1>
+        
+        {{-- FILTER TAHUN --}}
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+                <label class="text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                    <i class="fas fa-calendar-alt mr-1 text-blue-600"></i>Pilih Tahun:
+                </label>
+                <select id="yearFilterKbi" onchange="filterKbiByYear(this.value)" class="flex-1 sm:flex-none px-3 py-2 border border-blue-300 dark:border-blue-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm transition cursor-pointer">
+                    @for($y = date('Y'); $y >= date('Y')-5; $y--)
+                        <option value="{{ $y }}" {{ $tahun == $y ? 'selected' : '' }}>
+                            Tahun {{ $y }}
+                        </option>
+                    @endfor
+                </select>
+            </div>
+            <div class="text-xs text-gray-600 dark:text-gray-400 italic">
+                Menampilkan KBI tahun <strong class="text-blue-600 dark:text-blue-400" id="currentYearDisplayKbi">{{ $tahun }}</strong>
+            </div>
+        </div>
+    </div>
 
     {{-- LAYOUT RESPONSIF: Kartu horizontal --}}
     <div class="grid grid-cols-1 gap-4 sm:gap-6">
@@ -267,4 +288,40 @@
         @endif
     </div>
 </div>
+
+<script>
+    // Fungsi Filter KBI Berdasarkan Tahun
+    function filterKbiByYear(year) {
+        console.log('Mengubah tahun KBI ke:', year);
+        
+        // Validasi input
+        if (!year || year === '') {
+            alert('Pilih tahun terlebih dahulu!');
+            return;
+        }
+
+        // Update display
+        document.getElementById('currentYearDisplayKbi').textContent = year;
+        document.getElementById('yearFilterKbi').value = year;
+        
+        // Buat URL dengan parameter tahun
+        const currentUrl = new URL(window.location);
+        currentUrl.searchParams.set('tahun', year);
+        // Hapus parameter search agar ke halaman pertama saat ganti tahun
+        currentUrl.searchParams.delete('page');
+        
+        console.log('URL baru:', currentUrl.toString());
+        
+        // Loading indicator
+        const selectElement = document.getElementById('yearFilterKbi');
+        if (selectElement) {
+            selectElement.disabled = true;
+        }
+        
+        // Redirect dengan delay minimal
+        setTimeout(function() {
+            window.location.href = currentUrl.toString();
+        }, 100);
+    }
+</script>
 @endsection

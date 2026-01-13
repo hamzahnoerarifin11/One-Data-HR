@@ -36,6 +36,11 @@
             <strong class="font-bold">Error!</strong> <span class="block sm:inline">{{ session('error') }}</span>
         </div>
     @endif
+    @if (session('warning'))
+        <div class="mb-6 bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded relative">
+            <strong class="font-bold">Peringatan!</strong> <span class="block sm:inline">{{ session('warning') }}</span>
+        </div>
+    @endif
     @if (session('success'))
         <div class="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
             <strong class="font-bold">Berhasil!</strong> <span class="block sm:inline">{{ session('success') }}</span>
@@ -44,12 +49,28 @@
 
     {{-- HEADER --}}
     <div class="mb-6 flex flex-col lg:flex-row justify-between items-start lg:items-center bg-white dark:bg-gray-800 p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 gap-4">
-        <div class="w-full lg:w-auto">
-            <h1 class="text-xl md:text-2xl font-bold mb-1 text-gray-800 dark:text-white">Form Penilaian Kinerja (KPI)</h1>
-            <p class="text-xs md:text-sm text-gray-500">
-                Karyawan: <span class="font-semibold text-blue-600">{{ $karyawan->Nama_Lengkap_Sesuai_Ijazah }}</span> 
-                | Periode: {{ $kpi->tahun }}
-            </p>
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">Form Penilaian KPI</h1>
+            <p class="text-gray-500">Periode Penilaian: {{ $tahun }}</p>
+        </div>
+
+        {{-- FILTER TAHUN KPI --}}
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+                <label class="text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                    <i class="fas fa-calendar-alt mr-1 text-blue-600"></i>Pilih Tahun:
+                </label>
+                <select id="yearFilterForm" onchange="changeKpiYear(this.value)" class="flex-1 sm:flex-none px-3 py-2 border border-blue-300 dark:border-blue-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm transition cursor-pointer">
+                    @for($y = date('Y'); $y >= date('Y')-5; $y--)
+                        <option value="{{ $y }}" {{ $tahun == $y ? 'selected' : '' }}>
+                            Tahun {{ $y }}
+                        </option>
+                    @endfor
+                </select>
+            </div>
+            <div class="text-xs text-gray-600 dark:text-gray-400 italic">
+                Menampilkan KPI tahun <strong class="text-blue-600 dark:text-blue-400" id="currentYearDisplay">{{ $tahun }}</strong>
+            </div>
         </div>
         
         <div class="flex flex-wrap gap-2 w-full lg:w-auto justify-start lg:justify-end items-center">
@@ -118,6 +139,30 @@
         </button>
     </div>
 
+    {{-- PESAN JIKA FORM KOSONG --}}
+    @if($items->isEmpty())
+    <div class="mb-6 bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-500 p-5 rounded-lg shadow-sm">
+        <div class="flex items-start gap-4">
+            <div class="flex-shrink-0">
+                <i class="fas fa-info-circle text-blue-600 dark:text-blue-400 text-2xl"></i>
+            </div>
+            <div class="flex-1">
+                <h3 class="font-semibold text-blue-900 dark:text-blue-200 mb-2">
+                    Form KPI Tahun {{ $tahun }} Kosong
+                </h3>
+                <p class="text-sm text-blue-800 dark:text-blue-300 mb-3">
+                    Data KPI untuk tahun ini belum ada. Silakan tambahkan KPI baru dengan menekan tombol <strong>"Tambah KPI Baru"</strong> di atas, atau Anda bisa mengisi detail KPI ketika semua item sudah ditambahkan.
+                </p>
+                <div class="text-xs text-blue-700 dark:text-blue-400 space-y-1">
+                    <p><i class="fas fa-arrow-right mr-2"></i>Klik tombol <strong>Tambah KPI Baru</strong> untuk memulai</p>
+                    <p><i class="fas fa-arrow-right mr-2"></i>Isi informasi KPI sesuai kebutuhan</p>
+                    <p><i class="fas fa-arrow-right mr-2"></i>Setelah semua KPI ditambah, klik <strong>Simpan</strong> untuk menyimpan</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     @php
     // Cek apakah user yang login berhak melakukan adjustment?
     // Staff TIDAK BOLEH (False), Manager/Admin BOLEH (True)
@@ -130,6 +175,7 @@
     {{-- FORM UTAMA --}}
     <form id="kpiForm" action="{{ route('kpi.update', $kpi->id_kpi_assessment) }}" method="POST">
         @csrf
+        @if(!$items->isEmpty())
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700 relative">
             <div class="w-full overflow-x-auto custom-scrollbar">
                 <table class="w-full text-sm text-left border-collapse min-w-[3000px] md:min-w-[4500px]"> 
@@ -259,6 +305,7 @@
                 </table>
             </div>
         </div>
+        @endif
     </form>
 </div>
 
@@ -336,6 +383,42 @@
 
 {{-- SCRIPT --}}
 <script>
+    // Fungsi Filter KPI Berdasarkan Tahun
+    function changeKpiYear(selectedYear) {
+        console.log('Mengubah tahun ke:', selectedYear);
+        
+        // Validasi input
+        if (!selectedYear || selectedYear === '') {
+            alert('Pilih tahun terlebih dahulu!');
+            return;
+        }
+
+        // Update display di halaman sebelum redirect
+        const currentYearDisplay = document.getElementById('currentYearDisplay');
+        if (currentYearDisplay) {
+            currentYearDisplay.textContent = selectedYear;
+        }
+
+        // Buat URL dengan template dan placeholder
+        let rawUrl = "{{ route('kpi.show', ['karyawan_id' => $karyawan->id_karyawan, 'tahun' => '8888']) }}";
+        console.log('Raw URL template:', rawUrl);
+        
+        // Ganti placeholder tahun dengan tahun yang dipilih
+        let finalUrl = rawUrl.replace('8888', selectedYear);
+        console.log('Final URL:', finalUrl);
+        
+        // Loading indicator
+        const selectElement = document.querySelector('select[onchange="changeKpiYear(this.value)"]');
+        if (selectElement) {
+            selectElement.disabled = true;
+        }
+        
+        // Redirect dengan delay minimal untuk memastikan visual update
+        setTimeout(function() {
+            window.location.href = finalUrl;
+        }, 100);
+    }
+
     // Fungsi Submit Manual
     function submitKpiForm() {
         const form = document.getElementById('kpiForm');

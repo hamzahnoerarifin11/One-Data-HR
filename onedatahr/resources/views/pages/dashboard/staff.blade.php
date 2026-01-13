@@ -10,15 +10,23 @@
     </div>
 
     {{-- Filter Tahun (Opsional, jika ingin lihat history) --}}
-    <div class="flex justify-end">
-        <form method="GET">
-            <select name="tahun" onchange="this.form.submit()" class="border-gray-300 rounded-lg text-sm shadow-sm">
-                @for($y = date('Y'); $y >= date('Y')-2; $y--)
-                    <option value="{{ $y }}" {{ $tahun == $y ? 'selected' : '' }}>Tahun {{ $y }}</option>
-                @endfor
-            </select>
-        </form>
-    </div>
+    <form method="GET">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+            <div class="flex items-center gap-2">
+                <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    <i class="fas fa-calendar-alt mr-1 text-blue-600"></i>Pilih Tahun:
+                </label>
+                <select name="tahun" onchange="this.form.submit()" class="px-3 py-2 border border-blue-300 dark:border-blue-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm">
+                    @for($y = date('Y'); $y >= date('Y')-5; $y--)
+                        <option value="{{ $y }}" {{ $tahun == $y ? 'selected' : '' }}>Tahun {{ $y }}</option>
+                    @endfor
+                </select>
+            </div>
+            <div class="text-xs text-gray-600 dark:text-gray-400 italic">
+                Menampilkan tahun <strong class="text-blue-600 dark:text-blue-400">{{ $tahun }}</strong>
+            </div>
+        </div>
+    </form>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         
