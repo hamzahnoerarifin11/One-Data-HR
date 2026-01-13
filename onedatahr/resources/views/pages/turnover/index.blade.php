@@ -91,31 +91,50 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 gap-6">
+    <div id="turnoverExportArea" class="grid grid-cols-1 gap-6">
 
         <div class="bg-white dark:bg-gray-800 rounded-sm border border-gray-200 dark:border-gray-700 shadow-sm">
-            <div class="p-6 border-b border-gray-100 dark:border-gray-700">
-                <h4 class="text-lg font-bold text-gray-800 dark:text-white">Trend Turnover Bulanan</h4>
-                <form method="GET">
-                    <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
-                    <select name="tahun"
-                        onchange="this.form.submit()"
-                        class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 pr-11 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
-                                    :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true">
-                        @foreach($listTahun as $th)
-                            <option value="{{ $th }}" {{ $tahun == $th ? 'selected' : '' }}>
-                                {{ $th }}
-                            </option>
+            <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h4 class="text-lg font-bold text-gray-800 dark:text-white">Trend Turnover Bulanan</h4>
+                </div>
 
-                        @endforeach
-                    </select>
-                    <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
-                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                    <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                            </span>
+                <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <form method="GET" class="w-full sm:w-auto">
+                        <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
+                        <select name="periode"
+                            onchange="this.form.submit()"
+                            class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 pr-11 text-sm text-gray-800 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                                        :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true">
+                            <option value="">-- Semua Periode (Default: Tahun Saat Ini) --</option>
+                            @foreach($listPeriode as $p)
+                                <option value="{{ $p['value'] }}" {{ ((isset($periode) ? $periode : $tahun.'-0') == $p['value']) ? 'selected' : '' }}>
+                                    {{ $p['label'] }}
+                                </option>
+
+                            @endforeach
+                        </select>
+                        <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
+                                    <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                        <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </span>
+                        </div>
+                    </form>
+
+                    <div class="flex items-center gap-2">
+                        <form method="GET" action="{{ route('turnover.export.excel') }}" class="inline-block">
+                            <input type="hidden" name="periode" value="">
+                            <button id="exportExcelBtn" type="submit" class="px-3 py-2 bg-green-600 text-white rounded-md text-sm hover:bg-green-700">Excel</button>
+                        </form>
+                        <form method="GET" action="{{ route('turnover.export.pdf') }}" class="inline-block" target="_blank">
+                            <input type="hidden" name="periode" value="">
+                            <button id="exportPdfBtn" type="submit" class="px-3 py-2 bg-red-600 text-white rounded-md text-sm hover:bg-red-700">PDF</button>
+                        </form>
+                        <!-- <button id="exportJpgBtn" type="button" class="px-3 py-2 bg-yellow-600 text-white rounded-md text-sm hover:bg-yellow-700">JPG (Area)</button> -->
+                        <button id="exportChartJpgBtn" type="button" class="px-3 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700">JPG (Chart)</button>
                     </div>
-                </form>
+                </div>
             </div>
             <x-common.component-card title="Line Chart Turnover">
                 <div class="custom-scrollbar max-w-full overflow-x-auto">
@@ -140,7 +159,7 @@
             </div>
 
             <div class="overflow-x-auto w-full">
-                <table class="w-full text-left border-collapse">
+                <table id="turnoverTable" class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-gray-50 dark:bg-gray-700/50">
                             <th class="py-4 px-6 text-xs font-bold uppercase text-gray-500 dark:text-gray-400">Nama Kandidat</th>
@@ -200,14 +219,16 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const data = @json($turnoverBulanan);
+    const data = {!! json_encode($turnoverBulanan) !!};
+    const chartYear = {!! json_encode($chartYear) !!};
 
     const seriesData = data.map(item => item.total);
     const categories = data.map(item =>
-        new Date(2024, item.bulan - 1, 1).toLocaleString('id-ID', { month: 'long' })
+        new Date(chartYear, item.bulan - 1, 1).toLocaleString('id-ID', { month: 'long' })
     );
 
     const options = {
@@ -260,14 +281,90 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
-    new ApexCharts(
+    const turnoverChart = new ApexCharts(
         document.querySelector("#turnoverLineChart"),
         options
-    ).render();
+    );
+
+    turnoverChart.render();
+    // expose for export
+    window.turnoverChart = turnoverChart;
+
+    // Helper: get periode label for filenames
+    function getPeriodeLabel() {
+        const sel = document.querySelector('select[name="periode"]');
+        return sel && sel.selectedOptions && sel.selectedOptions[0] ? sel.selectedOptions[0].text.trim().replace(/\s+/g, '_') : 'periode_all';
+    }
+
+    // Helper: download blob
+    function downloadBlob(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+    }
+
+    // Replace client-side Excel/PDF export with form submission to server endpoints
+    const excelRoute = "{{ route('turnover.export.excel') }}";
+    const pdfRoute = "{{ route('turnover.export.pdf') }}";
+    document.querySelectorAll(`form[action="${excelRoute}"], form[action="${pdfRoute}"]`).forEach(function (form) {
+        form.addEventListener('submit', function (e) {
+            const sel = document.querySelector('select[name="periode"]');
+            let val = '';
+            if (sel && sel.value) val = sel.value;
+            let input = this.querySelector('input[name="periode"]');
+            if (! input) {
+                input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'periode';
+                this.appendChild(input);
+            }
+            input.value = val;
+            // allow submit to proceed
+        });
+    });
+
+    // Export entire area to JPG
+    // document.getElementById('exportJpgBtn').addEventListener('click', function () {
+    //     const el = document.getElementById('turnoverExportArea');
+    //     html2canvas(el, { scale: 2 }).then(canvas => {
+    //         canvas.toBlob(function (blob) {
+    //             const filename = `turnover_${getPeriodeLabel()}_${Date.now()}.jpg`;
+    //             downloadBlob(blob, filename);
+    //         }, 'image/jpeg', 0.92);
+    //     }).catch(err => { console.error(err); alert('Gagal membuat JPG'); });
+    // });
+
+
+    // Export only chart to JPG using ApexCharts dataURI
+    document.getElementById('exportChartJpgBtn').addEventListener('click', function () {
+        if (!window.turnoverChart) return alert('Chart belum siap');
+        window.turnoverChart.dataURI().then(({ imgURI }) => {
+            const image = new Image();
+            image.onload = function () {
+                const canvas = document.createElement('canvas');
+                canvas.width = image.width;
+                canvas.height = image.height;
+                const ctx = canvas.getContext('2d');
+                // white background
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(image, 0, 0);
+                canvas.toBlob(function (blob) {
+                    const filename = `turnover_chart_${getPeriodeLabel()}_${Date.now()}.jpg`;
+                    downloadBlob(blob, filename);
+                }, 'image/jpeg', 0.92);
+            };
+            image.src = imgURI;
+        }).catch(err => { console.error(err); alert('Gagal mengekspor chart'); });
+    });
 });
+
 </script>
-
-
 <style>
     /* Mengunci Layout agar tidak ada double scrollbar */
     body {

@@ -56,6 +56,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/turnover', [TurnoverController::class, 'index'])
     ->name('turnover.index');
 
+    // Export routes for Turnover
+    Route::get('/turnover/export-excel', [TurnoverController::class, 'exportExcel'])->name('turnover.export.excel');
+    Route::get('/turnover/export-pdf', [TurnoverController::class, 'exportPdf'])->name('turnover.export.pdf');
+
     // User management resource
     Route::resource('users', UserController::class);
 

@@ -81,7 +81,7 @@
             </div>
 
             <div>
-                <label class="text-sm text-gray-500">Selesai Recruitment</label>
+                <label class="text-sm text-gray-500">Selesai di HR/Rekrutmen</label>
                 <div class="mt-1 font-medium text-gray-900 dark:text-white">
                     {{ $pemberkasan->selesai_recruitment ? \Carbon\Carbon::parse($pemberkasan->selesai_recruitment)->translatedFormat('d F Y') : '-' }}
                 </div>

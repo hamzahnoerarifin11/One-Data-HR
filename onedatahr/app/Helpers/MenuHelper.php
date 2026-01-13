@@ -62,7 +62,7 @@ class MenuHelper
                     ['name' => 'Interview HR',         'path' => '/rekrutmen/interview_hr'],
                     ['name' => 'Kandidat Lanjut User', 'path' => '/rekrutmen/kandidat_lanjut_user'],
                     ['name' => 'Pemberkasan',          'path' => '/rekrutmen/pemberkasan'],
-                    ['name' => 'Database WIG',         'path' => '/rekrutmen/wig'],
+                    // ['name' => 'Database WIG',         'path' => '/rekrutmen/wig'],
                 ],
             ];
 
