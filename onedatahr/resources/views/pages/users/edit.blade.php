@@ -106,6 +106,26 @@
 
                 {{-- Role --}}
                 <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-2">
+                        Role
+                    </label>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        @foreach($roles as $role)
+                            <label class="flex items-center gap-2 text-sm dark:text-gray-400">
+                                <input
+                                    type="checkbox"
+                                    name="roles[]"
+                                    value="{{ $role->id }}"
+                                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    @checked($user->roles->contains($role->id))
+                                >
+                                {{ ucfirst($role->name) }}
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+                <!-- <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
                         Role
                     </label>
@@ -125,7 +145,7 @@
                             </svg>
                         </span>
                     </div>
-                </div>
+                </div> -->
 
                 {{-- Password --}}
                 <div>

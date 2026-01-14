@@ -23,25 +23,11 @@ class MenuHelper
             'path' => '/dashboard',
         ];
 
-        // KPI Karyawan (Punya Staff Sendiri)
-        $menu[] = [
-            'icon' => 'chartline', // Saya ikuti icon pilihan Anda
-            'name' => 'KPI Karyawan',
-            'path' => '/kpi/dashboard',
-        ];
-
-        // KBI Karyawan (Punya Staff Sendiri)
-        $menu[] = [
-            'icon' => 'speedometer', // Saya ikuti icon pilihan Anda
-            'name' => 'KBI Karyawan',
-            'path' => '/kbi/dashboard',
-        ];
-
         // =============================================================
         // 2. MENU KHUSUS (Hanya Admin, HRD, Manager)
         // =============================================================
         // Logika: "Jika User ADA dan User BUKAN Staff"
-        if ($user && !$user->isStaff()) {
+        if ($user->hasRole(['admin', 'superadmin'])) {
 
             // Data Karyawan
             $menu[] = [
@@ -85,25 +71,41 @@ class MenuHelper
                 'path' => '/turnover',
             ];
 
-            // Monitoring KBI (Khusus HRD memantau Staff)
-            $menu[] = [
-                'icon' => 'desktop',
-                'name' => 'Monitoring KBI',
-                'path' => '/kbi/monitoring',
-            ];
-
-            // Rekap Performance
-            $menu[] = [
-                'icon' => 'rekap', // Pastikan sudah didaftarkan di getIconSvg
-                'name' => 'Rekap Performance',
-                'path' => '/performance/rekap',
-            ];
-
             // Manajemen User
+            if ($user->hasRole('superadmin')) {
+                $menu[] = [
+                    'icon' => 'authentication',
+                    'name' => 'Manajemen User',
+                    'path' => '/users',
+                ];
+            }
+        }
+        // KPI Karyawan (Punya Staff Sendiri)
+        $menu[] = [
+            'icon' => 'chartline', // Saya ikuti icon pilihan Anda
+            'name' => 'KPI Karyawan',
+            'path' => '/kpi/dashboard',
+        ];
+
+        // KBI Karyawan (Punya Staff Sendiri)
+        $menu[] = [
+            'icon' => 'speedometer', // Saya ikuti icon pilihan Anda
+            'name' => 'KBI Karyawan',
+            'path' => '/kbi/dashboard',
+        ];
+        // Monitoring KBI (Khusus HRD memantau Staff)
+        if ($user->hasRole(['admin', 'superadmin', 'manager'])) {
             $menu[] = [
-                'icon' => 'authentication',
-                'name' => 'Manajemen User',
-                'path' => '/users',
+                    'icon' => 'desktop',
+                    'name' => 'Monitoring KBI',
+                    'path' => '/kbi/monitoring',
+                ];
+
+                // Rekap Performance
+            $menu[] = [
+                    'icon' => 'rekap', // Pastikan sudah didaftarkan di getIconSvg
+                    'name' => 'Rekap Performance',
+                    'path' => '/performance/rekap',
             ];
         }
 

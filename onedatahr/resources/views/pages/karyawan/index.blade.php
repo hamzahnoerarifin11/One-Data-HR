@@ -15,8 +15,6 @@
             </p>
         </div>
 
-        @if(in_array(auth()->user()?->role, ['admin', 'superadmin']))
-
         <a href="{{ route('karyawan.create') }}"
            class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700 transition">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -25,7 +23,7 @@
             </svg>
             Tambah Karyawan
         </a>
-        @endif
+
     </div>
 
     <!-- SUCCESS ALERT -->

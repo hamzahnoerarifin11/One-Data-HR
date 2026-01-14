@@ -112,7 +112,7 @@
                                 <div class="flex flex-col">
                                     <span x-text="row.progress_rekrutmen"
                                         :class="{
-                                            'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400': row.progress_rekrutmen === 'Interview HR' || row.progress_rekrutmen === 'Pemberkasan',
+                                            'text-blue-600 bg-blue-50 dark:bg-blue-900/20 dark:text-blue-400': row.progress_rekrutmen === 'Interview HR' || row.progress_rekrutmen === 'Interview User' || row.progress_rekrutmen === 'Pemberkasan',
                                             'text-green-600 bg-green-50 dark:bg-green-900/20 dark:text-green-400': row.progress_rekrutmen === 'Rekrutmen Selesai',
                                             'text-gray-500 bg-gray-50 dark:bg-gray-800 dark:text-gray-400': row.progress_rekrutmen === 'Menerima Kandidat',
                                             'text-orange-600 bg-orange-50 dark:bg-orange-900/20 dark:text-orange-400': row.progress_rekrutmen === 'Pre Interview',

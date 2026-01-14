@@ -56,7 +56,7 @@
                                         </svg>
                             </span>
                     </div>
-                <button id="refresh-calendar" class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 dark:text-white text-sm font-medium rounded-md transition-colors">
+                <button id="refresh-calendar" class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-md transition-colors">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                     Refresh
                 </button>
@@ -69,7 +69,7 @@
                     <tr class="bg-gray-50">
                         <th rowspan="2" class="sticky left-0 z-20 bg-gray-50 border-b border-r p-3 text-center font-bold text-gray-600">No.</th>
                         <th rowspan="2" class="sticky left-[45px] z-20 bg-gray-50 border-b border-r p-3 min-w-[220px] text-left font-bold text-gray-600 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">Posisi</th>
-                        <th id="month-header" class="border-b border-r p-2 bg-purple-700 uppercase font-bold text-center tracking-wider"></th>
+                        <th id="month-header" class="border-b border-r p-2 bg-purple-700 text-white uppercase font-bold text-center tracking-wider"></th>
                         <!-- <th rowspan="2" class="sticky right-0 z-20 bg-blue-50 border-b border-l p-3 min-w-[70px] text-center font-bold text-blue-700 shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.1)]">Total</th> -->
                          <th rowspan="2" class="sticky right-[70px] z-20 bg-blue-500 border-b border-l p-3 min-w-[70px] text-center font-bold text-white shadow-[-2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                             Total Bulan
@@ -79,7 +79,7 @@
                         </th>
 
                     </tr>
-                    <tr id="header-row-days" class="bg-purple-600 dark:text-white text-center font-medium">
+                    <tr id="header-row-days" class="bg-purple-600 text-white text-center font-medium">
                         </tr>
                 </thead>
                 <tbody id="table-body" class="divide-y divide-gray-100">

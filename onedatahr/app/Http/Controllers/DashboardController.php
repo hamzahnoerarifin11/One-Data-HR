@@ -15,6 +15,8 @@ use App\Models\Kontrak;
 use App\Models\Perusahaan;
 use App\Models\KpiAssessment;
 use App\Models\KbiAssessment;
+use App\Models\Role;
+use App\Models\User;
 
 class DashboardController extends Controller
 {
@@ -25,11 +27,12 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $user  = Auth::user();
-        $role  = $user->role; // Asumsi nama kolom di tabel users adalah 'role'
+        // $roles = Role::orderBy('name')->get();
+        // $role  = $user->role; // Asumsi nama kolom di tabel users adalah 'role'
         $tahun = $request->input('tahun', date('Y'));
 
         // 1. LOGIKA UNTUK ADMIN & SUPERADMIN (Melihat Global Data)
-        if (in_array($role, ['superadmin', 'admin'])) {
+        if ($user->hasRole(['superadmin', 'admin'])) {
             return $this->adminDashboard();
         }
 
@@ -42,8 +45,8 @@ class DashboardController extends Controller
         }
 
         // 2. LOGIKA UNTUK MANAGER (Melihat Tim)
-        if ($role === 'manager') {
-            return $this->managerDashboard($request, $karyawan, $tahun);
+         if ($user->hasRole('manager')) {
+        return $this->managerDashboard($request, $karyawan, $tahun);
         }
 
         // 3. LOGIKA UNTUK STAFF (Melihat Diri Sendiri)
@@ -65,11 +68,11 @@ class DashboardController extends Controller
         // --- Statistik Demografi (Gender, Jabatan, Divisi, dll) ---
         // (Kode query sama persis seperti sebelumnya)
         $genderData = Karyawan::select(DB::raw("CASE WHEN Jenis_Kelamin_Karyawan = 'L' THEN 'Laki-laki' WHEN Jenis_Kelamin_Karyawan = 'P' THEN 'Perempuan' ELSE 'Tidak Diketahui' END as gender"), DB::raw('count(*) as total'))->groupBy('gender')->pluck('total','gender')->toArray();
-        
+
         $jabatanData = Pekerjaan::whereNotNull('Jabatan')->groupBy('Jabatan')->select('Jabatan', DB::raw('count(*) as total'))->pluck('total','Jabatan')->toArray();
-        
+
         $divisiData = Pekerjaan::whereNotNull('Divisi')->groupBy('Divisi')->select('Divisi', DB::raw('count(*) as total'))->pluck('total','Divisi')->toArray();
-        
+
         $pendidikanData = Pendidikan::whereNotNull('Pendidikan_Terakhir')->groupBy('Pendidikan_Terakhir')->select('Pendidikan_Terakhir', DB::raw('count(*) as total'))->pluck('total','Pendidikan_Terakhir')->toArray();
 
         // --- Masa Kerja & Umur ---
@@ -116,14 +119,14 @@ class DashboardController extends Controller
             ->where('penilai_id', Auth::id()) // Dinilai oleh User yang login
             ->where('tipe_penilai', 'ATASAN')
             ->count();
-        
+
         $belumDinilaiKBI = $totalTim - $sudahDinilaiKBI;
 
         // 4. Tabel Monitoring (Pagination)
         $teamMonitoring = Karyawan::where('atasan_id', $manager->id_karyawan)
-            ->with(['pekerjaan', 
-                'kpiAssessment' => function($q) use ($tahun) { 
-                    $q->where('tahun', $tahun); 
+            ->with(['pekerjaan',
+                'kpiAssessment' => function($q) use ($tahun) {
+                    $q->where('tahun', $tahun);
                 },
                 // Cek status KBI apakah sudah dinilai manager ini
                 'kbiAssessment' => function($q) use ($tahun) {
