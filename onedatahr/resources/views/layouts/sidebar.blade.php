@@ -5,11 +5,10 @@
 
     // 1. DEFINISI RULE DI ATAS (Supaya rapi)
     // Pastikan nama ini SAMA PERSIS dengan 'name' di MenuHelper
-    $restrictedMenus = ['Manajemen User', 'Training', 'Rekrutmen', 'Data Karyawan']; 
-    
+    $restrictedMenus = ['Manajemen User', 'Training', 'Rekrutmen', 'Data Karyawan'];
+
     // Ambil role user
     $user = auth()->user();
-    $allowedRoles = ['superadmin', 'admin'];
 @endphp
 
 <aside id="sidebar"
@@ -29,7 +28,7 @@
                             if (currentPath === '{{ ltrim($subItem['path'], '/') }}' ||
                                 window.location.pathname === '{{ $subItem['path'] }}') {
                                 this.openSubmenus['{{ $groupIndex }}-{{ $itemIndex }}'] = true;
-                            } 
+                            }
                         @endforeach
                     @endif
                 @endforeach
@@ -57,7 +56,7 @@
     }"
     @mouseenter="if (!$store.sidebar.isExpanded) $store.sidebar.setHovered(true)"
     @mouseleave="$store.sidebar.setHovered(false)">
-    
+
     {{-- LOGO SECTION --}}
     <div class="pt-8 pb-7 flex"
     :class="(!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen)
@@ -84,7 +83,7 @@
     <div class="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
         <nav class="mb-6">
             <div class="flex flex-col gap-4">
-                
+
                 @foreach ($menuGroups as $groupIndex => $menuGroup)
                     <div>
                         {{-- GROUP TITLE --}}
@@ -102,14 +101,16 @@
                         <ul class="flex flex-col gap-1">
                             {{-- LOOP ITEMS --}}
                             @foreach ($menuGroup['items'] as $itemIndex => $item)
-                                
+
                                 {{-- 2. LOGIKA PENYARINGAN DI DALAM LOOP --}}
                                 @php
                                     // Cek apakah nama menu ini ada di daftar terlarang
                                     // DAN user bukan admin/superadmin
                                     if (
-                                        in_array($item['name'], $restrictedMenus) && !$user->hasAnyRole($allowedRoles)) {
-                                        continue; // Skip item ini, lanjut ke item berikutnya
+                                        in_array($item['name'], $restrictedMenus)
+                                        && !$user->hasRole(['admin', 'superadmin'])
+                                    ) {
+                                        continue;
                                     }
                                 @endphp
 
@@ -185,7 +186,7 @@
                         </ul>
                     </div>
                 @endforeach
-                
+
             </div>
         </nav>
 

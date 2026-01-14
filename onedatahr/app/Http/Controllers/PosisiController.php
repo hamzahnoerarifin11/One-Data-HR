@@ -8,38 +8,32 @@ use Illuminate\Support\Facades\DB;
 
 class PosisiController extends Controller
 {
-    // Menampilkan halaman manajemen (Server Rendered)
+    public function __construct()
+    {
+        $this->middleware('auth');
+
+        // Gunakan middleware role yang sudah kita perbaiki logikanya.
+        // Method manage, store, update, dan destroy hanya untuk admin & superadmin.
+        // Method index (untuk API filter) mungkin bisa diakses semua user yang login.
+        $this->middleware('role:admin|superadmin')->except(['index']);
+    }
+
     public function manage()
     {
-        // Mengambil semua data posisi untuk ditampilkan di table
-        // $pos = Posisi::orderBy('created_at', 'DESC')->get();
-        // return view('pages.rekrutmen.posisi.index', ['posisis' => $pos]);
-        // Mengambil semua data dari VIEW agar kolom progress_rekrutmen & total_pelamar muncul
-        // $pos = DB::table('view_rekrutmen_dashboard')
-        //         ->orderBy('id_posisi', 'DESC') // Urutkan berdasarkan ID posisi terbaru
-        //         ->get();
-
-        // return view('pages.rekrutmen.posisi.index', ['posisis' => $pos]);
-        // Kembali menggunakan Eloquent Model karena kolom sudah ada di tabel fisik
         $pos = Posisi::orderBy('id_posisi', 'DESC')->get();
         return view('pages.rekrutmen.posisi.index', ['posisis' => $pos]);
     }
 
-    // JSON list untuk keperluan API/Filter
     public function index()
     {
         $pos = Posisi::aktif()->orderBy('nama_posisi')->get(['id_posisi', 'nama_posisi', 'status']);
         return response()->json($pos);
     }
 
-
-    // Create via AJAX
     public function store(Request $request)
     {
-        // Validasi akses (Pastikan user login & admin)
-        if (!auth()->user() || !auth()->user()->hasRole(['admin', 'superadmin'])) {
-            return response()->json(['message' => 'Unauthorized. Hanya admin yang diperbolehkan.'], 403);
-        }
+        // HAPUS pengecekan manual in_array(auth()->user()->role, ...)
+        // karena sudah ditangani oleh middleware di __construct
 
         $request->validate([
             'nama_posisi' => 'required|string|max:150|unique:posisi,nama_posisi',
@@ -62,12 +56,9 @@ class PosisiController extends Controller
         }
     }
 
-    // Update via AJAX
     public function update(Request $request, $id)
     {
-        if (!auth()->user() || !auth()->user()->hasRole(['admin', 'superadmin'])) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        // HAPUS pengecekan manual in_array(auth()->user()->role, ...)
 
         $request->validate([
             'nama_posisi' => 'required|string|max:150|unique:posisi,nama_posisi,' . $id . ',id_posisi',
@@ -91,21 +82,12 @@ class PosisiController extends Controller
         }
     }
 
-    // Destroy via AJAX
     public function destroy(Request $request, $id)
     {
-        if (!auth()->user() || !auth()->user()->hasRole(['admin', 'superadmin'])) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        // HAPUS pengecekan manual in_array(auth()->user()->role, ...)
 
         try {
             $pos = Posisi::findOrFail($id);
-
-            // Opsional: Cek jika posisi sedang digunakan di tabel lain sebelum hapus
-            // if ($pos->kandidat()->count() > 0) {
-            //     return response()->json(['message' => 'Posisi tidak bisa dihapus karena memiliki data kandidat.'], 422);
-            // }
-
             $pos->delete();
 
             return response()->json([

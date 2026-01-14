@@ -46,7 +46,7 @@
                 'nik'        => $u->nik ?? '-',
                 'email'      => $u->email ?? '-',
                 'jabatan'    => $u->jabatan ?? '-',
-                'role' => $u->roles->pluck('name')->map(fn($r) => ucfirst($r))->implode(', '),
+                'role'       => $u->roles->pluck('name')->map(fn($r) => ucfirst($r))->implode(', '),
                 'created_at' => $u->created_at ? $u->created_at->format('d M Y') : '-',
             ];
         })->values()->toArray(); // Pastikan jadi array murni

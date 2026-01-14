@@ -11,16 +11,19 @@ use App\Models\DataKeluarga;
 use App\Models\Bpjs;
 use App\Models\Perusahaan;
 use App\Models\StatusKaryawan;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class KaryawanController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-        $this->middleware('role:admin|superadmin')->only(['create', 'store', 'edit', 'update', 'destroy']);
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware('auth');
+    //     $this->middleware('role:admin|superadmin')->only(['create', 'store', 'edit', 'update', 'destroy']);
+    //     // $this->middleware('role:admin|superadmin');
+    // }
 
     public function index()
     {

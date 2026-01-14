@@ -191,7 +191,7 @@
                         </div>
 
                         <!-- CATATAN -->
-                        <div class="md:col-span-2">
+                        <div class="md:col-span-6">
                             <textarea name="catatan_{{ $key }}" placeholder="Catatan"
                                 class="dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border border-gray-300 bg-transparent
                                 px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">{{ $interview->{'catatan_'.$key} }}</textarea>

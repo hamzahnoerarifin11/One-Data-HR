@@ -24,7 +24,6 @@ class User extends Authenticatable
         'email',
         'nik',
         'jabatan',
-        'role',
         'password',
     ];
 
@@ -70,6 +69,9 @@ class User extends Authenticatable
 
     public function hasRole(string|array $role): bool
     {
+        if (is_string($role)) {
+            $role = [$role];
+        }
         return $this->roles()->where('name', $role)->exists();
     }
     public function hasAnyRole(string|array $roles): bool
@@ -79,4 +81,5 @@ class User extends Authenticatable
         }
         return $this->roles()->whereIn('name', $roles)->exists();
     }
+
 }

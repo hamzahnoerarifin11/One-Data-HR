@@ -20,22 +20,11 @@ class MenuHelper
             'path' => '/dashboard',
         ];
 
-        $menu[] = [
-            'icon' => 'chartline',
-            'name' => 'KPI Karyawan',
-            'path' => '/kpi/dashboard',
-        ];
-
-        $menu[] = [
-            'icon' => 'speedometer',
-            'name' => 'KBI Karyawan',
-            'path' => '/kbi/dashboard',
-        ];
-
         // =============================================================
         // 2. MENU ADMIN / SUPERADMIN / MANAGER
         // =============================================================
-        if ($user && $user->hasAnyRole(['superadmin', 'admin', 'manager'])) {
+        // Logika: "Jika User ADA dan User BUKAN Staff"
+        if ($user->hasAnyRole(['admin', 'superadmin'])) {
 
             $menu[] = [
                 'icon' => 'user-profile',
@@ -53,8 +42,8 @@ class MenuHelper
                     ['name' => 'Kalender Rekrutmen', 'path' => '/rekrutmen/calendar'],
                     ['name' => 'Interview HR', 'path' => '/rekrutmen/interview_hr'],
                     ['name' => 'Kandidat Lanjut User', 'path' => '/rekrutmen/kandidat_lanjut_user'],
-                    ['name' => 'Pemberkasan', 'path' => '/rekrutmen/pemberkasan'],
-                    ['name' => 'Database WIG', 'path' => '/rekrutmen/wig'],
+                    ['name' => 'Pemberkasan',          'path' => '/rekrutmen/pemberkasan'],
+                    // ['name' => 'Database WIG',         'path' => '/rekrutmen/wig'],
                 ],
             ];
 
@@ -65,26 +54,52 @@ class MenuHelper
             ];
 
             $menu[] = [
-                'icon' => 'desktop',
-                'name' => 'Monitoring KBI',
-                'path' => '/kbi/monitoring',
+                'icon' => 'user-shield',
+                'name' => 'Onboarding Karyawan',
+                'path' => '/onboarding',
             ];
 
             $menu[] = [
-                'icon' => 'rekap',
-                'name' => 'Rekap Performance',
-                'path' => '/performance/rekap',
+                'icon' => 'chartline_down',
+                'name' => 'Data Turnover',
+                'path' => '/turnover',
             ];
+
+            // Manajemen User
+            if ($user->hasAnyRole('superadmin')) {
+                $menu[] = [
+                    'icon' => 'authentication',
+                    'name' => 'Manajemen User',
+                    'path' => '/users',
+                ];
+            }
         }
+        // KPI Karyawan (Punya Staff Sendiri)
+        $menu[] = [
+            'icon' => 'chartline', // Saya ikuti icon pilihan Anda
+            'name' => 'KPI Karyawan',
+            'path' => '/kpi/dashboard',
+        ];
 
-        // =============================================================
-        // 3. MENU KHUSUS SUPERADMIN & ADMIN
-        // =============================================================
-        if ($user && $user->hasAnyRole(['superadmin', 'admin'])) {
+        // KBI Karyawan (Punya Staff Sendiri)
+        $menu[] = [
+            'icon' => 'speedometer', // Saya ikuti icon pilihan Anda
+            'name' => 'KBI Karyawan',
+            'path' => '/kbi/dashboard',
+        ];
+        // Monitoring KBI (Khusus HRD memantau Staff)
+        if ($user->hasAnyRole(['admin', 'superadmin', 'manager'])) {
             $menu[] = [
-                'icon' => 'authentication',
-                'name' => 'Manajemen User',
-                'path' => '/users',
+                    'icon' => 'desktop',
+                    'name' => 'Monitoring KBI',
+                    'path' => '/kbi/monitoring',
+                ];
+
+                // Rekap Performance
+            $menu[] = [
+                    'icon' => 'rekap', // Pastikan sudah didaftarkan di getIconSvg
+                    'name' => 'Rekap Performance',
+                    'path' => '/performance/rekap',
             ];
         }
 

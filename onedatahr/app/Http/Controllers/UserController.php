@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
+
 class UserController extends Controller
 {
     /**
@@ -15,7 +16,7 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $users = User::orderBy('created_at', 'desc')->get();
+        $users = User::with('roles')->orderBy('created_at', 'desc')->get();
         return view('pages.users.index', compact('users'));
     }
 
@@ -31,7 +32,7 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+   public function store(Request $request)
     {
         $request->validate([
             'name'     => 'required|string|max:255',
@@ -58,7 +59,6 @@ class UserController extends Controller
             ->route('users.index')
             ->with('success', 'User berhasil ditambahkan.');
     }
-
     /**
      * Display the specified resource.
      */
@@ -75,7 +75,6 @@ class UserController extends Controller
         $roles = Role::orderBy('name')->get();
         return view('pages.users.edit', compact('user', 'roles'));
     }
-
     /**
      * Update the specified resource in storage.
      */

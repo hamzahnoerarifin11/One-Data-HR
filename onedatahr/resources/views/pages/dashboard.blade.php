@@ -7,6 +7,9 @@
         <div>
             <h1 class="text-2xl font-bold text-gray-800 dark:text-white">HR Dashboard</h1>
             <p class="text-sm text-gray-500 dark:text-gray-400">Ringkasan Data Kepegawaian & Statistik</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Login sebagai:
+                {{ auth()->user()->roles->pluck('name')->implode(', ') }}
+            </p>
         </div>
         <div class="mt-2 sm:mt-0">
             <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">
