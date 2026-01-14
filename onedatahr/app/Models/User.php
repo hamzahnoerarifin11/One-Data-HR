@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Role;
+
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -52,12 +54,29 @@ class User extends Authenticatable
     public function isStaff()
     {
         // Cek apakah kolom role isinya 'staff' (huruf kecil sesuai database)
-        return $this->role === 'staff';
+        return $this->roles === 'staff';
     }
 
     public function isAdmin()
     {
         // Menganggap superadmin dan admin sebagai Admin
-        return in_array($this->role, ['admin', 'superadmin']);
+        return in_array($this->roles, ['admin', 'superadmin']);
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class);
+    }
+
+    public function hasRole(string|array $role): bool
+    {
+        return $this->roles()->where('name', $role)->exists();
+    }
+    public function hasAnyRole(string|array $roles): bool
+    {
+        if (is_string($roles)) {
+            $roles = [$roles];
+        }
+        return $this->roles()->whereIn('name', $roles)->exists();
     }
 }

@@ -202,7 +202,7 @@
 
         {{-- KONTEN UTAMA: DAFTAR KARYAWAN --}}
         {{-- Tampilkan table hanya jika role bukan staff --}}
-        @if(auth()->user()->role !== 'staff')
+        @if(auth()->user() && auth()->user()->hasAnyRole(['staff']))
         <div class="bg-white dark:bg-gray-800 p-5 sm:p-6 rounded-xl shadow border border-green-100 dark:border-gray-700">
 
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">

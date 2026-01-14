@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -23,7 +24,8 @@ class UserController extends Controller
      */
     public function create()
     {
-        return view('pages.users.create');
+        $roles = Role::orderBy('name')->get();
+        return view('pages.users.create', compact('roles'));
     }
 
     /**
@@ -36,18 +38,21 @@ class UserController extends Controller
             'email'    => 'required|email|max:255|unique:users,email',
             'nik'      => 'required|string|max:50|unique:users,nik',
             'jabatan'  => 'required|string|max:200',
-            'role'     => 'required|in:superadmin,admin,manager,staff',
+            'roles'    => 'required|array',
+            'roles.*'  => 'exists:roles,id',
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        User::create([
+        $user = User::create([
             'name'     => $request->name,
             'email'    => $request->email,
             'nik'      => $request->nik,
             'jabatan'  => $request->jabatan,
-            'role'     => $request->role,
             'password' => Hash::make($request->password),
         ]);
+
+        // Attach roles
+        $user->roles()->sync($request->roles);
 
         return redirect()
             ->route('users.index')
@@ -67,7 +72,8 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        return view('pages.users.edit', compact('user'));
+        $roles = Role::orderBy('name')->get();
+        return view('pages.users.edit', compact('user', 'roles'));
     }
 
     /**
@@ -90,23 +96,31 @@ class UserController extends Controller
                 Rule::unique('users', 'nik')->ignore($user->id),
             ],
             'jabatan' => 'required|string|max:200',
-            'role'    => 'required|in:superadmin,admin,manager,staff',
-            'password'=> 'nullable|string|min:8|confirmed',
+
+            // 🔥 GANTI role → roles[]
+            'roles'   => 'required|array',
+            'roles.*' => 'exists:roles,id',
+
+            'password' => 'nullable|string|min:8|confirmed',
         ]);
 
+        // Update data user (TANPA role)
         $user->update([
             'name'    => $request->name,
             'email'   => $request->email,
             'nik'     => $request->nik,
             'jabatan' => $request->jabatan,
-            'role'    => $request->role,
         ]);
 
+        // Update password jika diisi
         if ($request->filled('password')) {
             $user->update([
                 'password' => Hash::make($request->password),
             ]);
         }
+
+        // 🔥 INI KUNCI MULTI ROLE
+        $user->roles()->sync($request->roles);
 
         return redirect()
             ->route('users.index')

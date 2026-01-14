@@ -25,11 +25,11 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $user  = Auth::user();
-        $role  = $user->role; // Asumsi nama kolom di tabel users adalah 'role'
+
         $tahun = $request->input('tahun', date('Y'));
 
         // 1. LOGIKA UNTUK ADMIN & SUPERADMIN (Melihat Global Data)
-        if (in_array($role, ['superadmin', 'admin'])) {
+        if ($user->hasAnyRole(['superadmin', 'admin'])) {
             return $this->adminDashboard();
         }
 
@@ -42,7 +42,7 @@ class DashboardController extends Controller
         }
 
         // 2. LOGIKA UNTUK MANAGER (Melihat Tim)
-        if ($role === 'manager') {
+        if ($user->hasAnyRole(['manager'])) {
             return $this->managerDashboard($request, $karyawan, $tahun);
         }
 
@@ -64,34 +64,50 @@ class DashboardController extends Controller
 
         // --- Statistik Demografi (Gender, Jabatan, Divisi, dll) ---
         // (Kode query sama persis seperti sebelumnya)
-        $genderData = Karyawan::select(DB::raw("CASE WHEN Jenis_Kelamin_Karyawan = 'L' THEN 'Laki-laki' WHEN Jenis_Kelamin_Karyawan = 'P' THEN 'Perempuan' ELSE 'Tidak Diketahui' END as gender"), DB::raw('count(*) as total'))->groupBy('gender')->pluck('total','gender')->toArray();
-        
-        $jabatanData = Pekerjaan::whereNotNull('Jabatan')->groupBy('Jabatan')->select('Jabatan', DB::raw('count(*) as total'))->pluck('total','Jabatan')->toArray();
-        
-        $divisiData = Pekerjaan::whereNotNull('Divisi')->groupBy('Divisi')->select('Divisi', DB::raw('count(*) as total'))->pluck('total','Divisi')->toArray();
-        
-        $pendidikanData = Pendidikan::whereNotNull('Pendidikan_Terakhir')->groupBy('Pendidikan_Terakhir')->select('Pendidikan_Terakhir', DB::raw('count(*) as total'))->pluck('total','Pendidikan_Terakhir')->toArray();
+        $genderData = Karyawan::select(DB::raw("CASE WHEN Jenis_Kelamin_Karyawan = 'L' THEN 'Laki-laki' WHEN Jenis_Kelamin_Karyawan = 'P' THEN 'Perempuan' ELSE 'Tidak Diketahui' END as gender"), DB::raw('count(*) as total'))->groupBy('gender')->pluck('total', 'gender')->toArray();
+
+        $jabatanData = Pekerjaan::whereNotNull('Jabatan')->groupBy('Jabatan')->select('Jabatan', DB::raw('count(*) as total'))->pluck('total', 'Jabatan')->toArray();
+
+        $divisiData = Pekerjaan::whereNotNull('Divisi')->groupBy('Divisi')->select('Divisi', DB::raw('count(*) as total'))->pluck('total', 'Divisi')->toArray();
+
+        $pendidikanData = Pendidikan::whereNotNull('Pendidikan_Terakhir')->groupBy('Pendidikan_Terakhir')->select('Pendidikan_Terakhir', DB::raw('count(*) as total'))->pluck('total', 'Pendidikan_Terakhir')->toArray();
 
         // --- Masa Kerja & Umur ---
         $tenureCounts = ['< 1 Tahun' => 0, '1 - 3 Tahun' => 0, '4 - 8 Tahun' => 0, '> 8 Tahun' => 0];
         foreach (Kontrak::whereNotNull('Tanggal_Mulai_Tugas')->get() as $k) {
             $years = Carbon::parse($k->Tanggal_Mulai_Tugas)->diffInYears(now());
-            if ($years < 1) $tenureCounts['< 1 Tahun']++; elseif ($years <= 3) $tenureCounts['1 - 3 Tahun']++; elseif ($years <= 8) $tenureCounts['4 - 8 Tahun']++; else $tenureCounts['> 8 Tahun']++;
+            if ($years < 1) $tenureCounts['< 1 Tahun']++;
+            elseif ($years <= 3) $tenureCounts['1 - 3 Tahun']++;
+            elseif ($years <= 8) $tenureCounts['4 - 8 Tahun']++;
+            else $tenureCounts['> 8 Tahun']++;
         }
 
         $ageCounts = ['< 25' => 0, '25 - 27' => 0, '28 - 30' => 0, '30 - 40' => 0, '40 - 50' => 0, '> 50' => 0];
         foreach (Karyawan::whereNotNull('Tanggal_Lahir_Karyawan')->get() as $k) {
             $age = Carbon::parse($k->Tanggal_Lahir_Karyawan)->age;
-            if ($age < 25) $ageCounts['< 25']++; elseif ($age <= 27) $ageCounts['25 - 27']++; elseif ($age <= 30) $ageCounts['28 - 30']++; elseif ($age <= 40) $ageCounts['30 - 40']++; elseif ($age <= 50) $ageCounts['40 - 50']++; else $ageCounts['> 50']++;
+            if ($age < 25) $ageCounts['< 25']++;
+            elseif ($age <= 27) $ageCounts['25 - 27']++;
+            elseif ($age <= 30) $ageCounts['28 - 30']++;
+            elseif ($age <= 40) $ageCounts['30 - 40']++;
+            elseif ($age <= 50) $ageCounts['40 - 50']++;
+            else $ageCounts['> 50']++;
         }
 
-        $perusahaanData = Perusahaan::whereNotNull('Perusahaan')->groupBy('Perusahaan')->select('Perusahaan', DB::raw('count(*) as total'))->pluck('total','Perusahaan')->toArray();
+        $perusahaanData = Perusahaan::whereNotNull('Perusahaan')->groupBy('Perusahaan')->select('Perusahaan', DB::raw('count(*) as total'))->pluck('total', 'Perusahaan')->toArray();
 
         // View: pages/dashboard/admin.blade.php (atau dashboard.blade.php yang lama)
         return view('pages.dashboard', compact(
-            'totalKaryawan', 'karyawanAktif', 'totalKontrak', 'totalDepartemen',
-            'genderData', 'jabatanData', 'divisiData', 'pendidikanData',
-            'tenureCounts', 'ageCounts', 'perusahaanData'
+            'totalKaryawan',
+            'karyawanAktif',
+            'totalKontrak',
+            'totalDepartemen',
+            'genderData',
+            'jabatanData',
+            'divisiData',
+            'pendidikanData',
+            'tenureCounts',
+            'ageCounts',
+            'perusahaanData'
         ));
     }
 
@@ -116,27 +132,33 @@ class DashboardController extends Controller
             ->where('penilai_id', Auth::id()) // Dinilai oleh User yang login
             ->where('tipe_penilai', 'ATASAN')
             ->count();
-        
+
         $belumDinilaiKBI = $totalTim - $sudahDinilaiKBI;
 
         // 4. Tabel Monitoring (Pagination)
         $teamMonitoring = Karyawan::where('atasan_id', $manager->id_karyawan)
-            ->with(['pekerjaan', 
-                'kpiAssessment' => function($q) use ($tahun) { 
-                    $q->where('tahun', $tahun); 
+            ->with([
+                'pekerjaan',
+                'kpiAssessment' => function ($q) use ($tahun) {
+                    $q->where('tahun', $tahun);
                 },
                 // Cek status KBI apakah sudah dinilai manager ini
-                'kbiAssessment' => function($q) use ($tahun) {
+                'kbiAssessment' => function ($q) use ($tahun) {
                     $q->where('tahun', $tahun)
-                      ->where('penilai_id', Auth::id())
-                      ->where('tipe_penilai', 'ATASAN');
+                        ->where('penilai_id', Auth::id())
+                        ->where('tipe_penilai', 'ATASAN');
                 }
             ])
             ->paginate(5); // Tampilkan 5 per halaman di dashboard
 
         // View: pages/dashboard/manager.blade.php
         return view('pages.dashboard.manager', compact(
-            'manager', 'tahun', 'totalTim', 'butuhApprovalKPI', 'belumDinilaiKBI', 'teamMonitoring'
+            'manager',
+            'tahun',
+            'totalTim',
+            'butuhApprovalKPI',
+            'belumDinilaiKBI',
+            'teamMonitoring'
         ));
     }
 
@@ -147,14 +169,14 @@ class DashboardController extends Controller
     {
         // Ambil KPI Saya
         $myKpi = KpiAssessment::where('karyawan_id', $karyawan->id_karyawan)
-                              ->where('tahun', $tahun)
-                              ->first();
+            ->where('tahun', $tahun)
+            ->first();
 
         // Ambil KBI Saya (Self Assessment)
         $myKbi = KbiAssessment::where('karyawan_id', $karyawan->id_karyawan)
-                              ->where('tahun', $tahun)
-                              ->where('tipe_penilai', 'DIRI_SENDIRI')
-                              ->first();
+            ->where('tahun', $tahun)
+            ->where('tipe_penilai', 'DIRI_SENDIRI')
+            ->first();
 
         // View: pages/dashboard/staff.blade.php
         return view('pages.dashboard.staff', compact('karyawan', 'tahun', 'myKpi', 'myKbi'));

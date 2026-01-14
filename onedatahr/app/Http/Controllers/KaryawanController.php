@@ -24,7 +24,7 @@ class KaryawanController extends Controller
 
     public function index()
     {
-        $karyawans = Karyawan::with(['pekerjaan', 'pendidikan', 'kontrak', 'keluarga', 'bpjs', 'perusahaan', 'status'])
+        $karyawans = Karyawan::with(['pekerjaanTerkini', 'pendidikan', 'kontrak', 'keluarga', 'bpjs', 'perusahaan', 'status', 'pekerjaan'])
             ->orderBy('id_karyawan', 'desc')
             ->get();
 

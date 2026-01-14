@@ -26,8 +26,8 @@ class EnsureRole
             $allowed = preg_split('/[|,]/', $roles);
             $allowed = array_map('trim', $allowed);
 
-            if (!in_array($user->role, $allowed, true)) {
-                abort(403, 'Unauthorized');
+            if (!$user->hasAnyRole($allowed)) {
+                abort(403, 'ANDA TIDAK MEMILIKI AKSES KE HALAMAN INI.');
             }
         }
 

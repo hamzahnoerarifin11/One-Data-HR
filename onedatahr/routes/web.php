@@ -48,18 +48,40 @@ Route::post('/signout', [AuthController::class, 'logout'])->name('signout');
 // Dashboard home (require auth)
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
-    Route::delete('/users/batch-delete', [UserController::class, 'batchDelete'])->name('users.batchDelete');
-    Route::resource('users', UserController::class);
-    // Karyawan resource
-    Route::resource('karyawan', KaryawanController::class);
-    Route::resource('onboarding', OnboardingKaryawanController::class);
-    Route::get('/turnover', [TurnoverController::class, 'index'])
-    ->name('turnover.index');
 
-    // User management resource
-    Route::resource('users', UserController::class);
+    // KPI & KBI - Accessible to all authenticated users (they see only their data)
+    Route::get('/kpi/dashboard', [KpiAssessmentController::class, 'index'])->name('kpi.index');
+    Route::delete('/kpi/delete/{id}', [KpiAssessmentController::class, 'destroy'])->name('kpi.destroy');
+    Route::get('/kpi/form/{karyawan_id}', [KpiAssessmentController::class, 'create'])->name('kpi.create');
+    Route::post('/kpi/store', [KpiAssessmentController::class, 'store'])->name('kpi.store');
+    Route::get('/kpi/penilaian/{karyawan_id}/{tahun}', [KpiAssessmentController::class, 'show'])->name('kpi.show');
+    Route::post('/kpi/update/{id}', [KpiAssessmentController::class, 'update'])->name('kpi.update');
+    Route::post('/kpi/{id}/finalize', [App\Http\Controllers\KpiAssessmentController::class, 'finalize'])->name('kpi.finalize');
 
-    Route::resource('wig-rekrutmen', WigRekrutmenController::class);
+    Route::get('/kbi/dashboard', [KbiController::class, 'index'])->name('kbi.index');
+    Route::get('/kbi/nilai/{karyawan_id}/{tipe}', [KbiController::class, 'create'])->name('kbi.create');
+    Route::post('/kbi/store', [KbiController::class, 'store'])->name('kbi.store');
+    Route::get('/kbi/hasil/{id_assessment}', [KbiController::class, 'show'])->name('kbi.show');
+    Route::post('/kbi/update-atasan', [App\Http\Controllers\KbiController::class, 'updateAtasan'])->name('kbi.update-atasan');
+    Route::post('/kbi/reset-atasan', [App\Http\Controllers\KbiController::class, 'resetAtasan'])->name('kbi.reset-atasan');
+
+    // Admin/Superadmin/Manager Only Routes
+    Route::middleware('role:admin|superadmin|manager')->group(function () {
+        Route::delete('/users/batch-delete', [UserController::class, 'batchDelete'])->name('users.batchDelete');
+        Route::resource('karyawan', KaryawanController::class);
+        Route::get('/kbi/monitoring', [App\Http\Controllers\KbiController::class, 'monitoring'])->name('kbi.monitoring');
+        Route::get('/performance/rekap', [App\Http\Controllers\PerformanceController::class, 'index'])->name('performance.rekap');
+        Route::resource('training', TrainingController::class)->names('training');
+        Route::resource('onboarding', OnboardingKaryawanController::class);
+        Route::get('/turnover', [TurnoverController::class, 'index'])->name('turnover.index');
+        Route::resource('wig-rekrutmen', WigRekrutmenController::class);
+
+    });
+
+    // Admin/Superadmin Only Routes (User Management)
+    Route::middleware('role:admin|superadmin')->group(function () {
+        Route::resource('users', UserController::class);
+    });
 
     // Route::resource('interview_hr', InterviewHrController::class);
     // routes/web.php
@@ -70,34 +92,34 @@ Route::middleware(['auth'])->group(function () {
     //     Route::get('{id}/laporan', [KandidatController::class, 'generateLaporan'])
     //         ->name('laporan');
     // });
-// routes/web.php
-        // Route::prefix('rekrutmen/kandidat')
-        //     ->name('rekrutmen.kandidat.')
-        //     ->group(function () {
+    // routes/web.php
+    // Route::prefix('rekrutmen/kandidat')
+    //     ->name('rekrutmen.kandidat.')
+    //     ->group(function () {
 
-        //         Route::get('/', [KandidatController::class, 'index'])
-        //             ->name('index');
+    //         Route::get('/', [KandidatController::class, 'index'])
+    //             ->name('index');
 
-        //         Route::post('/', [KandidatController::class, 'store'])
-        //             ->name('store');
+    //         Route::post('/', [KandidatController::class, 'store'])
+    //             ->name('store');
 
-        //         Route::delete('{id}', [KandidatController::class, 'destroy'])
-        //             ->name('destroy');
+    //         Route::delete('{id}', [KandidatController::class, 'destroy'])
+    //             ->name('destroy');
 
-        //         Route::get('{id}/download-excel', [KandidatController::class, 'downloadExcel'])
-        //             ->name('downloadExcel');
+    //         Route::get('{id}/download-excel', [KandidatController::class, 'downloadExcel'])
+    //             ->name('downloadExcel');
 
-        //         Route::get('{id}/preview-excel', [KandidatController::class, 'previewExcel'])
-        //             ->name('previewExcel');
+    //         Route::get('{id}/preview-excel', [KandidatController::class, 'previewExcel'])
+    //             ->name('previewExcel');
 
-        //         Route::get('{id}/laporan', [KandidatController::class, 'generateLaporan'])
-        //             ->name('laporan');
-        //     });
+    //         Route::get('{id}/laporan', [KandidatController::class, 'generateLaporan'])
+    //             ->name('laporan');
+    //     });
 
 
 
-    // Recruitment / Kandidat resources and metrics
-    Route::prefix('rekrutmen')->name('rekrutmen.')->group(function () {
+    // Recruitment / Kandidat resources and metrics - Admin/Superadmin/Manager Only
+    Route::middleware('role:admin|superadmin|manager')->prefix('rekrutmen')->name('rekrutmen.')->group(function () {
         Route::get('/', [RecruitmentDashboardController::class, 'index'])->name('dashboard');
 
         // PERBAIKAN DI SINI: Nama route diubah agar sesuai dengan yang dipanggil di View [rekrutmen.wig.index]
@@ -126,18 +148,18 @@ Route::middleware(['auth'])->group(function () {
         Route::get('summary', [SummaryController::class, 'index'])->name('summary');
 
         // Metrics endpoints (JSON)
-        Route::get('/metrics/candidates', [RecruitmentDashboardController::class,'candidatesByPositionMonth'])->name('metrics.candidates');
-        Route::get('/metrics/cv', [RecruitmentDashboardController::class,'cvPassedByPositionMonth'])->name('metrics.cv');
-        Route::get('/metrics/cv/export', [RecruitmentDashboardController::class,'exportCvCsv'])->name('metrics.cv.export');
-        Route::get('/metrics/psikotes', [RecruitmentDashboardController::class,'psikotesPassedByPosition'])->name('metrics.psikotes');
-        Route::get('/metrics/psikotes/export', [RecruitmentDashboardController::class,'exportPsikotesCsv'])->name('metrics.psikotes.export');
-        Route::get('/metrics/kompetensi', [RecruitmentDashboardController::class,'kompetensiPassedByPosition'])->name('metrics.kompetensi');
+        Route::get('/metrics/candidates', [RecruitmentDashboardController::class, 'candidatesByPositionMonth'])->name('metrics.candidates');
+        Route::get('/metrics/cv', [RecruitmentDashboardController::class, 'cvPassedByPositionMonth'])->name('metrics.cv');
+        Route::get('/metrics/cv/export', [RecruitmentDashboardController::class, 'exportCvCsv'])->name('metrics.cv.export');
+        Route::get('/metrics/psikotes', [RecruitmentDashboardController::class, 'psikotesPassedByPosition'])->name('metrics.psikotes');
+        Route::get('/metrics/psikotes/export', [RecruitmentDashboardController::class, 'exportPsikotesCsv'])->name('metrics.psikotes.export');
+        Route::get('/metrics/kompetensi', [RecruitmentDashboardController::class, 'kompetensiPassedByPosition'])->name('metrics.kompetensi');
         Route::get(
-                        '/metrics/kompetensi/export',
-                        [RecruitmentDashboardController::class, 'exportKompetensiCsv']
-                    )->name('metrics.kompetensi.export');
-        Route::get('/metrics/interview_hr', [RecruitmentDashboardController::class,'interviewHrPassedByPositionMonth'])->name('metrics.hr');
-        Route::get('/metrics/interview-user', [RecruitmentDashboardController::class,'interviewUserPassedByPositionMonth'])->name('metrics.user');
+            '/metrics/kompetensi/export',
+            [RecruitmentDashboardController::class, 'exportKompetensiCsv']
+        )->name('metrics.kompetensi.export');
+        Route::get('/metrics/interview_hr', [RecruitmentDashboardController::class, 'interviewHrPassedByPositionMonth'])->name('metrics.hr');
+        Route::get('/metrics/interview-user', [RecruitmentDashboardController::class, 'interviewUserPassedByPositionMonth'])->name('metrics.user');
 
         // Pages for per-stage metrics
         Route::get('/metrics/cv-page', [RecruitmentDashboardController::class, 'cvPage'])->name('metrics.cv.page');
@@ -152,10 +174,11 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/metrics/candidates/export', [RecruitmentDashboardController::class, 'exportCandidatesCsv'])->name('metrics.candidates.export');
 
         // CRUD
-       // Pastikan strukturnya seperti ini
-         Route::get('/kandidat/{id}/preview-excel',
-                [KandidatController::class, 'previewExcel']
-            )->name('kandidat.preview-excel');
+        // Pastikan strukturnya seperti ini
+        Route::get(
+            '/kandidat/{id}/preview-excel',
+            [KandidatController::class, 'previewExcel']
+        )->name('kandidat.preview-excel');
 
         Route::get(
             'kandidat/{id}/laporan',
@@ -170,8 +193,8 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/rekrutmen/kandidat/export-pdf/{id}', [KandidatController::class, 'exportExcelToPdf']);
 
-        Route::get('proses/{kandidat_id}/edit', [ProsesRekrutmenController::class,'edit'])->name('proses.edit');
-        Route::post('proses', [ProsesRekrutmenController::class,'store'])->name('proses.store');
+        Route::get('proses/{kandidat_id}/edit', [ProsesRekrutmenController::class, 'edit'])->name('proses.edit');
+        Route::post('proses', [ProsesRekrutmenController::class, 'store'])->name('proses.store');
 
 
         // Perbaikan: Hindari double naming untuk resource
@@ -197,47 +220,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('daily/entries', [RekrutmenCalendarController::class, 'store'])->name('daily.entries.store');
         Route::delete('daily/entries/{id}', [RekrutmenCalendarController::class, 'destroy'])->name('daily.entries.destroy');
     });
-    // --- KPI ROUTES (DIPINDAHKAN KE SINI AGAR AMAN) ---
 
-    // Dashboard Monitoring (All Karyawan)
-    Route::get('/kpi/dashboard', [KpiAssessmentController::class, 'index'])->name('kpi.index');
-
-    // Hapus KPI
-    Route::delete('/kpi/delete/{id}', [KpiAssessmentController::class, 'destroy'])->name('kpi.destroy');
-
-    Route::get('/kpi/form/{karyawan_id}', [KpiAssessmentController::class, 'create'])->name('kpi.create');
-    // Generate KPI Baru
-    Route::post('/kpi/store', [KpiAssessmentController::class, 'store'])->name('kpi.store');
-
-    // KPI Assessment Routes
-    Route::get('/kpi/penilaian/{karyawan_id}/{tahun}', [KpiAssessmentController::class, 'show'])->name('kpi.show');
-    Route::post('/kpi/update/{id}', [KpiAssessmentController::class, 'update'])->name('kpi.update');
-
-    Route::post('/kpi/{id}/finalize', [App\Http\Controllers\KpiAssessmentController::class, 'finalize'])->name('kpi.finalize');
-
-    // --- KBI ROUTES ---
-    // 1. Dashboard KBI (Menu Utama untuk memilih siapa yang dinilai)
-    Route::get('/kbi/dashboard', [KbiController::class, 'index'])->name('kbi.index');
-
-    // 2. Form Penilaian (Form yang sudah Anda buat)
-    // Parameter: id karyawan yg dinilai, dan tipe penilai (DIRI_SENDIRI/ATASAN/BAWAHAN)
-    Route::get('/kbi/nilai/{karyawan_id}/{tipe}', [KbiController::class, 'create'])->name('kbi.create');
-
-    // 3. Simpan Data
-    Route::post('/kbi/store', [KbiController::class, 'store'])->name('kbi.store');
-
-    // 4. Lihat Hasil Detail (Report)
-    Route::get('/kbi/hasil/{id_assessment}', [KbiController::class, 'show'])->name('kbi.show');
-    // 5. Update Atasan yang dinilai oleh Karyawan
-    Route::post('/kbi/update-atasan', [App\Http\Controllers\KbiController::class, 'updateAtasan'])->name('kbi.update-atasan');
-    // 6. Reset Atasan yang dinilai oleh Karyawan
-    Route::post('/kbi/reset-atasan', [App\Http\Controllers\KbiController::class, 'resetAtasan'])->name('kbi.reset-atasan');
-    // 7. monitoring
-    Route::get('/kbi/monitoring', [App\Http\Controllers\KbiController::class, 'monitoring'])->name('kbi.monitoring');
-
-    // --- rekap PERFORMANCE ROUTES ---
-    Route::get('/performance/rekap', [App\Http\Controllers\PerformanceController::class, 'index'])->name('performance.rekap');
-
+    // Export routes (accessible to all authenticated users)
     Route::get('/kpi/export/excel', [KpiAssessmentController::class, 'exportExcel'])->name('performance.export.excel');
     Route::get('/kpi/export/pdf', [KpiAssessmentController::class, 'exportPdf'])->name('performance.export.pdf');
 

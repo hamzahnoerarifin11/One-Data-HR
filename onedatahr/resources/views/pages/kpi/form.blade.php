@@ -75,7 +75,7 @@
         
         <div class="flex flex-wrap gap-2 w-full lg:w-auto justify-start lg:justify-end items-center">
             {{-- LOGIKA TOMBOL KEMBALI DINAMIS --}}
-            @if(in_array(auth()->user()->role, ['superadmin', 'admin']))
+            @if(auth()->user()->hasAnyRole(['superadmin', 'admin']))
                 {{-- 1. Jika ADMIN: Kembali ke Tabel List KPI --}}
                 <a href="{{ route('kpi.index') }}" class="px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition flex-1 lg:flex-none text-center text-gray-600 dark:text-gray-300">
                     <i class="fas fa-arrow-left mr-1"></i> List Karyawan

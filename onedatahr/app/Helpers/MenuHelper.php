@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Helpers;
+
 use Illuminate\Support\Facades\Auth;
 
 class MenuHelper
@@ -8,90 +9,78 @@ class MenuHelper
     public static function getMainNavItems()
     {
         $user = Auth::user();
-        $role = $user->role ?? 'staff'; // Ambil role dari database
         $menu = [];
 
         // =============================================================
-        // 1. MENU UMUM (SEMUA ROLE BISA LIHAT)
+        // 1. MENU UMUM
         // =============================================================
-
         $menu[] = [
             'icon' => 'dashboard',
             'name' => 'Dashboard',
             'path' => '/dashboard',
         ];
 
-        // Menu KPI & KBI untuk Staff (Agar bisa isi punya sendiri)
         $menu[] = [
-            'icon' => 'chartline', 
+            'icon' => 'chartline',
             'name' => 'KPI Karyawan',
-            'path' => '/kpi/dashboard', // Pastikan route ini benar
+            'path' => '/kpi/dashboard',
         ];
 
         $menu[] = [
-            'icon' => 'speedometer', 
+            'icon' => 'speedometer',
             'name' => 'KBI Karyawan',
-            'path' => '/kbi/dashboard', // Pastikan route ini benar
+            'path' => '/kbi/dashboard',
         ];
 
         // =============================================================
-        // 2. MENU KHUSUS (HANYA ADMIN, SUPERADMIN, MANAGER)
+        // 2. MENU ADMIN / SUPERADMIN / MANAGER
         // =============================================================
-        // Staff tidak boleh lihat menu di bawah ini
-        
-        if (in_array($role, ['superadmin', 'admin', 'manager'])) {
-            
-            // Data Karyawan
+        if ($user && $user->hasAnyRole(['superadmin', 'admin', 'manager'])) {
+
             $menu[] = [
                 'icon' => 'user-profile',
                 'name' => 'Data Karyawan',
                 'path' => '/karyawan',
             ];
 
-            // Rekrutmen
             $menu[] = [
                 'icon' => 'task',
                 'name' => 'Rekrutmen',
                 'subItems' => [
-                    ['name' => 'Dashboard Rekrutmen',   'path' => '/rekrutmen'],
-                    ['name' => 'Manage Posisi',        'path' => '/rekrutmen/posisi-manage'],
-                    ['name' => 'Manage Kandidat',      'path' => '/rekrutmen/kandidat'],
-                    ['name' => 'Kalender Rekrutmen',   'path' => '/rekrutmen/calendar'],
-                    ['name' => 'Interview HR',         'path' => '/rekrutmen/interview_hr'],
+                    ['name' => 'Dashboard Rekrutmen', 'path' => '/rekrutmen'],
+                    ['name' => 'Manage Posisi', 'path' => '/rekrutmen/posisi-manage'],
+                    ['name' => 'Manage Kandidat', 'path' => '/rekrutmen/kandidat'],
+                    ['name' => 'Kalender Rekrutmen', 'path' => '/rekrutmen/calendar'],
+                    ['name' => 'Interview HR', 'path' => '/rekrutmen/interview_hr'],
                     ['name' => 'Kandidat Lanjut User', 'path' => '/rekrutmen/kandidat_lanjut_user'],
-                    ['name' => 'Pemberkasan',          'path' => '/rekrutmen/pemberkasan'],
-                    ['name' => 'Database WIG',         'path' => '/rekrutmen/wig'],
+                    ['name' => 'Pemberkasan', 'path' => '/rekrutmen/pemberkasan'],
+                    ['name' => 'Database WIG', 'path' => '/rekrutmen/wig'],
                 ],
             ];
 
-            // Training
             $menu[] = [
                 'icon' => 'forms',
                 'name' => 'Training',
                 'path' => '/training',
             ];
 
-            // Monitoring KBI
             $menu[] = [
                 'icon' => 'desktop',
                 'name' => 'Monitoring KBI',
                 'path' => '/kbi/monitoring',
             ];
 
-            // Rekap Performance
             $menu[] = [
-                'icon' => 'rekap', 
+                'icon' => 'rekap',
                 'name' => 'Rekap Performance',
                 'path' => '/performance/rekap',
             ];
         }
 
         // =============================================================
-        // 3. MENU SUPER KHUSUS (HANYA SUPERADMIN & ADMIN)
+        // 3. MENU KHUSUS SUPERADMIN & ADMIN
         // =============================================================
-        // Manager & Staff TIDAK BOLEH LIHAT "Manajemen User"
-        
-        if (in_array($role, ['superadmin', 'admin'])) {
+        if ($user && $user->hasAnyRole(['superadmin', 'admin'])) {
             $menu[] = [
                 'icon' => 'authentication',
                 'name' => 'Manajemen User',
@@ -102,8 +91,6 @@ class MenuHelper
         return $menu;
     }
 
-    // ... (Sisa function getOthersItems, getMenuGroups, getIconSvg tetap sama) ...
-    
     public static function getOthersItems()
     {
         return [];
@@ -122,7 +109,7 @@ class MenuHelper
             ],
         ];
     }
-    
+
 
     public static function isActive($path)
     {
@@ -199,5 +186,4 @@ class MenuHelper
 
         return $icons[$iconName] ?? '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/></svg>';
     }
-
 }

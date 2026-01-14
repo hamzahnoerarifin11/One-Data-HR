@@ -26,7 +26,7 @@ class RekrutmenCalendarController extends Controller
 
     public function store(Request $request)
     {
-        abort_unless(auth()->user() && auth()->user()->role === 'admin', 403);
+        abort_unless(auth()->user() && auth()->user()->hasRole('admin'), 403);
 
         $data = $request->validate([
             'posisi_id' => 'required|integer|exists:posisi,id_posisi',
@@ -58,7 +58,7 @@ class RekrutmenCalendarController extends Controller
 
     public function destroy($id)
     {
-        abort_unless(auth()->user() && auth()->user()->role === 'admin', 403);
+        abort_unless(auth()->user() && auth()->user()->hasRole('admin'), 403);
 
         $entry = RekrutmenCalendarEntry::findOrFail($id);
         $entry->delete();

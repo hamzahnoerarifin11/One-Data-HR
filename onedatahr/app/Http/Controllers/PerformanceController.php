@@ -11,6 +11,12 @@ use Illuminate\Support\Facades\Auth;
 
 class PerformanceController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('role:admin|superadmin|manager');
+    }
+
     public function index(Request $request)
     {
         $user = Auth::user();
@@ -24,7 +30,7 @@ class PerformanceController extends Controller
         $me = Karyawan::where('nik', $user->nik)->first();
 
         // Jika user BUKAN admin, tapi data karyawannya tidak ada -> TENDANG KELUAR
-        if (!$me && !in_array($user->role, ['superadmin', 'admin'])) {
+        if (!$me && !$user->hasRole(['superadmin', 'admin'])) {
             return redirect()->back()->with('error', 'Data profil karyawan Anda belum terhubung. Silakan hubungi HRD.');
         }
 
@@ -43,12 +49,11 @@ class PerformanceController extends Controller
         }
 
         // B. Filter Role (Manager hanya lihat bawahan)
-        if ($user->role === 'manager') {
+        if ($user->hasRole('manager')) {
             // PERBAIKAN: Gunakan $me->id_karyawan (Aman karena sudah dicek diatas)
             // PERBAIKAN: Typo 'atasa_id' jadi 'atasan_id'
-            $query->where('atasan_id', $me->id_karyawan); 
-        
-        } elseif ($user->role === 'staff') {
+            $query->where('atasan_id', $me->id_karyawan);
+        } elseif ($user->hasRole('staff')) {
             // Staff hanya lihat diri sendiri
             $query->where('id_karyawan', $me->id_karyawan);
         }
@@ -74,7 +79,7 @@ class PerformanceController extends Controller
                 ->where('tahun', $tahun)
                 ->latest('created_at') // Ambil yang paling baru
                 ->first();
-            
+
             $skorKpi = $kpiRecord ? $kpiRecord->total_skor_akhir : 0;
 
             // --- C. Hitung Final Score (Bobot 70:30) ---
@@ -93,7 +98,7 @@ class PerformanceController extends Controller
                 'nik'         => $k->NIK,
                 'nama'        => $k->Nama_Lengkap_Sesuai_Ijazah,
                 // PERBAIKAN: Gunakan safe navigation operator
-                'jabatan'     => $k->pekerjaan->first()?->Jabatan ?? '-', 
+                'jabatan'     => $k->pekerjaan->first()?->Jabatan ?? '-',
                 'skor_kbi_asli' => $skorKbiAsli,
                 'skor_kbi'    => number_format($skorKbiAsli, 2),
                 'skor_kpi'    => number_format($skorKpi, 2),
@@ -114,16 +119,16 @@ class PerformanceController extends Controller
         // ======================================================
         $page = LengthAwarePaginator::resolveCurrentPage();
         $perPage = 10;
-        
+
         // Potong data sesuai halaman
         $currentItems = $rekapCollection->slice(($page - 1) * $perPage, $perPage)->all();
 
         // Buat Object Paginator
         $rekap = new LengthAwarePaginator(
-            $currentItems, 
-            count($rekapCollection), 
-            $perPage, 
-            $page, 
+            $currentItems,
+            count($rekapCollection),
+            $perPage,
+            $page,
             ['path' => LengthAwarePaginator::resolveCurrentPath()]
         );
 

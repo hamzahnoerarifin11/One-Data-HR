@@ -25,7 +25,7 @@ class KpiAssessmentController extends Controller
         $tahun = $request->input('tahun', date('Y'));
 
         // --- SKENARIO 1: ADMIN & SUPERADMIN (Lihat Semua Data) ---
-        if (in_array($user->role, ['superadmin', 'admin'])) {
+        if ($user->hasRole(['superadmin', 'admin'])) {
 
             $query = Karyawan::with(['pekerjaan', 'kpiAssessment' => function ($q) use ($tahun) {
                 $q->where('tahun', $tahun);
@@ -123,7 +123,7 @@ class KpiAssessmentController extends Controller
 
         // Validasi Akses (Cegah Staff A mengintip Staff B)
         $user = Auth::user();
-        if (!in_array($user->role, ['admin', 'superadmin'])) {
+        if (!$user->hasAnyRole(['admin', 'superadmin'])) {
             // Jika bukan admin, pastikan dia melihat punya sendiri atau punya bawahannya
             $me = Karyawan::where('nik', $user->nik)->first();
             if ($me->id_karyawan != $karyawanId && $karyawan->atasan_id != $me->id_karyawan) {
@@ -153,7 +153,7 @@ class KpiAssessmentController extends Controller
 
         return view('pages.kpi.form', compact('karyawan', 'kpi', 'items', 'tahun'));
     }
-    
+
 
     // =================================================================
     // 3. STORE HEADER (Opsional, karena sudah dihandle di Index)
@@ -342,13 +342,13 @@ class KpiAssessmentController extends Controller
 
             // SKENARIO 1: STAFF (Pemilik KPI) KLIK SIMPAN
             // Jika yang login adalah Staff, otomatis jadi "SUBMITTED" (Menunggu Approval)
-            if ($user->role == 'staff') {
+            if ($user->hasRole('staff')) {
                 $statusBaru = 'SUBMITTED';
             }
 
             // SKENARIO 2: MANAGER / ADMIN KLIK SIMPAN
             // Jika Manager/Admin yang simpan, otomatis jadi "FINAL" (Approved)
-            elseif (in_array($user->role, ['manager', 'admin', 'superadmin'])) {
+            elseif ($user->hasRole(['manager', 'admin', 'superadmin'])) {
                 $statusBaru = 'FINAL';
             }
 

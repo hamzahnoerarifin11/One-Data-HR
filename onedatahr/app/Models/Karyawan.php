@@ -20,19 +20,26 @@ class Karyawan extends Model
 
     // Gunakan guarded kosong agar semua kolom bisa diisi (lebih praktis)
     // protected $fillable = [ ... ]; // Ini bisa dihapus jika sudah pakai guarded
-    protected $guarded = []; 
+    protected $guarded = [];
 
     // =========================================================
     // PERBAIKAN UTAMA: RELASI KE PEKERJAAN (JABATAN)
     // =========================================================
-    
+
     // Karena di tabel 'pekerjaan' ada kolom 'id_karyawan', 
-    // kita pakai hasOne (untuk mengambil 1 jabatan aktif).
+    // kita pakai hasMany untuk history pekerjaan
     public function pekerjaan()
     {
         // hasOne(ModelTujuan, 'Foreign_Key_di_Tabel_Tujuan', 'Local_Key_di_Sini')
         return $this->hasMany(Pekerjaan::class, 'id_karyawan', 'id_karyawan')
-                    ->latest('id_pekerjaan'); // Opsional: Ambil yang paling baru diinput
+            ->latest('id_pekerjaan'); // Opsional: Ambil yang paling baru diinput
+    }
+
+    // Ambil pekerjaan terkini/terbaru saja (single record)
+    public function pekerjaanTerkini()
+    {
+        return $this->hasOne(Pekerjaan::class, 'id_karyawan', 'id_karyawan')
+            ->latest('id_pekerjaan');
     }
 
     // =========================================================
@@ -99,7 +106,7 @@ class Karyawan extends Model
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    
+
     // Konversi kolom created_at dan updated_at ke format DateTime
     protected $casts = [
         'created_at' => 'datetime',

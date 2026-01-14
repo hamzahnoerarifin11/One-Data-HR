@@ -8,7 +8,7 @@
     $restrictedMenus = ['Manajemen User', 'Training', 'Rekrutmen', 'Data Karyawan']; 
     
     // Ambil role user
-    $userRole = auth()->user()->role ?? 'staff'; 
+    $user = auth()->user();
     $allowedRoles = ['superadmin', 'admin'];
 @endphp
 
@@ -107,7 +107,8 @@
                                 @php
                                     // Cek apakah nama menu ini ada di daftar terlarang
                                     // DAN user bukan admin/superadmin
-                                    if (in_array($item['name'], $restrictedMenus) && !in_array($userRole, $allowedRoles)) {
+                                    if (
+                                        in_array($item['name'], $restrictedMenus) && !$user->hasAnyRole($allowedRoles)) {
                                         continue; // Skip item ini, lanjut ke item berikutnya
                                     }
                                 @endphp

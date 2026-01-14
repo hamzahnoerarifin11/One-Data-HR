@@ -106,26 +106,26 @@
 
                 {{-- Role --}}
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-2">
                         Role
                     </label>
-                    <div x-data="{ isOptionSelected: true }" class="relative z-20 bg-transparent">
-                        <select name="role" required
-                            class="dark:bg-dark-900 shadow-theme-xs h-11 w-full appearance-none rounded-lg
-                                   border border-gray-300 bg-transparent px-4 py-2.5 pr-11 text-sm
-                                   text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-                            <option value="superadmin" @selected($user->role === 'superadmin')>Super Admin</option>
-                            <option value="admin" @selected($user->role === 'admin')>Admin</option>
-                            <option value="manager" @selected($user->role === 'manager')>Manager</option>
-                            <option value="staff" @selected($user->role === 'staff')>Staff</option>
-                        </select>
-                        <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
-                            <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                        </span>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        @foreach($roles as $role)
+                            <label class="flex items-center gap-2 text-sm dark:text-gray-400">
+                                <input
+                                    type="checkbox"
+                                    name="roles[]"
+                                    value="{{ $role->id }}"
+                                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    @checked($user->roles->contains($role->id))
+                                >
+                                {{ ucfirst($role->name) }}
+                            </label>
+                        @endforeach
                     </div>
                 </div>
+
 
                 {{-- Password --}}
                 <div>
