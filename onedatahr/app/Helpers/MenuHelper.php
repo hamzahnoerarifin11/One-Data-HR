@@ -24,7 +24,7 @@ class MenuHelper
         // 2. MENU ADMIN / SUPERADMIN / MANAGER
         // =============================================================
         // Logika: "Jika User ADA dan User BUKAN Staff"
-        if ($user->hasAnyRole(['admin', 'superadmin'])) {
+        if ($user->hasRole(['admin', 'superadmin'])) {
 
             $menu[] = [
                 'icon' => 'user-profile',
@@ -66,7 +66,7 @@ class MenuHelper
             ];
 
             // Manajemen User
-            if ($user->hasAnyRole('superadmin')) {
+            if ($user->hasRole('superadmin')) {
                 $menu[] = [
                     'icon' => 'authentication',
                     'name' => 'Manajemen User',
@@ -74,33 +74,21 @@ class MenuHelper
                 ];
             }
         }
-        // KPI Karyawan (Punya Staff Sendiri)
+        // Penilaian Karyawan (Grouped Dropdown)
         $menu[] = [
-            'icon' => 'chartline', // Saya ikuti icon pilihan Anda
-            'name' => 'KPI Karyawan',
-            'path' => '/kpi/dashboard',
+            'icon' => 'chartline', // Icon untuk penilaian
+            'name' => 'Penilaian Karyawan',
+            'subItems' => [
+                ['name' => 'KPI Karyawan', 'path' => '/kpi/dashboard'],
+                ['name' => 'KBI Karyawan', 'path' => '/kbi/dashboard'],
+            ],
         ];
 
-        // KBI Karyawan (Punya Staff Sendiri)
-        $menu[] = [
-            'icon' => 'speedometer', // Saya ikuti icon pilihan Anda
-            'name' => 'KBI Karyawan',
-            'path' => '/kbi/dashboard',
-        ];
         // Monitoring KBI (Khusus HRD memantau Staff)
-        if ($user->hasAnyRole(['admin', 'superadmin', 'manager'])) {
-            $menu[] = [
-                    'icon' => 'desktop',
-                    'name' => 'Monitoring KBI',
-                    'path' => '/kbi/monitoring',
-                ];
-
-                // Rekap Performance
-            $menu[] = [
-                    'icon' => 'rekap', // Pastikan sudah didaftarkan di getIconSvg
-                    'name' => 'Rekap Performance',
-                    'path' => '/performance/rekap',
-            ];
+        if ($user->hasRole(['admin', 'superadmin', 'manager'])) {
+            // Tambahkan ke subItems Penilaian Karyawan
+            $menu[count($menu) - 1]['subItems'][] = ['name' => 'Monitoring KBI', 'path' => '/kbi/monitoring'];
+            $menu[count($menu) - 1]['subItems'][] = ['name' => 'Rekap Performance', 'path' => '/performance/rekap'];
         }
 
         return $menu;

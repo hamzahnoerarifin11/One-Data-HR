@@ -45,7 +45,7 @@ class EnsureRole
             $allowed = preg_split('/[|,]/', $roles); // Menghasilkan array
             $allowed = array_map('trim', $allowed);
 
-            if (!$user->hasAnyRole($allowed)) { // Mengecek apakah user punya salah satu dari array tersebut
+            if (!$user->hasRole($allowed)) { // Mengecek apakah user punya salah satu dari array tersebut
                 abort(403, 'Unauthorized');
             }
         }

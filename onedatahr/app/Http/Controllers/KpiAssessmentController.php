@@ -10,8 +10,6 @@ use App\Models\KpiScore;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\SingleKpiExport;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class KpiAssessmentController extends Controller
@@ -123,7 +121,7 @@ class KpiAssessmentController extends Controller
 
         // Validasi Akses (Cegah Staff A mengintip Staff B)
         $user = Auth::user();
-        if (!$user->hasAnyRole(['admin', 'superadmin'])) {
+        if (!$user->hasRole(['admin', 'superadmin'])) {
             // Jika bukan admin, pastikan dia melihat punya sendiri atau punya bawahannya
             $me = Karyawan::where('nik', $user->nik)->first();
             if ($me->id_karyawan != $karyawanId && $karyawan->atasan_id != $me->id_karyawan) {
@@ -468,5 +466,58 @@ class KpiAssessmentController extends Controller
         }
 
         return redirect()->back()->with('success', 'KPI berhasil diperbarui!');
+    }
+
+    // =================================================================
+    // 6. EXPORT FUNCTIONS
+    // =================================================================
+
+    public function exportExcel(Request $request)
+    {
+        $karyawanId = $request->get('karyawan_id');
+        $tahun = $request->get('tahun');
+
+        if (!$karyawanId || !$tahun) {
+            return redirect()->back()->with('error', 'Parameter karyawan_id dan tahun diperlukan.');
+        }
+
+        $karyawan = Karyawan::findOrFail($karyawanId);
+        $kpi = KpiAssessment::where('karyawan_id', $karyawanId)
+            ->where('tahun', $tahun)
+            ->first();
+
+        if (!$kpi) {
+            return redirect()->back()->with('error', 'Data KPI tidak ditemukan.');
+        }
+
+        return \App\Exports\SingleKpiExport::download($kpi->id_kpi_assessment);
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $karyawanId = $request->get('karyawan_id');
+        $tahun = $request->get('tahun');
+
+        if (!$karyawanId || !$tahun) {
+            return redirect()->back()->with('error', 'Parameter karyawan_id dan tahun diperlukan.');
+        }
+
+        $karyawan = Karyawan::findOrFail($karyawanId);
+        $kpi = KpiAssessment::where('karyawan_id', $karyawanId)
+            ->where('tahun', $tahun)
+            ->with(['items.scores'])
+            ->first();
+
+        if (!$kpi) {
+            return redirect()->back()->with('error', 'Data KPI tidak ditemukan.');
+        }
+
+        $items = $kpi->items ?? collect(); // Pastikan items selalu ada, meskipun kosong
+
+        $filename = "KPI_{$karyawan->NIK}_{$tahun}.pdf";
+
+        $pdf = Pdf::loadView('pages.kpi.pdf', compact('karyawan', 'kpi', 'items', 'tahun'));
+
+        return $pdf->download($filename);
     }
 }

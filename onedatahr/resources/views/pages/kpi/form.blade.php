@@ -75,7 +75,7 @@
         
         <div class="flex flex-wrap gap-2 w-full lg:w-auto justify-start lg:justify-end items-center">
             {{-- LOGIKA TOMBOL KEMBALI DINAMIS --}}
-            @if(auth()->user()->hasAnyRole(['superadmin', 'admin']))
+            @if(auth()->user()->hasRole(['superadmin', 'admin']))
                 {{-- 1. Jika ADMIN: Kembali ke Tabel List KPI --}}
                 <a href="{{ route('kpi.index') }}" class="px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition flex-1 lg:flex-none text-center text-gray-600 dark:text-gray-300">
                     <i class="fas fa-arrow-left mr-1"></i> List Karyawan
@@ -166,7 +166,7 @@
     @php
     // Cek apakah user yang login berhak melakukan adjustment?
     // Staff TIDAK BOLEH (False), Manager/Admin BOLEH (True)
-    $isStaff = auth()->user()->role == 'staff';
+    $isStaff = auth()->user()->hasRole(['staff']);
     
     // Class CSS untuk input yang dikunci (Abu-abu & tidak bisa diklik)
     $readonlyClass = $isStaff ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-transparent text-orange-700 font-bold border-b border-orange-300';

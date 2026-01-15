@@ -15,12 +15,10 @@ use App\Http\Controllers\PosisiController;
 use App\Http\Controllers\RekrutmenDailyController;
 use App\Http\Controllers\RekrutmenCalendarController;
 // Import Controller yang sebelumnya tertinggal agar tidak error class not found
-use App\Http\Controllers\PelamarHarianController;
 use App\Http\Controllers\ScreeningCvController;
 use App\Http\Controllers\TesKompetensiController;
 use App\Http\Controllers\InterviewHrController;
 use App\Http\Controllers\InterviewUserController;
-use App\Http\Controllers\SummaryController;
 use App\Http\Controllers\KandidatLanjutUserController;
 use App\Http\Controllers\TrainingController;
 use App\Http\Controllers\UserController;
@@ -54,108 +52,105 @@ Route::middleware(['auth'])->group(function () {
     //     Route::resource('karyawan', KaryawanController::class);
     //     Route::delete('/karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
     // });
-Route::middleware(['auth', 'role:admin|superadmin'])->group(function () {
+    Route::middleware(['auth', 'role:admin|superadmin'])->group(function () {
         // --- KARYAWAN MANAGEMENT ---
-    Route::post('karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
-    Route::resource('karyawan', KaryawanController::class);
+        Route::post('karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
+        Route::resource('karyawan', KaryawanController::class);
 
-    // --- REKRUTMEN MODULE ---
-    Route::prefix('rekrutmen')->name('rekrutmen.')->group(function () {
+        // --- REKRUTMEN MODULE ---
+        Route::prefix('rekrutmen')->name('rekrutmen.')->group(function () {
 
-        // Dashboards & Main Pages
-        Route::get('/', [RecruitmentDashboardController::class, 'index'])->name('dashboard');
-        Route::get('summary', [SummaryController::class, 'index'])->name('summary');
-        Route::get('calendar', [RecruitmentDashboardController::class, 'calendarPage'])->name('calendar');
+            // Dashboards & Main Pages
+            Route::get('/', [RecruitmentDashboardController::class, 'index'])->name('dashboard');
+            Route::get('calendar', [RecruitmentDashboardController::class, 'calendarPage'])->name('calendar');
 
-        // WIG & Positions
-        Route::get('wig', [WigRekrutmenController::class, 'index'])->name('wig.index');
-        Route::put('wig/{posisiId}', [WigRekrutmenController::class, 'update'])->name('wig.update');
-        Route::get('posisi/list', [PosisiController::class, 'index'])->name('posisi.list');
-        Route::post('posisi', [PosisiController::class, 'store'])->name('posisi.store');
-        Route::get('posisi-manage', [PosisiController::class, 'manage'])->name('posisi.index');
-        Route::put('posisi/{id}', [PosisiController::class, 'update'])->name('posisi.update');
-        Route::delete('posisi/{id}', [PosisiController::class, 'destroy'])->name('posisi.destroy');
+            // WIG & Positions
+            Route::get('wig', [WigRekrutmenController::class, 'index'])->name('wig.index');
+            Route::put('wig/{posisiId}', [WigRekrutmenController::class, 'update'])->name('wig.update');
+            Route::get('posisi/list', [PosisiController::class, 'index'])->name('posisi.list');
+            Route::post('posisi', [PosisiController::class, 'store'])->name('posisi.store');
+            Route::get('posisi-manage', [PosisiController::class, 'manage'])->name('posisi.index');
+            Route::put('posisi/{id}', [PosisiController::class, 'update'])->name('posisi.update');
+            Route::delete('posisi/{id}', [PosisiController::class, 'destroy'])->name('posisi.destroy');
 
 
-        // Pelamar & Tahapan
-        Route::resource('pelamar', PelamarHarianController::class)->only(['index', 'store']);
-        Route::get('screening-cv', [ScreeningCvController::class, 'index'])->name('screening-cv');
-        Route::get('tes-kompetensi', [TesKompetensiController::class, 'index'])->name('tes-kompetensi');
-        Route::resource('interview_hr', InterviewHrController::class);
-        Route::get('interview-user', [InterviewUserController::class, 'index'])->name('interview-user');
-        Route::resource('kandidat_lanjut_user', KandidatLanjutUserController::class);
-        Route::resource('pemberkasan', PemberkasanController::class);
+            // Pelamar & Tahapan
+            Route::get('screening-cv', [ScreeningCvController::class, 'index'])->name('screening-cv');
+            Route::get('tes-kompetensi', [TesKompetensiController::class, 'index'])->name('tes-kompetensi');
+            Route::resource('interview_hr', InterviewHrController::class);
+            Route::get('interview-user', [InterviewUserController::class, 'index'])->name('interview-user');
+            Route::resource('kandidat_lanjut_user', KandidatLanjutUserController::class);
+            Route::resource('pemberkasan', PemberkasanController::class);
 
-        // Kandidat CRUD & Exports
-        Route::get('kandidat/list', [KandidatController::class, 'list'])->name('kandidat.list');
-        Route::get('kandidat/{id}/preview-excel', [KandidatController::class, 'previewExcel'])->name('kandidat.preview-excel');
-        Route::get('kandidat/{id}/laporan', [KandidatController::class, 'generateLaporan'])->name('kandidat.laporan');
-        Route::get('kandidat/download-excel/{id}', [KandidatController::class, 'downloadExcel'])->name('kandidat.downloadExcel');
-        Route::get('kandidat/export-pdf/{id}', [KandidatController::class, 'exportExcelToPdf'])->name('kandidat.export-pdf');
-        Route::resource('kandidat', KandidatController::class);
+            // Kandidat CRUD & Exports
+            Route::get('kandidat/list', [KandidatController::class, 'list'])->name('kandidat.list');
+            Route::get('kandidat/{id}/preview-excel', [KandidatController::class, 'previewExcel'])->name('kandidat.preview-excel');
+            Route::get('kandidat/{id}/laporan', [KandidatController::class, 'generateLaporan'])->name('kandidat.laporan');
+            Route::get('kandidat/download-excel/{id}', [KandidatController::class, 'downloadExcel'])->name('kandidat.downloadExcel');
+            Route::get('kandidat/export-pdf/{id}', [KandidatController::class, 'exportExcelToPdf'])->name('kandidat.export-pdf');
+            Route::resource('kandidat', KandidatController::class);
 
-        // Proses Rekrutmen
-        Route::get('proses/{kandidat_id}/edit', [ProsesRekrutmenController::class, 'edit'])->name('proses.edit');
-        Route::post('proses', [ProsesRekrutmenController::class, 'store'])->name('proses.store');
+            // Proses Rekrutmen
+            Route::get('proses/{kandidat_id}/edit', [ProsesRekrutmenController::class, 'edit'])->name('proses.edit');
+            Route::post('proses', [ProsesRekrutmenController::class, 'store'])->name('proses.store');
 
-        // Daily Activity
-        Route::resource('daily', RekrutmenDailyController::class);
-        Route::resource('daily/entries', RekrutmenCalendarController::class)->names('daily.entries');
+            // Daily Activity
+            Route::resource('daily', RekrutmenDailyController::class);
+            Route::resource('daily/entries', RekrutmenCalendarController::class)->names('daily.entries');
 
-        // METRICS & ANALYTICS
-        Route::prefix('metrics')->name('metrics.')->group(function () {
-            // Data Endpoints (JSON)
-            Route::get('candidates', [RecruitmentDashboardController::class, 'candidatesByPositionMonth'])->name('candidates');
-            Route::get('cv', [RecruitmentDashboardController::class, 'cvPassedByPositionMonth'])->name('cv');
-            Route::get('psikotes', [RecruitmentDashboardController::class, 'psikotesPassedByPosition'])->name('psikotes');
-            Route::get('kompetensi', [RecruitmentDashboardController::class, 'kompetensiPassedByPosition'])->name('kompetensi');
-            Route::get('interview-hr', [RecruitmentDashboardController::class, 'interviewHrPassedByPositionMonth'])->name('hr');
-            Route::get('interview-user', [RecruitmentDashboardController::class, 'interviewUserPassedByPositionMonth'])->name('user');
-            Route::get('progress', [RecruitmentDashboardController::class, 'recruitmentProgressByPosition'])->name('progress');
-            Route::get('pemberkasan', [RecruitmentDashboardController::class, 'pemberkasanProgress'])->name('pemberkasan');
+            // METRICS & ANALYTICS
+            Route::prefix('metrics')->name('metrics.')->group(function () {
+                // Data Endpoints (JSON)
+                Route::get('candidates', [RecruitmentDashboardController::class, 'candidatesByPositionMonth'])->name('candidates');
+                Route::get('cv', [RecruitmentDashboardController::class, 'cvPassedByPositionMonth'])->name('cv');
+                Route::get('psikotes', [RecruitmentDashboardController::class, 'psikotesPassedByPosition'])->name('psikotes');
+                Route::get('kompetensi', [RecruitmentDashboardController::class, 'kompetensiPassedByPosition'])->name('kompetensi');
+                Route::get('interview-hr', [RecruitmentDashboardController::class, 'interviewHrPassedByPositionMonth'])->name('hr');
+                Route::get('interview-user', [RecruitmentDashboardController::class, 'interviewUserPassedByPositionMonth'])->name('user');
+                Route::get('progress', [RecruitmentDashboardController::class, 'recruitmentProgressByPosition'])->name('progress');
+                Route::get('pemberkasan', [RecruitmentDashboardController::class, 'pemberkasanProgress'])->name('pemberkasan');
 
-            // View Pages
-            Route::get('cv-page', [RecruitmentDashboardController::class, 'cvPage'])->name('cv.page');
-            Route::get('psikotes-page', [RecruitmentDashboardController::class, 'psikotesPage'])->name('psikotes.page');
-            Route::get('kompetensi-page', [RecruitmentDashboardController::class, 'kompetensiPage'])->name('kompetensi.page');
-            Route::get('interview-hr-page', [RecruitmentDashboardController::class, 'interviewHrPage'])->name('hr.page');
-            Route::get('interview-user-page', [RecruitmentDashboardController::class, 'interviewUserPage'])->name('user.page');
-            Route::get('pemberkasan-page', [RecruitmentDashboardController::class, 'pemberkasanPage'])->name('pemberkasan.page');
+                // View Pages
+                Route::get('cv-page', [RecruitmentDashboardController::class, 'cvPage'])->name('cv.page');
+                Route::get('psikotes-page', [RecruitmentDashboardController::class, 'psikotesPage'])->name('psikotes.page');
+                Route::get('kompetensi-page', [RecruitmentDashboardController::class, 'kompetensiPage'])->name('kompetensi.page');
+                Route::get('interview-hr-page', [RecruitmentDashboardController::class, 'interviewHrPage'])->name('hr.page');
+                Route::get('interview-user-page', [RecruitmentDashboardController::class, 'interviewUserPage'])->name('user.page');
+                Route::get('pemberkasan-page', [RecruitmentDashboardController::class, 'pemberkasanPage'])->name('pemberkasan.page');
 
-            // Exports
-            Route::get('cv/export', [RecruitmentDashboardController::class, 'exportCvCsv'])->name('cv.export');
-            Route::get('psikotes/export', [RecruitmentDashboardController::class, 'exportPsikotesCsv'])->name('psikotes.export');
-            Route::get('kompetensi/export', [RecruitmentDashboardController::class, 'exportKompetensiCsv'])->name('kompetensi.export');
-            Route::get('progress/export', [RecruitmentDashboardController::class, 'exportProgressCsv'])->name('progress.export');
-            Route::get('candidates/export', [RecruitmentDashboardController::class, 'exportCandidatesCsv'])->name('candidates.export');
+                // Exports
+                Route::get('cv/export', [RecruitmentDashboardController::class, 'exportCvCsv'])->name('cv.export');
+                Route::get('psikotes/export', [RecruitmentDashboardController::class, 'exportPsikotesCsv'])->name('psikotes.export');
+                Route::get('kompetensi/export', [RecruitmentDashboardController::class, 'exportKompetensiCsv'])->name('kompetensi.export');
+                Route::get('progress/export', [RecruitmentDashboardController::class, 'exportProgressCsv'])->name('progress.export');
+                Route::get('candidates/export', [RecruitmentDashboardController::class, 'exportCandidatesCsv'])->name('candidates.export');
+            });
+        });
+
+        // --- OTHER ADMIN MODULES ---
+        Route::resource('training', TrainingController::class);
+        Route::resource('onboarding', OnboardingKaryawanController::class);
+
+        Route::prefix('turnover')->name('turnover.')->group(function () {
+            Route::get('/', [TurnoverController::class, 'index'])->name('index');
+            Route::get('/export-excel', [TurnoverController::class, 'exportExcel'])->name('export.excel');
+            Route::get('/export-pdf', [TurnoverController::class, 'exportPdf'])->name('export.pdf');
         });
     });
 
-    // --- OTHER ADMIN MODULES ---
-    Route::resource('training', TrainingController::class);
-    Route::resource('onboarding', OnboardingKaryawanController::class);
-
-    Route::prefix('turnover')->name('turnover.')->group(function () {
-        Route::get('/', [TurnoverController::class, 'index'])->name('index');
-        Route::get('/export-excel', [TurnoverController::class, 'exportExcel'])->name('export.excel');
-        Route::get('/export-pdf', [TurnoverController::class, 'exportPdf'])->name('export.pdf');
-    });
-});
-
     // Route::resource('karyawan', KaryawanController::class);
 
-Route::middleware(['auth', 'role:superadmin'])->group(function () {
-    // User management resource
-    Route::resource('users', UserController::class);
-    Route::delete('/users/batch-delete', [UserController::class, 'batchDelete'])->name('users.batchDelete');
+    Route::middleware(['auth', 'role:superadmin'])->group(function () {
+        // User management resource
+        Route::resource('users', UserController::class);
+        Route::delete('/users/batch-delete', [UserController::class, 'batchDelete'])->name('users.batchDelete');
     });
-Route::middleware(['auth', 'role:admin|superadmin|manager'])->group(function () {
-    // User management resource
-    // 7. monitoring
-    Route::get('/kbi/monitoring', [App\Http\Controllers\KbiController::class, 'monitoring'])->name('kbi.monitoring');
-  // --- rekap PERFORMANCE ROUTES ---
-    Route::get('/performance/rekap', [App\Http\Controllers\PerformanceController::class, 'index'])->name('performance.rekap');
-
+    Route::middleware(['auth', 'role:admin|superadmin|manager'])->group(function () {
+        // User management resource
+        // 7. monitoring
+        Route::get('/kbi/monitoring', [App\Http\Controllers\KbiController::class, 'monitoring'])->name('kbi.monitoring');
+        // --- rekap PERFORMANCE ROUTES ---
+        Route::get('/performance/rekap', [App\Http\Controllers\PerformanceController::class, 'index'])->name('performance.rekap');
     });
     // Route::resource('wig-rekrutmen', WigRekrutmenController::class);
 
