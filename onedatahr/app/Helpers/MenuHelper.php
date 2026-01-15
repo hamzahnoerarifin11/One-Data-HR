@@ -71,14 +71,41 @@ class MenuHelper
                 'path' => '/turnover',
             ];
 
-            // Manajemen User
-            if ($user->hasRole('superadmin')) {
-                $menu[] = [
-                    'icon' => 'authentication',
-                    'name' => 'Manajemen User',
-                    'path' => '/users',
-                ];
-            }
+        }
+
+        // =============================================================
+        // 3. MENU TEMPA (Untuk ketua_tempa, admin, superadmin)
+        // =============================================================
+        $tempaSubItems = [];
+        if ($user->hasRole(['ketua_tempa', 'admin', 'superadmin'])) {
+            $tempaSubItems[] = ['name' => 'Peserta TEMPA', 'path' => '/tempa/peserta'];
+        }
+        if ($user->hasRole(['ketua_tempa', 'admin', 'superadmin'])) {
+            $tempaSubItems[] = ['name' => 'Absensi TEMPA', 'path' => '/tempa/absensi'];
+        }
+        if ($user->hasRole(['admin', 'superadmin'])) {
+            $tempaSubItems[] = ['name' => 'Monitoring TEMPA', 'path' => '/tempa/monitoring'];
+        }
+        if ($user->hasRole(['ketua_tempa', 'admin', 'superadmin'])) {
+            $tempaSubItems[] = ['name' => 'Materi TEMPA', 'path' => '/tempa/materi'];
+        }
+        if (!empty($tempaSubItems)) {
+            $menu[] = [
+                'icon' => 'task',
+                'name' => 'TEMPA',
+                'subItems' => $tempaSubItems,
+            ];
+        }
+
+        // =============================================================
+        // 4. MENU KHUSUS SUPERADMIN
+        // =============================================================
+        if ($user->hasRole('superadmin')) {
+            $menu[] = [
+                'icon' => 'authentication',
+                'name' => 'Manajemen User',
+                'path' => '/users',
+            ];
         }
         // KPI Karyawan (Punya Staff Sendiri)
         $menu[] = [

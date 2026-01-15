@@ -10,6 +10,8 @@ use App\Models\Posisi;
 use App\Models\InterviewHr;
 use App\Observers\KandidatObserver;
 use App\Observers\PosisiObserver;
+use App\Policies\TempaPolicy;
+use Illuminate\Support\Facades\Gate;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -35,5 +37,17 @@ class AppServiceProvider extends ServiceProvider
         Kandidat::observe(KandidatObserver::class);
         Posisi::observe(PosisiObserver::class);
         Paginator::useTailwind();
+
+        // Register Gates for TEMPA
+        Gate::define('viewTempaPeserta', [TempaPolicy::class, 'viewTempaPeserta']);
+        Gate::define('createTempaPeserta', [TempaPolicy::class, 'createTempaPeserta']);
+        Gate::define('editTempaPeserta', [TempaPolicy::class, 'editTempaPeserta']);
+        Gate::define('deleteTempaPeserta', [TempaPolicy::class, 'deleteTempaPeserta']);
+
+        Gate::define('viewTempaAbsensi', [TempaPolicy::class, 'viewTempaAbsensi']);
+        Gate::define('createTempaAbsensi', [TempaPolicy::class, 'createTempaAbsensi']);
+
+        Gate::define('viewTempaMonitoring', [TempaPolicy::class, 'viewTempaMonitoring']);
+        Gate::define('createTempaMateri', [TempaPolicy::class, 'createTempaMateri']);
     }
 }

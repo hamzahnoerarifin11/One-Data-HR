@@ -15,12 +15,7 @@ use App\Http\Controllers\PosisiController;
 use App\Http\Controllers\RekrutmenDailyController;
 use App\Http\Controllers\RekrutmenCalendarController;
 // Import Controller yang sebelumnya tertinggal agar tidak error class not found
-use App\Http\Controllers\PelamarHarianController;
-use App\Http\Controllers\ScreeningCvController;
-use App\Http\Controllers\TesKompetensiController;
 use App\Http\Controllers\InterviewHrController;
-use App\Http\Controllers\InterviewUserController;
-use App\Http\Controllers\SummaryController;
 use App\Http\Controllers\KandidatLanjutUserController;
 use App\Http\Controllers\TrainingController;
 use App\Http\Controllers\UserController;
@@ -64,7 +59,6 @@ Route::middleware(['auth', 'role:admin|superadmin'])->group(function () {
 
         // Dashboards & Main Pages
         Route::get('/', [RecruitmentDashboardController::class, 'index'])->name('dashboard');
-        Route::get('summary', [SummaryController::class, 'index'])->name('summary');
         Route::get('calendar', [RecruitmentDashboardController::class, 'calendarPage'])->name('calendar');
 
         // WIG & Positions
@@ -78,11 +72,11 @@ Route::middleware(['auth', 'role:admin|superadmin'])->group(function () {
 
 
         // Pelamar & Tahapan
-        Route::resource('pelamar', PelamarHarianController::class)->only(['index', 'store']);
-        Route::get('screening-cv', [ScreeningCvController::class, 'index'])->name('screening-cv');
-        Route::get('tes-kompetensi', [TesKompetensiController::class, 'index'])->name('tes-kompetensi');
+        // Route::resource('pelamar', PelamarHarianController::class)->only(['index', 'store']);
+        // Route::get('screening-cv', [ScreeningCvController::class, 'index'])->name('screening-cv');
+        // Route::get('tes-kompetensi', [TesKompetensiController::class, 'index'])->name('tes-kompetensi');
         Route::resource('interview_hr', InterviewHrController::class);
-        Route::get('interview-user', [InterviewUserController::class, 'index'])->name('interview-user');
+        // Route::get('interview-user', [InterviewUserController::class, 'index'])->name('interview-user');
         Route::resource('kandidat_lanjut_user', KandidatLanjutUserController::class);
         Route::resource('pemberkasan', PemberkasanController::class);
 
@@ -235,4 +229,20 @@ Route::middleware(['auth', 'role:admin|superadmin|manager'])->group(function () 
     Route::delete('/kpi/items/{id}', [KpiAssessmentController::class, 'destroyItem'])->name('kpi.delete-item');
     // Route untuk Update Item KPI
     Route::put('/kpi/items/{id}', [KpiAssessmentController::class, 'updateItem'])->name('kpi.update-item');
+});
+
+// Routes untuk TEMPA
+Route::middleware(['auth', 'role:admin|superadmin|ketua_tempa'])->prefix('tempa')->name('tempa.')->group(function () {
+    // Peserta TEMPA
+    Route::resource('peserta', \App\Http\Controllers\TempaPesertaController::class);
+
+    // Absensi TEMPA
+    Route::resource('absensi', \App\Http\Controllers\TempaAbsensiController::class);
+
+    // Monitoring TEMPA
+    Route::get('monitoring', [\App\Http\Controllers\TempaMonitoringController::class, 'index'])->name('monitoring.index');
+
+    // Materi TEMPA
+    Route::resource('materi', \App\Http\Controllers\TempaMateriController::class)->except(['edit', 'update', 'destroy', 'show']);
+    Route::get('materi/download/{id}', [\App\Http\Controllers\TempaMateriController::class, 'download'])->name('materi.download');
 });
