@@ -234,7 +234,9 @@ Route::middleware(['auth', 'role:admin|superadmin|manager'])->group(function () 
 // Routes untuk TEMPA
 Route::middleware(['auth', 'role:admin|superadmin|ketua_tempa'])->prefix('tempa')->name('tempa.')->group(function () {
     // Peserta TEMPA
-    Route::resource('peserta', \App\Http\Controllers\TempaPesertaController::class);
+    Route::resource('peserta', \App\Http\Controllers\TempaPesertaController::class)->parameters([
+        'peserta' => 'peserta' // This forces the parameter to be {peserta} instead of {pesertum}
+    ]);
 
     // Absensi TEMPA
     Route::resource('absensi', \App\Http\Controllers\TempaAbsensiController::class);

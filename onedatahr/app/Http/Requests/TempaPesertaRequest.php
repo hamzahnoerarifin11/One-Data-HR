@@ -13,17 +13,24 @@ class TempaPesertaRequest extends FormRequest
 
     public function rules()
     {
+        $user = auth()->user();
+        $isKetuaTempa = $user->hasRole('ketua_tempa') && !$user->hasRole(['admin','superadmin']);
+
         return [
-            'id_tempa' => 'required|exists:tempa,id_tempa',
-            'id_kelompok' => 'required|exists:tempa_kelompok,id_kelompok',
-            'status_peserta' => 'required|integer|in:0,1,2',
-            'nama_peserta' => 'required|string|max:255',
-            'nik_karyawan' => 'nullable|string|max:50|unique:tempa_peserta,nik_karyawan' . ($this->route('peserta') ? ',' . $this->route('peserta') . ',id_peserta' : ''),
-            'mentor_id' => 'required|exists:users,id',
-            'unit' => 'nullable|string|max:100',
-            'shift' => 'nullable|integer|min:1|max:3',
+            'nama_peserta' => 'required|string|max:150',
+            'nik_karyawan' => 'required|string|max:50',
+            'status_peserta' => 'required|in:0,1,2',
+            'keterangan_pindah' => 'nullable|string',
+
+            // KETUA TEMPA INPUT MANUAL
+            'nama_kelompok' => $isKetuaTempa ? 'required|string|max:100' : 'nullable',
+            'nama_mentor'   => $isKetuaTempa ? 'required|string|max:100' : 'nullable',
+
+            // ADMIN PILIH KELOMPOK
+            'kelompok_id' => !$isKetuaTempa ? 'required|exists:tempa_kelompok,id_kelompok' : 'nullable',
         ];
     }
+
 
     public function attributes()
     {
@@ -34,6 +41,7 @@ class TempaPesertaRequest extends FormRequest
             'nama_peserta' => 'Nama Peserta',
             'nik_karyawan' => 'NIK Karyawan',
             'mentor_id' => 'Mentor',
+            'keterangan_pindah' => 'Keterangan Pindah',
             'unit' => 'Unit',
             'shift' => 'Shift',
         ];

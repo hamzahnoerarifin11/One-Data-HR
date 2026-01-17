@@ -1,0 +1,2810 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.0
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Waktu pembuatan: 17 Jan 2026 pada 04.43
+-- Versi server: 10.4.27-MariaDB
+-- Versi PHP: 8.2.0
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `dbwr`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `biaya_promote_ta`
+--
+
+CREATE TABLE `biaya_promote_ta` (
+  `id_biaya_promote_ta` int(11) NOT NULL,
+  `tanggal` date DEFAULT NULL,
+  `keperluan` varchar(150) DEFAULT NULL,
+  `biaya` decimal(15,2) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `bpjs`
+--
+
+CREATE TABLE `bpjs` (
+  `id_bpjs` bigint(20) NOT NULL,
+  `id_karyawan` bigint(20) DEFAULT NULL,
+  `Status_BPJS_KT` enum('Aktif','Tidak Aktif') DEFAULT NULL,
+  `Status_BPJS_KS` enum('Aktif','Tidak Aktif') DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `bpjs`
+--
+
+INSERT INTO `bpjs` (`id_bpjs`, `id_karyawan`, `Status_BPJS_KT`, `Status_BPJS_KS`, `created_at`, `updated_at`) VALUES
+(1, 3, 'Aktif', 'Aktif', '2025-12-10 06:55:33', '2025-12-29 04:16:51'),
+(2, 5, 'Aktif', 'Aktif', '2025-12-12 03:17:08', '2025-12-29 04:16:51'),
+(4, 8, 'Aktif', 'Tidak Aktif', '2025-12-14 08:42:52', '2025-12-29 04:16:51'),
+(5, 9, 'Aktif', 'Aktif', '2025-12-14 10:21:22', '2025-12-29 04:16:51'),
+(6, 2, 'Aktif', 'Aktif', '2025-12-14 14:03:42', '2025-12-29 06:07:59'),
+(7, 900, 'Aktif', 'Aktif', '2026-01-09 04:34:14', '2026-01-09 04:34:14'),
+(9, 902, 'Aktif', 'Aktif', '2026-01-09 06:16:43', '2026-01-09 06:19:00'),
+(10, 242, 'Aktif', 'Aktif', '2026-01-09 07:22:27', '2026-01-09 07:22:27');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `data_keluarga`
+--
+
+CREATE TABLE `data_keluarga` (
+  `id_keluarga` bigint(20) NOT NULL,
+  `id_karyawan` bigint(20) DEFAULT NULL,
+  `Nama_Ayah_Kandung` varchar(255) DEFAULT NULL,
+  `Nama_Ibu_Kandung` varchar(255) DEFAULT NULL,
+  `Nama_Lengkap_Suami_Istri` varchar(255) DEFAULT NULL,
+  `NIK_KTP_Suami_Istri` varchar(16) DEFAULT NULL,
+  `Tempat_Lahir_Suami_Istri` varchar(255) DEFAULT NULL,
+  `Tanggal_Lahir_Suami_Istri` date DEFAULT NULL,
+  `Nomor_Telepon_Suami_Istri` varchar(255) DEFAULT NULL,
+  `Pendidikan_Terakhir_Suami_Istri` varchar(255) DEFAULT NULL,
+  `anak` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `data_keluarga`
+--
+
+INSERT INTO `data_keluarga` (`id_keluarga`, `id_karyawan`, `Nama_Ayah_Kandung`, `Nama_Ibu_Kandung`, `Nama_Lengkap_Suami_Istri`, `NIK_KTP_Suami_Istri`, `Tempat_Lahir_Suami_Istri`, `Tanggal_Lahir_Suami_Istri`, `Nomor_Telepon_Suami_Istri`, `Pendidikan_Terakhir_Suami_Istri`, `anak`, `created_at`, `updated_at`) VALUES
+(1, 3, 'Asep', 'Dini', 'Putri', '66666666666', 'Jakarta', '1985-07-15', '081333333333', 'S1', '[{\"nama\":\"Martin Manewar\",\"tempat_lahir\":\"Jakarta\",\"tanggal_lahir\":\"2000-05-15\",\"jenis_kelamin\":\"L\",\"pendidikan\":\"S1\"}]', '2025-12-10 06:49:53', '2025-12-29 04:17:24'),
+(2, 5, 'Ahmad Budi', 'Siti', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-12-12 03:17:08', '2025-12-29 04:17:24'),
+(4, 8, 'Ayah Karyawan 1', 'Ibu Karyawan 1', 'Suami Karyawan 1', '22222222222', 'Pati', '1996-10-14', '081222222222', 'S1', '[{\"nama\":\"Anak 1 Karyawan 1\",\"tempat_lahir\":\"Pati\",\"tanggal_lahir\":\"2020-01-14\",\"jenis_kelamin\":\"L\",\"pendidikan\":\"SD\"},{\"nama\":\"Anak 2 Karyawan 1\",\"tempat_lahir\":\"Pati\",\"tanggal_lahir\":\"2024-01-14\",\"jenis_kelamin\":\"P\",\"pendidikan\":\"Belum Sekolah\"}]', '2025-12-14 08:42:52', '2025-12-29 04:17:24'),
+(5, 9, 'Ahmad Dahlan', 'Lusi', 'Mirai', '123456', 'Batam', '2002-10-14', '081222222222', 'S1', '[{\"nama\":\"Bas\",\"tempat_lahir\":\"Batam\",\"tanggal_lahir\":\"2024-01-14\",\"jenis_kelamin\":\"L\",\"pendidikan\":\"Belum Sekolah\"}]', '2025-12-14 10:21:21', '2025-12-29 04:17:24'),
+(6, 2, 'aa', 'bb', 'moji', '1234', 'Jakarta', '2001-10-28', '081432432432', 'SMA', '[{\"nama\":\"Dewa\",\"tempat_lahir\":\"Kudus\",\"tanggal_lahir\":\"2023-01-16\",\"jenis_kelamin\":\"L\",\"pendidikan\":\"Belum Sekolah\"},{\"nama\":\"Dewi\",\"tempat_lahir\":\"Kudus\",\"tanggal_lahir\":\"2025-02-10\",\"jenis_kelamin\":\"P\",\"pendidikan\":\"Belum Sekolah\"}]', '2025-12-14 14:03:42', '2025-12-29 06:07:59'),
+(7, 900, 'a', 'b', 'Putri', '12345', 'Kudus', '2000-01-03', '081333333333', 'S1', '[{\"nama\":\"Anak1\",\"tempat_lahir\":\"Pati\",\"tanggal_lahir\":\"2026-01-01\",\"jenis_kelamin\":\"L\",\"pendidikan\":\"Belum Sekolah\"}]', '2026-01-09 04:34:14', '2026-01-09 04:34:14'),
+(9, 902, 'a', 'b', 'Putri', '22222222222', 'Pati', '1998-06-09', '081222222222', 'S1', '[]', '2026-01-09 06:16:41', '2026-01-09 06:19:00'),
+(10, 242, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '[]', '2026-01-09 07:22:27', '2026-01-09 07:22:27');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `interview_hr`
+--
+
+CREATE TABLE `interview_hr` (
+  `id_interview_hr` int(11) NOT NULL,
+  `kandidat_id` int(11) NOT NULL,
+  `posisi_id` int(11) DEFAULT NULL,
+  `hari_tanggal` date DEFAULT NULL,
+  `nama_interviewer` varchar(150) DEFAULT NULL,
+  `model_wawancara` enum('Online','Offline') DEFAULT NULL,
+  `skor_profesional` int(11) DEFAULT NULL,
+  `catatan_profesional` text DEFAULT NULL,
+  `skor_spiritual` int(11) DEFAULT NULL,
+  `catatan_spiritual` text DEFAULT NULL,
+  `skor_learning` int(11) DEFAULT NULL,
+  `catatan_learning` text DEFAULT NULL,
+  `skor_initiative` int(11) DEFAULT NULL,
+  `catatan_initiative` text DEFAULT NULL,
+  `skor_komunikasi` int(11) DEFAULT NULL,
+  `catatan_komunikasi` text DEFAULT NULL,
+  `skor_problem_solving` int(11) DEFAULT NULL,
+  `catatan_problem_solving` text DEFAULT NULL,
+  `skor_teamwork` int(11) DEFAULT NULL,
+  `catatan_teamwork` text DEFAULT NULL,
+  `catatan_tambahan` text DEFAULT NULL,
+  `keputusan` enum('DITERIMA','DITOLAK','MENGUNDURKAN DIRI') DEFAULT NULL,
+  `total` int(11) DEFAULT NULL,
+  `hasil_akhir` varchar(100) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `interview_hr`
+--
+
+INSERT INTO `interview_hr` (`id_interview_hr`, `kandidat_id`, `posisi_id`, `hari_tanggal`, `nama_interviewer`, `model_wawancara`, `skor_profesional`, `catatan_profesional`, `skor_spiritual`, `catatan_spiritual`, `skor_learning`, `catatan_learning`, `skor_initiative`, `catatan_initiative`, `skor_komunikasi`, `catatan_komunikasi`, `skor_problem_solving`, `catatan_problem_solving`, `skor_teamwork`, `catatan_teamwork`, `catatan_tambahan`, `keputusan`, `total`, `hasil_akhir`, `created_at`, `updated_at`) VALUES
+(14, 11, 7, '2025-12-29', 'Rafif', 'Online', 4, 'Lorem ipsum, atau ringkasnya lipsum, adalah teks standar yang ditempatkan untuk mendemostrasikan elemen grafis atau presentasi visual seperti font, tipografi, dan tata letak.', 4, 'q', 4, 'q', 4, 'q', 4, 'q', 4, 'q', 4, 'q', 'Lanjut User', 'DITERIMA', 28, 'Lolos Tes Interview', '2025-12-31 08:06:01', '2026-01-13 06:40:46'),
+(16, 17, 7, '2025-12-31', 'Luki', 'Online', 4, 's', 4, 's', 4, 's', 4, 's', 4, 's', 4, 'e', 4, 's', 'Lnjt user', 'DITERIMA', 28, 'Lolos Tes Interview HR', '2026-01-02 02:10:06', '2026-01-14 07:46:16');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `kandidat`
+--
+
+CREATE TABLE `kandidat` (
+  `id_kandidat` int(11) NOT NULL,
+  `nama` varchar(150) NOT NULL,
+  `posisi_id` int(11) NOT NULL,
+  `tanggal_melamar` date DEFAULT NULL,
+  `sumber` varchar(100) DEFAULT NULL,
+  `link_cv` text DEFAULT NULL,
+  `file_pdf` varchar(255) DEFAULT NULL,
+  `status_akhir` enum('CV Lolos','Psikotes Lolos','Tes Kompetensi Lolos','Interview HR Lolos','Interview User Lolos','Diterima','Tidak Lolos') DEFAULT 'CV Lolos',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `tgl_lolos_cv` date DEFAULT NULL,
+  `tgl_lolos_psikotes` date DEFAULT NULL,
+  `tgl_lolos_kompetensi` date DEFAULT NULL,
+  `tgl_lolos_hr` date DEFAULT NULL,
+  `tgl_lolos_user` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `kandidat`
+--
+
+INSERT INTO `kandidat` (`id_kandidat`, `nama`, `posisi_id`, `tanggal_melamar`, `sumber`, `link_cv`, `file_pdf`, `status_akhir`, `created_at`, `updated_at`, `tgl_lolos_cv`, `tgl_lolos_psikotes`, `tgl_lolos_kompetensi`, `tgl_lolos_hr`, `tgl_lolos_user`) VALUES
+(3, 'Joni', 1, NULL, NULL, NULL, NULL, 'Psikotes Lolos', '2025-12-16 23:45:32', '2026-01-02 02:05:56', NULL, NULL, NULL, NULL, NULL),
+(4, 'Isyana', 5, NULL, NULL, NULL, NULL, 'Psikotes Lolos', '2025-12-17 00:45:54', '2026-01-02 02:05:56', NULL, NULL, NULL, NULL, NULL),
+(7, 'Rudi', 13, '2025-12-22', 'Glints', NULL, NULL, 'Tes Kompetensi Lolos', '2025-12-21 23:15:27', '2026-01-02 02:05:56', NULL, NULL, '2025-12-22', NULL, NULL),
+(9, 'Mardi', 2, '2025-12-22', 'Glints', NULL, NULL, 'CV Lolos', '2025-12-21 23:45:36', '2026-01-02 02:05:56', '2025-12-22', NULL, NULL, NULL, NULL),
+(11, 'Raditya', 7, '2025-12-30', 'glints', NULL, NULL, 'Diterima', '2025-12-30 02:31:19', '2026-01-14 07:48:55', NULL, NULL, NULL, '2026-01-02', '2025-12-30'),
+(12, 'in', 3, '2025-12-03', 'glints', NULL, NULL, 'Psikotes Lolos', '2025-12-30 02:34:15', '2026-01-02 02:05:56', NULL, '2025-12-03', NULL, NULL, NULL),
+(13, 'Wiwi', 4, '2025-12-31', 'Glints', NULL, NULL, 'CV Lolos', '2025-12-31 01:40:39', '2026-01-02 02:05:56', '2025-12-31', NULL, NULL, NULL, NULL),
+(15, 'Adit', 12, '2025-12-29', 'Glints', NULL, NULL, 'CV Lolos', '2025-12-31 06:09:46', '2026-01-05 02:04:26', '2026-01-05', '2026-01-02', NULL, NULL, NULL),
+(16, 'Mane', 7, '2025-12-22', 'Glints', NULL, NULL, 'CV Lolos', '2025-12-31 07:59:33', '2026-01-02 02:05:56', '2025-12-22', NULL, NULL, NULL, NULL),
+(17, 'Uus', 7, '2025-12-22', 'Glints', NULL, NULL, 'Diterima', '2025-12-31 08:02:11', '2026-01-14 07:48:41', '2026-01-02', '2026-01-02', NULL, '2026-01-02', '2026-01-14'),
+(18, 'Andika', 7, '2025-12-23', 'Glints', 'https://drive.google.com/file/d/1tIVqS7Gz_KS_72TtOjzqhqlBHIybCfe4/view?usp=sharing', NULL, 'CV Lolos', '2025-12-31 08:02:58', '2026-01-02 06:18:00', '2025-12-23', NULL, NULL, NULL, NULL),
+(20, 'Hamzah', 4, '2025-12-22', 'glints', 'https://drive.google.com/file/d/1M5Hp0wDGm4pzBU-3W7cd8g1AZ-rgClTf/view?usp=sharing', NULL, 'CV Lolos', '2026-01-02 07:25:12', '2026-01-14 07:46:03', '2026-01-14', NULL, NULL, '2026-01-14', NULL),
+(22, 'Aa', 1, '2025-12-29', 'glints', 'https://drive.google.com/file/d/1M5Hp0wDGm4pzBU-3W7cd8g1AZ-rgClTf/view?usp=sharing', '1767929663_ALAT_INTERPRETASI.pdf', 'CV Lolos', '2026-01-03 04:33:39', '2026-01-14 08:16:43', '2026-01-05', NULL, NULL, '2026-01-05', NULL),
+(25, 'BE', 11, '2026-01-05', 'glints', 'https://drive.google.com/file/d/1M5Hp0wDGm4pzBU-3W7cd8g1AZ-rgClTf/view?usp=sharing', '1767929785_ALAT_INTERPRETASI.pdf', 'CV Lolos', '2026-01-09 03:35:31', '2026-01-09 03:36:25', NULL, NULL, NULL, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `kandidat_lanjut_user`
+--
+
+CREATE TABLE `kandidat_lanjut_user` (
+  `id_kandidat_lanjut_user` int(11) NOT NULL,
+  `kandidat_id` int(11) DEFAULT NULL,
+  `posisi_id` int(11) DEFAULT NULL,
+  `tanggal_interview_hr` date DEFAULT NULL,
+  `tanggal_penyerahan` date DEFAULT NULL,
+  `detail_interview` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  `catatan` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `kandidat_lanjut_user`
+--
+
+INSERT INTO `kandidat_lanjut_user` (`id_kandidat_lanjut_user`, `kandidat_id`, `posisi_id`, `tanggal_interview_hr`, `tanggal_penyerahan`, `detail_interview`, `catatan`, `created_at`, `updated_at`) VALUES
+(12, 11, NULL, '2025-12-29', '2025-12-30', '[{\"nama_user\":\"Pak Eko\",\"tanggal\":\"2025-12-30\",\"hasil\":\"Lolos\"},{\"nama_user\":\"Pak Abdul\",\"tanggal\":\"2026-01-14\",\"hasil\":\"Lolos\"}]', 'Lanjut', '2026-01-09 07:56:35', '2026-01-14 07:47:28'),
+(13, 17, NULL, '2025-12-31', '2026-01-05', '[{\"nama_user\":\"Pak Eko\",\"tanggal\":\"2026-01-06\",\"hasil\":\"Lolos\"}]', 'qweqwe', '2026-01-14 07:47:16', '2026-01-14 07:47:16');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `karyawan`
+--
+
+CREATE TABLE `karyawan` (
+  `id_karyawan` bigint(20) NOT NULL,
+  `user_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `atasan_id` bigint(20) DEFAULT NULL,
+  `NIK` double DEFAULT NULL,
+  `Status` enum('1','0') DEFAULT NULL,
+  `Kode` enum('Aktif','Non Aktif') DEFAULT NULL,
+  `Nama_Sesuai_KTP` varchar(255) DEFAULT NULL,
+  `NIK_KTP` varchar(16) DEFAULT NULL,
+  `Nama_Lengkap_Sesuai_Ijazah` varchar(255) DEFAULT NULL,
+  `Tempat_Lahir_Karyawan` varchar(255) DEFAULT NULL,
+  `Tanggal_Lahir_Karyawan` date DEFAULT NULL,
+  `Umur_Karyawan` varchar(255) DEFAULT NULL,
+  `Jenis_Kelamin_Karyawan` enum('L','P') DEFAULT NULL,
+  `Status_Pernikahan` enum('Belum Menikah','Menikah','Cerai Hidup','Cerai Mati (Duda/Janda)') DEFAULT NULL,
+  `Golongan_Darah` enum('Tidak Tahu','A','B','O','AB') DEFAULT NULL,
+  `Nomor_Telepon_Aktif_Karyawan` varchar(255) DEFAULT NULL,
+  `Email` varchar(255) DEFAULT NULL,
+  `Alamat_KTP` varchar(255) DEFAULT NULL,
+  `RT` varchar(255) DEFAULT NULL,
+  `RW` varchar(255) DEFAULT NULL,
+  `Kelurahan_Desa` varchar(255) DEFAULT NULL,
+  `Kecamatan` varchar(255) DEFAULT NULL,
+  `Kabupaten_Kota` varchar(255) DEFAULT NULL,
+  `Provinsi` varchar(255) DEFAULT NULL,
+  `Alamat_Domisili` varchar(255) DEFAULT NULL,
+  `RT_Sesuai_Domisili` varchar(255) DEFAULT NULL,
+  `RW_Sesuai_Domisili` varchar(255) DEFAULT NULL,
+  `Kelurahan_Desa_Domisili` varchar(255) DEFAULT NULL,
+  `Kecamatan_Sesuai_Domisili` varchar(255) DEFAULT NULL,
+  `Kabupaten_Kota_Sesuai_Domisili` varchar(255) DEFAULT NULL,
+  `Provinsi_Sesuai_Domisili` varchar(255) DEFAULT NULL,
+  `Alamat_Lengkap` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `karyawan`
+--
+
+INSERT INTO `karyawan` (`id_karyawan`, `user_id`, `atasan_id`, `NIK`, `Status`, `Kode`, `Nama_Sesuai_KTP`, `NIK_KTP`, `Nama_Lengkap_Sesuai_Ijazah`, `Tempat_Lahir_Karyawan`, `Tanggal_Lahir_Karyawan`, `Umur_Karyawan`, `Jenis_Kelamin_Karyawan`, `Status_Pernikahan`, `Golongan_Darah`, `Nomor_Telepon_Aktif_Karyawan`, `Email`, `Alamat_KTP`, `RT`, `RW`, `Kelurahan_Desa`, `Kecamatan`, `Kabupaten_Kota`, `Provinsi`, `Alamat_Domisili`, `RT_Sesuai_Domisili`, `RW_Sesuai_Domisili`, `Kelurahan_Desa_Domisili`, `Kecamatan_Sesuai_Domisili`, `Kabupaten_Kota_Sesuai_Domisili`, `Provinsi_Sesuai_Domisili`, `Alamat_Lengkap`, `created_at`, `updated_at`) VALUES
+(2, NULL, NULL, 1111, '1', 'Aktif', 'Mirai', '1111', 'Mirai', 'Kudus', '2001-01-09', '24 Tahun', 'P', 'Menikah', 'AB', '081234234234', 'mirai@gmail.com', 'Jl. Manggis Kudus', '003', '001', 'WERGU WETAN', 'KOTA KUDUS', 'KABUPATEN KUDUS', 'JAWA TENGAH', 'Jl. Manggis Kudus', '003', '001', 'WERGU WETAN', 'KOTA KUDUS', 'KABUPATEN KUDUS', 'JAWA TENGAH', 'Jl. Manggis Kudus', '2025-12-10 06:45:49', '2025-12-29 06:07:59'),
+(3, NULL, NULL, 21670004, '1', 'Aktif', 'Marcell Bas', '234', 'Marcell Bas', 'pati', '1980-02-15', '45 Tahun', 'L', 'Menikah', 'O', '081999999999', 'marcellbas@gmail.com', 'Jakarta', '01', '01', 'KEBON SIRIH', 'MENTENG', 'KOTA JAKARTA PUSAT', 'DKI JAKARTA', 'Pati', '01', '02', 'PURI', 'PATI', 'KABUPATEN PATI', 'JAWA TENGAH', 'Puri Pati', '2025-12-10 06:45:49', '2025-12-29 04:18:02'),
+(5, NULL, NULL, 123456, '1', 'Aktif', 'Budi Santoso', '3.31123452345234', 'Budi Santoso', 'Pati', '2002-02-12', '23 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '081234567890', 'budi@gmail.com', 'Ds Bumiayu RT 01 RW 02 Kecamatan Wedarijaksa Kabupaten Pati', '001', '002', 'BUMIAYU', 'WEDARIJAKSA', 'KABUPATEN PATI', 'JAWA TENGAH', 'Ds Bumiayu RT 01 RW 02 Kecamatan Wedarijaksa Kabupaten Pati', '001', '002', 'BUMIAYU', 'WEDARIJAKSA', 'KABUPATEN PATI', 'JAWA TENGAH', 'Ds Bumiayu RT 01 RW 02 Kecamatan Wedarijaksa Kabupaten Pati', '2025-12-12 03:17:08', '2025-12-29 04:18:02'),
+(8, NULL, NULL, 333333333, '1', 'Aktif', 'Karyawan1', '1', 'Karyawan1', 'Pati', '1996-01-01', '29 Tahun', 'P', 'Menikah', 'B', '081234567890', 'karyawan1@gmail.com', 'Pati', '01', '02', 'WINONG', 'PATI', 'KABUPATEN PATI', 'JAWA TENGAH', 'Pati', '01', '02', 'WINONG', 'PATI', 'KABUPATEN PATI', 'JAWA TENGAH', 'Pati', '2025-12-14 08:42:52', '2025-12-29 04:18:02'),
+(9, NULL, NULL, 12345, '1', 'Aktif', 'Tokio', '3311234523452345', 'Tokio', 'Pati', '1999-03-14', '26 Tahun', 'L', 'Menikah', 'Tidak Tahu', '081234567890', 'tokio@gmail.com', 'batam', '001', '002', 'BELIAN', 'BATAM KOTA', 'KOTA B A T A M', 'KEPULAUAN RIAU', 'batam', '001', '002', 'BELIAN', 'BATAM KOTA', 'KOTA B A T A M', 'KEPULAUAN RIAU', 'batam', '2025-12-14 10:21:21', '2025-12-29 04:18:02'),
+(10, NULL, NULL, 120021204036, '1', 'Aktif', 'Abie Surya Fuadi', '3308030604860000', 'Abie Surya Fuadi', 'Magelang', '1986-04-06', '39 Tahun', 'L', 'Menikah', 'O', '82323302600', 'ABIESURYA86@GMAIL.COM', 'Dk Serut Ds Kedungbulus Rt 3 Rw 3 Kec Gembong Kab Pati', '3', '3', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Serut Kedungbulus Gembong Pati', '003', '003', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(11, NULL, NULL, 120021711062, '1', 'Aktif', 'Muhammad Andi Purwanto', '3320091001940000', 'Muhammad Andi Purwanto', 'Jepara', '1994-01-10', '31 Tahun', 'L', 'Menikah', 'O', '85288040012', 'SADIRWKD@GMAIL.COM', 'Karangrejo', '4', '2', 'Clering', 'Donorojo', 'Jepara', 'Jawa Tengah', 'Karangrejo', '004', '002', 'Clering', 'Donorojo', 'Jepara', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(12, NULL, NULL, 220022004761, '0', 'Non Aktif', 'Bayu Aji Prasetyo', '3313012207990000', 'Bayu Aji Prasetyo', 'Wonogiri', '1999-07-22', '26 Tahun', 'L', 'Belum Menikah', 'O', '82135636314', 'BAYUAJIPRASETYO220799@GMAIL.COM', 'Klerong', '7', '3', 'Jatisobo', 'Jatipuro', 'Karanganyar', 'Jawa Tengah', 'Klerong', '007', '003', 'Jatisobo', 'Jatipuro', 'Karanganyar', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(13, NULL, NULL, 220022004758, '0', 'Non Aktif', 'Muhammad Ali Maadullah', '3605041107950000', 'Muhammad Ali Maadullah', 'Serang', '1995-07-11', '30 Tahun', 'L', 'Menikah', 'A', '82258963942', 'MADUDLAUT@GMAIL.COM', 'Komp. Gsi Blok B 2/7', '3', '5', 'Margatani', 'Kramatwatu', 'Serang', 'Banten', 'Komp. Gsi Blok B 2/7', '003', '005', 'Margatani', 'Kramatwatu', 'Serang', 'Banten', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(14, NULL, NULL, 220021711416, '1', 'Aktif', 'Cahya Kurniawan', '3319081710990000', 'Cahya Kurniawan', 'Kudus', '1999-10-17', '26 Tahun', 'L', 'Belum Menikah', 'AB', '89660295082', 'CAHYAKURNIAWAN.IXH@GMAIL.COM', 'Dk Magangan', '2', '8', 'Besito', 'Gebog', 'Kudus', 'Jawa Tengah', 'Dk Magangan', '002', '008', 'Besito', 'Gebog', 'Kudus', 'Jawa Tengah', 'Ds. Besito, Rt 02 Rw 08, Kec. Gebog, Kab. Kudus\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(15, NULL, NULL, 220021810549, '0', 'Non Aktif', 'Husna Nur Rosyidah', '3523166111970000', 'Husna Nur Rosyidah', 'Tuban', '1997-10-21', '28 Tahun', 'P', 'Menikah', 'B', '81226315924', 'HUSNANURROSYIDAH@GMAIL.COM', 'Dk. Domo', '1', '1', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Ds. Klakahkasihan Rt. 01 Rw. 01 Kec. Gembong Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(16, NULL, NULL, 220022105866, '1', 'Aktif', 'Hidayatul Mutaqin', '3302181808950000', 'Hidayatul Mutaqin', 'Banyumas', '1995-08-18', '30 Tahun', 'L', 'Belum Menikah', 'A', '82335349177', 'AQIENHIDAYAT@GMAIL.COM', 'Desa Pasir Lor', '2', '2', 'Pasir Lor', 'Karanglewas', 'Banyumas', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Ds. Pasir Lor, Rt. 02 Rw. 02, Kec. Karanglewas, Kab. Banyumas\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(17, NULL, NULL, 220022002740, '1', 'Aktif', 'Lusi Purwanti', '3318106311970000', 'Lusi Purwanti', 'Pati', '1997-11-23', '28 Tahun', 'P', 'Menikah', 'Tidak Tahu', '85875567156', 'LUSIPURWANTI23@GMAIL.COM', 'Ds. Panjunan Rt 01 Rw 01 Kec. Pati Kab. Pati', '1', '1', 'Panjunan', 'Pati', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Ds. Panjunan, Rt. 001/001, Kec. Pati, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(18, NULL, NULL, 220022003753, '0', 'Non Aktif', 'Falah Firmansyah', '3274050503970010', 'Falah Firmansyah', 'Cirebon', '1997-03-05', '28 Tahun', 'L', 'Menikah', 'O', '81320003196', 'FALAHIMAN7@GMAIL.COM', 'Gg. Moch. Idris No. 50/75', '1', '1', 'Garuda', 'Andir', 'Bandung', 'Jawa Barat', 'Gg. Moch. Idris No. 50/75', '001', '001', 'Garuda', 'Andir', 'Bandung', 'Jawa Barat', 'Gg. Moch. Idris No. 50/75 Garuda, Kota Bandung\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(19, NULL, NULL, 220021907645, '0', 'Non Aktif', 'Dhila Ayu Putri Prastiwi', '3318136910960000', 'Dhila Ayu Putri Prastiwi', 'Pati', '1996-10-29', '29 Tahun', 'P', 'Menikah', 'B', '82137102178', 'DHILAAYU65@GMAIL.COM', 'Desa Kedungbulus', '5', '3', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Desa Kedungbulus', '005', '003', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(20, NULL, NULL, 220021804521, '0', 'Non Aktif', 'Tri Ayuk Septiani', '3318124509930010', 'Tri Ayuk Septiani', 'Pati', '1993-09-05', '32 Tahun', 'P', 'Menikah', 'B', '81392137628', 'SEPTIAYU241@GMAIL.COM', 'Dk. Bangsri', '3', '4', 'Muktiharjo', 'Margorejo', 'Pati', 'Jawa Tengah', 'Dk. Bangsri', '003', '004', 'Muktiharjo', 'Margorejo', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(21, NULL, NULL, 220022105868, '1', 'Aktif', 'Riska Ristiana', '3318144410980000', 'Riska Ristiana', 'Pati', '1998-10-04', '27 Tahun', 'P', 'Menikah', 'Tidak Tahu', '85156845127', 'RISKA04RISTIANA@GMAIL.COM', 'Ds Sumbermulyo Dk Jatiurip ', '4', '3', 'Sumbermulyo ', 'Tlogowungu ', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Ds. Sumbermulyo, Rt: 04, Rw: 03, Kec. Tlogowungu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(22, NULL, NULL, 220022009810, '0', 'Non Aktif', 'Lia Oktavia', '3522146010970000', 'Lia Oktavia', 'Bojonegoro', '1997-10-20', '28 Tahun', 'P', 'Menikah', 'A', '895396000000', 'LOKTA4284@GMAIL.COM', 'Desa Tikusan ', '1', '1', 'Tikusan', 'Kapas', 'Bojonegoro', 'Jawa Timur', 'Desa Tikusan ', '001', '001', 'Tikusan', 'Kapas', 'Bojonegoro', 'Jawa Timur', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(23, NULL, NULL, 220021905637, '0', 'Non Aktif', 'Ahmad ', '3322031412890000', 'Ahmad ', 'Kab. Semarang', '1989-12-14', '36 Tahun', 'L', 'Menikah', 'B', '85325031713', 'AHMADHASANMURANI@GMAIL.COM', 'Perumahan Ketileng Indah Blok H 76', '6', '12', 'Sendangmulyo', 'Tembalang', 'Kota Semarang', 'Jawa Tengah', 'Rumah Dinas Lapas Pati', '001', '001', 'Ngarus', 'Pati Kota', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(24, NULL, NULL, 220021803453, '0', 'Non Aktif', 'Mira Silmiyati', '3318104202930000', 'Mira Silmiyati', 'Pati', '1993-02-02', '32 Tahun', 'P', 'Belum Menikah', 'B', '85728346155', 'MIRAAJA.1993@GMAIL.COM', 'Jl. Kol. Sugiono No. 29 Pati', '6', '2', 'Winong', 'Pati', 'Pati', 'Jawa Tengah', 'Jl. Kol. Sugiono No.29 Pati', '006', '002', 'Pati', 'Pati', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(25, NULL, NULL, 220022011839, '1', 'Aktif', 'Muhamad Saepudin', '3273171511960000', 'Muhamad Saepudin', 'Bandung', '1997-09-17', '28 Tahun', 'L', 'Menikah', 'O', '89656844604', 'SINTANURPADILLAH9828@GMAIL.COM', 'Kp. Cilisung No. 36', '3', '16', 'Sukamenak', 'Margahayu', 'Bandung', 'Jawa Barat', 'Kp. Cilisung No. 36', '003', '016', 'Sukamenak', 'Margahayu', 'Bandung', 'Jawa Barat', 'Kel. Sukamenak Rt. 03, Rw. 06, No. 36, Kec. Margahayu Kab. Bandung\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(26, NULL, NULL, 220022003755, '0', 'Non Aktif', 'Bintang Wijaya', '3309102011960000', 'Bintang Wijaya', 'Boyolali ', '1996-11-20', '29 Tahun', 'L', 'Belum Menikah', 'B', '81217988121', 'BINTANGWIDJAYA19@GMAIL.COM', 'Blimbing Rt.16/Rw.03, Ngaglik, Sambi, Boyolali', '16', '3', 'Ngaglik', 'Sambi', 'Boyolali', 'Jawa Tengah', 'Winong Rt15/Rw03', '015', '003', 'Winong', 'Pati', 'Pati', 'Jawa Tengah', 'Blimbing, Rt. 016/003, Ngaglik, Sambi, Boyolali\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(27, NULL, NULL, 120021711059, '1', 'Aktif', 'Jihan Zuhairu', '3309102011960000', 'Jihan Zuhairu', 'Jepara', '1998-04-16', '27 Tahun', 'L', 'Belum Menikah', 'A', '85865091115', 'ZUHAIRUJ@GMAIL.COM', 'Purwosari', '4', '1', 'Purwosari', 'Kudus', 'Kudus', 'Jawa Tengah', 'Purwosari', '004', '001', 'Purwosari', 'Kota Kudus', 'Kudus', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(28, NULL, NULL, 120021409052, '1', 'Aktif', 'Agung Yulianto', '3318101706900000', 'Agung Yulianto', 'Pati', '1990-06-17', '35 Tahun', 'L', 'Menikah', 'A', '81328118625', 'AGUNG17KU@GMAIL.COM', 'Dukuh Randu', '3', '4', 'Kutoharjo', 'Pati', 'Pati', 'Jawa Tengah', 'Pasuruhan', '005', '002', 'Pasuruhan', 'Kayen', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(29, NULL, NULL, 220021811553, '1', 'Aktif', 'Khoirul Azman Sulkan', '3318040109990000', 'Khoirul Azman Sulkan', 'Pati', '1999-09-01', '26 Tahun', 'L', 'Menikah', 'O', '85647575506', 'AZMANIRUL123@GMAIL.COM', 'Dsn. Konang', '3', '2', 'Karangkonang', 'Winong', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Ds. Karangkonang, Rt. 003/002, Kec. Winong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(30, NULL, NULL, 120021711063, '1', 'Aktif', 'Andi Putro Hartanto', '3318101405860010', 'Andi Putro Hartanto', 'Pati', '1986-05-14', '39 Tahun', 'L', 'Menikah', 'O', '85641609666', 'ANDIPH14051986@GMAIL.COM', 'Ds.Gajahmati', '3', '1', 'Gajahmati', 'Pati', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(31, NULL, NULL, 220021306086, '1', 'Aktif', 'Junaidi', '3318130312930000', 'Junaidi', 'Pati', '1993-12-03', '32 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85742856236', 'JUNAIDIPATI69@GMAIL.COM', 'Ds. Kedungbulus Kidul', '2', '1', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Desa Kedungbulus Kidul', '002', '001', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Kedungbulus Rt 04 / 01 Kec. Gembong Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(32, NULL, NULL, 220021504291, '1', 'Aktif', 'Nur Kholis', '3318142008840000', 'Nur Kholis', 'Pati', '1984-08-20', '41 Tahun', 'L', 'Menikah', 'B', '82221612555', 'XOLISPATI@GMAIL.COM', 'Tlogosari', '6', '1', 'Tlogosari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Idem', '007', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Ds. Tlogosari Rt. 06 Rw. 01 Kec. Tlogowungu Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(33, NULL, NULL, 220022101845, '0', 'Non Aktif', 'Wendy Afrizal', '1671052404850010', 'Wendy Afrizal', 'Palembang', '1985-04-24', '40 Tahun', 'L', 'Menikah', 'O', '89665992487', 'HUNGKUL2525@GMAIL.COM', 'Kinabalu 3 No1 ', '1', '8', 'Babakan Penghulu', 'Cinambo', 'Bandung', 'Jawa Barat', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(34, NULL, NULL, 220022003756, '1', 'Aktif', 'Yustantina', '3204057108990000', 'Yustantina', 'Bandung', '1999-08-31', '26 Tahun', 'P', 'Menikah', 'O', '89679671574', 'YUSTANTINA31@GMAIL.COM', 'Jl. Musieum Arkelologi No. 40', '2', '15', 'Cimekar', 'Cileunyi', 'Bandung', 'Jawa Barat', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Jl. Museum Arkeolog, No. 40, Rt. 002/015, Ds. Cimekar, Kec. Cileunyi, Kab. Bandung\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(35, NULL, NULL, 220021901558, '1', 'Aktif', 'Subroto, S.Farm., Apt', '3318190308850000', 'Subroto, S.Farm., Apt', 'Pati', '1985-08-03', '40 Tahun', 'L', 'Menikah', 'A', '82221204444', 'SUBROTOAPOTEKER@GMAIL.COM', 'Tayukulon', '4', '3', 'Tayukulon', 'Tayu', 'Pati', 'Jawa Tengah', 'Perum Kutoharjo', '001', '007', 'Kutoharjo', 'Pati', 'Pati', 'Jawa Tengah', 'Jl. Yudistira 6, No. 2, Perum Kutoharjo, Rt. 001/007, Kec. Pati, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(36, NULL, NULL, 220021306060, '1', 'Aktif', 'Nanang Kunarso', '3318131705940000', 'Nanang Kunarso', 'Pati', '1994-05-17', '31 Tahun', 'L', 'Menikah', 'Tidak Tahu', '87779752229', 'NANANGLEZANO@GMAIL.COM', 'Dk.Serut', '3', '3', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Serut', '003', '003', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Bageng Rt 03/03, Gembong, Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(37, NULL, NULL, 220021907644, '1', 'Aktif', 'Silvia Pebriani', '3519145202960000', 'Silvia Pebriani', 'Madiun', '1996-02-12', '29 Tahun', 'P', 'Menikah', 'B', '85856888730', 'SILVIAPEBRIANI2@GMAIL.COM', 'Jl.Urip Sumoharjo No.300 D', '67', '16', 'Nambangan Lor', 'Manguharjo', 'Madiun', 'Jawa Timur', 'Jl. Urip Sumoharjo No.300 D', '067', '016', 'Nambangan Lor', 'Manguharjo', 'Madiun', 'Jawa Timur', 'Ds. Pucangrejo Rt. 02 Rw. 01 Kec. Sawahan Kab. Madiun\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(38, NULL, NULL, 220021804506, '1', 'Aktif', 'Muh. Ali Imron', '3318022309920000', 'Muh Ali Imron', 'Pati', '1992-09-23', '33 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85217254180', 'MOHALIIMRON0@GMAIL.COM', 'Ds Kayen Rt 08/03 Kayen', '8', '3', 'Kayen', 'Kayen', 'Pati', 'Jawa Tengah', 'Kayen', '008', '003', 'Kayen', 'Kayen', 'Pati', 'Jawa Tengah', 'Jl. Raya Pati - Kayen, Rt. 003/003, Kec. Kayen, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(39, NULL, NULL, 220021902575, '1', 'Aktif', 'Edi Porwoko', '3520121007880000', 'Edi Porwoko', 'Ponorogo', '1988-07-15', '37 Tahun', 'L', 'Menikah', 'Tidak Tahu', '81217158915', 'EDIP1.ID@GMAIL.COM', 'Dukuh Gembes', '10', '1', 'Slahung', 'Slahung', 'Ponorogo', 'Jawa Timur', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Ds. BanjarejoRt. 02/01 Kec. Barat Kab. Magetan\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(40, NULL, NULL, 120021803065, '1', 'Aktif', 'M. Syahril', '3374110204790010', 'M. Syahril', 'Selatpanjang-(Riau)', '1979-04-02', '46 Tahun', 'L', 'Menikah', 'AB', '81226126797', 'M8ARIL79@GMAIL.COM', 'Wologito Barat X No. 12', '6', '5', 'Kembangarum', 'Semarang Barat', 'Semarang', 'Jawa Tengah', 'Wologito Barat X No. 12', '006', '007', 'Kembangarum', 'Semarang Barat', 'Semarang', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(41, NULL, NULL, 220021807537, '0', 'Non Aktif', 'Sri Indah Lestari', '3319095408990000', 'Sri Indah Lestari', 'Kudus', '1999-08-14', '26 Tahun', 'P', 'Menikah', 'A', '882005000000', 'SRIINDAHLESTARI2314@GMAIL.COM', 'Kayen', '8', '3', 'Kayen', 'Kayen', 'Pati', 'Jawa Tengah', 'Tergo', '002', '002', 'Tergo', 'Dawe', 'Kudus', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(42, NULL, NULL, 220021908660, '1', 'Aktif', 'Dedi Priyatna', '3209203107810000', 'Dedi Priyatna', 'Brebes', '1981-07-31', '44 Tahun', 'L', 'Menikah', 'O', '81321713143', 'DEDIPRIYATNA99@YAHOO.COM', 'Komplek Bima Garden Blok A No 1', '2', '4', 'Kalikoa', 'Kedawung', 'Cirebon', 'Jawa Barat', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Komplek Bima, Garden Blok A No. 1 Rt. 002/004, Kalikoa, Cirebon\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(43, NULL, NULL, 120020408006, '1', 'Aktif', 'Ari Setiawan', '3318100910690010', 'Ari Setiawan', 'Semarang ', '1969-10-09', '56 Tahun', 'L', 'Menikah', 'O', '8157700207', 'SETIAWANARI1009@GMAIL.COM', 'Jl Panunggulan No 8A ', '1', '1', 'Panjunan ', 'Pati', 'Pati', 'Jawa Tengah', 'Jl Panunggulan No 8A ', '001', '001', 'Panjunan ', 'Pati', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(44, NULL, NULL, 220021410234, '1', 'Aktif', 'Moh. Abdul Aziz', '3318130106900000', 'Moh. Abdul Aziz', 'Pati', '1990-06-01', '35 Tahun', 'L', 'Menikah', 'AB', '85727330025', 'MOHABDULAZIZ1690@GMAIL.COM', 'Dk. Bergat', '4', '6', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Bergat', '004', '006', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Bergat Rt 04 Rw 06 Ds. Gembong Kec. Gembong Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(45, NULL, NULL, 220021803468, '0', 'Non Aktif', 'Miftachul Afief', '3318020103920010', 'Miftachul Afief', 'Pati', '1992-03-01', '33 Tahun', 'L', 'Menikah', 'Tidak Tahu', '8122639480', 'MIFTACHULAFIEF@GMAIL.COM', 'Jl. Pati-Kayen Km 12 Rt 001 Rw 001', '1', '1', 'Boloagung', 'Kayen', 'Pati', 'Jawa Tengah', 'Jl. Pati Kayen Km 12', '001', '001', 'Boloagung', 'Kayen', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(46, NULL, NULL, 220022103856, '1', 'Aktif', 'Dyah Eva Andriyani', '3318134905000000', 'Dyah Eva Andriyani', 'Pati', '2000-05-09', '25 Tahun', 'P', 'Belum Menikah', 'Tidak Tahu', '81617675074', 'DYAHEVA11@GMAIL.COM', 'Dk.Gembong Lor ', '2', '3', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Ds. Gembong Rt. 02 Rw. 03 Kec. Gembong Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(47, NULL, NULL, 220022101846, '1', 'Aktif', 'Ali Arifin', '3321041605930000', 'Ali Arifin', 'Demak', '1993-05-16', '32 Tahun', 'L', 'Menikah', 'A', '82227552022', 'ALIARIFINSUKSES@GMAIL.COM', 'Desa Loireng', '3', '2', 'Loireng ', 'Sayung', 'Demak', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Ds. Loireng, Rt. 03, Rw. 02, Kec. Sayung, Kab. Demak\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(48, NULL, NULL, 220022004757, '0', 'Non Aktif', 'Heryana', '3604222308920000', 'Heryana', 'Serang', '1992-08-23', '33 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85779573513', 'YANA.JulyAN98@GMAIL.COM', 'Kp Baru', '8', '3', 'Sukacai', 'Baros', 'Serang', 'Banten', 'Kp Baru', '008', '003', 'Sukacai', 'Baros', 'Serang', 'Banten', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(49, NULL, NULL, 220022103855, '0', 'Non Aktif', 'Choirun Nafis Afisah', '3318155311970010', 'Choirun Nafis Afisah', 'Pati', '1997-11-13', '28 Tahun', 'P', 'Belum Menikah', 'O', '85876505030', 'CHOIRUNNAFISAFISAH@GMAIL.COM', 'Ds Sukoharjo Rt 01/Rw 03, Kec Wedarijaksa, Pati', '1', '3', 'Sukoharjo', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(50, NULL, NULL, 220021511332, '0', 'Non Aktif', 'Tri Puji Lestari', '3318156312950000', 'Tri Puji Lestari', 'Pati', '1995-12-23', '30 Tahun', 'P', 'Menikah', 'O', '85875719121', 'TRIPUJILESTARI943@GMAIL.COM', 'Dk. Karangnongko', '5', '4', 'Tamansari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Tamansari', '005', '004', 'Tamansari', 'Tlogowungu', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(51, NULL, NULL, 220021809539, '0', 'Non Aktif', 'Taryoto', '3303152509850000', 'Taryoto', 'Purbalingga', '1985-07-19', '40 Tahun', 'L', 'Menikah', 'Tidak Tahu', '81809736337', 'MELIKAANAS099@GMAIL.COM', 'Purbalingga', '1', '1', 'Mipiran', 'Padamara', 'Purbalingga', 'Jawa Tengah', 'Purbalingga', '001', '001', 'Mipiran', 'Padamara', 'Purbalingga', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(52, NULL, NULL, 220022003741, '0', 'Non Aktif', 'Novan Alfiansyah', '3508071510890000', 'Novan Alfiansyah', 'Lumajang', '1990-11-13', '35 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85204900485', 'NOVANALVIANSYAH3@GMAIL.COM', 'Dusun Krajan', '4', '2', 'Buwek', 'Randuagung', 'Lumajang', 'Jawa Timur', 'Dusun Krajan', '004', '002', 'Buwek', 'Randuagung', 'Lumajang', 'Jawa Timur', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(53, NULL, NULL, 120020807021, '1', 'Aktif', 'Moh Sholikhin', '3318133110800000', 'Moh Sholikhin', 'Pati', '1980-10-31', '45 Tahun', 'L', 'Menikah', 'B', '81329004229', 'AYAHFATIHH25@GMAIL.COM', 'Bermi ', '2', '1', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(54, NULL, NULL, 120021503060, '1', 'Aktif', 'Sulih Sutiyono', '3318142012870000', 'Sulih Sutiyono', 'Pati', '1987-12-20', '38 Tahun', 'L', 'Menikah', 'B', '82322739883', 'SULIHSUTIONO@GMAIL.COM', 'Cabak', '2', '4', 'Cabak', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Cabak', '002', '004', 'Cabak', 'Tlogowungu', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(55, NULL, NULL, 220021908659, '1', 'Aktif', 'Ahmad Firman Kusnandar', '3274031101960000', 'Ahmad Firman Kusnandar', 'Sragen', '1996-01-11', '29 Tahun', 'L', 'Menikah', 'AB', '895334000000', 'AHMADFIRMAN92@GMAIL.COM', 'Larangan Utara', '2', '2', 'Kecapi', 'Harjamukti', 'Cirebon', 'Jawa Barat', 'Jl Permai 24 Blok N5 No 7 Gerbang Permai Pamengkang', '001', '010', 'Pamengkang', 'Mundu', 'Cirebon', 'Jawa Barat', 'Jl. Larangan Utara, Rt. 002/002, Ds. Kecapi, Kec. Harjamukti, Kota Cirebon\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(56, NULL, NULL, 220021411244, '0', 'Non Aktif', 'Syaiful Arif Muhammad', '3318122010950000', 'Syaiful Arif Muhammad', 'Pati', '1995-10-20', '30 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85726357137', 'IARIP828@GMAIL.COM', 'Ds Muktiharjo', '4', '1', 'Muktiharjo', 'Margorejo', 'Pati', 'Jawa Tengah', 'Ds Muktiharjo Kec Margorejo Kab Pati', '004', '001', 'Muktiharjo', 'Margorejo', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(57, NULL, NULL, 220021902584, '1', 'Aktif', 'Feri Eriyanto', '3318131202000000', 'Feri Eriyanto', 'Pati', '2000-02-12', '25 Tahun', 'L', 'Menikah', 'O', '87704550205', 'FERRY122400@GMAIL.COM', 'Pohgading', '2', '2', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Pohgading', '002', '002', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Pohgading Rt. 02/02 Kec. Gembong Kab. Pati \r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(58, NULL, NULL, 220021510309, '1', 'Aktif', 'Muhammad Ridwan Amirullah', '3318132007940000', 'Muhammad Ridwan Amirullah', 'Pati', '1994-07-20', '31 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85801101368', 'RIDWANAMIRULLAH94@GMAIL.COM', 'Kedung Bulus ', '2', '3', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Idem', '002', '003', 'Kedung Bulus', 'Gembong ', 'Pati', 'Jawa Tengah', 'Ds. Kedungbulus, Rt. 02/03, Kec. Gembong, Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(59, NULL, NULL, 220021802452, '0', 'Non Aktif', 'Robiul Aliv', '3319093004950000', 'Robiul Aliv', 'Kudus', '1995-04-30', '30 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85720635133', 'ROBIULALIV69@GMAIL.COM', 'Dk.Karang Dalem ', '3', '3', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk.Karang Dalem', '003', '003', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Glagah Kulon, Rt. 001/002, Kec. Dawe, Kab. Kudus\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(60, NULL, NULL, 220022009820, '1', 'Aktif', 'Ramadhani Prasetyo', '3510160603930000', 'Ramadhani Prasetyo', 'Banyuwangi', '1993-03-06', '32 Tahun', 'L', 'Menikah', 'O', '87858484870', 'RAMADHANIPRASETYO23@GMAIL.COM', 'Perum Dadapan Asri ', '2', '1', 'Dadapan', 'Kabat', 'Banyuwangi', 'Jawa Timur', 'Perum Dadapan Asri', '002', '001', 'Dadapan', 'Kabat', 'Banyuwangi', 'Jawa Timur', 'Perum. Dadapan Asri Blok J 2 Kabat, Banyuwangi\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(61, NULL, NULL, 220021607385, '1', 'Aktif', 'Ridwan Hidayat', '3318132707980000', 'Ridwan Hidayat', 'Pati', '1998-07-27', '27 Tahun', 'L', 'Menikah', 'Tidak Tahu', '87772957771', 'POJOKGEMBONG@GMAIL.COM', 'Koripan', '2', '10', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', 'Koripan', '002', '010', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Bageng, Rt. 02/10, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(62, NULL, NULL, 220021804488, '0', 'Non Aktif', 'Ahmad Bushroni', '3318141909980000', 'Ahmad Bushroni', 'Pati', '1998-09-19', '27 Tahun', 'L', 'Menikah', 'B', '88802736487', 'AHMADBUSYRONI19@GMAIL.COM', 'Tlogorejo', '3', '3', 'Tlogorejo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Tlogorejo', '003', '003', 'Tlogorejo', 'Tlogowungu', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(63, NULL, NULL, 220021607382, '0', 'Non Aktif', 'Eko Triyanto', '3318140909980000', 'Eko Triyanto', 'Pati', '1998-09-09', '27 Tahun', 'L', 'Menikah', 'AB', '82330885275', 'TRIYANTOEKO64@GMAIL.COM', 'Kerep Pare', '3', '1', 'Tamansari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Kerep Pare', '003', '001', 'Tamansari', 'Tlogowungu', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(64, NULL, NULL, 220021803461, '0', 'Non Aktif', 'Dedy Irawan', '3318132808980000', 'Dedy Irawan', 'Pati', '1998-08-28', '27 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82133121699', 'AJDEDYSATRIA@GMAIL.COM', 'Ds Bermi Kec Gembong Kab Pati Rt 02 Rw 05 Jawa Tengah', '2', '5', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', 'Bermi Rt 02 Rw 05 Kecamatan Gembong ', '002', '005', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(65, NULL, NULL, 220021306207, '1', 'Aktif', 'Nashrul Ihsan', '3318130312950000', 'Nashrul Ihsan', 'Pati', '1995-11-03', '30 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85848821818', 'DIEGOCOSTASEMBILANBELAS@GMAIL.COM', 'Dukuh Bergat Tinab Desa Gembong Kec. Gembong Kab. Pati', '4', '6', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Bergat Tinab ', '004', '006', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Bergat Rt 04 / Rw 06 Kec. Gembong Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(66, NULL, NULL, 220021811555, '1', 'Aktif', 'Rohadi', '3603052305840000', 'Rohadi', 'Pati', '1984-05-23', '41 Tahun', 'L', 'Menikah', 'O', '82145558307', 'ROYHADI37@GMAIL.COM', 'Ds.Ngepungrojo', '5', '2', 'Ngepungrojo', 'Pati', 'Pati', 'Jawa Tengah', 'Ds.Ngepungrojo', '005', '002', 'Desa Ngepungrojo', 'Pati', 'Pati', 'Jawa Tengah', 'Ds. Ngepungrojo, Rt. 005/002, Kec. Pati, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(67, NULL, NULL, 220021803482, '1', 'Aktif', 'Taufiq Nur Rohman', '3318130411980000', 'Taufiq Nur Rohman', 'Pati', '1998-11-04', '27 Tahun', 'L', 'Menikah', 'Tidak Tahu', '81311492703', 'ROHMANTAUFIQ976@GMAIL.COM', 'Dk.Klakah', '4', '5', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk.Klakah', '004', '005', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Klakahkasihan, Rt. 004/005, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(68, NULL, NULL, 220022008788, '1', 'Aktif', 'Muhammad Yahya', '3318112810980010', 'Muhammad Yahya', 'Pati', '1998-10-28', '27 Tahun', 'L', 'Menikah', 'Tidak Tahu', '82323914566', 'YAHYA.AGRA13@GMAIL.COM', 'Dusun Jatisari\n', '3', '1', 'Gempolsari', 'Gabus', 'Pati', 'Jawa Tengah', 'Dusun Jatisari', '003', '001', 'Gempolsari', 'Gabus', 'Pati', 'Jawa Tengah', 'Ds. Gempolsari Rt. 03 Rw. 01, Kec. Gabus, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(69, NULL, NULL, 220021802431, '0', 'Non Aktif', 'Arif Abdullah', '3318141905870000', 'Arif Abdullah', 'Pati', '1987-05-19', '38 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85225659555', 'ABCELL704@GMAIL.COM', ' Tlogosari', '6', '4', 'Tlogosari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds Tlogosari', '006', '004', 'Tlogosari', 'Tlogowungu', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(70, NULL, NULL, 220021901563, '0', 'Non Aktif', 'Edy Kusnanto', '3318142006960000', 'Edy Kusnanto', 'Pati', '1996-06-20', '29 Tahun', 'L', 'Menikah', 'O', '85717125090', 'GETHOKCINTA96@GMAIL.COM', 'Dk Dekem Sumbermulyo Tlogowungu Pati', '4', '1', 'Sumbermulyo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Sumbermulyo Tlogowungu Pati', '004', '001', 'Sumbermulyo', 'Tlgowungu', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(71, NULL, NULL, 220022008770, '1', 'Aktif', 'Bagus Cahyo Saputro', '3318132012010000', 'Bagus Cahyo Saputro', 'Pati', '2001-12-20', '24 Tahun', 'L', 'Menikah', 'O', '87760952997', 'BAGUSCS201@GMAIL.COM', 'Desa Semirejo Dukuh Gembol', '2', '5', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', 'Desa Semirejo Dukuh Gembol', '002', '005', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Semirejo, Rt. 02 Rw. 05 Kec. Gembong Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(72, NULL, NULL, 120021512068, '1', 'Aktif', 'Mohammad Ali', '3318131806830000', 'Mohammad Ali', 'Pati', '1983-06-18', '42 Tahun', 'L', 'Menikah', 'O', '85772472043', 'ALIFUJIKIKO1@GMAIL.COM', 'Dukuh Ngembes Desa Gembong', '1', '11', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(73, NULL, NULL, 220022103853, '1', 'Aktif', 'Agus Defi Rizaqi', '3320090608950000', 'Agus Defi Rizaqi', 'Jepara', '1995-08-06', '30 Tahun', 'L', 'Menikah', 'O', '87831216913', 'AGUSDEFIRIZAQI@GMAIL.COM', 'Desa Mojo Rt 03 Rw 02 Cluwak Pati', '3', '2', 'Mojo', 'Cluwak', 'Pati', 'Jawa Tengah', 'Desa Mojo Rt 03 Rw 02 Cluwak Pati', '003', '002', 'Mojo', 'Cluwak', 'Pati', 'Jawa Tengah', 'Ds. Mojo Rt. 03 Rw. 02 Kec. Cluwak Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(74, NULL, NULL, 220021908663, '0', 'Non Aktif', 'Mochamad Mulyadi', '320907180486004', 'Mochamad Mulyadi', 'Cirebon', '1986-04-18', '39 Tahun', 'L', 'Menikah', 'B', '81214119564', 'RCHELICRB@GMAIL.COM', 'Kedung Mendeng No 35', '2', '3', 'Argasunya', 'Harjamukti', 'Cirebon', 'Jawa Barat', 'Kedung Mendeng No.35', '002', '003', 'Argasunya', 'Harjamukti', 'Cirebon', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(75, NULL, NULL, 220021906641, '0', 'Non Aktif', 'Teguh Yudianto', '3510091003800010', 'Teguh Yudianto', 'Banyuwangi', '1980-03-10', '45 Tahun', 'L', 'Menikah', 'Tidak Tahu', '82132847393', 'TEGUHYUDIANTO151@GMAIL.COM', 'Dusun Kopen', '6', '2', 'Genteng Kulon', 'Genteng', 'Banyuwangi', 'Jawa Timur', 'Dusun Kopen', '002', '002', 'Genteng Kulon', 'Genteng', 'Banyuwangi', 'Jawa Timur', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(76, NULL, NULL, 220022104859, '0', 'Non Aktif', 'Irvan Suhendar', '3175061807990010', 'Irvan Suhendar', 'Jakarta', '1999-07-18', '26 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85892930292', 'IRVANSUHENDAR18@GMAIL.COM', 'Kp.Cilengkong Kaum ', '2', '6', 'Pamijahan', 'Pamijahan', 'Bogor', 'Jawa Barat', 'Ko Cilengkong Kaum', '002', '006', 'Pamijahan', 'Pamijahan', 'Bogor', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(77, NULL, NULL, 220021807538, '1', 'Aktif', 'Evika Nesti Alfiani', '3318136802000000', 'Evika Nesti Alfiani', 'Pati', '2000-02-28', '25 Tahun', 'P', 'Belum Menikah', 'Tidak Tahu', '85846974996', 'EFIKANESTI@GMAIL.COM', 'Semirejo', '1', '1', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', 'Semirejo', '001', '001', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Semirejo, Rt. 001/001, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(78, NULL, NULL, 220021306072, '0', 'Non Aktif', 'Muhammad Amin Nasyir', '3318131301930000', 'Muhammad Amin Nasyir', 'Pati', '1993-01-13', '32 Tahun', 'L', 'Menikah', 'Tidak Tahu', '81326014225', 'AMIENNAZIER@GMAIL.COM', 'Bermi ', '1', '8', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', 'Bermi', '001', '008', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(79, NULL, NULL, 220021904632, '1', 'Aktif', 'Setiawan Alfianto', '3318161910940000', 'Setiawan Alfianto', 'Pati', '1994-10-19', '31 Tahun', 'L', 'Menikah', 'Tidak Tahu', '81228253206', 'SETIAWANALFIANTO@GMAIL.COM', 'Ngemplaklor', '2', '2', 'Ngemplak Lor', 'Margoyoso', 'Pati', 'Jawa Tengah', 'Ngemplak Lor', '002', '002', 'Ngemplaklor', 'Margoyoso', 'Pati', 'Jawa Tengah', 'Ds. Ngemplak Lor Rt. 02/02 Kec. Margoyoso Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(80, NULL, NULL, 220021511326, '0', 'Non Aktif', 'Doni Kurniawan', '3318161206960010', 'Doni Kurniawan', 'Pati', '1996-06-12', '29 Tahun', 'L', 'Menikah', 'AB', '82220709935', 'KDONI8293@GMAIL.COM', 'Jln. Pati-Tayu', '1', '1', 'Sidomukti', 'Margoyoso', 'Pati', 'Jawa Tengah', 'Jln. Pati-Tayu ', '001', '001', 'Sidomukti', 'Margoyoso', 'Pati', 'Jawa Tengah', 'Ds. Sidomukti, Rt. 01/01, Kec. Margoyoso, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(81, NULL, NULL, 220021306044, '0', 'Non Aktif', 'Yulianto', '3318102807890000', 'Yulianto', 'Pati', '1989-07-28', '36 Tahun', 'L', 'Menikah', 'O', '85641116693', 'DJOSKID@GMAIL.COM', 'Dk. Kunden ', '3', '1', 'Sidokerto', 'Pati', 'Pati', 'Jawa Tengah', 'Dk Kunden', '003', '001', 'Sidokerto', 'Pati', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(82, NULL, NULL, 220021902599, '1', 'Aktif', 'Aan Khunaefi', '3318110107890000', 'Aan Khunaefi', 'Pati', '1989-07-01', '36 Tahun', 'L', 'Menikah', 'O', '81226871506', 'AANKHUNAIFI877@YAHOO.COM', 'Ds. Wuwur ', '1', '2', 'Wuwur', 'Gabus', 'Pati', 'Jawa Tengah', 'Ds. Wuwur Rt 01 Rw 02 Gabus', '001', '002', 'Wuwur', 'Gabus', 'Pati', 'Jawa Tengah', 'Ds. Keboromo Rt. 02/03 Kec. Tayu Kab. Pati \r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(83, NULL, NULL, 220021902603, '0', 'Non Aktif', 'Devin Aji Pratama', '3318140401010000', 'Devin Aji Pratama', 'Pati', '2001-01-04', '24 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85239055313', 'DEVINAJI88@GMAIL.COM', 'Desa.Tlogosari', '7', '2', 'Tlogosari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Desa .Tlogosari', '007', '002', 'Tlogosari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Tlogosari Rt. 07/02 Kec. Tlogowungu Kab. Pati \r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(84, NULL, NULL, 220021306098, '1', 'Aktif', 'Nur Cahyono', '3318133103920000', 'Nur Cahyono', 'Pati', '1992-07-31', '33 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85600644441', 'NURCAHYONO8008@GMAIL.COM', 'Gembong', '3', '14', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Gembong', '003', '014', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Gembong, Rt. 3/14, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(85, NULL, NULL, 220021512342, '1', 'Aktif', 'Tri Mulyono', '3318130506960000', 'Tri Mulyono', 'Pati', '1996-06-05', '29 Tahun', 'L', 'Belum Menikah', 'A', '85740871178', 'TRIKOBENG985@GMAIL.COM', 'Ds.Pohgading ', '2', '5', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk.Alastuwo', '002', '005', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Pohgading, Rt. 02/05, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(86, NULL, NULL, 220021802438, '1', 'Aktif', 'Karsudi', '3318140208930000', 'Karsudi', 'Pati', '1993-08-02', '32 Tahun', 'L', 'Menikah', 'O', '85229069237', 'KARSUDIK8@GMAIL.COM', 'Dk Jatiurip', '1', '3', 'Sumbermulyo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Dk Jatiurip', '001', '003', 'Sumbermulyo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Sumbermulyo, Rt. 001/003, Kec. Tlogowungu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(87, NULL, NULL, 220021607373, '0', 'Non Aktif', 'Mohammad Setyo Budi', '3318115290797000', 'Mohammad Setyo Budi', 'Pati', '1997-07-29', '28 Tahun', 'L', 'Belum Menikah', 'O', '85161429077', 'BUDHIISATYA@GMAIL.COM', 'Jalan Gatot Kaca No 15', '1', '3', 'Wedarijaksa', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Jalan Gatot Kaca No 15', '001', '003', 'Wedarijaksa', 'Wedarijaksa', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(88, NULL, NULL, 220021910680, '0', 'Non Aktif', 'Mas\'Ud', '3318132010990000', 'Mas\'Ud', 'Pati', '1999-10-24', '26 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '877374000000', 'MASUDTHEONE7@GMAIL.COM', 'Dk.Tengger ', '1', '4', 'Ketanggan ', 'Gembong ', 'Pati', 'Jawa Tengah', 'Dk.Tengger ', '001', '004', 'Ketanggan ', 'Gembong ', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(89, NULL, NULL, 220021902585, '0', 'Non Aktif', 'Muhamad Imron Sholikhin', '3173011204910010', 'Muhamad Imron Sholikhin', 'Pati', '1991-04-12', '34 Tahun', 'L', 'Menikah', 'O', '82153739080', 'MUHAMMADIMRONSHOLIKHIN445@GMAIL.COM', 'Dk Tapen Rt004 Rw003', '4', '3', 'Tawangharjo', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Dk Tapen', '004', '003', 'Tawangharjo', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Ds. Tawangharjo Rt. 04/03 Kec. Wedarijaksa Kab. Pati \r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(90, NULL, NULL, 220021811554, '1', 'Aktif', 'Heri Sudarto', '3318141804810010', 'Heri Sudarto', 'Pati', '1981-04-18', '44 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85600621240', 'HERRY.SUDARTO1988@GMAIL.COM', 'Tlogosari', '7', '4', 'Tlogosari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Tlogosari', '007', '004', 'Tlogosari', 'Tlogowunggu', 'Pati', 'Jawa Tengah', 'Ds. Tlogosari, Rt. 007/004, Kec. Tlogowungu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(91, NULL, NULL, 220021802436, '1', 'Aktif', 'Jaya Santoso', '3318102504990000', 'Jaya Santoso', 'Pati', '1999-04-25', '26 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82225012281', 'GOANGSPEED81@GMAIL.COM', 'Dk Randu Ds Kutoharjo', '2', '4', 'Kotoharjo', 'Pati', 'Pati', 'Jawa Tengah', 'Ds Kutoharjo Dk Randu', '002', '004', 'Kutoharjo', 'Pati', 'Pati', 'Jawa Tengah', 'Ds. Kutoharjo, Rt. 002/004, Kec. Pati, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(92, NULL, NULL, 220022008776, '1', 'Aktif', 'Abdul Hasan', '3318130806990000', 'Abdul Hasan', 'Pati', '1999-06-08', '26 Tahun', 'L', 'Menikah', 'Tidak Tahu', '8882437010', 'HASANHASAB67@GMAIL.COM', 'Rambutan', '1', '6', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Rambutan', '001', '006', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Pohgading Rt. 01 Rw. 06, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(93, NULL, NULL, 220021804491, '0', 'Non Aktif', 'Anesda Noviandi', '3318132211950000', 'Anesda Noviandi', 'Pati', '1995-11-22', '30 Tahun', 'L', 'Menikah', 'O', '85325940430', 'ANESDANOVIANDI@GMAIL.COM', 'Dk.Randangan', '2', '4', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk.Randangan', '002', '004', 'Ds.Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Semirejo, Rt. 002/004, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(94, NULL, NULL, 220022008794, '0', 'Non Aktif', 'Indra Widiyanto', '3318060204980000', 'Indra Widiyanto', 'Pati', '1998-04-02', '27 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82143783552', 'WIDIYANTOINDRA2@GMAIL.COM', 'Ds. Boto', '1', '3', 'Boto', 'Jaken', 'Pati', 'Jawa Tengah', 'Ds. Boto', '001', '003', 'Boto', 'Jaken', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(95, NULL, NULL, 220022406032, '1', 'Aktif', 'Muhammad Arifin', '3318122205020000', 'Muhammad Arifin', 'Pati', '2002-05-22', '23 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85331481046', 'MARIFINPATI@GMAIL.COM', 'Banyuurip', '2', '2', 'Banyuurip', 'Margorejo', 'Pati', 'Jawa Tengah', 'Banyuurip', '002', '002', 'Banyuurip', 'Margorejo', 'Pati', 'Jawa Tengah', 'Ds. Banyuurip, Rt. 02, Rw. 02, Kec. Margorejo, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(96, NULL, NULL, 220022103857, '0', 'Non Aktif', 'Iphong Prabowo', '3318141709020000', 'Iphong Prabowo', 'Pati', '2002-09-17', '23 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82325772512', 'IPHONGPRABOWO@GMAIL.COM', 'Desa Tlogosari', '2', '3', 'Mbagangan', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Desa Tlogosari', '002', '003', 'Mbagangan', 'Tlogowungu', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(97, NULL, NULL, 120020304004, '1', 'Aktif', 'Rumadi', '3318101604820010', 'Rumadi', 'Purwodadi', '1980-04-15', '45 Tahun', 'L', 'Menikah', 'O', '87847531953', 'RUMADIANDI12@GMAIL.COM', 'Gajah Mati Pati', '2', '1', 'Gajah Mati Pati', 'Psti', 'Pati', 'Jawa Tengah', 'Gajah Mati', '002', '001', 'Gajah Mati', 'Pati', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(98, NULL, NULL, 220021909667, '0', 'Non Aktif', 'Wahyudin', '3204151104950000', 'Wahyudin', 'Bandung ', '1995-04-11', '30 Tahun', 'L', 'Menikah', 'B', '82115199322', 'AKUTRAVELING@GMAIL.COM', 'Kp.Puncakmulya ', '4', '6', 'Sukaluyu ', 'Pangalengan', 'Bandung', 'Jawa Barat', 'Kp.Puncak Mulya', '004', '006', 'Sukaluyu', 'Pangalengan', 'Bandung ', 'Jawa Barat ', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(99, NULL, NULL, 220021607354, '0', 'Non Aktif', 'Luky Pratama Five Kananda', '3318131503080050', 'Luky Pratama Five Kananda', 'Pati', '1997-08-07', '28 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85797961484', 'LUCKYKANANDA@GMAIL.COM', 'Pati', '4', '1', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Pati', '002', '001', 'Kedung Bulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Kedungbulus, Rt. 02/03, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(100, NULL, NULL, 220021407208, '1', 'Aktif', 'Sujud', '3319082611810000', 'Sujud', 'Kudus', '1981-11-26', '44 Tahun', 'L', 'Menikah', 'A', '81229952271', 'SJDWIJAYA1981@GMAIL.COM', 'Dk.Bapangan ', '6', '2', 'Bakalan Krapyak', 'Kaliwungu', 'Kudus', 'Jawa Tengah', 'Dk.Bapangan', '006', '002', 'Bakalan Krapyak', 'Kaliwungu', 'Kudus', 'Jawa Tengah', 'Dk. Bapangan Ds. Bakalan Krapyak Kec. Kaliwungu, Kudus\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(101, NULL, NULL, 220022010826, '0', 'Non Aktif', 'Ali Muhtarom', '3318132212930000', 'Ali Muhtarom', 'Pati', '1993-12-22', '32 Tahun', 'L', 'Menikah', 'Tidak Tahu', '81357541751', 'TAROMNEW18@GMAIL.COM', 'Dk. Koripan', '1', '10', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk Koripan', '001', '010', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(102, NULL, NULL, 220022008786, '1', 'Aktif', 'Nur Kholis Majid', '3318141206980000', 'Nur Kholis Majid', 'Pati', '1998-06-12', '27 Tahun', 'L', 'Menikah', 'O', '85770233119', 'HOLISKER2015@GMAIL.COM', 'Regaloh', '1', '3', 'Regaloh', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Regaloh', '001', '003', 'Regaloh', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Regaloh Rt. 01 Rw. 03, Kec. Tlogowungu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(103, NULL, NULL, 120021402050, '1', 'Aktif', 'Rohmat Efendi', '3318131001810000', 'Rohmat Efendi', 'Pati', '1981-01-10', '44 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85725738414', 'ROHMATEFENDI550@GMAIL.COM', 'Dk.Sumuran Ds.Pohgading', '1', '3', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk.Sumuran Ds. Pohgading', '001', '003', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(104, NULL, NULL, 220021407210, '0', 'Non Aktif', 'Ahmad Marwazi', '3308041902750000', 'Ahmad Marwazi', 'Magelang', '1975-02-19', '50 Tahun', 'L', 'Menikah', 'AB', '85743665413', 'MASMARWAZI@GMAIL.COM', 'Sucen Kidul', '2', '2', 'Sucen', 'Salam', 'Magelang', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(105, NULL, NULL, 220021306064, '1', 'Aktif', 'Sudarmanto', '3318140109840000', 'Sudarmanto', 'Pati', '1984-09-01', '41 Tahun', 'L', 'Menikah', 'O', '82140377232', 'SUDAR8105@GMAIL.COM', 'Lahar', '4', '1', 'Lahar', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Dk.Ndopang', '004', '001', 'Lahar', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Dk. Dopang Rt 04/01, Lahar, Tlogowungu, Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(106, NULL, NULL, 220021306099, '1', 'Aktif', 'Muhtarom', '3318132303910000', 'Muhtarom', 'Pati', '1991-03-23', '34 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85640105594', 'MUHHT62@GMAIL.COM', 'Pohgading', '1', '4', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Pohgading', '001', '004', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Pohgading Rt 01/04 Gembong\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(107, NULL, NULL, 220021503278, '1', 'Aktif', 'Muhammad Dzikron', '3318140402910000', 'Muhammad Dzikron', 'Pati', '1991-02-04', '34 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85800628342', 'DDZIKRON2@GMAIL.COM', 'Sumbermulyo', '5', '1', 'Sumbermulyo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Sumber Mulyo', '005', '001', 'Sumber Mulyo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Sumbermulyo Rt 04 Rw 01 Kec. Tlogowungu Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(108, NULL, NULL, 220022106875, '1', 'Aktif', 'Dwi Purnama Aji ', '3318132403010010', 'Dwi Purnama Aji ', 'Pati', '2001-03-24', '24 Tahun', 'L', 'Menikah', 'A', '88902945432', 'DWIPURNAMAAJI167@GMAIL.COM', 'Desa Semirejo ', '3', '7', 'Semirejo', 'Gembong ', 'Pati', 'Jawa Tengah', 'Dk Semi', '003', '007', 'Semirejo ', 'Gembong ', 'Pati', 'Jawa Tengah', 'Ds. Semirejo, Rt. 03, Rw. 07, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(109, NULL, NULL, 220022012842, '1', 'Aktif', 'Nadiyah', '3318215911970010', 'Nadiyah', 'Pati', '1997-11-19', '28 Tahun', 'P', 'Belum Menikah', 'A', '89510636273', 'NANDIYAH99@GMAIL.COM', 'Pasucen', '3', '2', 'Pasucen', 'Trangkil', 'Pati', 'Jawa Tengah', 'Pasucen', '003', '002', 'Pasucen', 'Trangkil', 'Pati', 'Jawa Tengah', 'Ds. Pasucen Rt. 03 Rw. 02 Kec. Trangkil Kec. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(110, NULL, NULL, 220021906643, '1', 'Aktif', 'Slamet Riadi', '5271012104870000', 'Slamet Riadi', 'Sumbawa', '1987-04-21', '38 Tahun', 'L', 'Menikah', 'B', '85936566997', 'SLAMET.ALFAIT115@GMAIL.COM', 'Dusun Masjid', '3', '3', 'Baru', 'Alas', 'Sumbawa Besar', 'Nusa Tenggara Barat', 'Krakitan', '001', '001', 'Sucen', 'Salam', 'Magelang', 'Jawa Tengah', 'Lingk. Batu Raja, Ampean Utara, Mataram, NTB\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(111, NULL, NULL, 220021410238, '1', 'Aktif', 'Abdul Kholis', '3318130906950000', 'Abdul Kholis', 'Pati', '1995-06-09', '30 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85713423515', 'ABDULKHOLIS.AK6388@GMAIL.COM', 'Dk Tarukan', '4', '7', 'Margorejo', 'Margorejo', 'Pati', 'Jawa Tengah', 'Dk Tarukan', '004', '007', 'Margorejo', 'Margorejo', 'Pati', 'Jawa Tengah', 'Ds. Bageng Rt 01 Rw 08 Kec. Gembong Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(112, NULL, NULL, 220021409213, '0', 'Non Aktif', 'Imam Syaifulloh', '3318142604970000', 'Imam Syaifulloh', 'Pati', '1997-04-26', '28 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85866888253', 'IMAMSYAIFULLOH97@GMAIL.COM', 'Sumbermulyo', '6', '1', 'Sumbermulyo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Sumbermulyo', '006', '001', 'Sumbermulyo', 'Tlogowungu', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(113, NULL, NULL, 220021902572, '0', 'Non Aktif', 'Anang Puji Harto', '3311121005760010', 'Anang Puji Harto', 'Sukoharjo', '1976-05-10', '49 Tahun', 'L', 'Menikah', 'O', '81548518432', 'ANANGPUJIHARTO220@GMAIL.COM', 'Klinggen', '1', '2', 'Ngadirejo', 'Kartasura', 'Sukoharjo', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(114, NULL, NULL, 120020908026, '1', 'Aktif', 'Yusep Susilo', '3318120109760000', 'Yusep Susilo', 'Pati', '1976-09-01', '49 Tahun', 'L', 'Menikah', 'O', '83898373943', 'YUSEPSUSILO2@GMAIL.COM', 'Desa Meteraman', '3', '1', 'Metaraman', 'Margorejo', 'Pati', 'Jawa Tengah', 'Desa Metaraman', '003', '001', 'Desa', 'Margorejo', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(115, NULL, NULL, 220021902590, '1', 'Aktif', 'Syarif Ainul Yakin', '3319093006960000', 'Syarif Ainul Yakin', 'Kudus', '1996-06-30', '29 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '81215034416', 'SARIFAINUL@GMAIL.COM', 'Dk Bengkal Japan', '3', '4', 'Japan', 'Dawe', 'Kudus', 'Jawa Tengah', 'Dk Bengkal Japan', '003', '004', 'Japan', 'Dawe', 'Kudus', 'Jawa Tengah', 'Ds. Bengkal Japan Rt. 03/04 Kec. Dawe Kab. Kudus \r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(116, NULL, NULL, 220022008805, '1', 'Aktif', 'Jumain', '3318133001980000', 'Jumain', 'Pati', '1998-01-30', '27 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85156075237', 'JUMAINUYYE@GMAIL.COM', 'Dk. Rambutan', '2', '6', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Rambutan', '002', '006', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Pohgading, Rt. 02, Rw. 06, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30');
+INSERT INTO `karyawan` (`id_karyawan`, `user_id`, `atasan_id`, `NIK`, `Status`, `Kode`, `Nama_Sesuai_KTP`, `NIK_KTP`, `Nama_Lengkap_Sesuai_Ijazah`, `Tempat_Lahir_Karyawan`, `Tanggal_Lahir_Karyawan`, `Umur_Karyawan`, `Jenis_Kelamin_Karyawan`, `Status_Pernikahan`, `Golongan_Darah`, `Nomor_Telepon_Aktif_Karyawan`, `Email`, `Alamat_KTP`, `RT`, `RW`, `Kelurahan_Desa`, `Kecamatan`, `Kabupaten_Kota`, `Provinsi`, `Alamat_Domisili`, `RT_Sesuai_Domisili`, `RW_Sesuai_Domisili`, `Kelurahan_Desa_Domisili`, `Kecamatan_Sesuai_Domisili`, `Kabupaten_Kota_Sesuai_Domisili`, `Provinsi_Sesuai_Domisili`, `Alamat_Lengkap`, `created_at`, `updated_at`) VALUES
+(117, NULL, NULL, 220021803460, '1', 'Aktif', 'Baharudy Hanafi', '3318130101000000', 'Baharudy Hanafi', 'Pati', '2000-01-01', '25 Tahun', 'L', 'Menikah', 'Tidak Tahu', '88232811218', 'RUDDYHANA@GMAIL.COM', 'Dk Rubiyah', '2', '9', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk Rubiyah', '002', '009', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Bageng, Rt. 002/009, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(118, NULL, NULL, 220021902604, '1', 'Aktif', 'Ervin Doser', '3318140407980000', 'Ervin Doser', 'Pati', '1998-07-04', '27 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85702688836', 'ERVINDOSER32@GMAIL.COM', 'Ds.Tlogorejo', '6', '3', 'Tlogorejo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Tlogorejo', '006', '003', 'Tlogorejo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Tlogorejo Rt. 06/03 Kec. Tlogowungu Kab. Pati \r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(119, NULL, NULL, 120021306038, '1', 'Aktif', 'Noor Kholis', '3319012804810000', 'Noor Kholis', 'Kudus', '1981-04-28', '44 Tahun', 'L', 'Menikah', 'B', '85225567334', 'NOORCHOLIS.WKD@GMAIL.COM', 'Bapangan Bakalan Krapyak Kaliwungu Kudus', '2', '2', 'Bakalan Krapyak', 'Kaliwungu', 'Kudus', 'Jawa Tengah', 'Bapangan Rt 02/02 Bakalan Krapyak Kaliwungu Kudus', '002', '002', 'Bakalan Krapyak', 'Kaliwungu', 'Kudus', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(120, NULL, NULL, 220021607377, '1', 'Aktif', 'Heri Ahmad Fauzan', '3318130707920000', 'Heri Ahmad Fauzan', 'Pati', '1992-07-07', '33 Tahun', 'L', 'Menikah', 'A', '81914015927', 'HERYF335@GMAIL.COM', 'Dk Bergat', '4', '7', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk Bergat', '004', '007', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Gembong, Rt. 04/07, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(121, NULL, NULL, 220021901560, '1', 'Aktif', 'Ali Sholeh', '3318210110900000', 'Ali Sholeh', 'Pati', '1990-10-01', '35 Tahun', 'L', 'Menikah', 'Tidak Tahu', '89542184176', 'ULIRROCHMAH21@GMAIL.COM', 'Pasucen', '1', '3', 'Pasucen', 'Trangkil', 'Pati', 'Jawa Tengah', 'Pasucen', '001', '003', 'Pasucen', 'Trangkil', 'Pati', 'Jawa Tengah', 'Ds. Pasucen, RT. 01/03, Kec Trangkil, Kab Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(122, NULL, NULL, 220022004760, '1', 'Aktif', 'Sarif Saefuloh', '3305221612920000', 'Sarif Saefuloh', 'Kebumen', '1992-12-16', '33 Tahun', 'L', 'Menikah', 'O', '87837800853', 'AIP.PULLOH@GMAIL.COM', 'Desa Karangsambung', '3', '3', 'Karangsambung', 'Karangsambung', 'Kebumen', 'Jawa Tengah', 'Desa Karangsambung', '003', '003', 'Karangsambung', 'Karangsambung', 'Kebumen', 'Jawa Tengah', 'Ds. Karangsambung Rt. 03/03 Kec. Karangsambung, Kab. Kebumen\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(123, NULL, NULL, 220022010831, '1', 'Aktif', 'Wahyu Sigit Handika', '3318022904960000', 'Wahyu Sigit Handika', 'Pati', '1996-04-29', '29 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85775458748', 'WAHYUSIGIT1996@GMAIL.COM', 'Desa Jimbaran', '9', '2', 'Jimbaran', 'Kayen', 'Pati', 'Jawa Tengah', 'Desa Jimbaran', '009', '002', 'Jimbaran', 'Kayen', 'Pati', 'Jawa Tengah', 'Ds. Jimbaran, Rt. 09, Rw. 02, Kec. Kayen, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(124, NULL, NULL, 220021409216, '0', 'Non Aktif', 'Irfan Romadlon', '3318130303930000', 'Irfan Romadlon', 'Pati', '1993-03-03', '32 Tahun', 'L', 'Menikah', 'O', '85742461655', 'AQIELMIQDAD@GMAIL.COM', 'Ds. Bageng', '2', '3', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Bageng', '002', '003', 'Ds. Bageng', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(125, NULL, NULL, 120020910028, '1', 'Aktif', 'Didik Muhammad Saroni', '3318132805890000', 'Didik Muhammad Saroni', 'Pati', '1989-05-28', '36 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85602781746', 'DIDONSARONI@GMAIL.COM', 'Ds Serut', '3', '3', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds Serut', '003', '003', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(126, NULL, NULL, 220022008781, '0', 'Non Aktif', 'Andi Santoso', '3318132605000000', 'Andi Santoso', 'Pati', '2000-05-26', '25 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '83843491822', 'ANDISTAX123@GMAIL.COM', 'Dk. Rambutan, Desa Pohgading Rt 01 /Rw 06, Kecamatan Gembong, Kabupaten Pati', '1', '6', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Rambutan, Desa Pohgading Rt 01/Rw 06, Kecamatan Gembong, Kabupaten Pati', '001', '006', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(127, NULL, NULL, 220022008792, '0', 'Non Aktif', 'Doni Nurdianto', '3318091312000000', 'Doni Nurdianto', 'Pati', '2000-12-13', '25 Tahun', 'L', 'Belum Menikah', 'B', '85806639947', 'DIANTODONI1312@GMAIL.COM', 'Dukuh Lagar', '6', '1', 'Kedungmulyo', 'Jakenan', 'Pati', 'Jawa Tengah', 'Dukuh Lagar', '006', '001', 'Kedungmulyo', 'Jakenan', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(128, NULL, NULL, 220021411259, '0', 'Non Aktif', 'Zainal Marlis', '3318121104940000', 'Zainal Marlis', 'Pati', '1994-04-11', '31 Tahun', 'L', 'Menikah', 'Tidak Tahu', '81246209434', 'BOBMARLIS1194@GMAIL.COM', 'Desa Sukobubuk', '2', '2', 'Sukobubuk', 'Margorejo', 'Pati', 'Jawa Tengah', 'Desa Sukobubuk', '002', '002', 'Sukobubuk', 'Margorejo', 'Pati', 'Jawa Tengah', 'Ds. Sukobubuk Rt 02 Rw 02 Kec. Margorejo Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(129, NULL, NULL, 220021411252, '1', 'Aktif', 'Winarto', '3318130411860000', 'Winarto', 'Pati', '1986-11-04', '39 Tahun', 'L', 'Menikah', 'Tidak Tahu', '87837956546', 'WINARTAWINARTA51@GMAIL.COM', 'Dk. Koripan', '2', '10', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk.Koripan', '002', '010', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Bageng, Dk. Koripan, Rt 02 Rw 10 Kec. Gembong-Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(130, NULL, NULL, 220021808542, '1', 'Aktif', 'Imam Mahmuji', '3318102707980000', 'Imam Mahmuji', 'Pati', '1998-07-27', '27 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82311627049', 'IMAMKEBAK@YAHOO.COM', 'Ds Ngepungrojo Dukuh Kebak', '2', '3', 'Ngepungrojo', 'Pati', 'Pati', 'Jawa Tengah', 'Dk Kebak', '002', '003', 'Ngepungrojo', 'Pati', 'Pati', 'Jawa Tengah', 'Ds. Ngepungrojo, Rt. 002/003, Kec. Pati, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(131, NULL, NULL, 220021410230, '1', 'Aktif', 'Nur Kamid', '3318132705850000', 'Nur Kamid', 'Pati', '1985-05-27', '40 Tahun', 'L', 'Menikah', 'A', '81357964002', 'AYAHANDRO.2705@GMAIL.COM', 'Dk. Godang', '2', '10', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Godang', '002', '010', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Gembong, Rt. 02/10, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(132, NULL, NULL, 220021306208, '1', 'Aktif', 'Komari', '3318141104910010', 'Komari', 'Pati', '1991-04-11', '34 Tahun', 'L', 'Menikah', 'B', '85876353922', 'KOMARIPATI123@GMAIL.COM', 'Dk.Tajungsari', '3', '6', 'Tajungsari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Dk.Tajungsari', '003', '006', 'Tajungsari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Tajungsari Rt 03 / Rw 06 Kec. Tlogowungu, Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(133, NULL, NULL, 220021407209, '1', 'Aktif', 'Purnadi Kurniawan', '3318100803800010', 'Purnadi Kurniawan', 'Pati', '1980-03-08', '45 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85290519993', 'IW3NKAJA@GMAIL.COM', 'Kp. Kranggan ', '2', '3', 'Kelurahan Pati Kidul', 'Pati', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Kp. Kranggan Rt 02 Rw 03 Ds. Pati Kidul, Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(134, NULL, NULL, 220022008782, '0', 'Non Aktif', 'Dani Oktaviansa', '3318152310000000', 'Dani Oktaviansa', 'Pati', '2000-10-23', '25 Tahun', 'L', 'Belum Menikah', 'O', '82313929214', 'OKTAVIANSADANI@GMAIL.COM', 'Dk Ngulaan', '3', '3', 'Sukoharjo', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Dk Ngulaan', '003', '003', 'Sukoharjo', 'Wedarijaksa', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(135, NULL, NULL, 220021306124, '1', 'Aktif', 'Sholihul Huda', '3318131311940000', 'Sholihul Huda', 'Pati', '1994-11-13', '31 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85741315741', 'SHOLIKULHUDA21@GMAIL.COM', 'Dukuh Sudo ', '4', '10', 'Kandangmas', 'Dawe', 'Kudus', 'Jawa Tengah', 'Dukuh Sudo', '004', '010', 'Kandangmas', 'Dawe', 'Kudus', 'Jawa Tengah', 'Dk. Kendil, Ds. Kelakah Kasihan, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(136, NULL, NULL, 220021409220, '1', 'Aktif', 'Andi Setiawan', '3318132808950000', 'Andi Setiawan', 'Pati', '1995-08-28', '30 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85775539589', 'SETIAWANANDY02@GMAIL.COM', 'Dk. Alastuwo', '3', '5', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Alastuwo', '003', '005', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Alastuwo Rt 03 Rw 05 Ds. Pohgading Kec. Gembong Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(137, NULL, NULL, 220021511325, '1', 'Aktif', 'Deni Kusnadi', '3318142512930000', 'Deni Kusnadi', 'Pati', '1993-12-25', '32 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '81391043700', 'DENIKUSNADI572@GMAIL.COM', 'Ds. Sumbermulyo', '2', '3', 'Sumbermulyo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Sumbermulyo', '002', '003', 'Desa Sumbermulyo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Sumbermulyo, Rt. 02/03, Kec. Tlogowungu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(138, NULL, NULL, 220021904631, '0', 'Non Aktif', 'Vikki Maulana Ainul Yaqin', '3318130704970000', 'Vikki Maulana Ainul Yaqin', 'Pati', '1997-04-07', '28 Tahun', 'L', 'Belum Menikah', 'O', '85977803460', 'VIKKYAPRILIO73@GMAIL.COM', 'Desa Gembong', '3', '15', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Desa Gembong', '003', '015', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(139, NULL, NULL, 220021910673, '1', 'Aktif', 'Abdul Muiz', '3318131806000000', 'Abdul Muiz', 'Pati', '2000-06-18', '25 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82136384211', 'MUIEZKAMO3636@GMAIL.COM', 'Rambutan', '1', '6', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Rambutan', '001', '006', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Pohgading, Rt. 001/006, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(140, NULL, NULL, 220022010825, '0', 'Non Aktif', 'Ainun Giar Nadilana', '331813511020005', 'Ainun Giar Nadilana', 'Pati', '2002-11-15', '23 Tahun', 'L', 'Belum Menikah', 'A', '88226469462', 'AINUNDILANA@GMAIL.COM', 'Ds Semirejo Di Gembol Rt 2 Rw 5 Kec.Gembong Kab.Pati', '2', '5', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds Semirejo', '002', '005', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(141, NULL, NULL, 220021803474, '0', 'Non Aktif', 'Afif Ma\'Ruf', '3318161593980000', 'Afif Ma\'Ruf', 'Pati', '1998-03-15', '27 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '89503039016', 'AFIFFURAM@GMAIL.COM', 'Ngemplak Kidul ,Margoyoso ,Pati', '5', '2', 'Ngemplak Kidul', 'Margoyoso', 'Pati', 'Jawa Tengah', 'Ngemplak Kidul', '005', '002', 'Ngenplak Kidul', 'Margoyoso', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(142, NULL, NULL, 220021712421, '1', 'Aktif', 'Safuan', '3318130403990000', 'Safuan', 'Pati', '1999-03-04', '26 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85640208453', 'YIPOYIPO283@GMAIL.COM', 'Dk.Kendil ', '5', '3', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Kendil', '005', '003', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Gembong, Rt. 005/003, Kec. Gembong, Kab. Pati \r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(143, NULL, NULL, 220021910683, '0', 'Non Aktif', 'Naimmatul Nizam', '3318160703960000', 'Naimmatul Nizam', 'Pati', '1996-03-07', '29 Tahun', 'L', 'Belum Menikah', 'A', '82211426030', 'NAIMMATULNIZAM@GMAIL.COM', 'Kedung Panjang', '5', '3', 'Soneyan', 'Margoyoso', 'Pati', 'Jawa Tengah', 'Kedung Panjang', '005', '003', 'Soneyan', 'Margoyoso', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(144, NULL, NULL, 220021804496, '1', 'Aktif', 'Ismir Abdul Aziz ', '3318132711970000', 'Ismir Abdul Aziz ', 'Pati', '1997-11-27', '28 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85869539610', 'ISMIRAZIZ170@GMAIL.COM', 'Dk.Kembang', '1', '5', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Dukuh Kembang', '001', '005', 'Gembong ', 'Gembong ', 'Pati ', 'Jawa Tengah', 'Ds. Gembong, Rt. 001/005, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(145, NULL, NULL, 220022003754, '1', 'Aktif', 'Rizky Kubro Wahyu Saputro', '3522092112000000', 'Rizky Kubro Wahyu Saputro', 'Bojonegoro', '2000-12-21', '25 Tahun', 'L', 'Belum Menikah', 'O', '85732284900', 'RIZKYKUBRO@GMAIL.COM', 'Dusun Kupas', '9', '3', 'Sumberoto', 'Kepohbaru', 'Bojonegoro', 'Jawa Timur', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Dsn. Kupas, Rt. 09/03, Desa Sumberoto, Kepohbaru, Bojonegoro\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(146, NULL, NULL, 220022001727, '0', 'Non Aktif', 'Rudi Hartono', '3523112203880000', 'Rudi Hartono', 'Tuban', '1988-03-22', '37 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85769416008', 'RUDIHARTONOCELLO@GMAIL.COM', 'Desa Menilo', '3', '2', 'Menilo', 'Soko', 'Tuban', 'Jawa Timur', 'Desa Menilo', '003', '002', 'Menilo', 'Soko', 'Tuban', 'Jawa Timur', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(147, NULL, NULL, 220022010834, '0', 'Non Aktif', 'Reza Anan Ferdiansyah', '3523112805020000', 'Reza Anan Ferdiansyah', 'Tuban', '2002-06-28', '23 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '81331465824', 'FERDIANSYAHR058@GMAIL.COM', 'Dsn Menilo', '3', '2', 'Menilo', 'Soko', 'Tuban', 'Jawa Timur', 'Dsn Menilo', '003', '002', 'Menilo', 'Soko', 'Tuban', 'Jawa Timur', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(148, NULL, NULL, 220021907647, '1', 'Aktif', 'Yunedya Fellyx Indrastian', '3311121904940000', 'Yunedya Fellyx Indrastian', 'Sukoharjo', '1994-04-19', '31 Tahun', 'L', 'Menikah', 'B', '8995251589', 'FELLYX.INDRA@GMAIL.COM', 'Somodinalan', '3', '3', 'Ngadirejo', 'Kartasura', 'Sukoharjo', 'Jawa Tengah', 'Somodinalan', '003', '003', 'Ngadirejo', 'Kartasura', 'Sukoharjo', 'Jawa Tengah', 'Somodinalan, Rt. 03/03 Ngadirejo Kartosuro Sukoharjo\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(149, NULL, NULL, 220022102852, '1', 'Aktif', 'Yayang Kurniawan', '3310180303980000', 'Yayang Kurniawan', 'Klaten', '1998-03-03', '27 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82136905764', 'KURNIAWANYAYANG771@GMAIL.COM', 'Karang Salam', '1', '10', 'Glagah', 'Jatinom', 'Klaten', 'Jawa Tengah', 'Karang Salam', '001', '010', 'Glagah', 'Jatinom', 'Klaten', 'Jawa Tengah', 'Karang Salam Rt. 01 Rw. 10 Ds. Glagah Kec. Jatinom kab. Klaten\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(150, NULL, NULL, 120020804010, '1', 'Aktif', 'Ali Maftuchin', '3318152906890000', 'Ali Maftuchin', 'Pati', '1989-06-29', '36 Tahun', 'L', 'Menikah', 'A', '85225917091', 'ALIMAFTUCHIN677@GMAIL.COM', 'Dk Rames Rt 03 Rw 04 Sukoharjo Wedarijaksa Pati Jawa Tengah ', '3', '3', 'Sukoharjo ', 'Wedarijaksa ', 'Pati', 'Jawa Tengah', 'Perumahan Kajar Residence Ii, Gg Ii Emerald, No.G6, Rt 04 Rw 03, Desa Kajar, Kecamatan Trangkil, Kabupaten Pati, Jawa Tengah 59153', '004', '003', 'Kajar', 'Trangkil ', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(151, NULL, NULL, 220021607357, '1', 'Aktif', 'Muhammad Teguh Rifanto', '3318132703980000', 'Muhammad Teguh Rifanto', 'Pati', '1998-03-27', '27 Tahun', 'L', 'Belum Menikah', 'AB', '85702687207', 'TEGUHRIFANTO@GMAIL.COM', 'Kedungbulus', '5', '3', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Kedungbulus', '005', '003', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Kedungbulus, Rt. 05/03, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(152, NULL, NULL, 220021810552, '0', 'Non Aktif', 'Muhammad Abdur Rosyid', '3318130606000000', 'Muhammad Abdur Rosyid', 'Pati', '2000-06-06', '25 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '81575515339', 'ROSYIDTREMOS@GMAIL.COM', 'Ds. Gembong Dk. Bergat Tinab', '4', '6', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Bergat', '004', '006', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(153, NULL, NULL, 220021902609, '1', 'Aktif', 'Vivi Aliningtias', '3528064803930010', 'Vivi Aliningtias', 'Jember', '1993-03-08', '32 Tahun', 'P', 'Belum Menikah', 'B', '83852170273', 'VIVITIAS25@GMAIL.COM', 'Jalan Bungur Xviii', '2', '17', 'Gebang', 'Patrang', 'Jember', 'Jawa Timur', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Jl. Bungur XVIII Gang Masjid Rt. 02/17 Gebang, Patrang, Jember\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(154, NULL, NULL, 120021711060, '1', 'Aktif', 'Lukman Pujianto', '3318100205890000', 'Lukman Pujianto', 'Pati', '1989-05-02', '36 Tahun', 'L', 'Menikah', 'Tidak Tahu', '83843228777', 'LUKMANPUJIANTO78@GMAIL.COM', 'Dk.Koroyo, Ds.Panggungroyom Rt.02 Rw.01 Wedarijaksa', '2', '1', 'Panggungroyom', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(155, NULL, NULL, 120021511066, '1', 'Aktif', 'Jasono', '3318130406880000', 'Jasono', 'Pati', '1988-06-04', '37 Tahun', 'L', 'Menikah', 'AB', '81327227793', 'JASONOBRO842@GMAIL.COM', 'Gembong', '4', '11', 'Ngembes', 'Gembong', 'Pati', 'Jawa Tengah', 'Bogor', '003', '001', 'Pondok Rajeg', 'Pondok Rajeg', 'Bogor', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(156, NULL, NULL, 220022009814, '0', 'Non Aktif', 'Jepis Suteja', '3202470605950000', 'Jepis Suteja', 'Sukabumi', '1995-05-06', '30 Tahun', 'L', 'Belum Menikah', 'B', '895336000000', 'JEPISSUTEJA.080595@GMAIL.COM', 'Kp. Gobang', '4', '2', 'Cibunarjaya', 'Ciambar', 'Sukabumi', 'Jawa Barat', 'Jl. Balimbing Iii No.19', '003', '013', 'Kelurahan Tegalgundil', 'Bogor Utara', 'Kota Bogor', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(157, NULL, NULL, 220021711415, '1', 'Aktif', 'Luky Rismadiyanti', '3318104105980000', 'Luky Rismadiyanti', 'Pati', '1998-05-01', '27 Tahun', 'P', 'Menikah', 'O', '81314685302', 'LUKIRISMA77@GMAIL.COM', 'Ds. Pohgading 2/6 Gembong', '2', '4', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Pohgading 2/6 Gembong', '002', '006', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Tambaharjo, Rt. 007/001, Kec. Pati, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(158, NULL, NULL, 220022104860, '0', 'Non Aktif', 'Aripta Pradana', '3318141112890000', 'Aripta Pradana', 'Pati', '1989-12-11', '36 Tahun', 'L', 'Menikah', 'O', '85641919021', 'ARIPTAPRADANA151@GMAIL.COM', 'Desa Tlogorejo', '1', '4', 'Tlogorejo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Desa Tlogorejo', '001', '004', 'Tlogorejo', 'Tlogowungu', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(159, NULL, NULL, 220021803455, '0', 'Non Aktif', 'Teguh Surono', '3308041905830010', 'Teguh Surono', 'Magelang', '1983-05-19', '42 Tahun', 'L', 'Menikah', 'AB', '85600985660', 'TEGUHJATI88@GMAIL.COM', 'Tempel Sari', '3', '17', 'Gulon', 'Salam', 'Magelang', 'Jawa Tengah', 'Tempel Sari', '003', '017', 'Gulon', 'Salam', 'Magelang', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(160, NULL, NULL, 220021410227, '1', 'Aktif', 'Irvan Yudhi Efendi', '3318132501970000', 'Irvan Yudhi Efendi', 'Pati', '1997-01-25', '28 Tahun', 'L', 'Menikah', 'A', '85156846572', 'EVENDIIRFAN1@GMAIL.COM', 'Ngembes', '1', '1', 'Sitiluhur', 'Gembong', 'Pati', 'Jawa Tengah', 'Sumbermulyo', '006', '001', 'Sumbermulyo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Sitiluhur Rt 01 Rw 01 Kec. Gembong Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(161, NULL, NULL, 220022010822, '1', 'Aktif', 'Abdul Jalil', '3318133101020000', 'Abdul Jalil', 'Pati', '2002-01-31', '23 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85848949143', 'ABDULJAL405@GMAIL.COM', 'Kendil Klakahkasihan ', '4', '3', 'Klakahkasihan', 'Gembong ', 'Pati', 'Jawa Tengah', 'Dk.Kendil', '004', '003', 'Klakahkasihan ', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Klakahkasihan, Rt. 04, Rw. 03, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(162, NULL, NULL, 220021902605, '1', 'Aktif', 'Moh. Abdul Wahab', '3318133004930000', 'Moh. Abdul Wahab', 'Pati', '1993-04-30', '32 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85743393662', 'ALWAHHAB.BION@GMAIL.COM', 'Ds. Klakahkasihan Dk. Gondoriyo', '3', '8', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Klakahkasihan Dk. Gondoriyo', '003', '008', 'Ds. Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Klakahkasihan Rt. 03/08 Kec. Gembong Kab. Pati \r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(163, NULL, NULL, 220022011840, '0', 'Non Aktif', 'Sugih', '3202101712990010', 'Sugih', 'Sukabumi', '1999-12-17', '26 Tahun', 'L', 'Belum Menikah', 'A', '8987032725', 'SUGIH.SCOUTS@GMAIL.COM', 'Kp Cioray', '3', '2', 'Bojongraharja', 'Cikembar', 'Sukabumi', 'Jawa Barat', 'Kp Padasuka ', '003', '005', 'Kertaharja', 'Cikembar', 'Kabupaten Sukabumi', 'Jawa Barat', 'Kp. Cioray, Rt. 03, Rw. 02, Ds. Bojongraharja, Kec. Cikembar, Kab. Sukabumi\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(164, NULL, NULL, 220021607376, '1', 'Aktif', 'Muhammad Hanafi', '3318130106910000', 'Muhammad Hanafi', 'Pati', '1991-06-01', '34 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85641142827', 'CALLISTA.ANNASYA@GMAIL.COM', 'Dk Bergat', '4', '7', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Bergat', '004', '007', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Gembong, Rt. 04/07, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(165, NULL, NULL, 120021402041, '1', 'Aktif', 'Heri Muklis', '3318131301900000', 'Heri Muklis', 'Pati', '1990-01-13', '35 Tahun', 'L', 'Menikah', 'O', '82324111787', 'HERYMUKLIS@GMAIL.COM', 'Desa Bermi Kec Gembong Kab Pati', '2', '7', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', 'Desa Bermi Kec Gembong Kab Pati', '002', '007', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(166, NULL, NULL, 220022003743, '1', 'Aktif', 'Dendi Salda Wahyudi', '3203151411000000', 'Dendi Salda Wahyudi', 'Cianjur', '2000-11-14', '25 Tahun', 'L', 'Belum Menikah', 'O', '85862059846', 'DENDISW046@GMAIL.COM', 'Kp Sukaasih', '1', '3', 'Sukadana', 'Campaka', 'Cianjur', 'Jawa Barat', 'Kp Sukaasih', '001', '003', 'Sukadana', 'Campaka', 'Cianjur', 'Jawa Barat', 'Kp. Suka Asih, Rt. 001/003, Ds. Sukadana, Kec. Campaka, Kab. Cianjur\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(167, NULL, NULL, 220021607358, '1', 'Aktif', 'Wawan Sofyan Haryono', '3318130205970000', 'Wawan Sofyan Haryono', 'Pati', '1997-05-02', '28 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85803005682', 'WAWANKAJI22@GMAI.COM', 'Pati', '1', '2', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Gembong', '001', '002', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Gembong, Rt. 01/02, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(168, NULL, NULL, 220021803465, '0', 'Non Aktif', 'M. Sutrisno', '3318162106930000', 'M. Sutrisno', 'Pati', '1993-06-21', '32 Tahun', 'L', 'Menikah', 'B', '82221467926', 'SUTRISNO.2124@GMAIL.COM', 'Kertomulyo(Dukuh Tapen),Kec Margoyoso,Pati', '3', '4', 'Kertomulyo', 'Margoyoso', 'Pati', 'Jawa Tengah', 'Kertomulyo(Dukuh Tapen),Margoyoso,Pati', '003', '004', 'Kertomulyo', 'Margoyoso', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(169, NULL, NULL, 220021410233, '1', 'Aktif', 'Khorojat', '3318130212850000', 'Khorojat', 'Pati', '1985-12-02', '40 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85865403146', 'WAFIIBAD@GMAIL.COM', 'Dukuh Krajan', '1', '1', 'Glagahkulon', 'Dawe', 'Kudus', 'Jawa Tengah', 'Dukuh Posono', '003', '007', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Glagah Kulon, Rt. 01/01, Kec. Dawe, Kab. Kudus\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(170, NULL, NULL, 220022008791, '0', 'Non Aktif', 'Andreano Darma Pragestha', '3318102701980000', 'Andreano Darma Pragestha', 'Pati', '1998-01-27', '27 Tahun', 'L', 'Belum Menikah', 'O', '81225119993', 'ANDREANODARMA@GMAIL.COM', 'Ds. Panjunan', '23', '3', 'Panjunan', 'Pati', 'Pati', 'Jawa Tengah', 'Ds Panjunan', '023', '003', 'Panjunan', 'Pati', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(171, NULL, NULL, 220022105865, '1', 'Aktif', 'Firda Hayati Nufus', '3604014908020250', 'Firda Hayati Nufus', 'Serang', '2002-08-09', '23 Tahun', 'P', 'Menikah', 'A', '85960620528', 'FIRDAHAYATINUFUS@GMAIL.COM', 'Komplek Bap 1 Blok S:6 No:11', '4', '18', 'Unyur', 'Serang', 'Serang', 'Banten', 'Komplek Bap 1 Blok S:6 No:11', '004', '018', 'Unyur', 'Serang', 'Serang', 'Banten', 'Bumi Agung Permai 1 Blok S6 No. 11, Rt. 04, Rw. 18, Kota Serang\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(172, NULL, NULL, 220021709411, '0', 'Non Aktif', 'Khoirul Anam', '3318131801920000', 'Khoirul Anam', 'Pati', '1992-01-18', '33 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85729170967', 'ANAM.CHOIRUL852@GMAIL.COM', 'Dukuh Mbangan', '2', '2', 'Sitiluhur', 'Gembong', 'Pati', 'Jawa Tengah', 'Sitiluhur', '002', '002', 'Sitiluhur', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(173, NULL, NULL, 120021004001, '1', 'Aktif', 'Farhani', '3318101509750000', 'Farhani', 'Demak', '1975-09-15', '50 Tahun', 'L', 'Menikah', 'O', '82135153510', 'WKDFARCHANI555@GMAIL.COM', 'Ds Winong', '20', '1', 'Winong', 'Pati', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(174, NULL, NULL, 220021607355, '1', 'Aktif', 'Risa Sanjaya', '3318130507980000', 'Risa Sanjaya', 'Pati', '1998-07-05', '27 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85712002393', 'REZHAZANDJ13@GMAIL.COM', 'Kedungbulus', '1', '3', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Kedungbulus', '001', '003', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Kedungbulus, Rt. 01/03, Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(175, NULL, NULL, 120021001034, '0', 'Non Aktif', 'Suyuti', '3318101901690000', 'Suyuti', 'Pati', '1969-01-19', '56 Tahun', 'L', 'Menikah', 'O', '895110000000', 'DISANAAKU15@GMAIL.COM', 'Ds. Payang', '5', '4', 'Payang', 'Pati', 'Pati', 'Jawa Tengah', 'Ds. Payang', '005', '004', 'Payang', 'Pati', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(176, NULL, NULL, 220021608388, '1', 'Aktif', 'Agus Rifa\'i', '3318131309930000', 'Agus Rifa\'i', 'Pati ', '1993-09-13', '32 Tahun', 'L', 'Menikah', 'O', '8813907008', 'AR5267705@GMAIL.COM', 'Ds Kedungbulus ', '4', '3', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Desa Kedung Bulus', '004', '003', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Kedungbulus Rt 04 Rw 03 Kec. Gembong Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(177, NULL, NULL, 120021501056, '1', 'Aktif', 'Fandi Ahmad', '3318152702920000', 'Fandi Ahmad', 'Pati', '1992-02-27', '33 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85225566198', 'FANDI1992.FA@GMAIL.COM', 'Dk. Grobog', '5', '1', 'Wonorejo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Dk. Grobog', '005', '001', 'Wonorejo', 'Tlogowungu', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(178, NULL, NULL, 220021909668, '0', 'Non Aktif', 'Riska Rahmawati', '3274036112020000', 'Riska Rahmawati', 'Cirebon', '2000-12-21', '25 Tahun', 'P', 'Belum Menikah', 'A', '82316543422', 'RAHMAWATIRISKA848@GMAIL.COM', 'Jl.Asem Gede Gg Delima ', '5', '3', 'Kalijaga', 'Harjamukti', 'Kota Cirebon', 'Jawa Barat', 'Tugu Dalem Jl.Karya Bakti', '002', '004', 'Kalijaga', 'Harjamukti', 'Kota Cirebon', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(179, NULL, NULL, 220021306141, '1', 'Aktif', 'Rodli', '3318130903820000', 'Rodli', 'Pati', '1982-03-09', '43 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85236835601', 'RODLIHARYATI@GMAIL.COM', 'Dk Jurang', '3', '7', 'Sitiluhur', 'Gembong', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Ds. Plukaran, RT. 03/ RW. 01, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(180, NULL, NULL, 220022102849, '0', 'Non Aktif', 'Ferizal Rostriawan', '3318150605010000', 'Ferizal Rostriawan', 'Pati', '2001-05-06', '24 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '8981848613', 'FERIZAL.ROSTRIAWAN@GMAIL.COM', 'Desa Sukoharjo, Dukuh Rames Rt. 04 Rw. 05, Kecamatan Wedarijaksa, Kabupaten Pati, Provinsi Jawa Tengah 59152', '4', '5', 'Sukoharjo', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Desa Sukoharjo, Dukuh Rames Rt. 04 Rw. 05, Kecamatan Wedarijaksa, Kabupaten Pati, Provinsi Jawa Tengah 59152', '004', '005', 'Sukoharjo', 'Wedarijaksa', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(181, NULL, NULL, 220022009811, '0', 'Non Aktif', 'Catur Winarko', '3318210609910000', 'Catur Winarko', 'Pati', '1991-09-06', '34 Tahun', 'L', 'Menikah', 'A', '81229772043', 'CATURKOKO92@GMAIL.COM', 'Trangkil', '5', '7', 'Trangkil', 'Trangkil', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(182, NULL, NULL, 120020507007, '1', 'Aktif', 'Ahmad Witono', '3318130604800000', 'Ahmad Witono', 'Pati', '1980-04-06', '45 Tahun', 'L', 'Menikah', 'B', '82325577678', 'WITONOAHMAD@YMAIL.COM', 'Posono', '4', '7', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Posono', '004', '007', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(183, NULL, NULL, 220021607353, '1', 'Aktif', 'Hadi Maulana', '3318132909980000', 'Hadi Maulana', 'Pati', '1998-09-29', '27 Tahun', 'L', 'Menikah', 'Tidak Tahu', '88237197215', 'HADIMAULANA01ZEROONE@GMAIL.COM', 'Dk. Rubiyah', '3', '7', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk.Rubiyah', '003', '007', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Bageng, Rt. 03/07, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(184, NULL, NULL, 220021803483, '1', 'Aktif', 'Fatimah Nur Jannah', '3318024109980010', 'Fatimah Nur Jannah', 'Karawang', '1998-01-09', '27 Tahun', 'P', 'Menikah', 'A', '81236098490', 'VETTY.FNJ@GMAIL.COM', 'Bp. Karno/Alm. H. Thamsir\nDs. Kasiyan Rt/ Rw 005/001 (Rumah Pertama Sebelah Baratnya Sekolahan Mi Kasiyan) ', '5', '1', 'Kasiyan', 'Sukolillo', 'Pati', 'Jawa Tengah', 'Bp. Karno/Alm. H. Thamsir\nDs. Kasiyan Rt/ Rw 005/001 (Rumah Pertama Sebelah Baratnya Sekolahan Mi Kasiyan) ', '005', '001', 'Kasiyan', 'Sukolillo', 'Pati', 'Jawa Tengah', 'Ds. Kasiyan, Rt. 005/001, Kec. Sukolilo , Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(185, NULL, NULL, 120021503059, '1', 'Aktif', 'Falikin', '3319040308720010', 'Falikin', 'Kudus', '1972-08-03', '53 Tahun', 'L', 'Menikah', 'O', '85741597668', 'FALIKIN4@GMAIL.COM', 'Undaan Lor', '4', '4', 'Undaan Lor', 'Undaan', 'Kudus', 'Jawa Tengah', 'Undaan Lor', '004', '004', 'Undaan Lor', 'Undaan', 'Kudus', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(186, NULL, NULL, 220021902573, '1', 'Aktif', 'Agung Pangestu Aji', '3502171710840000', 'Agung Pangestu Aji', 'Ponorogo', '1984-10-17', '41 Tahun', 'L', 'Menikah', 'O', '89603242149', 'AJIPANG291@GMAL.COM', 'Jl. Ir. H. Juanda V/1A ', '3', '2', 'Tonatan', 'Ponorogo', 'Ponorogo', 'Jawa Timur', 'Jalan Gegono Manis G3 No 14', '031', '008', 'Manisrejo', 'Taman', 'Madiun', 'Jawa Timur', 'Jl. Gegono Manis Gang 03 No 14 Manisrejo Madiun\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(187, NULL, NULL, 120020910032, '1', 'Aktif', 'Rusdianto', '3318100807860000', 'Rusdianto', 'Pati', '1986-07-08', '39 Tahun', 'L', 'Menikah', 'B', '89536508108', 'RUSDIANTO081986@GMAIL.COM', 'Dukuh Ngipik', '5', '3', 'Kutoharjo', 'Pati', 'Pati', 'Jawa Tengah', 'Dukuh Ngipik', '005', '003', 'Ds Kutoharjo', 'Pati', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(188, NULL, NULL, 220021712423, '0', 'Non Aktif', 'Supriyanto', '3318131707900000', 'Supriyanto', 'Pati', '1990-07-17', '35 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85747064108', 'SUPREX108@GMAIL.COM', 'Dk.Karang Dalem', '3', '4', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk.Karang Dalem', '003', '004', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(189, NULL, NULL, 220021803463, '0', 'Non Aktif', 'Eko Triyono', '3318132811950000', 'Eko Triyono', 'Pati', '1995-11-28', '30 Tahun', 'L', 'Menikah', 'O', '8812932557', 'TRIYONOEKO80@GMAIL.COM', 'Pohgading', '2', '2', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Pohgading', '002', '002', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(190, NULL, NULL, 220021709406, '1', 'Aktif', 'Ahmad Syaiful Bakri', '3320090201980000', 'Ahmad Syaiful Bakri', 'Jepara', '1998-01-02', '27 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '87870332370', 'SYAIFULBAKRI850@GMAIL.COM', 'Dk. Karang Rejo', '4', '2', 'Clering', 'Donorojo', 'Jepara', 'Jawa Tengah', 'Dk. Karang Rejo', '004', '002', 'Clering', 'Donorojo', 'Jepara', 'Jawa Tengah', 'Ds. Clering, Rt. 04/02, Kec. Donorojo, Kab. Jepara\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(191, NULL, NULL, 220021306041, '1', 'Aktif', 'Teguh Wibisono', '3318131801930000', 'Teguh Wibisono', 'Pati', '1993-01-18', '32 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85740331357', 'WIBIETEGUH@GMAIL.COM', 'Ds Kedungbulus', '3', '1', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds Kedungbulus', '003', '001', 'Desa Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Kedungbulus Rt.03 Rw.01 Kec.Gembong-Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(192, NULL, NULL, 220022103851, '1', 'Aktif', 'Chatherine Nada Oktafiana', '3318135110020000', 'Chatherine Nada Oktafiana', 'Pati', '2002-11-10', '23 Tahun', 'P', 'Belum Menikah', 'Tidak Tahu', '81326648060', 'CHATHERINE.NADA11@GMAIL.COM', 'Desa Bermi Rt 01 Rw 05 Kecamatan Gembong Kabupaten Pati ', '1', '5', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', 'Desa Bermi Rt 01 Rw 05 Kecamatan Gembong Kabupaten Pati ', '001', '005', 'Bermi ', 'Gembong ', 'Pati', 'Jawa Tengah', 'Ds. Bermi, Rt. 01, Rw. 05, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(193, NULL, NULL, 220022009812, '0', 'Non Aktif', 'Ahmad Ramdani', '3203271810010000', 'Ahmad Ramdani', 'Cianjur', '2001-10-18', '24 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85888432048', 'AHMADRAMDANIUT181001@GMAIL.COM', 'Kp.Cipadang ', '2', '4', 'Bangbayang', 'Gekbrong', 'Cianjur', 'Jawa Barat', 'Kp.Cipadang ', '002', '004', 'Bangbayang', 'Gekbrong', 'Cianjur', 'Jawa Barat', 'Ds. Bangbayang, Rt. 02  Rw. 04, Kec. Gekbrong, Kab. Cianjur\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(194, NULL, NULL, 220021906639, '0', 'Non Aktif', 'Jumadi', '3319052610750000', 'Jumadi', 'Kudus', '1975-10-26', '50 Tahun', 'L', 'Menikah', 'A', '81513212579', 'JUMADI.SUBUR@GMAIL.COM', 'Jl Suryo Kusumo No.46', '1', '6', 'Jepang', 'Mejobo', 'Kudus', 'Jawa Tengah', 'Jl. Suryo Kusumo No.46', '001', '010', 'Jepang', 'Mejobo', 'Kudus', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(195, NULL, NULL, 220021410239, '0', 'Non Aktif', 'Dwi Eko Priyono', '3318160608960000', 'Dwi Eko Priyono', 'Pati', '1996-08-06', '29 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82225240976', 'SATINWIJAYA21@GMAIL.COM', 'Ds Sidomukti', '3', '2', 'Sidomukti', 'Margoyoso', 'Pati', 'Jawa Tengah', 'Sidomukti', '003', '002', 'Sidomukti', 'Margoyoso', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(196, NULL, NULL, 220021903616, '1', 'Aktif', 'Salimna Rahmadana', '3318150101000000', 'Salimna Rahmadana', 'Pati', '2000-01-01', '25 Tahun', 'L', 'Menikah', 'Tidak Tahu', '81357671882', 'SALIMNA01@GMAIL.COM', 'Jontro', '3', '3', 'Jontro', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Ds Jontro', '003', '003', 'Jontro', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Ds. Jontro Rt. 03/03 Kec. Wedarijaksa Kab. Pati \r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(197, NULL, NULL, 220022101844, '0', 'Non Aktif', 'Muhammad Sari Khamdani', '3318131804950000', 'Muhammad Sari Khamdani', 'Pati', '1995-04-18', '30 Tahun', 'L', 'Menikah', 'O', '82223125027', 'MSARIKHAMDANI@GMAIL.COM', 'Dukuh Domo', '1', '1', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Ds. Klakahkasihan Rt. 01 Rw. 01 Kec. Gembong Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(198, NULL, NULL, 220021306183, '1', 'Aktif', 'Ujok Pramono', '3318111406830000', 'Ujok Pramono', 'Pati', '1983-06-14', '42 Tahun', 'L', 'Menikah', 'O', '85293324815', 'ENGGA.PRAMONO@GMAIL.COM', 'Ds Tanggel', '8', '1', 'Tanggel', 'Winong', 'Pati', 'Jawa Tengah', 'Tanggel', '008', '001', 'Tanggel', 'Winong', 'Pati', 'Jawa Tengah', 'Ds. Sunggingwarno Rt 01 / Rw 02 Kec. Gabus Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(199, NULL, NULL, 220021908657, '1', 'Aktif', 'Agus Darmawan, S. Pt', '3209022708820000', 'Agus Darmawan, S. Pt', 'Cirebon', '1982-08-27', '43 Tahun', 'L', 'Menikah', 'B', '85317763907', 'AGUSDAR242@GMAIL.COM', 'Dusun 01', '4', '2', 'Kejiwan', 'Susukan', 'Cirebon', 'Jawa Barat', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Jl. Letjen. S. Parman, No. 44, Ds. Jatiseeng, Rt. 007/004, Kec. Ciledug, Kab. Cirebon\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(200, NULL, NULL, 220021403229, '0', 'Non Aktif', 'Nur Ihsan', '3318110302820000', 'Nur Ihsan', 'Boyolali ', '1982-02-03', '43 Tahun', 'L', 'Menikah', 'Tidak Tahu', '81393124792', 'IKSANNUR@GMAIL.COM', 'Dusun Pakis', '3', '1', 'Sugihrejo', 'Gabus', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM ', 'IDEM ', 'Idem ', 'Idem ', 'Idem ', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(201, NULL, NULL, 220021802441, '1', 'Aktif', 'Muhammad Syaiful Ulum', '3318132807920010', 'Muhammad Syaiful Ulum', 'Pati', '1992-07-28', '33 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85876272485', 'RAHAYUSETYARINI103@GMAIL.COM', 'Dk Mbence ', '3', '5', 'Plukaran', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk Mbence', '003', '005', 'Plukaran', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Plukaran, Rt. 003/005, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(202, NULL, NULL, 220022010836, '0', 'Non Aktif', 'Dian Sandi Saputra', '3320092309020000', 'Dian Sandi Saputra', 'Jepara', '2002-09-23', '23 Tahun', 'L', 'Belum Menikah', 'O', '85226478636', 'DIANPETOX@GMAIL.COM', 'Dk Karangrejo', '4', '2', 'Clering', 'Donorojo', 'Jepara', 'Jawa Tengah', 'Dk Karangrejo', '004', '002', 'Clering', 'Donorojo', 'Jepara', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(203, NULL, NULL, 220022001726, '0', 'Non Aktif', 'Yulianto Aminur Riza', '3318132507010000', 'Yulianto Aminur Riza', 'Pati', '2001-07-25', '24 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85741876902', 'YULIANTOAMINUR11@GMAIL.COM', 'Ds Kedungbulus', '2', '1', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Desa Kedungbulus', '002', '001', 'Ds Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(204, NULL, NULL, 220021903623, '1', 'Aktif', 'Fiki Rahman Pramana', '3318133012990000', 'Fiki Rahman Pramana', 'Pati', '1999-12-30', '25 Tahun', 'L', 'Belum Menikah', 'O', '85866255676', 'PRAMANAFIKI3@GMAIL.COM', 'Ds. Gembong', '1', '12', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Gembong', '001', '012', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Gembong Rt. 01/12 Kec. Gembong Kab. Pati \r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(205, NULL, NULL, 220022104863, '1', 'Aktif', 'Widya Citra Puspitaning Rahayu', '3318195102960000', 'Widya Citra Puspitaning Rahayu', 'Pati', '1996-02-11', '29 Tahun', 'P', 'Belum Menikah', 'B', '85796091196', 'WIDYACITRA.PR@GMAIL.COM', 'Desa Keboromo Rt.004 Rw.001', '4', '1', 'Keboromo', 'Tayu', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Ds. Keboromo, Rt. 04 Rw. 01 Kec. Tayu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(206, NULL, NULL, 220021912720, '0', 'Non Aktif', 'Erlin Erlina', '3203096911000000', 'Erlin Erlina', 'Cianjur', '2000-11-29', '25 Tahun', 'P', 'Belum Menikah', 'O', '895636000000', 'ERLINERLINA29@GMAIL.COM', 'Kp. Punduksitu', '4', '2', 'Mekarjaya', 'Sukaluyu', 'Cianjur', 'Jawa Barat', 'Perumahan Bumi Marhamah', '004', '008', 'Sukamanah', 'Karangtengah', 'Cianjur', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(207, NULL, NULL, 220021902601, '1', 'Aktif', 'Ahmad Muhlis', '3318140101990000', 'Ahmad Muhlis', 'Pati', '1999-01-01', '26 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '87700263043', 'AHMADMUHLIS797@GMAIL.COM', 'Tlogosari.Tlogowungu.Pati.Jawa Tengah', '2', '1', 'Tlogosari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Tlogosari', '002', '001', 'Tlogosari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Tlogosari Rt. 02/01 Kec. Tlogowungu Kab. Pati \r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(208, NULL, NULL, 220021712419, '1', 'Aktif', 'Khoirul Anwar', '3318140301000000', 'Khoirul Anwar', 'Pati', '2000-01-03', '25 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '81358509773', 'ANWARKHOI55@GMAIL.COM', 'Cabak', '1', '3', 'Cabak', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Cabak', '001', '003', 'Cabak', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Cabak, Rt. 001/003, Kec. Tlogowungu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(209, NULL, NULL, 220021510304, '1', 'Aktif', 'Andiko Tris Wijayanto', '331810160490004', 'Andiko Tris Wijayanto', 'Pati', '1997-04-16', '28 Tahun', 'L', 'Menikah', 'Tidak Tahu', '895602000000', 'TRISWIJAYANTOANDIKO@GMAIL.COM', ' Ngepungrojo', '3', '4', 'Ngepungrojo', 'Pati', 'Pati', 'Jawa Tengah', 'Ngepungrojo', '003', '004', 'Ngepungrojo', 'Pati', 'Pati', 'Jawa Tengah', 'Ds. Ngepungrojo, Rt. 03/04, Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(210, NULL, NULL, 120020806019, '1', 'Aktif', 'Tri Sutrisno', '3318121710880000', 'Tri Sutrisno', 'Pati', '1988-10-17', '37 Tahun', 'L', 'Menikah', 'Tidak Tahu', '895618000000', 'SYIHABAZKA8@GMAIL.COM', 'Dusun Jethak', '2', '2', 'Langenharjo', 'Margorejo', 'Pati', 'Jawa Tengah', 'Dusun Jethak', '002', '002', 'Langenharjo', 'Margorejo', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(211, NULL, NULL, 220021709410, '1', 'Aktif', 'Chabib Nur Zaini', '3318122508980000', 'Chabib Nur Zaini', 'Pati', '1998-08-25', '27 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '895384000000', 'CHABIBNURZAENI270189@GMAIL.COM', 'Dk Ranggah', '2', '2', 'Metaraman', 'Margorejo', 'Pati', 'Jawa Tengah', 'Dk Ranggah', '002', '002', 'Metaraman', 'Margorejo', 'Pati', 'Jawa Tengah', 'Ds. Metaraman, Rt. 02/02, Kec. Margorejo, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(212, NULL, NULL, 220021902574, '1', 'Aktif', 'Galih Dwi Sasongko', '3502161401850000', 'Galih Dwi Sasongko', 'Madiun', '1985-01-14', '40 Tahun', 'L', 'Menikah', 'Tidak Tahu', '81335628255', 'DWISASONGKOGALIH@GMAIL.COM', 'Dsn Tempel', '2', '1', 'Purwosari', 'Babadan', 'Ponorogo', 'Jawa Timur', 'Dsn Tempel', '002', '001', 'Purwosari', 'Babadan', 'Ponorogo', 'Jawa Timur', 'Ds. Purwosari Rt. 02/01 Kec. Babadan Kab. Ponorogo\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(213, NULL, NULL, 220021306071, '1', 'Aktif', 'Didik Supriyanto', '3318110204890000', 'Didik Supriyanto', 'Pati', '1989-04-02', '36 Tahun', 'L', 'Belum Menikah', 'B', '85640072814', 'DIDIKSUPRIYANTO1989@GMAIL.COM', 'Dukuh Gempol', '3', '3', 'Gempolsari', 'Gabus', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Ds. Gempolsari Rt. 03 Rw. 03, Kec. Gabus, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(214, NULL, NULL, 220022008809, '0', 'Non Aktif', 'Muhammad Burhan Ali', '3318022706990000', 'Muhammad Burhan Ali', 'Pati', '1999-06-27', '26 Tahun', 'L', 'Belum Menikah', 'O', '85227062264', 'BURHAN.ALI34649@GMAIL.COM', 'Dukuh Jabung', '6', '2', 'Jatiroto', 'Kayen', 'Pati', 'Jawa Tengah', 'Dukuh Jabung', '006', '002', 'Jatiroto', 'Kayen', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(215, NULL, NULL, 220021804492, '0', 'Non Aktif', 'Aristiawan', '3318133012950000', 'Aristiawan', 'Pati', '1995-12-30', '30 Tahun', 'L', 'Menikah', 'Tidak Tahu', '82138224324', 'TIAWANARIS0@GMAIL.COM', 'Dukuh Ngembes', '3', '11', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Ngembes', '003', '011', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(216, NULL, NULL, 220021608393, '1', 'Aktif', 'Muhamad Rohim', '3318130707980000', 'Muhamad Rohim', 'Pati', '1998-07-07', '27 Tahun', 'L', 'Menikah', 'Tidak Tahu', '82220034625', 'MUHAMADROHIM477@GMAIL.COM', 'Ds.Klakahkasihan\nDk.Gondoriyo', '2', '8', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Dukuh Gondoriyo', '002', '008', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Klakahkasihan, Rt. 02/08, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(217, NULL, NULL, 220021902581, '0', 'Non Aktif', 'Dimas Aji Nugraha', '3318130605000000', 'Dimas Aji Nugraha', 'Pati', '2000-05-06', '25 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '88215223812', 'DIMASAJINUGRAHA9@GMAIL.COM', 'Dukuh Ngembes', '4', '13', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Dukuh Ngembes', '004', '013', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(218, NULL, NULL, 120021402040, '1', 'Aktif', 'Roky Jimawan', '3318100707900010', 'Roky Jimawan', 'Sukabumi ', '1990-07-07', '35 Tahun', 'L', 'Menikah', 'A', '82133206382', 'ROKYJIMAWAN13@GMAIL.COM', 'Dk. Ngipik ', '4', '3', 'Kutoharjo ', 'Pati ', 'Pati', 'Jawa Tengah', 'Dk. Ngipik ', '004', '003', 'Kutoharjo ', 'Pati ', 'Pati ', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(219, NULL, NULL, 220021712420, '1', 'Aktif', 'Muhammad Mufad Huzen', '3318130605960000', 'Muhammad Mufad Huzen', 'Pati', '1996-05-06', '29 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85800428270', 'HUSENMUHAMMAD967@GMAIL.COM', 'Dk. Bergad ', '4', '6', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Bergad', '004', '006', 'Ds. Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Gembong, Rt. 004/006, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(220, NULL, NULL, 220022009816, '0', 'Non Aktif', 'Ichwan Nur Mahfudz Ulin Nuha', '3318130606020000', 'Ichwan Nur Mahfudz Ulin Nuha', 'Pati', '2002-06-06', '23 Tahun', 'L', 'Belum Menikah', 'O', '85600190766', 'INUHA30@GMAIL.COM', 'Dk.Sentul', '4', '2', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk.Sentul', '004', '002', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(221, NULL, NULL, 220021802447, '1', 'Aktif', 'Muhammad Ulirrofiq', '3318140812940000', 'Muhammad Ulirrofiq', 'Pati', '1994-12-08', '31 Tahun', 'L', 'Menikah', 'Tidak Tahu', '81280981251', 'KUNTULA6@GMAIL.COM', 'Tanjung Sari', '2', '6', 'Tajung Sari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Tanjung Sari', '002', '006', 'Tajung Sari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Tajungsari, Rt. 002/006, Kec. Tlogowungu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(222, NULL, NULL, 220021802437, '1', 'Aktif', 'Joko Susilo', '3318132103960000', 'Joko Susilo', 'Pati', '1996-03-21', '29 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85727049411', 'SUSILOJOKER99@GMAIL.COM', 'Dk. Karangdalem', '3', '3', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Karangdalem ', '003', '003', 'Gembong', 'Gembong ', 'Pati', 'Jawa Tengah', 'Ds. Gembong, Rt. 003/003, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(223, NULL, NULL, 220022008787, '1', 'Aktif', 'Rizki Ilfan Faturohman', '3318152212010000', 'Rizki Ilfan Faturohman', 'Pati', '2001-12-22', '24 Tahun', 'L', 'Belum Menikah', 'B', '895423000000', 'RIZKIILFAN22@GMAIL.COM', 'Dk Ngulaan', '3', '3', 'Sukoharjo', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Dk Ngulaan', '003', '003', 'Sukoharjo', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Ds. Sukoharjo Rt. 03 Rw. 03, Kec. Wedarijaksa, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(224, NULL, NULL, 220021911703, '0', 'Non Aktif', 'Mahendra David Ferdiansyah', '3318130411010000', 'Mahendra David Ferdiansyah', 'Pati', '2001-11-04', '24 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85770240026', 'MAHENDRADAVID6@GMAIL.COM', 'Dk. Kedungbulus Kidul', '3', '1', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Kedungbulus Kidul', '003', '001', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(225, NULL, NULL, 220021901568, '1', 'Aktif', 'Mohammad Zamroni', '3318140301000000', 'Mohammad Zamroni', 'Pati', '2000-01-03', '25 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '81991536486', 'RONIZAM0301@GMAIL.COM', 'Tajungsari', '6', '6', 'Tajungsari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Tajungsari', '006', '006', 'Tajungsari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Tajungsari, Rt. 06/06, Kec. Tlogowungu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30');
+INSERT INTO `karyawan` (`id_karyawan`, `user_id`, `atasan_id`, `NIK`, `Status`, `Kode`, `Nama_Sesuai_KTP`, `NIK_KTP`, `Nama_Lengkap_Sesuai_Ijazah`, `Tempat_Lahir_Karyawan`, `Tanggal_Lahir_Karyawan`, `Umur_Karyawan`, `Jenis_Kelamin_Karyawan`, `Status_Pernikahan`, `Golongan_Darah`, `Nomor_Telepon_Aktif_Karyawan`, `Email`, `Alamat_KTP`, `RT`, `RW`, `Kelurahan_Desa`, `Kecamatan`, `Kabupaten_Kota`, `Provinsi`, `Alamat_Domisili`, `RT_Sesuai_Domisili`, `RW_Sesuai_Domisili`, `Kelurahan_Desa_Domisili`, `Kecamatan_Sesuai_Domisili`, `Kabupaten_Kota_Sesuai_Domisili`, `Provinsi_Sesuai_Domisili`, `Alamat_Lengkap`, `created_at`, `updated_at`) VALUES
+(226, NULL, NULL, 220021306127, '1', 'Aktif', 'Heri Setiawan 1', '3318130512920000', 'Heri Setiawan 1', 'Pati', '1992-12-05', '33 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '81218231045', 'WA2N.KYT@GMAIL.COM', 'Ds Bermi,Kec Gembong,Kab Pati', '2', '1', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', 'Des Bermi', '002', '001', 'Des Bermi', 'Kec Gembong', 'Kab Pati', 'Jawa Tengah', 'Ds. Bermi, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(227, NULL, NULL, 220021803462, '0', 'Non Aktif', 'Dian Putra Bagus Aditia', '3318042308990000', 'Dian Putra Bagus Aditia', 'Pati', '1999-08-23', '26 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '81393503275', 'DIANPUTRA5280@GMAIL.COM', 'Ds. Winong', '4', '3', 'Winong', 'Winong', 'Pati', 'Jawa Tengah', 'Ds. Winong', '004', '003', 'Ds.Winong', 'Winong', 'Pari', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(228, NULL, NULL, 120021402043, '1', 'Aktif', 'Rustaji', '3318141803740000', 'Rustaji', 'Pati', '1974-03-18', '51 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85280265862', 'RUSTAJITAJI18374@GMAIL.COM', 'Cabak 2', '5', '6', 'Cabak', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Cabak 2', '005', '006', 'Cabak', 'Tlogowungu', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(229, NULL, NULL, 220021306050, '0', 'Non Aktif', 'Arismanto', '3318121502830000', 'Arismanto', 'Pati', '1983-02-15', '42 Tahun', 'L', 'Menikah', 'O', '85876454555', 'ARANS.AIRIES@GMAIL.COM', 'Sukobubuk ', '2', '2', 'Sukobubuk', 'Margorejo', 'Pati', 'Jawa Tengah', 'Sukobubuk', '002', '002', 'Sukobubuk', 'Margorejo', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(230, NULL, NULL, 220021804502, '1', 'Aktif', 'Muhammad Luthfi Febrian', '3318131002990000', 'Muhammad Luthfi Febrian', 'Pati', '1999-02-10', '26 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85600925061', 'FEBRILUTHFI41@GMAIL.COM', 'Gembong', '3', '3', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Gembong', '003', '003', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Gembong, Rt. 003/003, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(231, NULL, NULL, 220022010828, '0', 'Non Aktif', 'Muhammad Ahid Rizal Abdullah', '3318130302020000', 'Muhammad Ahid Rizal Abdullah', 'Pati', '2002-02-03', '23 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85747979987', 'MOHAMMADAHID11@GMAIL.COM', 'Dukuh Bunton,Desa Gembong 4/1', '4', '1', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Bunton 04/01', '004', '001', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(232, NULL, NULL, 120020806016, '1', 'Aktif', 'Agung Aris Setiawan', '3318101110900000', 'Agung Aris Setiawan', 'Pati ', '1990-10-11', '35 Tahun', 'L', 'Menikah', 'A', '89647975414', 'ARISAGUNG119@GMAIL.COM', 'Ds Sarirejo Rt4 Rw2 Pati', '4', '2', 'Sarirejo', 'Pati', 'Pati', 'Jawa Tengah', 'Sarirejo', '004', '002', 'Sarirejo', 'Pati', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(233, NULL, NULL, 220021911705, '0', 'Non Aktif', 'M Iskandar Muis', '3318132601010000', 'M Iskandar Muis', 'Pati', '2001-01-26', '24 Tahun', 'L', 'Belum Menikah', 'O', '87804555528', 'ISKANDARMUIZ01@GMAIL.COM', 'Rambutan', '1', '6', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Rambutan', '001', '006', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(234, NULL, NULL, 220021903618, '1', 'Aktif', 'Untung Hadi Saputra', '3318132808990000', 'Untung Hadi Saputra', 'Pati', '1999-08-28', '26 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '89668205293', 'HADIUNTUNG200@GMAIL.COM', 'Dk Godang', '2', '10', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk Godang', '002', '010', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Gembong Rt. 02/10 Kec. Gembong Kab. Pati \r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(235, NULL, NULL, 220021808546, '0', 'Non Aktif', 'Sofiani Murti', '3302236105990000', 'Sofiani Murti', 'Banyumas', '1999-05-21', '26 Tahun', 'P', 'Menikah', 'B', '85878335251', 'SOFIANIMURTI8@GMAIL.COM', 'Kedungbanteng ', '3', '4', 'Kedungbanteng', 'Kedungbanteng', 'Banyumas', 'Jawa Tengah', 'Kedungbanteng', '003', '004', 'Kedungbanteng', 'Kedungbanteng', 'Banyumas', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(236, NULL, NULL, 220021902589, '1', 'Aktif', 'Sirrun Ni\'am', '3318132008960000', 'Sirrun Ni\'am', 'Pati', '1996-08-20', '29 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85713491541', 'SIRUNSIRUN568@GMAIL.COM', 'Ds Bageng', '3', '3', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', 'Bageng', '003', '003', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Bageng Rt. 03/03 Kec. Gembong Kab. Pati \r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(237, NULL, NULL, 220021606350, '1', 'Aktif', 'Puga Indarto', '3318132208930000', 'Puga Indarto', 'Pati', '1993-08-22', '32 Tahun', 'L', 'Menikah', 'B', '82325082073', 'PUGOINDARTO4@GMAIL.COM', 'Dk.Criwik', '1', '4', 'Sitiluhur', 'Gembong', 'Pati', 'Jawa Tengah', '--', 'IDEM', 'IDEM', '--', '--', '--', '--', 'Ds. Klakahkasihan, Rt. 004/005, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(238, NULL, NULL, 220022105869, '0', 'Non Aktif', 'Silha Wildania Utami', '3318135311960000', 'Silha Wildania Utami', 'Pati', '1996-11-13', '29 Tahun', 'P', 'Belum Menikah', 'O', '82324905298', 'SILHAWILDANIA@GMAIL.COM', 'Jalan Hanglekir, Perumahan Taman Lembah Hijau Blok H Nomor 16', '2', '7', 'Batu Ix', 'Tanjungpinang Timur', 'Tanjungpinang', 'Kepulauan Riau', 'Desa Bermi Rt 02/ Rw 04, Kecamatan Gembong, Kabupaten Pati', '002', '004', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(239, NULL, NULL, 220021811550, '0', 'Non Aktif', 'Jatmiko', '3302261411870000', 'Jatmiko', 'Banyumas', '1987-11-14', '38 Tahun', 'L', 'Menikah', 'Tidak Tahu', '81298091212', 'JMSIANO001@GMAIL.COM', 'Kalibagor', '2', '3', 'Kalibagor', 'Kalibagor', 'Banyumas', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(240, NULL, NULL, 220021608395, '1', 'Aktif', 'Mukhammad Rindo Setiyawan', '3318132404970000', 'Mukhammad Rindo Setiyawan', 'Pati', '1997-04-24', '28 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85747064249', 'RIDHOSETIAWAN2497@GMAIL.COM', 'Ds. Ketanggan', '1', '3', 'Ketanggan', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Ketanggan', '001', '003', 'Ketanggan', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Ketanggan, Rt. 01/03, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(241, NULL, NULL, 120021402039, '1', 'Aktif', 'Muhammad Shobirin', '3318132010900000', 'Muhammad Shobirin', 'Pati', '1990-10-20', '35 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85747799592', 'MUHAMMADSHOBIRINGL100@GMAIL.COM', 'Gembong', '1', '13', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Gembong', '001', '013', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(242, NULL, NULL, 220021802427, '0', 'Non Aktif', 'A\'An Agus Prasetya', '3318132311980000', 'A\'An Agus Prasetya', 'Pati', '1998-11-23', '27 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '082339520512', 'SINCHANAAN7@GMAIL.COM', 'Dk.Bengkal', '1', '6', 'Plukaran', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Bengkal Ds. Plukaran', '001', '006', 'Plukaran', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk.Bengkal', '2025-12-23 03:48:30', '2026-01-09 07:22:27'),
+(243, NULL, NULL, 220022012843, '0', 'Non Aktif', 'Ni\'Ma Diana', '6474015210980000', 'Ni\'Ma Diana', 'Pati', '1998-10-12', '27 Tahun', 'P', 'Belum Menikah', 'AB', '81292610579', 'NIKMAADIANA@GMAIL.COM', 'Jl. Raya Pati-Tayu Km. 7', '4', '3', 'Sukoharjo', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(244, NULL, NULL, 220022012841, '0', 'Non Aktif', 'Septiana Indriani Kusumaningrum', '3318134609990000', 'Septiana Indriani Kusumaningrum', 'Pati', '1999-09-06', '26 Tahun', 'P', 'Belum Menikah', 'B', '81336703846', 'SEPTIANAINDRIANIKUSUMANINGRUM@GMAIL.COM', 'Ds. Bermi 2/4 Kkec. Gembong Kab. Pati, Kode Pos. 59162', '2', '4', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Bermi 2/4 Kec. Gembong Kab. Pati, Kode Pos. 59162', '002', '004', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Bermi Rt. 02 Rw. 04 Kec. Gembong Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(245, NULL, NULL, 220021412268, '1', 'Aktif', 'Luthfi Al Hakim', '3318132806920000', 'Luthfi Al Hakim', 'Pati', '1992-06-28', '33 Tahun', 'L', 'Menikah', 'B', '82228886452', 'EL_H77@YAHOO.COM', 'Dk.Rambutan', '1', '6', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Rambutan', '001', '006', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Pohgading, Rt. 01/06, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(246, NULL, NULL, 220022001721, '0', 'Non Aktif', 'Afriyan Prabowo', '3318130904000000', 'Afriyan Prabowo', 'Pati', '2000-04-09', '25 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85888353941', 'AFRIYANRIYAN98@GMAIL.COM', 'Dk. Seloromo,Ds. Gembong Kec. Gembong', '1', '1', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Seloromo', '001', '001', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Gembong, Rt. 001/001, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(247, NULL, NULL, 220021510307, '1', 'Aktif', 'Imam Baedlowi', '3318191003980000', 'Imam Baedlowi', 'Pati', '1998-03-10', '27 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '895636000000', 'NDOWI103@GMAIL.COM', 'Tendas', '7', '2', 'Tendas', 'Tayu', 'Pati', 'Jawa Tengah', 'Tendas', '007', '002', 'Tendas', 'Tayu', 'Pati', 'Jawa Tengah', 'Ds. Tendas, Rt. 07/02, Cluwak, Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(248, NULL, NULL, 220021911702, '1', 'Aktif', 'Alfian Aldi Maulana', '3318132604010000', 'Alfian Aldi Maulana', 'Pati', '2001-04-26', '24 Tahun', 'L', 'Belum Menikah', 'O', '82397104900', 'ALFIANALDYMAULANA@GMAIL.COM', 'Dk Jollong', '1', '6', 'Sitiluhur', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk Jollong', '001', '006', 'Sitiluhur', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Sitiluhur, Rt. 001/006, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(249, NULL, NULL, 220021709405, '0', 'Non Aktif', 'Achmad Syaifuddin', '3318131505990000', 'Achmad Syaifuddin', 'Pati', '1999-05-15', '26 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85876272257', 'MEDKOMPATI0033@GMAIL.COM', 'Kedungbulus', '4', '1', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Kedungbulus', '004', '001', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(250, NULL, NULL, 220021510303, '0', 'Non Aktif', 'Akhmad Kusen', '3318141108940000', 'Akhmad Kusen', 'Pati', '1994-03-08', '31 Tahun', 'L', 'Menikah', 'O', '82221248355', 'MOTOVLOGKHUSEN@GMAIL.COM', 'Dk. Prapeyan Lor, Ds. Pagerharjo', '1', '3', 'Pagerharjo', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Dk. Pagerharjo, Ds. Pagerharjo', '001', '003', 'Pagerharjo', 'Wedarijaksa', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(251, NULL, NULL, 220021802443, '1', 'Aktif', 'Muhammad Farid', '3318101003990000', 'Muhammad Farid', 'Pati', '1999-03-10', '26 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '89530960286', 'MCFARIED789@GMAIL.COM', 'Wedarijaksa', '5', '2', 'Wedarijaksa', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Wedarijaksa', '005', '002', 'Wedarijaksa', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Ds. Tambaharjo, Rt. 003/001, Kec. Pati, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(252, NULL, NULL, 220021901562, '0', 'Non Aktif', 'Bagus Indriawan', '3318130703000000', 'Bagus Indriawan', 'Pati', '2000-03-07', '25 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '8156850849', 'BAGUSINDRIAWAN5@GMAIL.COM', 'Ds. Kedungbulus Kidul', '3', '1', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Desa. Kedungbulus', '003', '001', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Kedungbulus, Rt. 03/01, Kec. Gembong, Kab. Pati \r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(253, NULL, NULL, 220021908658, '0', 'Non Aktif', 'Alfius Artha Wijayanto', '3471010705820000', 'Alfius Artha Wijayanto', 'Yogyakarta', '1982-05-07', '43 Tahun', 'L', 'Menikah', 'Tidak Tahu', '81328739627', 'ARTHA.WIJAYANTO7@GMAIL.COM', 'Jatimulyo Tri/693', '24', '5', 'Kricak', 'Tegalrejo', 'Yogyakarta', 'Daerah Istimewa Yogyakarta', 'Graha Alana Cempaka Talun Jl. Sultan Ageng Tirtayasa Blok K 05', '002', '009', 'Cempaka', 'Talun', 'Cirebon', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(254, NULL, NULL, 120021402051, '0', 'Non Aktif', 'Dedy Surya Irawan', '3318132709900000', 'Dedy Surya Irawan', 'Pati', '1990-09-27', '35 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85743821539', 'DEDYSURYA456@GMAIL.COM', 'Ds Kedungbulus', '3', '1', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds Kedungbulus', '003', '001', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(255, NULL, NULL, 220021902606, '0', 'Non Aktif', 'Muhammad Rokhim', '3318130112990000', 'Muhammad Rokhim', 'Pati', '1999-12-01', '26 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85291717164', 'HILIHIPILIHIPILIH@GMAIL.COM', 'Dk Gondoriyo', '2', '8', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk Gondoriyo', '002', '008', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(256, NULL, NULL, 220021808545, '1', 'Aktif', 'Nur Indah', '3318156211000000', 'Nur Indah', 'Pati', '2000-11-22', '25 Tahun', 'P', 'Belum Menikah', 'Tidak Tahu', '81542246355', 'NURINDAH8412@GMAIL.COM', 'Desa Sukoharjo Rt 3 Rw 3 Kecamatan Wedarijaksa Kabupaten Pati', '3', '3', 'Sukoharjo', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Desa Sukoharjo Rt 3 Rw 3 Kecamatan Wedarijaksa Kabupaten Pati', '003', '003', 'Sukoharjo', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Ds. Sukoharjo, Rt. 003/003, Kec. Wedarijaksa, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(257, NULL, NULL, 220021306018, '1', 'Aktif', 'Eko Agus Setyawan', '3318130708920000', 'Eko Agus Setyawan', 'Pati', '1992-08-07', '33 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85740522508', 'WAWANWABUN59@GMAIL.COM', 'Kedung Bulus', '2', '3', 'Kedungbulus', 'Gembong ', 'Pati', 'Jawa Tengah', 'Serut', '002', '003', 'Kedung Bulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Kedungbulus Rt.2/3 Gembong Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(258, NULL, NULL, 220021409219, '1', 'Aktif', 'Moh Rizqi Mubarrok Afwa', '3318213003970000', 'Moh Rizqi Mubarrok Afwa', 'Pati', '1997-03-30', '28 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '89662950579', 'AFWAMOHAMMAD45@GMAIL.COM', 'Ds. Pasucen', '6', '4', 'Pasucen', 'Trangkil', 'Pati', 'Jawa Tengah', 'Pasucen', '006', '004', 'Pasucen', 'Trangkil', 'Pati', 'Jawa Tengah', 'Ds. Pasucen Rt 06 Rw 04 Kec. Trangkil Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(259, NULL, NULL, 220021601345, '1', 'Aktif', 'Agus Hendriyanto', '3318100104860000', 'Agus Hendriyanto', 'Pati', '1986-04-01', '39 Tahun', 'L', 'Menikah', 'O', '89618640281', 'AGUSANDRY16@GMAIL.COM', 'Juanalan', '11', '5', 'Juanalan', 'Pati', 'Pati', 'Jawa Tengah', 'Juanalan', '011', '005', 'Juanalan', 'Pati', 'Pati', 'Jawa Tengah', 'Ds. Juanalan, Rt 02 Rw 05, Kec. Pati Kidul, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(260, NULL, NULL, 120021402044, '1', 'Aktif', 'Afif Muhadi Ahmad S.Pd', '3318040307900000', 'Afif Muhadi Ahmad S.Pd', 'Pati', '1989-07-03', '36 Tahun', 'L', 'Menikah', 'A', '85244175058', 'AFIF89.AMA89@GMAIL.COM', 'Karangkonang', '2', '2', 'Karangkonang', 'Winong', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(261, NULL, NULL, 220022008800, '1', 'Aktif', 'Agung Syahroni', '3318131202970000', 'Agung Syahroni', 'Pati', '1997-02-12', '28 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85713138512', 'AGUNFSYAHRONI76@GMAIL.COM', 'Desa Plukaran Kec.Gembong Kab Pati', '3', '5', 'Plukaran', 'Gembong', 'Pati', 'Jawa Tengah', 'Desa Plukaran', '003', '005', 'Plukaran', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Plukaran, Rt. 03, Rw. 05, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(262, NULL, NULL, 220022102850, '1', 'Aktif', 'Wiji Yuliana Putri', '3318216107010000', 'Wiji Yuliana Putri', 'Pati ', '2001-07-21', '24 Tahun', 'P', 'Belum Menikah', 'Tidak Tahu', '81215993429', 'WIJIYULIANA21@GMAIL.COM', 'Dk. Poehbangu', '3', '1', 'Mojoagung ', 'Trangkil', 'Pati', 'Jawa Tengah', 'Dk. Poehbangu ', '003', '001', 'Mojoagung ', 'Trangkil ', 'Pati', 'Jawa Tengah', 'Ds. Mojoagung Rt. 03 Rw. 01 Kecamatan Trangkil, Kabupaten Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(263, NULL, NULL, 120020810022, '1', 'Aktif', 'Sulistiyo', '3318102704820010', 'Sulistiyo', 'Pati', '1982-04-27', '43 Tahun', 'L', 'Menikah', 'Tidak Tahu', '83128592961', 'SULISTYOSULIS030@GMAIL.COM', 'Ds Pohgading', '1', '2', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds Pohgading', '001', '002', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(264, NULL, NULL, 220021712417, '1', 'Aktif', 'Ifa Fahrotunnisa', '3318155410930000', 'Ifa Fahrotunnisa', 'Pati', '1993-10-14', '32 Tahun', 'P', 'Menikah', 'Tidak Tahu', '85740470300', 'IFAFAHROTUNNISA@GMAIL.COM', 'Tlogosari Rt 08 Rw.04 Kec.Tlogowungu Kab.Pati', '8', '4', 'Tlogosari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Tlogosari Rt.08 Rw.04 Kec. Tlogowungu Kab.Pati', '008', '004', 'Tlogosari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Tawangharjo, Rt. 004/003, Kec. Wedarijaksa, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(265, NULL, NULL, 220021901570, '0', 'Non Aktif', 'Muhammad Safuan', '3320162812910000', 'Muhammad Safuan', 'Jepara', '1991-12-28', '34 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '81284470501', 'MUHAMMADSAFUANBINSAMSURI@YAHOO.COM', 'Karang Rejo', '4', '2', 'Clering', 'Donorojo', 'Jepara', 'Jawa Tengah', 'Karang Rejo', '004', '002', 'Clering', 'Donorojo', 'Jepara', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(266, NULL, NULL, 220021503283, '1', 'Aktif', 'Ratmono Prastiawan', '3318100108860000', 'Ratmono Prastiawan', 'Pati', '1986-08-01', '39 Tahun', 'L', 'Menikah', 'B', '8996922290', 'WAWANNGGACE1986@GMAIL.COM', 'Desa Tambaharjo Runting,', '4', '1', 'Tambaharjo', 'Pati', 'Pati', 'Jawa Tengah', 'Desa Tambaharjo Runting', '004', '001', 'Tambaharjo/Runting', 'Pati', 'Pati', 'Jawa Tengah', 'Ds. Tambaharjo Rt. 04 Rw. 01 Kec. Pati Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(267, NULL, NULL, 220021607362, '1', 'Aktif', 'Hendri Kurniawan', '3318130111980000', 'Hendri Kurniawan', 'Pati', '1998-11-01', '27 Tahun', 'L', 'Menikah', 'Tidak Tahu', '88232931679', 'HENDRI011198@GMAIL.COM', 'Pati', '2', '7', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', 'Pati', '002', '007', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Bageng, Rt. 02/07, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(268, NULL, NULL, 220021306122, '1', 'Aktif', 'Muhammad Syafi\'i', '3318130801950000', 'Muhammad Syafi\'i', 'Pati', '1995-01-08', '30 Tahun', 'L', 'Menikah', 'Tidak Tahu', '88215475655', 'MS6006225@GMAIL.COM', 'Dk.Rubiyah', '2', '7', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk.Rubiyah', '002', '007', 'Desa Bageng', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Bageng, Rt. 02/07, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(269, NULL, NULL, 220021910685, '1', 'Aktif', 'Sulistyo Budi Prawoto', '3318141812010000', 'Sulistyo Budi Prawoto', 'Pati', '2001-12-18', '24 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '87854790995', 'SULISBUDI147@GMAIL.COM', 'Tlogosari ', '3', '3', 'Tlogosari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Tlogosari', '003', '003', 'Tlogosari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Tlogosari, Rt. 03/03, Kec. Tlogowungu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(270, NULL, NULL, 220021803476, '1', 'Aktif', 'Anggun Junanta', '3318162308960000', 'Anggun Junanta', 'Pati', '1996-08-23', '29 Tahun', 'L', 'Belum Menikah', 'B', '82236802069', 'ANGGUNJUNANTA23AUG@GMAIL.COM', 'Golilo', '2', '1', 'Sidomukti', 'Margoyoso', 'Pati', 'Jawa Tengah', 'Golilo', '002', '001', 'Sidomukti', 'Margoyoso', 'Pati', 'Jawa Tengah', 'Ds. Sidomukti, Rt. 002/001, Kec. Margoyoso, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(271, NULL, NULL, 220021803475, '0', 'Non Aktif', 'Ahmad Purwadi', '3318122301870000', 'Ahmad Purwadi', 'Pati', '1987-01-23', '38 Tahun', 'L', 'Menikah', 'B', '85226429818', 'PURWADIAHMAD023@GMAIL.COM', 'Gondoharum', '1', '5', 'Gondoharum', 'Jekulo', 'Kudus', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(272, NULL, NULL, 220021306032, '1', 'Aktif', 'Muhammad Rozi', '3318132407910000', 'Muhammad Rozi', 'Pati', '1991-07-24', '34 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85600670480', 'ROZIMUHAMADE@GMAIL.COM', 'Posono', '4', '7', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Dukuh Posono ', '004', '007', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Klakahkasihan Rt. 04/ 07 Gembong\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(273, NULL, NULL, 220022010830, '1', 'Aktif', 'Verry Firman Syah', '3318020508990000', 'Verry Firman Syah', 'Pati', '1999-08-05', '26 Tahun', 'L', 'Belum Menikah', 'O', '81227108523', 'PERRIECHUCKY@GMAIL.COM', 'Pati', '1', '1', 'Boloagung', 'Kayen', 'Pati', 'Jawa Tengah', 'Ds. Boloagung Rt:01 Rw:01 Kayen Pati', '001', '001', 'Boloagung', 'Kayen', 'Pati', 'Jawa Tengah', 'Ds. Boloagung, Rt. 01, Rw. 01, Kec. Kayen, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(274, NULL, NULL, 220022010824, '1', 'Aktif', 'Agung Handoko', '3318162905940000', 'Agung Handoko', 'Pati', '1994-05-29', '31 Tahun', 'L', 'Menikah', 'Tidak Tahu', '81229368608', 'HANDOKOAGUNG232@GMAIL.COM', 'Dk.Jollong 02/06 Ds.Sitiluhur Kec.Gembong Kab.Pati', '2', '6', 'Sitiluhur', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk.Jollong', '002', '006', 'Sitiluhur', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Sidomukti, Rt: 02, Rw: 01, Kec. Margoyoso, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(275, NULL, NULL, 220021306028, '1', 'Aktif', 'Toni Avrianto', '3318040210900000', 'Toni Avrianto', 'Pati', '1990-10-02', '35 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '89655483741', 'TONIBAGONG2019@GMAIL.COM', 'Serut Sadang', '1', '2', 'Serut Sadang', 'Winong', 'Pati', 'Jawa Tengah', 'Serut Sadang', '001', '002', 'Serut Sadang', 'Winong', 'Pati', 'Jawa Tengah', 'Ds. Serut Sadang Rt. 01/ 02, Kec. Winong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(276, NULL, NULL, 120020811023, '0', 'Non Aktif', 'Jumari', '3318130903900000', 'Jumari', 'Pati', '1990-03-09', '35 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85938660105', 'MASK38463@GMAIL.COM', 'Dk.Serut', '3', '3', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk.Serut', '003', '003', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(277, NULL, NULL, 220021712422, '1', 'Aktif', 'Sumaun', '3318140206850000', 'Sumaun', 'Pati', '1985-06-02', '40 Tahun', 'L', 'Menikah', 'AB', '85329612222', 'MAUNBRAJAYA@GMAIL.COM', 'Ds.Sidokerto', '2', '1', 'Sidokerto', 'Pati', 'Pati', 'Jawa Tengah', 'Ds.Tlogosari', '005', '002', 'Tlogosari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Tlogosari 005/002, Tlogowungu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(278, NULL, NULL, 220022008789, '0', 'Non Aktif', 'Ahmad Isnan Waldi', '3318160411020000', 'Ahmad Isnan Waldi', 'Pati', '2002-11-04', '23 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '81329428788', 'KEMPOT.GANTENG22@GMAIL.COM', 'Bulumanis Lor', '3', '3', 'Bulumanis Lor', 'Margoyoso', 'Pati', 'Jawa Tengah', 'Bulumanis Lor', '003', '003', 'Bulumanis Lor', 'Margoyoso', 'Pati', 'Jawa Tengah', 'Ds. Bulumanis Lor, Rt: 03, Rw: 03, Kec. Margoyoso, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(279, NULL, NULL, 120020910029, '1', 'Aktif', 'Ahmad Gunadi', '3318132603900000', 'Ahmad Gunadi', 'Pati', '1990-03-26', '35 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85870533611', 'GUNACHMAD12@GMAIL.COM', 'Tempel', '6', '2', 'Sumbermulyo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Tempel', '006', '002', 'Sumbermulyo', 'Tlogowungu', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(280, NULL, NULL, 220022008795, '1', 'Aktif', 'Muhammad Ali Imron', '3318131805960000', 'Muhammad Ali Imron', 'Pati', '1996-05-18', '29 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '81393444004', 'ALIESADEWA3@GMAIL.COM', 'Domo Klakahkasihan', '3', '1', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Domo Klakahkasihan', '003', '001', 'Domo', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Klakahkasihan, Rt : 03, Rw: 01, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(281, NULL, NULL, 220021910681, '0', 'Non Aktif', 'Mugi Safaat', '3319091604010000', 'Mugi Safaat', 'Kudus', '2001-04-16', '24 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '87875288959', 'ANASSYAFAAT6@GMAIL.COM', 'Bengkal', '3', '4', 'Japan', 'Dawe', 'Kudus', 'Jawa Tengah', 'Bengkal', '003', '004', 'Japan', 'Dawe', 'Kudus', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(282, NULL, NULL, 220021803479, '1', 'Aktif', 'Nur Rois', '3318132403000000', 'Nur Rois', 'Pati', '2000-03-24', '25 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '87779933516', 'ROISCHEP249@GMAIL.COM', 'Pohgading', '2', '6', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Pohgading', '002', '006', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Pohgading, Rt. 002/006, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(283, NULL, NULL, 120021409053, '1', 'Aktif', 'Purwadi', '3318132307920000', 'Purwadi', 'Pati', '1992-07-23', '33 Tahun', 'L', 'Menikah', 'O', '82325440273', 'D.ALFOXS@GMAIL.COM', 'Kerepare Barat', '1', '1', 'Tamansari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Kedungbulus Kidul', '001', '001', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(284, NULL, NULL, 120021511065, '0', 'Non Aktif', 'Sriati Puji Lestari', '3318105006950010', 'Sriati Puji Lestari', 'Pati', '1995-10-06', '30 Tahun', 'P', 'Menikah', 'Tidak Tahu', '85229910832', 'SRIATI.PUJILESTARI@GMAIL.COM', 'Dk Kebak', '1', '2', 'Ngepungrojo', 'Pati', 'Pati', 'Jawa Tengah', 'Dk Kebak', '001', '002', 'Desa Ngepungrojo', 'Pati', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(285, NULL, NULL, 120021402047, '1', 'Aktif', 'Arif Nurhuda', '3318130404870000', 'Arif Nurhuda', 'Pati', '1987-04-04', '38 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85713389383', 'ARIFARDANI28@GMAIL.COM', 'Ketanggan', '1', '3', 'Ketanggan', 'Gembong', 'Pati', 'Jawa Tengah', 'Ketanggan', '001', '003', 'Ketanggan', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(286, NULL, NULL, 220022008790, '0', 'Non Aktif', 'Aliyyu Nurliza', '3318110709010000', 'Aliyyu Nurliza', 'Pati', '2001-09-07', '24 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '81219161072', 'ALIYYUNURLIZA111@GMAIL.COM', 'Dusun Jrakah', '1', '3', 'Mintobasuki', 'Gabus', 'Pati', 'Jawa Tengah', 'Dusun Jrakah', '001', '003', 'Mintobasuki', 'Gabus', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(287, NULL, NULL, 220021306130, '1', 'Aktif', 'Suprianto', '3318132505900000', 'Suprianto', 'Pati', '1990-05-25', '35 Tahun', 'L', 'Menikah', 'Tidak Tahu', '81227221733', 'SUPRYANTOK4@GMAIL.COM', 'Desa Pohgading', '2', '4', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Desa Pohgading', '002', '004', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Selorejo, RT 03/RW 14, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(288, NULL, NULL, 220021607380, '1', 'Aktif', 'Riswanda Irmawan', '3318141704980000', 'Riswanda Irmawan', 'Pati', '1998-04-17', '27 Tahun', 'L', '', 'A', '85326540276', 'WANDASKA00@GMAIL.COM', 'Ds. Tlogosari Kec. Tlogowungu Kab. Pati', '5', '2', 'Tlogosari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Tlogosari  Kec. Tlogowungu Kab. Pati', '005', '002', 'Tlogosari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Tlogosari, Rt. 05/02, Kec. Tlogowungu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(289, NULL, NULL, 220022008793, '1', 'Aktif', 'Faiz Aminudin', '3318132507000000', 'Faiz Aminudin', 'Pati', '2000-07-25', '25 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '81235056287', 'FAIZCHANEL59@GMAIL.COM', 'Dk.Kendil Ds.Klahkah Kasihan ', '5', '3', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk.Kendil Ds.Klakah Kasihan', '005', '003', 'Klakah Kasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Klakahkasihan, Rt: 05, Rw: 03, Kec. Gembong Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(290, NULL, NULL, 220022008771, '1', 'Aktif', 'Faril Pratama', '3318120704010000', 'Faril Pratama', 'Pati', '2001-04-07', '24 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85290358860', 'FARILPRATAMA4@GMAIL.COM', 'Ds.Muktiharjo Dk.Rendolert05/01 Kec.Margorejo Kab.Pati', '5', '1', 'Muktiharjo', 'Margorejo', 'Pati', 'Jawa Tengah', 'Pati', '005', '001', 'Muktiharjo Dk.Rendole', 'Margorejo', 'Pati', 'Jawa Tengah', 'Ds. Muktiharjo Rt. 05 Rw. 01 Kec. Margorejo Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(291, NULL, NULL, 220021804513, '1', 'Aktif', 'Febri Sugianto', '3318211602960010', 'Febri Sugianto', 'Pati', '1996-02-16', '29 Tahun', 'L', 'Belum Menikah', 'B', '895349000000', 'FEBRISUGIANTO5@GMAIL.COM', 'Desa Karang Legi', '6', '2', 'Karang Legi', 'Trangkil', 'Pati', 'Jawa Tengah', 'Desa Karang Legi', '006', '002', 'Karang Legi ', 'Trangkil', 'Pati', 'Jawa Tengah', 'Ds. Karanglegi, Rt. 006/002, Kec. Trangkil, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(292, NULL, NULL, 220021709412, '1', 'Aktif', 'Muhamad Irkham Maulana', '3318120909960000', 'Muhamad Irkham Maulana', 'Cirebon', '1996-09-09', '29 Tahun', 'L', 'Menikah', 'A', '87760537261', 'MIRKHAM68@GMAIL.COM', 'Dukuh Gambiran', '4', '4', 'Sukoharjo', 'Margorejo', 'Pati', 'Jawa Tengah', 'Dukuh Gambiran', '004', '004', 'Sukoharjo', 'Margorejo', 'Pati', 'Jawa Tengah', 'Ds. Sukoharjo, Dk. Gambiran, Rt. 04/04, Kec. Margorejo, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(293, NULL, NULL, 220022002735, '0', 'Non Aktif', 'Rika Ukhtul Fitrah', '3318116606970000', 'Rika Ukhtul Fitrah', 'Pati', '1997-06-26', '28 Tahun', 'P', 'Menikah', 'O', '89623498588', 'RIKAUKHTUL26@GMAIL.COM', 'Desa Mintobasuki ', '5', '3', 'Mintobasuki', 'Gabus', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(294, NULL, NULL, 220021908655, '1', 'Aktif', 'Muhamad Agung Barkasyah Tias', '3273152310850000', 'Muhamad Agung Barkasyah Tias', 'Bandung', '1985-10-23', '40 Tahun', 'L', 'Menikah', 'O', '82120014696', 'AGUNGTIAS24@GMAIL.COM', 'Jalan Mekar Jaya No. 36', '5', '8', 'Cijerah', 'Bandung Kulon', 'Bandung', 'Jawa Barat', 'Jl. Arkeologi - Tagog Bumi Panyawangan', '001', '023', 'Cimekar', 'Cileunyi', 'Kab. Bandung', 'Jawa Barat', 'Jl. Mekar Jaya No. 36 Rt. 005/008, Kel. Cijerah, Kec. Bandung Kulon, Bandung\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(295, NULL, NULL, 220021910699, '1', 'Aktif', 'Mira Lestari', '3278046706990010', 'Mira Lestari', 'Tasikmalaya', '1999-06-27', '26 Tahun', 'P', 'Menikah', 'B', '89530482190', 'MIRALESTARI582@GMAIL.COM', 'Jl Sirnagalih', '1', '3', 'Sirnagalih', 'Indihiang', 'Tasikmalaya', 'Jawa Barat', 'Jl Sirnagalih', '001', '003', 'Sirnagalih', 'Indihiang', 'Tasikmalaya', 'Jawa Barat', 'Jl. Sirnagalih, Rt. 001/003, Kec. Indihiang, Kota. Tasikmalaya\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(296, NULL, NULL, 220021803457, '1', 'Aktif', 'Abdul Rosyad', '3318130901670000', 'Abdul Rosyad', 'Pati', '1997-01-09', '28 Tahun', 'L', 'Menikah', 'O', '8816532402', 'BBOBI0096@GMAIL.COM', 'Rambutan ', '1', '6', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Pohgading', '001', '006', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Pohgading, Rt. 001/006, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(297, NULL, NULL, 220021903617, '1', 'Aktif', 'Unggul Wahyu Leksono', '3318131005990000', 'Unggul Wahyu Leksono', 'Pati', '1999-05-10', '26 Tahun', 'L', 'Menikah', 'B', '85156797315', 'UNGGULLEKSONO99@GMAIL.COM', 'Ds.Kedungbulus Rt04 Rw 03', '4', '3', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds.Kedungbulus', '004', '003', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Kedungbulus, Rt. 04/03, Kec. Gembong, Kab. Pati \r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(298, NULL, NULL, 220021910672, '0', 'Non Aktif', 'Alga Oktavinda Pradana', '3318131810010000', 'Alga Oktavinda Pradana', 'Pati', '2001-10-18', '24 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82328900170', 'ALGAOKTAVINDAPRADANA123@GMAIL.COM', 'Dukuh Kwaren Rt 1 Rw 4 Desa Ketanggan', '1', '4', 'Ketanggan', 'Gembong', 'Pati', 'Jawa Tengah', 'Dukuh Kwaren', '001', '004', 'Ketanggan', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(299, NULL, NULL, 220022107894, '0', 'Non Aktif', 'Syahrul Ridwan', '3318133011020000', 'Syahrul Ridwan', 'Pati', '2002-11-30', '23 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85813215354', 'SYAHRULRIDWAN054@GMAIL.COM', 'Dk Alastuwo Ds Pogading Rt1/5 Kec. Gembong Kab. Pati', '1', '5', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk Seloromo Ds Gembong Rt1/1 Kec. Gembong Kab Pati', '001', '001', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(300, NULL, NULL, 220022008801, '1', 'Aktif', 'Alfian', '3318142010000000', 'Alfian', 'Pati', '2000-10-20', '25 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '8587601235', 'ALFIAN20.LINGARD14@GMAIL.COM', 'Desa Sumbermulyo Kecamatan Tlogowugu Kabupaten Pati', '2', '2', 'Sumbermulyo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Dukuh Sangklur', '002', '002', 'Sumbermulyo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Sumbermulyo, Rt. 02, Rw. 02, Kec. Tlogowungu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(301, NULL, NULL, 220021803464, '0', 'Non Aktif', 'Habib Zumrodi', '3318132107910000', 'Habib Zumrodi', 'Pati', '1991-07-21', '34 Tahun', 'L', 'Menikah', 'AB', '85866592052', 'ZUMRODIHABIB@GMAIL.COM', 'Ds. Gembong', '1', '11', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(302, NULL, NULL, 120020407005, '1', 'Aktif', 'Hadi Sukoyo', '3318042306780000', 'Hadi Sukoyo', 'Pati', '1979-06-23', '46 Tahun', 'L', 'Menikah', 'B', '81326242262', 'HADIKONANG@GMAIL.COM', 'Dk Konang', '3', '2', 'Karangkonang', 'Winong', 'Pati', 'Jawa Tengah', 'Dk Konang', '003', '002', 'Karangkonang', 'Winong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(303, NULL, NULL, 220021903620, '1', 'Aktif', 'Wahyu Nisfahullail', '3318142607940000', 'Wahyu Nisfahullail', 'Pati ', '1994-07-26', '31 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85848316802', 'WAHYU2018AA@YAHOO.COM', 'Dk. Sangklur', '2', '2', 'Sumbermulyo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Dk Sangklur', '002', '002', 'Sumbermulyo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Sumbermulyo Rt. 02/02 Kec. Tlogowungu Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(304, NULL, NULL, 220021503285, '1', 'Aktif', 'Muhamad Yusrul Falah', '3318131303890000', 'Muhamad Yusrul Falah', 'Pati', '1989-03-13', '36 Tahun', 'L', 'Menikah', 'Tidak Tahu', '8973687711', 'TRISTANANINDITO20@GMAIL.COM', 'Bermi', '1', '3', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', 'Bermi', '001', '003', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Bermi Rt. 02 Rw. 09 Kec. Gembong Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(305, NULL, NULL, 220021306160, '1', 'Aktif', 'Muhyidin', '3318140409940000', 'Muhyidin', 'Pati', '1994-09-04', '31 Tahun', 'L', 'Menikah', 'Tidak Tahu', '8886732316', 'MUHYIDIN995@GMAIL.COM', 'Tajungsari', '4', '5', 'Tajungsari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Tanjungsari', '004', '005', 'Tajungsari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Tajungsari Rt 04 / Rw 05 Kec. Tlogowungu Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(306, NULL, NULL, 220021503281, '1', 'Aktif', 'Heri Setiawan 2', '3318161805960010', 'Heri Setiawan 2', 'Pati', '1996-05-18', '29 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82242334505', 'HERICLLU@GMAIL.COM', 'Tegalarum Rt.04 Rw.01 Kec.Margoyoso Kab.Pati', '4', '1', 'Tegalarum', 'Margoyoso', 'Pati', 'Jawa Tengah', 'Tegalarum Rt.04 Rw.01 Kec.Margoyoso Kab.Pati ', '004', '001', 'Tegalarum', 'Margoyoso', 'Pati', 'Jawa Tengah', 'Ds. Tegalarum Rt 04 Rw 01 Kec. Margoyoso Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(307, NULL, NULL, 220022003744, '1', 'Aktif', 'Ahmad Haris', '3318152106950000', 'Ahmad Haris', 'Pati', '1995-06-21', '30 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85776870895', 'HARIS210695@GMAIL.COM', 'Pohgading', '3', '5', 'Pohgading', 'Gembong ', 'Pati', 'Jawa Tengah', 'Pohgading', '003', '005', 'Dk Alastuwo Ds Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Pohgading, Rt. 003, Rw. 005,Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(308, NULL, NULL, 220021607386, '1', 'Aktif', 'Imam Hanafi', '3318130208930000', 'Imam Hanafi', 'Pati', '1993-08-02', '32 Tahun', 'L', 'Menikah', 'O', '82229492184', 'HANAFIIMAM411@GMAIL.COM', 'Desa Semirejo', '3', '2', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', 'Desa Semirejo', '003', '002', 'Dukuh Soko / Desa Semirejo ', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Semirejo, Rt. 03/02, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(309, NULL, NULL, 220022008780, '0', 'Non Aktif', 'Anan Maulana', '3318210606010000', 'Anan Maulana', 'Pati', '2001-06-06', '24 Tahun', 'L', 'Belum Menikah', 'O', '81809192635', 'ANANPEOT234@GMAIL.COM', 'Tegalharjo', '10', '1', 'Tegalharjo', 'Trangkil', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(310, NULL, NULL, 220021306169, '0', 'Non Aktif', 'Muhammad Fauzi', '3318130601960000', 'Muhammad Fauzi', 'Pati', '1996-01-01', '29 Tahun', 'L', 'Menikah', 'O', '85640565237', 'UZYPATI@GMAIL.COM', 'Gembong ', '1', '2', 'Sentul', 'Gembong', 'Pati', 'Jawa Tengah', 'Gembong', '001', '002', 'Dk Sentul', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Sentul Ds. Gembong Rt 01 / Rw 02 Kec. Gembong Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(311, NULL, NULL, 220021306074, '1', 'Aktif', 'Qomaruddin', '3318142501850000', 'Qomaruddin', 'Demak ', '1983-01-25', '42 Tahun', 'L', 'Menikah', 'A', '85640778216', 'SYAHRIDLO1@GMAIL.COM', 'Guwo Rt03/Rw05 Tlogowungu Pati', '3', '5', 'Guwo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Pati', '003', '005', 'Guwo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Guwo 03/05, Kec. Tlogowungu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(312, NULL, NULL, 220021306214, '1', 'Aktif', 'Rasono', '3318130206930000', 'Rasono', 'Pati', '1993-06-02', '32 Tahun', 'L', 'Menikah', 'O', '85725382489', 'RASONOMBENDOL@GMAIL.COM', 'Semirejo', '3', '1', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', 'Semirejo', '003', '001', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Semirejo Rt 03 Rw 01 Kec. Gembong Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(313, NULL, NULL, 220021607361, '1', 'Aktif', 'Ahmad Anshori', '3318130607970000', 'Ahmad Anshori', 'Pati', '1997-07-06', '28 Tahun', 'L', 'Menikah', 'Tidak Tahu', '81229575483', 'BARGOWI007@GMAIL.COM', 'Dk. Tambak Mijen', '2', '3', 'Wonosekar', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk Tambak Mijen', '002', '003', 'Wonosekar', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Wonosekar, Rt. 02/03, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(314, NULL, NULL, 220021608398, '1', 'Aktif', 'Supriyadi', '3318132104910000', 'Supriyadi', 'Pati', '1991-04-21', '34 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85642806188', 'AKHIPBA@GMAIL.COM', 'Ds. Pohgading', '2', '2', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Pohgading', '002', '002', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Pohgading, Rt 02 Rw 02, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(315, NULL, NULL, 120021511064, '1', 'Aktif', 'Hasta Setyawan', '3318162407880000', 'Hasta Setyawan', 'Pati', '1988-07-24', '37 Tahun', 'L', 'Menikah', 'B', '82324781812', 'HASTASETYAWAN659@GMAIL.COM', 'Dk.Kedungbulus Kidul 001/001\nDesa Kedungbulus\nKecamatan Gembong\nKab. Pati', '1', '1', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk.Kedungbulus Kidul 001/001\nDs. Kedungbulus\nKec. Gembong\nKab.Pati', '001', '001', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(316, NULL, NULL, 120021502058, '1', 'Aktif', 'Nurul Fatah', '3318131003890000', 'Nurul Fatah', 'Pati', '1989-03-10', '36 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85641144344', 'NURULF4T4H@GMAIL.COM', 'Dk Bageng', '2', '3', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk Bageng', '002', '003', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(317, NULL, NULL, 220022107897, '0', 'Non Aktif', 'Dwi Dodo Teguh Santoso', '3318151406950000', 'Dwi Dodo Teguh Santoso', 'Pati', '1995-06-14', '30 Tahun', 'L', 'Belum Menikah', 'O', '8987519915', 'DWIDODOTS@GMAIL.COM', 'Jontro', '1', '5', 'Jontro', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Jontro', '001', '005', 'Jontro', 'Wedarijaksa', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(318, NULL, NULL, 220022107895, '1', 'Aktif', 'Eka Nur Laili', '3515144601980000', 'Eka Nur Laili', 'Sidoarjo', '1998-01-06', '27 Tahun', 'P', 'Belum Menikah', 'O', '8980197944', 'EKALAILI412@GMAIL.COM', 'Dsn Sumontoro ', '8', '3', 'Plumbungan', 'Sukodono', 'Sidoarjo', 'Jawa Timur', 'Dsn Sumontoro', '008', '003', 'Plumbungan', 'Sukodono', 'Sidoarjo', 'Jawa Timur', 'Ds. Plumbungan, Rt. 08, Rw. 03, Kec. Sukodono, Kab. Sidoarjo\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(319, NULL, NULL, 220022405024, '1', 'Aktif', 'Abdulloh Rouf', '3318020810920000', 'Abdulloh Rouf', 'Pati', '1992-10-08', '33 Tahun', 'L', 'Menikah', 'AB', '85870091325', 'ABDULLAHROUF06@GMAIL.COM', 'Pohgading', '1', '1', 'Pohgading ', 'Gembong ', 'Pati', 'Jawa Tengah', 'Pohgading ', '001', '001', 'Pohgading ', 'Gembong ', 'Pati ', 'Jawa Tengah', 'Ds. Pohgading Rt. 01/01 Kec. Gembong Kab. Pati \r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(320, NULL, NULL, 220022106872, '0', 'Non Aktif', 'Muhammad Riski', '3576022503900000', 'Muhammad Riski', 'Mojokerto', '1990-03-25', '35 Tahun', 'L', 'Menikah', 'O', '81357339876', 'RISKYELFARIZ@GMAIL.COM', 'Jl Empunala', '3', '3', 'Balongsari', 'Magersari', 'Mojokerto', 'Jawa Timur', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(321, NULL, NULL, 220021410243, '0', 'Non Aktif', 'Desi Karuniawati', '3318157112920000', 'Desi Karuniawati', 'Pati', '1992-12-31', '32 Tahun', 'P', 'Menikah', 'B', '82331254019', 'KARUNIAWATI.DESI@GMAIL.COM', 'Ds. Sukoharjo Dukuh Jontro Malang', '5', '3', 'Sukoharjo', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Ds. Sukoharjo Dukuh Jontro Malang', '005', '003', 'Sukoharjo', 'Wedarijaksa', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(322, NULL, NULL, 220022009818, '0', 'Non Aktif', 'Oki Candra Priyaditama', '3318211710990000', 'Oki Candra Priyaditama', 'Pati', '1999-10-17', '26 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82114837415', 'OKIADITAMA67@GMAIL.COM', 'Ds Tegalharjo', '2', '3', 'Tegalharjo', 'Trangkil', 'Pati', 'Jawa Tengah', 'Idem', '002', '003', 'Tegalharjo', 'Trangkil', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(323, NULL, NULL, 220021708403, '1', 'Aktif', 'Agus Yulianto', '3318140108780000', 'Agus Yulianto', 'Grobogan', '1978-08-01', '47 Tahun', 'L', 'Menikah', 'O', '81230599131', 'AGUSY482@GMAIL.COM', 'Tlogorejo', '2', '4', 'Tlogorejo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Tlogorejo', '002', '004', 'Tlogorejo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Tlogorejo, Rt. 04/06, Kec. Tlogowungu\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(324, NULL, NULL, 220021409218, '1', 'Aktif', 'Indi Alauddin', '3318150602960000', 'Indi Alauddin', 'Pati', '1996-02-06', '29 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85156326017', 'INDIENGKOX@GMAIL.COM', 'Jontro', '2', '3', 'Jontro', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Jontro', '002', '003', 'Jontro', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Ds. Jontro Rt 02 Rw 03 Kec. Wedarijaksa, Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(325, NULL, NULL, 220021910679, '1', 'Aktif', 'Luqman Abidin', '3318140708020000', 'Luqman Abidin', 'Pati ', '2001-08-07', '24 Tahun', 'L', 'Belum Menikah', 'A', '82327580159', 'LUQMANABIDIN35@GMAIL.COM', 'Ds.Tlogosari', '2', '3', 'Tlogosari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds.Tlogosari', '002', '003', 'Tlogosari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Tlogosari, Rt. 002/003, Kec. Tlogowungu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(326, NULL, NULL, 220022008807, '0', 'Non Aktif', 'Khoirus Sodiqin', '3318132101970000', 'Khoirus Sodiqin', 'Pati', '1997-01-21', '28 Tahun', 'L', 'Belum Menikah', 'B', '85803008972', 'SODIQINKHOIRUS97@GMAIL.COM', 'Dk Ngembes', '2', '11', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Ngembes', '002', '011', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(327, NULL, NULL, 220021403231, '1', 'Aktif', 'Gunawi', '3318132507770000', 'Gunawi', 'Pati', '1977-07-25', '48 Tahun', 'L', 'Menikah', 'O', '85225090603', 'GUNAWI647@GMAIL.COM', 'Dk.Dayan', '2', '6', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk.Dayan', '002', '006', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Dayan Rt 06 Rw 02 Ds. Semirejo Kec. Gembong Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(328, NULL, NULL, 220022010835, '0', 'Non Aktif', 'Farid Hamzah', '3277022207940030', 'Farid Hamzah', 'Cimahi', '1994-07-22', '31 Tahun', 'L', 'Menikah', 'A', '85723826938', 'DAUN.220794@GMAIL.COM', 'Lingkungan Gudang', '3', '2', 'Hegarsari', 'Pataruman', 'Banjar', 'Jawa Barat', 'Jalan Cimenyan 1', '001', '004', 'Mekarsari', 'Banjar', 'Banjar', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(329, NULL, NULL, 220022004762, '0', 'Non Aktif', 'Dadan Rahadian', '3214012810850000', 'Dadan Rahadian', 'Purwakarta', '1985-10-28', '40 Tahun', 'L', 'Menikah', 'A', '85720421260', 'DRAHADIAN85@GMAIL.COM', 'Jl Pahlawan 51', '16', '10', 'Nagrikaler', 'Purwakarta', 'Purwakarta', 'Jawa Barat', 'Perum Palasari 2 Blok C 25', '001', '001', 'Pasir Huni', 'Ciawi', 'Tasikmalaya', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(330, NULL, NULL, 120021502057, '1', 'Aktif', 'Rakiman', '3318131002760000', 'Rakiman', 'Pati ', '1976-02-10', '49 Tahun', 'L', 'Menikah', 'O', '81575727306', 'RAKIMAN000@GMAIL.COM', 'Kedungbulus', '4', '1', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Kedung Bulus', '004', '001', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(331, NULL, NULL, 120021511067, '1', 'Aktif', 'Amarruddin', '3318132208910000', 'Amarruddin', 'Pati', '1991-08-22', '34 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85875454760', 'AMARRANIM24@GMAIL.COM', 'Pohgading', '1', '2', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Pohgading', '001', '002', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(332, NULL, NULL, 220022107891, '1', 'Aktif', 'Mohammad Isnaen Farmay Nurhidayat', '3318100305010000', 'Mohammad Isnaen Farmay Nurhidayat', 'Pati', '2001-05-03', '24 Tahun', 'L', 'Belum Menikah', 'B', '8225029172', 'MISNAIN2019@GMAIL.COM', 'Jalan Soewondo, Desa Puri Rt03 Rw4', '3', '4', 'Puri', 'Pati', 'Pati', 'Jawa Tengah', 'Jalan Soewondo, Desa Puri Rt03 Rw04', '003', '004', 'Puri', 'Pati', 'Pati', 'Jawa Tengah', 'Ds. Puri, Rt. 03, Rw. 04, Kec. Pati, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(333, NULL, NULL, 220021608397, '1', 'Aktif', 'Setiyo Utomo', '3318142705890000', 'Setiyo Utomo', 'Pati', '1989-05-27', '36 Tahun', 'L', 'Menikah', 'B', '85740023369', 'ZUMYSJZ@GMAIL.COM', 'Ketanggan', '1', '3', 'Ketanggan', 'Gembong', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Ds. Guwo, Rt. 01/01, Kec. Tlogowungu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(334, NULL, NULL, 220021410242, '0', 'Non Aktif', 'Mursalim', '3318140503720000', 'Mursalim', 'Pati', '1972-03-05', '53 Tahun', 'L', 'Menikah', 'O', '85328337186', 'MOHMURSALIM@GMAIL.COM', 'Rambutan/Ndoro', '5', '1', 'Tajungsari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Dem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30');
+INSERT INTO `karyawan` (`id_karyawan`, `user_id`, `atasan_id`, `NIK`, `Status`, `Kode`, `Nama_Sesuai_KTP`, `NIK_KTP`, `Nama_Lengkap_Sesuai_Ijazah`, `Tempat_Lahir_Karyawan`, `Tanggal_Lahir_Karyawan`, `Umur_Karyawan`, `Jenis_Kelamin_Karyawan`, `Status_Pernikahan`, `Golongan_Darah`, `Nomor_Telepon_Aktif_Karyawan`, `Email`, `Alamat_KTP`, `RT`, `RW`, `Kelurahan_Desa`, `Kecamatan`, `Kabupaten_Kota`, `Provinsi`, `Alamat_Domisili`, `RT_Sesuai_Domisili`, `RW_Sesuai_Domisili`, `Kelurahan_Desa_Domisili`, `Kecamatan_Sesuai_Domisili`, `Kabupaten_Kota_Sesuai_Domisili`, `Provinsi_Sesuai_Domisili`, `Alamat_Lengkap`, `created_at`, `updated_at`) VALUES
+(335, NULL, NULL, 220021502273, '1', 'Aktif', 'Imam Sofi\'i', '3318031005870000', 'Imam Sofi\'i', 'Pati', '1987-05-10', '38 Tahun', 'L', 'Menikah', 'A', '85640442732', 'IMAMQU87@GMAIL.COM', 'Kedungbulus', '2', '2', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Kedungbulus', '002', '002', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Kedungbulus Rt 02 Rw 02 Kec. Gembong Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(336, NULL, NULL, 220022010829, '0', 'Non Aktif', 'Rohimam Saroni', '3318142003950000', 'Rohimam Saroni', 'Pati ', '1995-03-20', '30 Tahun', 'L', 'Menikah', 'Tidak Tahu', '81326128656', 'ROHIMAMRONI02@GMAIL.COM', 'Wonorejo ', '5', '3', 'Wonorejo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Wonorejo Dk.Ngaliyan ', '005', '003', 'Wonorejo', 'Tlogowungu', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(337, NULL, NULL, 220021809548, '0', 'Non Aktif', 'Randi Novaris', '3310182211930000', 'Randi Novaris', 'Klaten', '1993-11-22', '32 Tahun', 'L', 'Menikah', 'O', '88221411882', 'RANDINOVARIS4@GMAIL.COM', 'Karangsalam Glagah Jatinom', '1', '10', 'Glagah', 'Jatinom', 'Klaten', 'Jawa Tengah', 'Karangsalam ', '001', '010', 'Glagah', 'Jatinom', 'Klaten', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(338, NULL, NULL, 120020804012, '1', 'Aktif', 'Feri Nugriawan', '3318100602880000', 'Feri Nugriawan', 'Pati', '1988-02-06', '37 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85802867692', 'FNUGRIAWAN@GMAIL.COM', 'Dk.Ngipik', '4', '3', 'Kutoharjo', 'Pati', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(339, NULL, NULL, 220022008779, '1', 'Aktif', 'Ahmad Zainul Arifin', '3318141006020010', 'Ahmad Zainul Arifin', 'Pati', '2002-06-10', '23 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85826085636', 'INULPUTULENGGOR@GMAIL.COM', 'Klumpit', '6', '2', 'Klumpit', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Klumpit', '006', '002', 'Klumpit', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Klumpit Rt. 06 Rw. 02, Kec. Tlogowungu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(340, NULL, NULL, 220022107893, '0', 'Non Aktif', 'Syahrul Alfinsyah', '3318152412010000', 'Syahrul Alfinsyah', 'Pati', '2001-12-24', '24 Tahun', 'L', 'Belum Menikah', 'B', '87877665237', 'SYAHRULAL497@GMAIL.COM', 'Dk Prapean', '2', '4', 'Pagerharjo', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Dk Prapean', '002', '004', 'Pagerharjo', 'Wedarijaksa', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(341, NULL, NULL, 120020806018, '1', 'Aktif', 'Tari', '3318101805700000', 'Tari', 'Pati', '1970-05-18', '55 Tahun', 'L', 'Menikah', 'A', '85225562210', 'TARIARI131@GMAIL.COM', 'Ds Geritan', '4', '1', 'Geritan', 'Pati', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(342, NULL, NULL, 220021410237, '1', 'Aktif', 'Eko Siswanto', '3318131705940000', 'Eko Siswanto', 'Pati', '1994-05-17', '31 Tahun', 'L', 'Menikah', 'Tidak Tahu', '81568429773', 'EKOSISWANTO17102@GMAIL.COM', 'Dk Serut Bunuk', '4', '3', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds Kedungbulus \nDk Serut Bunuk', '004', '003', 'Ds Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Kedungbulus Rt 04 Rw 03 Kec. Gembong Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(343, NULL, NULL, 220022107900, '0', 'Non Aktif', 'Mohammad Fauzi', '3318021709020000', 'Mohammad Fauzi', 'Pati', '2002-09-17', '23 Tahun', 'L', 'Belum Menikah', 'O', '8986451223', 'KAYENFAUZI@GMAIL.COM', 'Ds.Kayen Rt 08 Rw 03 , Kec.Kayen Kab.Pati', '8', '3', 'Kayen', 'Kayen', 'Pati', 'Jawa Tengah', 'Kayen', '008', '003', 'Kayen', 'Kayen', 'Pati', 'Jawa Tengah', '#N/A\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(344, NULL, NULL, 120021711061, '1', 'Aktif', 'Kusdiyanto', '3318141306850000', 'Kusdiyanto', 'Pati', '1985-06-13', '40 Tahun', 'L', 'Menikah', 'O', '82322824948', 'Z.AZHARRAIHAN@GMAIL.COM', 'Tlogosari', '2', '4', 'Tlogosari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Tegalharjo', '004', '003', 'Tegalharjo', 'Trangkil', 'Pati', 'Jawa Tengah', '#N/A\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(345, NULL, NULL, 220021411247, '1', 'Aktif', 'Muhammad Shofwan', '3318161505900000', 'Muhammad Shofwan', 'Pati', '1990-05-15', '35 Tahun', 'L', 'Menikah', 'Tidak Tahu', '82313083761', 'MUHAMMADSHOFWAN90@GMAIL.COM', 'Cebolek Kidul', '3', '4', 'Cebolek Kidul', 'Margoyoso', 'Pati', 'Jawa Tengah', 'Cebolek Kidul', '003', '004', 'Cebolek Kidul', 'Margoyoso', 'Pati', 'Jawa Tengah', 'Ds. Cebolek Rt 03 Rw 04 Kec. Margoyoso Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(346, NULL, NULL, 220022011838, '1', 'Aktif', 'Ahmad Maulana Yusuf', '3374143004990000', 'Ahmad Maulana Yusuf', 'Semarang', '1999-04-30', '26 Tahun', 'L', 'Menikah', 'A', '82137246701', 'AHMADMAUL46@GMAIL.COM', 'Mijen', '1', '4', 'Mijen', 'Mijen', 'Semarang', 'Jawa Tengah', 'Mijen', '001', '004', 'Mijen', 'Mijen', 'Semarang', 'Jawa Tengah', 'Ds. Sidodadi, Rt. 01, Rw. 04, Kec. Mijen, Kota Semarang\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(347, NULL, NULL, 220021306140, '1', 'Aktif', 'Supangkat', '3318010909790000', 'Supangkat', 'Pati', '1979-09-09', '46 Tahun', 'L', 'Menikah', 'A', '85225400403', 'HALAHYOU@GMAIL.COM', 'Dk Poncomulyo Rt 02/02 Kec Sukolilo Kab Pati.', '2', '2', 'Gadudero', 'Sukolilo', 'Pati', 'Jawa Tengah', 'Dk Poncomulyo', '002', '002', 'Gadudero', 'Sukolilo', 'Pati', 'Jawa Tengah', 'Ds. Poncomulyo, RT. 02/ RW. 02, Kec. Sukolilo, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(348, NULL, NULL, 220022002729, '0', 'Non Aktif', 'Mohammad Najib', '3305071709890000', 'Mohammad Najib', 'Kebumen', '1989-09-17', '36 Tahun', 'L', 'Menikah', 'B', '81215206316', 'MOHAMMADNAJIB.SIDOMULYO@GMAIL.COM', 'Dk. Popoh', '3', '2', 'Sidomulyo', 'Ambal', 'Kebumen', 'Jawa Tengah', 'Dk Popoh', '003', '002', 'Sidomulyo', 'Ambal', 'Kebumen', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(349, NULL, NULL, 220021804507, '0', 'Non Aktif', 'Widayat Prasetiyo', '3318101212910000', 'Widayat Prasetiyo', 'Pati ', '1991-12-12', '34 Tahun', 'L', 'Menikah', 'B', '82135780530', 'WIDAYATD90@GMAIL.COM', 'Kauman Jekulo ', '1', '11', 'Jekulo', 'Jekulo ', 'Kudus ', 'Jawa Tengah', 'Jekulo Dukuh Kauman ', '001', '011', 'Jekulo ', 'Jekulo ', 'Kudus ', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(350, NULL, NULL, 220022107896, '1', 'Aktif', 'Ari Anggofah ', '3318042601940000', 'Ari Anggofah ', 'Pati', '1994-01-26', '31 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85713356188', 'ARIGANKSPER@GMAIL.COM', 'Jl Karang Konang ', '1', '2', 'Karangkonang', 'Winong ', 'Pati', 'Jawa Tengah', 'Karangkonang', '001', '002', 'Karangkonang', 'Winong', 'Pati', 'Jawa Tengah', 'Ds. Karangkonang, Rt. 01, Rw. 02, Kec. Winong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(351, NULL, NULL, 220021804490, '1', 'Aktif', 'Andi Witoko', '3318141612870000', 'Andi Witoko', 'Pati', '1987-12-16', '38 Tahun', 'L', 'Menikah', 'Tidak Tahu', '89647576740', 'OMPONG964@GMAIL.COM', 'Ds.Tamansari', '4', '2', 'Tamansari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds Tamansari', '004', '002', 'Tamansari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Tamansari, Rt. 004/002, Kec. Tlogowungu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(352, NULL, NULL, 220022002733, '1', 'Aktif', 'Muhammad Na\'im', '3318122808920000', 'Muhammad Na\'im', 'Pati', '1992-08-28', '33 Tahun', 'L', 'Menikah', 'B', '89675088971', 'MUHAMMADNAIM2808@YAHOO.COM', 'Desa Langse', '4', '1', 'Langse', 'Margorejo', 'Pati', 'Jawa Tengah', 'Desa Langse', '004', '001', 'Langse', 'Margorejo', 'Pati', 'Jawa Tengah', 'Ds. Langse, Rt. 04/01, Kec. Margorejo, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(353, NULL, NULL, 220021306217, '1', 'Aktif', 'Muhammad Choirul Anwar ', '3318130310940000', 'Muhammad Choirul Anwar ', 'Pati', '1994-10-03', '31 Tahun', 'L', 'Menikah', 'O', '85742867663', 'IRUL6278@GMAIL.COM', 'Dk. Bergat', '4', '6', 'Gembong ', 'Gembong ', 'Pati', 'Jawa Tengah', 'Dk. Bergat ', '004', '006', 'Gembong ', 'Gembong ', 'Pati ', 'Jawa Tengah', 'Dk. Bergat Rt 04 Rw 06 Kec. Gembong Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(354, NULL, NULL, 220022107889, '0', 'Non Aktif', 'Irfan Hidayat', '3318102212010000', 'Irfan Hidayat', 'Purworejo', '2001-12-22', '24 Tahun', 'L', 'Belum Menikah', 'B', '81802091407', 'IRFANHIDAYAT740@GMAIL.COM', 'Ds. Gajahmati ', '4', '2', 'Gajahmati', 'Pati', 'Pati', 'Jawa Tengah', 'Ds Gajahmati', '004', '002', 'Gajahmati', 'Pati', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(355, NULL, NULL, 220021804508, '0', 'Non Aktif', 'Arohmad Gunawi', '3318130308900000', 'Arohmad Gunawi', 'Pati', '1990-08-03', '35 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85868721456', 'MAD.GUNAWI@GMAIL.COM', 'Desa Bumirejo', '4', '1', 'Bumirejo', 'Margorejo', 'Pati', 'Jawa Tengah', 'Dusun Blado', '004', '001', 'Bumirejo', 'Margorejo', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(356, NULL, NULL, 120021806066, '1', 'Aktif', 'Riyadhul Badi\'ah', '3318134310890000', 'Riyadhul Badi\'ah', 'Pati', '1989-10-03', '36 Tahun', 'P', 'Menikah', 'O', '85726973997', 'RHEANT_10@YAHOO.COM', 'Dk Soko Rt 003/001 Ds Semirejo Kec Gembong Kab Pati', '3', '1', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk Soko Rt 003/001 Ds Semirejo Kec Gembong Kab Pati', '003', '001', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(357, NULL, NULL, 220021306186, '0', 'Non Aktif', 'Soegeng Irianto', '3318130608710000', 'Soegeng Irianto', 'Jayapura', '1971-08-05', '54 Tahun', 'L', 'Menikah', 'A', '85290131957', 'PAKDEANTOK123@GMAIL.COM', 'Dk.Ngembes', '1', '14', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Jln.Ahmad Yani Gg Bandeng 1', '011', '004', 'Winong', 'Pati', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(358, NULL, NULL, 220021512343, '0', 'Non Aktif', 'Oktaviana Wulandari', '3318106610970000', 'Oktaviana Wulandari', 'Pati', '1997-10-26', '28 Tahun', 'P', 'Menikah', 'Tidak Tahu', '8985457728', 'OKTAVIENAWULAN@GMAIL.COM', 'Jl. Raya Pati-Tayu Km. 4 Dk. Runting Gg. 1', '8', '1', 'Tambaharjo', 'Pati', 'Pati', 'Jawa Tengah', 'Dk. Runting', '008', '001', 'Tambaharjo', 'Pati', 'Pati', 'Jawa Tengah', 'Ds. Tambaharjo, Rt. 08/01, Kec. Pati, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(359, NULL, NULL, 220021911701, '0', 'Non Aktif', 'Abdullah Qosim Rosad', '3318121412900000', 'Abdullah Qosim Rosad', 'Pati', '1990-12-14', '35 Tahun', 'L', 'Menikah', 'O', '085640687786', 'OCIM074@GMAIL.COM', 'Kedung Bulus', '3', '1', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Kedung Bulus', '003', '001', 'Kedung Bulus', 'Gembong', 'Pati', 'Jawa Tengah', NULL, '2025-12-23 03:48:30', '2025-12-23 04:56:49'),
+(360, NULL, NULL, 120020805014, '1', 'Aktif', 'Siswo Wahono', '3318130705840000', 'Siswo Wahono', 'Pati ', '1984-05-07', '41 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85803889370', 'WAHONOSISWO2@GMAIL.COM', 'Ds Kedung Bulus', '2', '1', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Kedung Bulus', '002', '001', 'Kedung Bulus', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(361, NULL, NULL, 220021306102, '1', 'Aktif', 'Tri Suwito', '3318140202710000', 'Tri Suwito', 'Pati', '1971-02-02', '54 Tahun', 'L', 'Menikah', 'O', '81225389842', 'TRISUWITO1971@GMAIL.COM', 'EQUATRIAN', '1', '1', 'Tamansari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds Tamansari Rt01/Rw01 Kec Tlogowungu Kab Pati', '001', '001', 'Tamansari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Tamansari, Rt. 01/Rw. 01, Kec.Tlogowungu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(362, NULL, NULL, 220021306112, '0', 'Non Aktif', 'Edi Wiyono', '3318101703780010', 'Edi Wiyono', 'Pati', '1978-03-17', '47 Tahun', 'L', 'Menikah', 'O', '81391741716', 'EDIPANTURA05@GMAIL.COM', 'Sidokerto ', '6', '2', 'Sidokerto ', 'Pati', 'Pati', 'Jawa Tengah', 'Ds Sidokerto Kebondalem ', '006', '002', 'Sidokerto ', 'Pati', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(363, NULL, NULL, 220021306055, '1', 'Aktif', 'Martono', '3318120406850000', 'Martono', 'Pati', '1985-06-04', '40 Tahun', 'L', 'Menikah', 'A', '82323393993', 'ERNAABI785@GMAIL.COM', 'Pati Ds Sarirejo', '11', '1', 'Sarirejo', 'Pati', 'Pati', 'Jawa Tengah', 'Ds Sarirejo', '011', '001', 'Sarirejo', 'Pati', 'Pati', 'Jawa Tengah', 'Ds. Dadirejo Rt.1/1 Margorejo, Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(364, NULL, NULL, 220021909670, '1', 'Aktif', 'Amirul Mu\'minin', '3672031606840000', 'Amirul Mu\'minin', 'Serang', '1984-06-16', '41 Tahun', 'L', 'Menikah', 'O', '87774411516', 'AMINGSE16@GMAIL.COM', 'Komplek Pemda', '3', '7', 'Kaligandu', 'Serang', 'Serang', 'Banten', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Komplek Pemda Rt. 03 Rw 07 Kel. Kaligandu Kec. Serang Kab. Serang\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(365, NULL, NULL, 220022102848, '0', 'Non Aktif', 'Indra Sukmana', '3602181001930000', 'Indra Sukmana', 'Lebak', '1993-01-10', '32 Tahun', 'L', 'Menikah', 'Tidak Tahu', '8998634361', 'SUKMANADIRA1709@GMAIL.COM', 'Jl Ir H Djuanda Kp.Leuwikaung No.24L', '3', '3', 'Rangkasbitung', 'Rangkasbitung Barat', 'Lebak', 'Banten', 'Jl Ir H Djuanda Kp.Leuwikaung No.24L', '003', '003', 'Rangkasbitung', 'Rangkasbitung Barat', 'Lebak', 'Banten', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(366, NULL, NULL, 220021306043, '1', 'Aktif', 'Ali Ridlo', '3318130406900000', 'Ali Ridlo', 'Pati', '1990-06-04', '35 Tahun', 'L', 'Menikah', 'Tidak Tahu', '81542677081', 'RIDHOAHMED51@GMAIL.COM', 'Dk. Posono', '4', '7', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Posono', '004', '007', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Posono Klakah Kasihan Gembong\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(367, NULL, NULL, 220021808543, '1', 'Aktif', 'Arif Yuli Anwar', '3318152807940000', 'Arif Yuli Anwar', 'Pati', '1994-07-28', '31 Tahun', 'L', 'Belum Menikah', 'A', '81325087476', 'ARIFANWAR924@GMAIL.COM', 'Ds.Wedarijaksa Rt 04 Rw 05 Kec.Wedarijaksa Kab.Pati', '4', '5', 'Wedarijaksa', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Ds. Wedarijaksa Rt 04 Tr 05', '004', '005', 'Wedarijaksa', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Ds. Wedarijaksa, Rt. 004/005, Kec. Wedarijaksa, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(368, NULL, NULL, 220022002739, '0', 'Non Aktif', 'Melly Aris Tantiya', '3318104303930000', 'Melly Aris Tantiya', 'Pati', '1993-03-03', '32 Tahun', 'P', 'Menikah', 'A', '82135882059', 'AMEYRISTA03@GMAIL.COM', 'Ds. Sinomwidodo', '6', '2', 'Sinomwidodo', 'Tambakromo', 'Pati', 'Jawa Tengah', 'Ds. Tambaharjo', '005', '001', 'Tambaharjo', 'Pati', 'Pati', 'Jawa Tengah', 'Ds. Sinomwidodo, Rt. 06/02, Kec. Tambakromo, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(369, NULL, NULL, 220022010821, '1', 'Aktif', 'Aditya Arfianto Putra', '3318142707010000', 'Aditya Arfianto Putra', 'Pati', '2001-06-27', '24 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '87875817887', 'ADITYAARFIANTOP@GMAIL.COM', 'Desa Tlogorejo Kecamatan Tlogowungu Kabupaten Pati', '6', '3', 'Tlogorejo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Desa Tlogorejo Kecamatan Tlogowungu Kabupaten Pati', '006', '003', 'Tlogorejo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds.Tlogorejo, RT/RW, 06/03, Kec.Tlogowungu, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(370, NULL, NULL, 120021009002, '1', 'Aktif', 'Mu\'alim', '3318132306760000', 'Mu\'alim', 'Kudus', '1976-06-23', '49 Tahun', 'L', 'Menikah', 'A', '85727773560', 'ADIBA3185@GMAIL.COM', 'Dukuh Gilan', '2', '1', 'Plukaran', 'Gembong', 'Pati', 'Jawa Tengah', 'Dukuh Gilan', '002', '001', 'Plukaran', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(371, NULL, NULL, 220022106876, '1', 'Aktif', 'Pamuji Setyo', '3318111402940000', 'Pamuji Setyo', 'Pati', '1994-02-14', '31 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85725328454', 'PAMUJISETYO94@GMAIL.COM', 'Dk Koripan Sampi Rt 01 Rw 04 Desa Mintobasuki Kec Gabus Kab Pati', '1', '4', 'Mintobasuki', 'Gabus', 'Pati', 'Jawa Tengah', 'Dk Koripan Sampi', '001', '004', 'Mintobasuki', 'Gabus', 'Pati', 'Jawa Tengah', 'Ds. Mintobasuki, Rt. 01, Rw. 04, Kec. Gabus, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(372, NULL, NULL, 220022107888, '0', 'Non Aktif', 'Indra Eko Setiawan', '3318130906010000', 'Indra Eko Setiawan', 'Pati', '2001-08-09', '24 Tahun', 'L', 'Menikah', 'O', '85540224445', 'INDRAEKOS681@GMAIL.COM', 'Dk Jollong Ds Sitiluhur ', '3', '6', 'Sitiluhur', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk Jollong Ds Sitiluhur ', '003', '006', 'Sitiluhur', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(373, NULL, NULL, 120021511063, '0', 'Non Aktif', 'Retno Reka Lestari', '3318107008920010', 'Retno Reka Lestari', 'Pati', '1992-08-30', '33 Tahun', 'P', 'Menikah', 'O', '895421000000', 'REKACOLLECTION30@GMAIL.COM', 'Desa Panjunan', '23', '3', 'Panjunan', 'Pati', 'Pati', 'Jawa Tengah', 'Desa Panjunan', '023', '003', 'Panjunan', 'Pati', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(374, NULL, NULL, 220021306215, '1', 'Aktif', 'Nidzar Nadzarudin Pratama', '3318132312950000', 'Nidzar Nadzarudin Pratama', 'Pati', '1995-12-23', '30 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85251953940', 'NIDZARNADZARUDINPRATAMA@GMAIL.COM', 'Dayan', '2', '6', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', 'Dek.Dayan', '002', '006', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', 'Dayan, Semirejo, Gembong, Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(375, NULL, NULL, 220022107881, '0', 'Non Aktif', 'Sandra Devano', '3206012810020000', 'Sandra Devano', 'Tasikmalaya', '2002-10-28', '23 Tahun', 'L', 'Belum Menikah', 'O', '85224255621', 'SANDRADEVAANO@GMAIL.COM', 'Kp Tarisi', '23', '6', 'Cipatujah', 'Cipatujah', 'Tasikmalaya', 'Jawa Barat', 'Kp Tarisi', '023', '006', 'Cipatujah', 'Cipatujah', 'Tasikmalaya', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(376, NULL, NULL, 120021402046, '1', 'Aktif', 'Eko Prasetiyo', '3318132711870000', 'Eko Prasetiyo', 'Pati', '1987-11-27', '38 Tahun', 'L', 'Menikah', 'B', '86712342864', 'EPRASETIYO972@GMAIL.COM', 'Desa Kedungbulus', '4', '1', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Desa Kedungbulus', '004', '001', 'Kedungbulus', 'Gembong', 'Pati', 'Jateng', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(377, NULL, NULL, 220022107890, '0', 'Non Aktif', 'Mohammad Fauzan', '3318021709020000', 'Mohammad Fauzan', 'Pati', '2002-09-17', '23 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '8988751773', 'SKANG3944@GMAIL.COM', 'Desa Kayen Rt 08 / Rw 03 Kecamatan Kayen Kabupaten Pati', '8', '3', 'Kayen', 'Kayen', 'Pati', 'Jawa Tengah', 'Kayen', '008', '003', 'Kayen', 'Kayen', 'Pati', 'Jawa Tengah', 'Ds. Kayen, Rt. 08, Rw. 03, Kec. Kayen, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(378, NULL, NULL, 220021804497, '1', 'Aktif', 'Miftakhul Huda', '3318130607960000', 'Miftakhul Huda', 'Pati', '1996-07-06', '29 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85797958442', 'HMIFTAHUL731@GMAIL.COM', 'Dk.Kendil', '5', '3', 'Desa Klakah Kasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk.Kendil', '005', '003', 'Desa Klakah Kasian', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Bageng, Rt. 003/003, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(379, NULL, NULL, 220021902593, '0', 'Non Aktif', 'Syahroni Fathurrahman', '3509190503950000', 'Syahroni Fathurrahman', 'Jember ', '1995-03-05', '30 Tahun', 'L', 'Menikah', 'O', '82244624874', 'SYAHRONIFATHURRAHMAN@GMAIL.COM', 'Jalan Kauman No 29 Lingkungan Karang Mluwo', '3', '8', 'Mangli', 'Kaliwates', 'Jember', 'Jawa Timur', 'Jl. Kauman No 29 Lingkungan Karang Mluwo', '003', '008', 'Mangli', 'Kaliwates', 'Jember', 'Jawa Timur', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(380, NULL, NULL, 220021412266, '1', 'Aktif', 'Dwi Winarno', '3318131802960000', 'Dwi Winarno', 'Pati', '1996-02-18', '29 Tahun', 'L', 'Menikah', 'Tidak Tahu', '822003000000', 'DWIWINARNO004@GMAIL.COM', 'Desa Kedungbulus', '5', '3', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Desa Kedungbulus', '005', '003', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Kedungbulus Rt 04 Rw 03 Kec. Gembong Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(381, NULL, NULL, 220021804501, '1', 'Aktif', 'Muhammad Irkham', '3318130107980050', 'Muhammad Irkham', 'Pati', '1998-07-01', '27 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85875247206', 'KAJIKTP@GMAIL.COM', 'Bageng', '2', '4', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds.Bageng', '002', '004', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Bageng, Rt. 002/004, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(382, NULL, NULL, 220022008797, '1', 'Aktif', 'Januprambudi Indrabaskoro', '3511051301940000', 'Januprambudi Indrabaskoro', 'Bondowoso', '1994-01-13', '31 Tahun', 'L', 'Belum Menikah', 'O', '82333688484', 'JPRAMBUDI@GMAIL.COM', 'Dusun Krajan', '7', '2', 'Pengarang', 'Jambesari Darus Sholah', 'Bondowoso', 'Jawa Timur', 'Dusun Krajan', '007', '002', 'Pengarang', 'Jambesari Darus Sholah', 'Bondowoso', 'Jawa Timur', 'Ds. Pengarang, Rt. 07, Rw. 02, Kec. Jambesari Darus Sholah, Kab. Bondowoso\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(383, NULL, NULL, 220021306022, '1', 'Aktif', 'Ahmad Syafiq', '3318130204910000', 'Ahmad Syafiq', 'Pati', '1991-02-04', '34 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85741479175', 'Z73260086@GMAIL.COM', 'Dk.Posono', '2', '7', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Posono ', '002', '007', 'Klakah Kasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Klakahkasihan Rt.02/07 Gembong\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(384, NULL, NULL, 120021402045, '1', 'Aktif', 'Hasan Amirudin', '3318101704890010', 'Hasan Amirudin', 'Pati', '1989-04-17', '36 Tahun', 'L', 'Menikah', 'B', '85802608455', 'HASANDEFOUL@GMAIL.COM', 'Mintomulyo', '5', '2', 'Mintomulyo', 'Juwana', 'Pati', 'Jawa Tengah', 'Kauman', '003', '001', 'Kauman', 'Pati Kidul', 'Pati', 'Jateng', 'Ds. Kauman Rt. 03 Rw. 01 Kec. Pati Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(385, NULL, NULL, 220021804505, '1', 'Aktif', 'Agus Sugiharto', '3318020105900000', 'Agus Sugiharto', 'Pati', '1990-05-01', '35 Tahun', 'L', 'Menikah', 'A', '85740550196', 'ANIFAGUSTIE@GMAIL.COM', 'Desa Semirejo Kec Gembong Kab Pati', '1', '6', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', 'Desa Semirejo Kec Gembong Kab Pati', '001', '006', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Jimbaran, Rt. 009/002, Kec. Kayen, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(386, NULL, NULL, 220021607372, '1', 'Aktif', 'Muh Ilham Arosyid', '3318100204980010', 'Muh Ilham Arosyid', 'Pati ', '1998-04-02', '27 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85212616320', 'MUHILHAMALRASYID@GMAIL.COM', 'Desa Tambaharjo', '5', '1', 'Tambaharjo', 'Pati', 'Pati', 'Jawa Tengah', 'Pati', '005', '001', 'Desa Tambaharjo', 'Pati', 'Pati', 'Jawa Tengah', 'Ds. Tambaharjo, Rt. 05/01, Kec. Pati, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(387, NULL, NULL, 220022107883, '0', 'Non Aktif', 'Andrian Amifullah Yusuf', '3318132006020000', 'Andrian Amifullah Yusuf', 'Pati', '2002-06-20', '23 Tahun', 'L', 'Belum Menikah', 'A', '85290092301', 'ANDRIANJOLONG123@GMAIL.COM', 'Dk Satak Ds Klakahkasihan Rt 02/06', '2', '6', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk Satak ', '002', '006', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(388, NULL, NULL, 120020806017, '0', 'Non Aktif', 'Ali Mas\'Ud', '3318130507890000', 'Ali Mas\'Ud', 'Pati', '1989-07-05', '36 Tahun', 'L', '', 'A', '85741311646', 'MASUDALI050789@GMAIL.COM', 'Dk.Godang', '4', '7', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk.Godang', '004', '010', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(389, NULL, NULL, 220021411245, '1', 'Aktif', 'As\'adun Nufi', '3318150910950000', 'As\'adun Nufi', 'Pati', '1995-10-09', '30 Tahun', 'L', 'Menikah', 'B', '89668652303', 'NUFIASADUN1@GMAIL.COM', 'Ds. Jontro', '3', '2', 'Jontro', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Ds. Jontro', '003', '002', 'Jontro', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Ds. Jontro Rt 03 Rw 02 Kec. Wedarijaksa Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(390, NULL, NULL, 220021412263, '1', 'Aktif', 'Ahmad Muclis', '3318131109950000', 'Ahmad Muclis', 'Pati', '1995-09-11', '30 Tahun', 'L', 'Menikah', 'O', '85726256247', 'AHMADMUCLIS545@GMAIL.COM', 'Ds Kedung Bulus Kec. Gembong', '4', '3', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds Kedung Bulus', '004', '003', 'Ds Kedung Bulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Kedungbulus Rt 04 Rw 03 Kec. Gembong Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(391, NULL, NULL, 120021410055, '1', 'Aktif', 'Slamet Pujianto', '3604091606780000', 'Slamet Pujianto', 'Pati', '1978-06-16', '47 Tahun', 'L', 'Menikah', 'B', '82324792768', 'SLAMETPUJIANTO67@GMAIL.COM', 'Tlogowungu', '5', '3', 'Tlogorejo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Tlogowungu', '005', '003', 'Tlogorejo', 'Tlogowungu', 'Pati', 'Jateng', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(392, NULL, NULL, 120021601071, '1', 'Aktif', 'Dudi Mauludin', '3208011201850000', 'Dudi Mauludin', 'Kuningan', '1985-01-12', '40 Tahun', 'L', 'Menikah', 'O', '8112728312', 'DUDI12MAULUDIN@GMAIL.COM', 'Jl. Pesantren No.50', '19', '9', 'Kadugede', 'Kadugede', 'Kuningan ', 'Jawa Barat', 'Jalan Masjid Attaqwa Dk. Bongsri', '001', '001', 'Mulyoharjo ', 'Pati', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(393, NULL, NULL, 220022001723, '1', 'Aktif', 'Muhammad Minan Mahfudz', '3318131106010000', 'Muhammad Minan Mahfudz', 'Pati', '2001-06-11', '24 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85733225857', 'PISTON.MINAN.RACING@GMAIL.COM', 'Dk. Dengan', '1', '5', 'Sitiluhur', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Dengan', '001', '005', 'Sitiluhur', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Sitiluhur, Rt. 005/001, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(394, NULL, NULL, 220021306204, '1', 'Aktif', 'Eko Budiyanto', '3318130702940000', 'Eko Budiyanto', 'Sarolangun', '1994-02-07', '31 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85712088179', 'EKOYANTO58@GMAIL.COM', 'Dk. Gembol', '3', '5', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Gembol', '003', '005', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Semirejo Rt 03 / Rw 05 Kec. Gembong, Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(395, NULL, NULL, 120020304001, '1', 'Aktif', 'Abu Naim', '3318140210780000', 'Abu Naim', 'Pati', '1978-10-02', '47 Tahun', 'L', 'Menikah', 'Tidak Tahu', '8122826537', 'ABUNAIMKU@YAHOO.CO.ID', 'Ds. Tamansari', '1', '1', 'Tamansari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Tamansari', '001', '001', 'Tamansari', 'Tlogowungu', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(396, NULL, NULL, 220022107884, '0', 'Non Aktif', 'Andrian Maulana', '3318131810030000', 'Andrian Maulana', 'Pati', '2003-10-18', '22 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '87796673933', 'ANDRIANMAULANA0322@GMAIL.COM', 'Bermi', '2', '6', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', 'Bermi', '002', '006', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(397, NULL, NULL, 220021803459, '0', 'Non Aktif', 'Agung Cahyono', '3318042109920000', 'Agung Cahyono', 'Pati', '1992-09-21', '33 Tahun', 'L', 'Menikah', 'Tidak Tahu', '81226025860', 'CAHYONOA544@GMAIL.COM', 'Ds Bringinwareng', '2', '2', 'Bringin Wareng', 'Winong', 'Pati', 'Jawa Tengah', 'Bringinwareng', '002', '002', 'Binginwareng', 'Winong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(398, NULL, NULL, 220022107874, '0', 'Non Aktif', 'Al Fairul Akbar Fahrozi', '3318102602000000', 'Al Fairul Akbar Fahrozi', 'Pati', '2000-02-26', '25 Tahun', 'L', 'Belum Menikah', 'B', '895385000000', 'ARULAKBAR262@GMAIL.COM', 'Dk. Cengkok ', '3', '3', 'Sidoharjo', 'Pati', 'Pati', 'Jawa Tengah', 'Dk. Cengkok ', '003', '003', 'Sidoharjo', 'Pati', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(399, NULL, NULL, 220021802440, '1', 'Aktif', 'Mohamad Muis', '3318132508930000', 'Mohamad Muis', 'Pati', '1993-08-25', '32 Tahun', 'L', 'Menikah', 'O', '82139886586', 'ZEIUMAGUSBAGAS@GMAIL.COM', 'Kab Pati,Kec Gembong, Desa Semirejo Dukuh Soko', '3', '2', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', 'Kab Pati,Kec Gembong, Desa Semirejo Dukuh Soko', '003', '002', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Gembong, Rt. 003/002, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(400, NULL, NULL, 220022107882, '0', 'Non Aktif', 'Andika Trihan Nanta', '3318101104030000', 'Andika Trihan Nanta', 'Pati', '2003-04-11', '22 Tahun', 'L', 'Belum Menikah', 'B', '85692415431', 'ANDIKATRIHANNNT@GMAIL.COM', 'Desa Ngepungrojo', '2', '3', 'Ngepungrojo', 'Pati', 'Pati', 'Jawa Tengah', 'Desa Ngepungrojo', '002', '003', 'Ngepungrojo', 'Pati', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(401, NULL, NULL, 220022008785, '0', 'Non Aktif', 'Mohammad Tohirin', '3318101811010000', 'Mohammad Tohirin', 'Pati', '2001-11-18', '24 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85712463079', 'TOHIRIN714@GMAIL.COM', 'Ds.Ngepungrojo', '1', '4', 'Ngepungrojo', 'Pati', 'Pati', 'Jawa Tengah', 'Ds.Ngepungrojo', '001', '004', 'Ngepungrojo', 'Pati', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(402, NULL, NULL, 220021709404, '0', 'Non Aktif', 'Abdul Muchlis', '3318042702960000', 'Abdul Muchlis', 'Pati', '1996-02-27', '29 Tahun', 'L', 'Belum Menikah', 'B', '81391667794', 'ABDULMUCHLIS2803@GMAIL.COM', 'Desa Wirun', '1', '1', 'Wirun', 'Winong', 'Pati', 'Jawa Tengah', 'Desa Wirun', '001', '001', 'Wirun', 'Winong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(403, NULL, NULL, 220022107886, '0', 'Non Aktif', 'Deo Mahardika', '3318102411010000', 'Deo Mahardika', 'Pati', '2001-11-24', '24 Tahun', 'L', 'Belum Menikah', 'A', '81389395892', 'DEOMAHARDIKA07@GMAIL.COM', 'Ds Saliyan ', '9', '2', 'Pati Lor', 'Pati', 'Pati', 'Jawa Tengah', 'Kp Saliyan', '009', '002', 'Kelurahan Pati Lor', 'Pati', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(404, NULL, NULL, 320022102006, '0', 'Non Aktif', 'M. Akil Azizi', '1502161008020000', 'M. Akil Azizi', 'Simpang Guguk', '2003-08-10', '22 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '811276172', 'AZIZIART472@GMAIL.COM', 'Desa Karangkonang', '3', '2', 'Karangkonang', 'Winong', 'Pati', 'Jawa Tengah', 'Karangkonang', '003', '002', 'Karangkonang', 'Winong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(405, NULL, NULL, 220021911710, '0', 'Non Aktif', 'Alfin Ardiyansyah', '3318130310000000', 'Alfin Ardiyansyah', 'Pati', '2000-10-03', '25 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85641516952', 'ALVINARDIYANSYAH133@GMAIL.COM', 'Pati Kec Gembong Desa Gembong ', '4', '2', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Desa Gembongdukuh Sentul Rt 04 Rw 02', '004', '002', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(406, NULL, NULL, 220021512336, '0', 'Non Aktif', 'Muhamad Sarifudin', '3318132108970000', 'Muhamad Sarifudin', 'Pati', '1997-08-21', '28 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82186116710', 'MASRIF2108@GMAIL.COM', 'Dk. Koripan', '1', '10', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Koripan', '001', '010', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(407, NULL, NULL, 220022107879, '1', 'Aktif', 'Mohammad Lutfi Fitri Naharudin', '3318211002970000', 'Mohammad Lutfi Fitri Naharudin', 'Pati', '1997-02-10', '28 Tahun', 'L', 'Menikah', 'O', '85772340002', 'LUTFIUDIN77@GMAIL.COM', 'Karangwage Dk.Pungker 06/03 Trangkil Pati', '6', '3', 'Karangwage', 'Trangkil', 'Pati', 'Jawa Tengah', 'Karangwage', '006', '003', 'Karangwage', 'Trangkil', 'Pati', 'Jawa Tengah', 'Ds. Karangwage, Rt. 06, Rw. 03, Kec. Trangkil, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(408, NULL, NULL, 220022008774, '0', 'Non Aktif', 'Nur Suyanto', '3318101104000000', 'Nur Suyanto', 'Pati', '2000-04-11', '25 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85207408627', 'NURSUYANTO88@GMAIL.COM', 'Desa Ngepung Rojo', '1', '4', 'Ngepung Rojo', 'Pati', 'Pati', 'Jawa Tengah', 'Desa Ngepung Rojo', '001', '004', 'Ngepung Rojo', 'Pati ', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(409, NULL, NULL, 220021510317, '1', 'Aktif', 'Irfan Afifudin', '3318131201970000', 'Irfan Afifudin', 'Pati', '1997-10-12', '28 Tahun', 'L', 'Menikah', 'Tidak Tahu', '81215769413', 'IRFANAFIFUDIN138@GMAIL.COM', 'Dk.Posono.', '4', '7', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk.Posono', '004', '007', 'Klakah Kasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Klakahkasihan, Rt. 03/07, Kec. Gembong, Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(410, NULL, NULL, 220021403225, '1', 'Aktif', 'M Syaiful Anwar ', '3318212405930000', 'M Syaiful Anwar ', 'Pati', '1993-05-24', '32 Tahun', 'L', 'Menikah', 'Tidak Tahu', '8970409159', 'ARINA545471@GMAIL.COM', 'Pasucen', '6', '4', 'Pasucen ', 'Trangkil ', 'Pati', 'Jawa Tengah', 'Pasucen ', '004', '004', 'Pasucen ', 'Trangkil', 'Pati', 'Jawa Tengah', 'Ds. Pasucen Rt 06 Rw 04 Kec. Trangkil Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(411, NULL, NULL, 220021306131, '1', 'Aktif', 'Muhammad Khoirul Huda', '3318130511900000', 'Muhammad Khoirul Huda', 'Pati', '1990-11-05', '35 Tahun', 'L', 'Menikah', 'Tidak Tahu', '88227975233', 'RUELSYAKIB@GMAIL.COM', 'Bermi', '3', '5', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', 'Bermi', '003', '005', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', 'Bermi, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(412, NULL, NULL, 220022107898, '1', 'Aktif', 'Eko Prasetiyo', '3318131110980000', 'Eko Prasetiyo', 'Pati', '1998-10-10', '27 Tahun', 'L', 'Menikah', 'O', '85865181103', 'ZAENNALARIPHIN262@GMAIL.COM', 'Dk.Seloromo', '1', '1', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk.Seloromo', '001', '001', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Gembong, Rt. 01, Rw. 01, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(413, NULL, NULL, 220021306106, '1', 'Aktif', 'Edy Prasetyo', '3318142812920000', 'Edy Prasetyo', 'Pemalang', '1992-12-28', '33 Tahun', 'L', 'Menikah', 'O', '85799666606', 'SAKTIEDY.SHAKILABINTANG@GMAIL.COM', 'Perum Megawon Indah', '2', '4', 'Megawon', 'Jati', 'Kudus', 'Jawa Tengah', 'Perum Megawon Indah', '002', '004', 'Megawon', 'Jati', 'Kudus', 'Jawa Tengah', 'Ds. Megawon, Rt. 002/004, Kec. Jati, Kab. Kudus\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(414, NULL, NULL, 220022108907, '1', 'Aktif', 'Sunardi', '3318042407980000', 'Sunardi', 'Pati', '1998-07-24', '27 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '88802450406', 'NARDISNN2@GMAIL.COM', 'Dsn. Sugihan', '2', '3', 'Sugihan', 'Winong', 'Pati', 'Jawa Tengah', 'Dsn. Sugihan', '002', '003', 'Sugihan', 'Winong', 'Pati', 'Jawa Tengah', 'Ds. Sugihan, Rt. 02, Rw. 03, Kec. Winong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(415, NULL, NULL, 220022108905, '0', 'Non Aktif', 'Muchamad Kholiq', '3318142901030000', 'Muchamad Kholiq', 'Pati', '2003-01-29', '22 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '89501873978', 'MUCHAMMADKHOLIQ76@GMAIL.COM', 'Tamansari', '3', '2', 'Tamansari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Tamansari', '003', '002', 'Tamansari', 'Tlogowungu', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(416, NULL, NULL, 220022108902, '0', 'Non Aktif', 'Achmad Rizkiyanto Sami Aji', '3318101111010010', 'Achmad Rizkiyanto Sami Aji', 'Jepara', '2001-11-11', '24 Tahun', 'L', 'Belum Menikah', 'O', '82221201443', 'ARSAPATI3@GMAIL.COM', 'Dsn. Runting', '7', '1', 'Tambaharjo', 'Pati', 'Pati', 'Jawa Tengah', 'Dsn. Runting', '007', '001', 'Tambaharjo', 'Pati', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(417, NULL, NULL, 220022108901, '0', 'Non Aktif', 'Ahmad Rizal Haidar', '3318131008030000', 'Ahmad Rizal Haidar', 'Pati', '2003-08-10', '22 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '87814414581', '', 'Bermi', '2', '7', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', 'Bermi', '002', '007', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(418, NULL, NULL, 220022108903, '0', 'Non Aktif', 'Ahmad Yuliyanto', '3318211907020000', 'Ahmad Yuliyanto', 'Pati', '2002-07-19', '23 Tahun', 'L', 'Belum Menikah', 'B', '82322633683', '', 'Tegalharjo', '6', '3', 'Tegalharjo', 'Trangkil', 'Pati', 'Jawa Tengah', 'Tegalharjo', '006', '003', 'Tegalharjo', 'Trangkil', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(419, NULL, NULL, 220022108906, '1', 'Aktif', 'Muhammad Zacky Ihya\'udin', '3318131602020010', 'Muhammad Zacky Ihya\'udin', 'Pati', '2002-02-16', '23 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85740249713', 'ZAKIYAUDIN@GMAIL.COM', 'Dk. Ngembes', '2', '13', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Ngembes', '002', '013', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Gembong, Rt. 02, Rw. 13, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(420, NULL, NULL, 220022108908, '1', 'Aktif', 'Teguh Agus Bayu Wicaksono', '3318130508020000', 'Teguh Agus Bayu Wicaksono', 'Pati', '2002-08-05', '23 Tahun', 'L', 'Belum Menikah', 'AB', '83843158450', 'TEBEBAYU93@GMAIL.COM', 'Dk. Bergat', '2', '7', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Bergat', '002', '007', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Gembong, Rt. 02, Rw. 07, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(421, NULL, NULL, 220022108904, '0', 'Non Aktif', 'Mohammad Noor Kholis', '3318183001000000', 'Mohammad Noor Kholis', 'Pati', '2000-01-30', '25 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85257084506', 'MNKHOLIS7@GMAIL.COM', 'Sumur', '21', '3', 'Sumur', 'Cluwak', 'Pati', 'Jawa Tengah', 'Sumur', '021', '003', 'Sumur', 'Cluwak', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(422, NULL, NULL, 220021910689, '0', 'Non Aktif', 'Hanan Ragil Kurnianto ', '3302192309930000', 'Hanan Ragil Kurnianto ', 'Banyumas', '1993-09-23', '32 Tahun', 'L', 'Menikah', 'Tidak Tahu', '81329888467', 'HANAN.MEY8@GMAIL.COM', 'Lemberang Rt02 Rw04 Kec.Sokaraja Kab.Banyumas ', '2', '4', 'Lemberang ', 'Sokaraja ', 'Banyumas ', 'Jawa Tengah', 'Lemberang ', '002', '004', 'Lemberang ', 'Sokaraja ', 'Banyumas ', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(423, NULL, NULL, 120021402048, '1', 'Aktif', 'Abdurrokhman Hakim', '3318132809930000', 'Abdurrokhman Hakim', 'Pati', '1993-09-28', '32 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85866377940', 'KEMPING.REGGAEMEN@GMAIL.COM', 'Dk.Blado', '1', '1', 'Bumirejo', 'Margorejo', 'Pati', 'Jawa Tengah', 'Blado', '001', '001', 'Bumirejo', 'Margorejo', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(424, NULL, NULL, 220022010827, '0', 'Non Aktif', 'Eko Saputa', '3318211104960000', 'Eko Saputa', 'Pati', '1996-04-11', '29 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85113394923', 'EKOOSAPUTA11@GMAIL.COM', 'Desa Kajar', '2', '5', 'Kajar', 'Trangkil', 'Pati', 'Jawa Tengah', 'Kajar', '002', '005', 'Kajar', 'Trangkil', 'Patu', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(425, NULL, NULL, 220021512334, '1', 'Aktif', 'Agus Setiawan', '3318142906910000', 'Agus Setiawan', 'Pati', '1991-06-29', '34 Tahun', 'L', 'Menikah', 'O', '82232937273', 'C0.SMART29@GMAIL.COM', 'Dk. Bagangan', '2', '1', 'Tlogosari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Dk. Bagangan', '002', '001', 'Tlogosari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Tlogosari, Rt. 05/02, Kec. Tlogowungu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(426, NULL, NULL, 220022107887, '0', 'Non Aktif', 'Dwi Ahmad Ali', '3318150504030000', 'Dwi Ahmad Ali', 'Pati', '2003-04-05', '22 Tahun', 'L', 'Belum Menikah', 'O', '81289900155', 'DWICAKWI28@GMAIL.COM', 'Desa Panggungroyom Rt 07 Rw 03 Kecamatan Wedarijaksa Kabupaten Pati', '7', '3', 'Panggung Royom', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Desa Panggungroyom Rt 07 Rw 03 Kecamatan Wedarijaksa Kabupaten Pati', '007', '003', 'Panggung Royom', 'Wedarijaksa', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(427, NULL, NULL, 220021901566, '0', 'Non Aktif', 'Irfan Saputra', '3318130806000000', 'Irfan Saputra', 'Pati', '2000-06-08', '25 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82332605476', 'IRFANS.PUTRA86@GMAIL.COM', 'Sitiluhur', '2', '6', 'Sitiluhur', 'Gembong', 'Pati', 'Jawa Tengah', 'Sitiluhur', '002', '006', 'Sitiluhur', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(428, NULL, NULL, 220022107892, '0', 'Non Aktif', 'Mohammad Kurniawan ', '3318101005020000', 'Mohammad Kurniawan ', 'Pati', '2002-05-10', '23 Tahun', 'L', 'Belum Menikah', 'A', '81316376900', 'MKURNIAWANN01@GMAIL.COM', 'Desa Geritan Rt 08 Rw 02 Kec.Pati Kab.Pati', '8', '2', 'Geritan', 'Pati', 'Pati', 'Jawa Tengah', 'Desa Geritan Rt 08 Rw 02', '008', '002', 'Geritan', 'Pati', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(429, NULL, NULL, 220022009815, '0', 'Non Aktif', 'Fachrul Alif Firmansyah', '3318130610010000', 'Fachrul Alif Firmansyah', 'Pati', '2001-10-06', '24 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '83865564623', 'JIMATBOS@GMAIL.COM', 'Klakah Kasian', '4', '5', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Klakahkasian', '004', '005', 'Klakahkasian', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(430, NULL, NULL, 220021903615, '0', 'Non Aktif', 'Muhammad Haidar Hilmi', '3319090601970000', 'Muhammad Haidar Hilmi', 'Kudus', '1997-01-06', '28 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85602604007', 'HAIDARCUNGOK@GMAIL.COM', 'Bergad', '5', '1', 'Japan', 'Dawe', 'Kudus', 'Jawa Tengah', 'Bergad', '005', '001', 'Japan', 'Dawe', 'Kudus', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(431, NULL, NULL, 220022108917, '0', 'Non Aktif', 'Afwa Alvent Fadh', '3318102701980000', 'Afwa Alvent Fadh', 'Pati', '1998-01-27', '27 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '89627731709', 'AFWAALVENTFADH@GMAIL.COM', 'Tambaharjo', '5', '1', 'Tambaharjo', 'Pati', 'Pati', 'Jawa Tengah', '', '', '', '', '', '', '', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(432, NULL, NULL, 220022108918, '0', 'Non Aktif', 'Agus Supriyanto', '3318142912020000', 'Agus Supriyanto', 'Pati', '2002-12-29', '22 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '81546225311', 'AGUSWILLIAM31@GMAIL.COM', 'Dk. Sangklur', '1', '2', 'Sumbermulyo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Dk. Sangklur', '001', '002', 'Sumbermulyo', 'Tlogowungu', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(433, NULL, NULL, 220022108919, '1', 'Aktif', 'Asep Setiawan', '3318142609030000', 'Asep Setiawan', 'Pati', '2003-09-26', '22 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '81807226232', 'SETYAWANASEP606@GMAIL.COM', 'Tamansari', '3', '2', 'Tamansari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Tamansari', '003', '002', 'Tamansari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Tamansari, Rt. 03, Rw. 02. Kec. Tlogowungu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(434, NULL, NULL, 220022108920, '0', 'Non Aktif', 'Dicky Julyyanto', '3318142307990000', 'Dicky Julyyanto', 'Pati', '1999-07-23', '26 Tahun', 'L', 'Belum Menikah', 'B', '87833571309', '', 'Tlogorejo', '4', '4', 'Tlogorejo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Tlogorejo', '004', '004', 'Tlogorejo', 'Tlogowungu', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(435, NULL, NULL, 220022108921, '0', 'Non Aktif', 'Dwi Santiko', '3318141207000000', 'Dwi Santiko', 'Pati', '2000-07-12', '25 Tahun', 'L', 'Belum Menikah', 'O', '838399000000', 'DWISANTIKO888@GMAIL.COM', 'Guwo', '2', '2', 'Guwo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Guwo', '002', '002', 'Guwo', 'Tlogowungu', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(436, NULL, NULL, 220022108922, '1', 'Aktif', 'Erlangga Yusuf Muhaimin', '3318132712010000', 'Erlangga Yusuf Muhaimin', 'Pati', '2001-12-27', '24 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85868667292', 'ERLANGGAYUSUF09@GMAIL.COM', 'Kudungbulus Kidul', '2', '1', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Kudungbulus Kidul', '002', '001', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Kedungbulus, Rt. 02, Rw. 01, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(437, NULL, NULL, 220022108923, '1', 'Aktif', 'Gilang Ahmad Zaini', '3318151909030000', 'Gilang Ahmad Zaini', 'Pati', '2003-09-19', '22 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '895422000000', 'GILANGAHMADZAINI33@GMAIL.COM', 'Dk. Ngulaan', '4', '3', 'Sukoharjo', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Dk. Ngulaan', '004', '003', 'Sukoharjo', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Ds. Sukoharjo, Rt. 04, Rw. 03, Kec. Wedarijaksa, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(438, NULL, NULL, 220022108924, '1', 'Aktif', 'Gusti Robiwala', '3318131404970000', 'Gusti Robiwala', 'Pati', '1997-04-14', '28 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82223124991', 'ROBIWALA051@GMAIL.COM', 'Bermi', '1', '5', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', 'Bermi', '001', '005', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Bermi, Rt. 01, Rw. 05, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(439, NULL, NULL, 220022108925, '1', 'Aktif', 'Hendro Prasetyo', '3318161105970000', 'Hendro Prasetyo', 'Pati', '1997-05-11', '28 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85216557624', '', 'Ngemplak Kidul', '2', '2', 'Ngemplak Kidul', 'Margoyoso', 'Pati', 'Jawa Tengah', 'Ngemplak Kidul', '002', '002', 'Ngemplak Kidul', 'Margoyoso', 'Pati', 'Jawa Tengah', 'Ds. Ngemplak Kidul, Rt. 02, Rw. 02, Kec. Margoyoso, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(440, NULL, NULL, 220022108926, '0', 'Non Aktif', 'Heri Setiawan', '3318141701010000', 'Heri Setiawan', 'Pati', '2001-01-17', '24 Tahun', 'L', 'Belum Menikah', 'B', '81296309294', 'HERI17SETIAWAN@GMAIL.COM', 'Guwo', '1', '1', 'Guwo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Guwo', '001', '001', 'Guwo', 'Tlogowungu', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(441, NULL, NULL, 220022108927, '0', 'Non Aktif', 'Khafid Adi Yansah', '3318130303020000', 'Khafid Adi Yansah', 'Pati', '2002-03-03', '23 Tahun', 'L', 'Belum Menikah', 'O', '85891354450', '', 'Semirejo', '2', '8', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', 'Semirejo', '002', '008', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(442, NULL, NULL, 220022108928, '1', 'Aktif', 'M. Abdul Fitroh', '3318131812010000', 'M. Abdul Fitroh', 'Pati', '2001-12-18', '24 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82322421729', 'FITROHAGL@GMAIL.COM', 'Dk. Segawe', '5', '1', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Segawe', '005', '001', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Klakahkasihan, Rt. 05, Rw. 01, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(443, NULL, NULL, 220022108929, '1', 'Aktif', 'Moh Choirul Anam', '3318130803030000', 'Moh Choirul Anam', 'Pati', '2003-03-08', '22 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85801225202', 'AHMADHERBANI4@GMAIL.COM', 'Dk. Dengan', '2', '5', 'Sitiluhur', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Dengan', '002', '005', 'Sitiluhur', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Sitiluhur, Rt. 02, Rw. 05, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(444, NULL, NULL, 220022108930, '0', 'Non Aktif', 'Muhamad Ferly Wahibul Minan', '3318131511030000', 'Muhamad Ferly Wahibul Minan', 'Pati', '2003-11-15', '22 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82262213932', '', 'Bermi', '2', '6', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', 'Bermi', '002', '006', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(445, NULL, NULL, 220022108931, '0', 'Non Aktif', 'Muhammad Danu Fidi Yahya', '3318153103020000', 'Muhammad Danu Fidi Yahya', 'Pati', '2002-03-31', '23 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '89673045959', 'M.DANUFIDIYAHYA028@GMAIL.COM', 'Dk. Ngulaan', '4', '2', 'Sukoharjo', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Dk. Ngulaan', '004', '002', 'Sukoharjo', 'Wedarijaksa', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30');
+INSERT INTO `karyawan` (`id_karyawan`, `user_id`, `atasan_id`, `NIK`, `Status`, `Kode`, `Nama_Sesuai_KTP`, `NIK_KTP`, `Nama_Lengkap_Sesuai_Ijazah`, `Tempat_Lahir_Karyawan`, `Tanggal_Lahir_Karyawan`, `Umur_Karyawan`, `Jenis_Kelamin_Karyawan`, `Status_Pernikahan`, `Golongan_Darah`, `Nomor_Telepon_Aktif_Karyawan`, `Email`, `Alamat_KTP`, `RT`, `RW`, `Kelurahan_Desa`, `Kecamatan`, `Kabupaten_Kota`, `Provinsi`, `Alamat_Domisili`, `RT_Sesuai_Domisili`, `RW_Sesuai_Domisili`, `Kelurahan_Desa_Domisili`, `Kecamatan_Sesuai_Domisili`, `Kabupaten_Kota_Sesuai_Domisili`, `Provinsi_Sesuai_Domisili`, `Alamat_Lengkap`, `created_at`, `updated_at`) VALUES
+(446, NULL, NULL, 220022108932, '1', 'Aktif', 'Muhammad Khoirudin', '3318133107020000', 'Muhammad Khoirudin', 'Pati', '2002-07-31', '23 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85600336241', '', 'Klakah Kasian', '5', '7', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Klakah Kasian', '005', '007', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Klakahkasihan, Rt. 05, Rw. 07, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(447, NULL, NULL, 220022108933, '1', 'Aktif', 'Muhammad Naimulutfi', '3318130111010000', 'Muhammad Naimulutfi', 'Pati', '2001-11-01', '24 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85972561075', 'MUH.NAIMULUTFI@GMAIL.COM', 'Bermi', '1', '7', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', 'Bermi', '001', '007', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Bermi, Rt. 01, Rw. 07, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(448, NULL, NULL, 220022108934, '0', 'Non Aktif', 'Muhammad Zakiuddin Armal', '3318132903040000', 'Muhammad Zakiuddin Armal', 'Pati', '2004-03-29', '21 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82247365957', '', 'Bermi', '2', '6', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', 'Bermi', '002', '006', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(449, NULL, NULL, 220022108935, '0', 'Non Aktif', 'Mujibur Rohman', '3318132911030000', 'Mujibur Rohman', 'Pati', '2003-11-29', '22 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85742131564', '', 'Dk. Ngembes', '2', '11', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Ngembes', '002', '011', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(450, NULL, NULL, 220022108936, '1', 'Aktif', 'Rojib Akmaluddin', '3318132909030000', 'Rojib Akmaluddin', 'Pati', '2003-09-29', '22 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82145140147', '', 'Sitiluhur', '3', '4', 'Sitiluhur', 'Gembong', 'Pati', 'Jawa Tengah', 'Sitiluhur', '003', '004', 'Sitiluhur', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Sitiluhur, Rt. 03, Rw. 04, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(451, NULL, NULL, 220022108909, '1', 'Aktif', 'Dimas Joko Purnomo', '3515110511980000', 'Dimas Joko Purnomo', 'Sidoarjo', '1998-11-05', '27 Tahun', 'L', 'Belum Menikah', 'O', '89613570806', 'DIMASJOKO345@GMAIL.COM', 'Jerukgamping', '6', '2', 'Jerukgamping', 'Krian', 'Sidoarjo', 'Jawa Timur', 'Jerukgamping', '006', '002', 'Jerukgamping', 'Krian', 'Sidoarjo', 'Jawa Timur', 'Ds. Jerukgamping, Rt. 06, Rw. 02, Kec. Krian, Kab. Sidoarjo\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(452, NULL, NULL, 220022108910, '0', 'Non Aktif', 'Emut Kurniasih', '3327075211960020', 'Emut Kurniasih', 'Pemalang', '1996-11-12', '29 Tahun', 'P', 'Belum Menikah', 'Tidak Tahu', '83813662890', 'EMUT.KURNIASIH112@GMAIL.COM', 'Kreyo', '4', '1', 'Kreyo', 'Randudongkal', 'Pemalang', 'Jawa Tengah', 'Kreyo', '004', '001', 'Kreyo', 'Randudongkal', 'Pemalang', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(453, NULL, NULL, 220022108911, '1', 'Aktif', 'Muhammad Rizal Baidhowi', '3319052806930000', 'Muhammad Rizal Baidhowi', 'Kudus', '1993-06-28', '32 Tahun', 'L', 'Menikah', 'B', '85600363070', 'RIZALBAIDHOWI@GMAIL.COM', 'Tegalarum', '6', '1', 'Tegalarum', 'Margoyoso', 'Pati', 'Jawa Tengah', 'Tegalarum', '006', '001', 'Tegalarum', 'Margoyoso', 'Pati', 'Jawa Tengah', 'Ds. Tegalarum, Rt. 06, Rw. 01, Kec. Margoyoso, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(454, NULL, NULL, 220022108912, '0', 'Non Aktif', 'Zikrul Hanif Maulana', '3276022209000010', 'Zikrul Hanif Maulana', 'Puwodadi', '2000-09-22', '25 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '89648492159', 'ZIKRULHANIF308@GMAIL.COM', 'Jatijajar', '6', '7', 'Jatijajar', 'Tapos', 'Kota Depok', 'Jawa Barat', 'Jatijajar', '006', '007', 'Jatijajar', 'Tapos', 'Kota Depok', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(455, NULL, NULL, 220022108913, '0', 'Non Aktif', 'Ari Robin Purwana', '3278062005930000', 'Ari Robin Purwana', 'Bandung', '1993-05-20', '32 Tahun', 'L', 'Belum Menikah', 'B', '82116666316', 'AARIROBIN@GMAIL.COM', 'Jl. Cibangun Kaler', '3', '12', 'Ciherang', 'Cibeureum', 'Kota Tasikmalaya', 'Jawa Barat', 'Jl. Cibangun Kaler', '003', '012', 'Ciherang', 'Cibeureum', 'Kota Tasikmalaya', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(456, NULL, NULL, 220022108914, '0', 'Non Aktif', 'Miftahul Azwar', '3305111606900000', 'Miftahul Azwar', 'Kebumen', '1990-06-16', '35 Tahun', 'L', 'Menikah', 'B', '82310461934', 'ADEDOANXZ@GMAIL.COM', 'Perum Korpri', '3', '6', 'Jatimulyo', 'Alian', 'Kebumen', 'Jawa Tengah', 'Perum Korpri', '003', '006', 'Jatimulyo', 'Alian', 'Kebumen', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(457, NULL, NULL, 220022108915, '0', 'Non Aktif', 'Dani Rosadi', '3207031608940000', 'Dani Rosadi', 'Sumedang', '1994-08-16', '31 Tahun', 'L', 'Belum Menikah', 'O', '85780996575', 'DANIROSADI0@GMAIL.COM', 'Karangkamulyan', '30', '9', 'Karangkamulyan', 'Cijeunjing', 'Ciamis', 'Jawa Barat', 'Karangkamulyan', '030', '009', 'Karangkamulyan', 'Cijeunjing', 'Ciamis', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(459, NULL, NULL, 220022109940, '0', 'Non Aktif', 'Agil Satrio', '3318151212980000', 'Agil Satrio', 'Pati', '1998-12-12', '27 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85852325261', 'AGILSATRIO28@GMAIL.COM', 'Ds. Sukoharjo, Rt. 02, Rw. 03, Kec. Wedarijaksa, Kab. Pati', '2', '3', 'Sukoharjo', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Ds. Sukoharjo, Rt. 02, Rw. 03, Kec. Wedarijaksa, Kab. Pati', '002', '003', 'Sukoharjo', 'Wedarijaksa', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(460, NULL, NULL, 220022405028, '0', 'Non Aktif', 'Ahmad Saiful Ibad', '3318131806030000', 'Ahmad Saiful Ibad', 'Pati', '2003-06-18', '22 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82226207201', 'IBADCAHAY@GMAIL.COM', 'Ds. Bermi, Rt. 01, Rw. 04, Kec. Gembong, Kab. Pati', '1', '4', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Bermi, Rt. 01, Rw. 04, Kec. Gembong, Kab. Pati', '001', '004', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Bermi, Rt. 01, Rw. 04, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(461, NULL, NULL, 220022109942, '0', 'Non Aktif', 'Dedy Muhammad Luthfi', '3318142805000000', 'Dedy Muhammad Luthfi', 'Pati', '2000-05-28', '25 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '81933764170', 'DEDYMUHAMMADLUTHFI21@GMAIL.COM', 'Ds. Tlogosari, Rt. 05 Rw. 02, Kec. Tlogowungu Kab. Pati', '5', '2', 'Tlogosari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Tlogosari, Rt. 05 Rw. 02, Kec. Tlogowungu Kab. Pati', '005', '002', 'Tlogosari', 'Tlogowungu', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(462, NULL, NULL, 220022109943, '1', 'Aktif', 'Muhammad Anggit Kusaeri', '3318151707970000', 'Muhammad Aggit Kusaeri', 'Pati', '1997-07-12', '28 Tahun', 'L', 'Menikah', 'B', '82215112207', 'ANGGITKUSAERI17@GMAIL.COM', 'Ds. Bumiayu, Rt. 04, Rw. 03, Kec. Wedarijaksa, Kab. Pati', '4', '3', 'Bumiayu', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Ds. Bumiayu, Rt. 04, Rw. 03, Kec. Wedarijaksa, Kab. Pati', '004', '003', 'Bumiayu', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Ds. Bumiayu, Rt. 04, Rw. 03, Kec. Wedarijaksa, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(463, NULL, NULL, 220022202983, '0', 'Non Aktif', 'Muhammad Ilham', '3301232707980000', 'Muhammad Ilham', 'Cilacap', '1998-07-27', '27 Tahun', 'L', 'Belum Menikah', 'O', '82332227400', 'ILHAM.MUHAMMAD2341@GMAIL.COM', 'Jl. Cemara, Rt. 02, Rw. 07, Tritih Kulon, Kec. Cilacap Utara, Kab. Cilacap', '2', '7', 'Tritih Kulon', 'Cilacap Utara', 'Cilacap', 'Jawa Tengah', 'Jl. Sidokerto', '000', '000', 'Winong', 'Pati', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(464, NULL, NULL, 220022109937, '0', 'Non Aktif', 'Ridwan Dhaut Kholif Fatullah', '3519071611020000', 'Ridwan Dhaut Kholif Fatullah', 'Madiun', '2002-11-16', '23 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '8887028970', 'RIDWANDHAUT1611@GMAIL.COM', 'Ds. Sidorejo, Rt. 03, Rw. 01, Kec. Wungu, Kab. Madiun', '3', '1', 'Sidorejo', 'Wungu', 'Madiun', 'Jawa Timur', 'Ds. Sidorejo, Rt. 03, Rw. 01, Kec. Wungu, Kab. Madiun', '003', '001', 'Sidorejo', 'Wungu', 'Madiun', 'Jawa Timur', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(465, NULL, NULL, 220022109938, '0', 'Non Aktif', 'Febri Koirul Atnan', '3374112602970000', 'Febri Koirul Atnan', 'Bojonegoro', '1997-02-26', '28 Tahun', 'L', 'Menikah', 'O', '81770262851', 'FEBRIKOIRUL97@GMAIL.COM', 'Jl. Karangrejo V/26, Rt. 10, Rw. 07, Kel. Srondol Wetan, Kec. Banyumanik, Kota Semarang', '10', '7', 'Srondol Wetan', 'Banyumanik', 'Semarang', 'Jawa Tengah', 'Jl. Karangrejo V/26, Rt. 10, Rw. 07, Kel. Srondol Wetan, Kec. Banyumanik, Kota Semarang', '010', '007', 'Srondol Wetan', 'Banyumanik', 'Semarang', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(466, NULL, NULL, 220022109939, '0', 'Non Aktif', 'Nurul Nazmi', '3673062702000000', 'Nurul Nazmi', 'Serang', '2000-02-27', '25 Tahun', 'L', 'Belum Menikah', 'O', '85717852834', 'NURULNAZMI270200@GMAIL.COM', 'Kp. Cibetik, Rt. 05, Rw. 03, Ds. Cilowong, Kec. Taktakan, Kota Serang', '5', '3', 'Cilowong', 'Taktakan', 'Serang', 'Jawa Barat', 'Kp. Cibetik, Rt. 05, Rw. 03, Ds. Cilowong, Kec. Taktakan, Kota Serang', '005', '003', 'Cilowong', 'Taktakan', 'Serang', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(467, NULL, NULL, 220022109945, '0', 'Non Aktif', 'Ifan Nur Hidayat', '3302192509990000', 'Ifan Nur Hidayat', 'Banyumas', '1999-09-25', '26 Tahun', 'L', 'Belum Menikah', 'A', '85733606093', 'IFANNURHIDAYAT200@GMAIL.COM', 'Ds. Lemberang, Rt. 02, Rw. 04, Kec. Sokaraja, Kab. Banyumas', '2', '4', 'Lemberang', 'Sokaraja', 'Banyumas ', 'Jawa Tengah', 'Ds. Lemberang, Rt. 02, Rw. 04, Kec. Sokaraja, Kab. Banyumas', '002', '004', 'Lemberang', 'Sokaraja', 'Banyumas ', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(468, NULL, NULL, 220022109947, '0', 'Non Aktif', 'Khairul Purwanto', '3214162209960000', 'Khairul Purwanto', 'Purwakarta', '1996-09-22', '29 Tahun', 'L', 'Menikah', 'O', '8312627353', 'KHAIRULPURWA@GMAIL.COM', 'Kp. Suka Asih', '6', '3', 'Parakansalam', 'Pondoksalam', 'Purwakarta', 'Jawa Barat', 'Ds. Parakansalam, Rt. 06, Rw. 03, Kec. Pondoksalam, Kab. Purwakarta', '006', '003', 'Parakansalam', 'Pondoksalam', 'Purwakarta', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(469, NULL, NULL, 220022109948, '0', 'Non Aktif', 'Neki Reilena', '3318124104980000', 'Neki Reilena', 'Pati', '1998-04-01', '27 Tahun', 'P', 'Belum Menikah', 'B', '85959708041', 'NEKIREILENA98@GMAIL.COM', 'Ds. Sukoharjo, Rt. 01, Rw. 05, Kec. Margorejo, Kab. Pati', '1', '5', 'Sukoharjo', 'Margorejo', 'Pati', 'Jawa Tengah', 'Ds. Sukoharjo, Rt. 01, Rw. 05, Kec. Margorejo, Kab. Pati', '001', '005', 'Sukoharjo', 'Margorejo', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(470, NULL, NULL, 220022109946, '1', 'Aktif', 'Dhimas Tegar Wicaksana', '3318102402900000', 'Dhimas Tegar Wicaksana', 'Pati', '1990-02-24', '35 Tahun', 'L', 'Menikah', 'O', '85640303317', 'RHADITDIMAS@GMAIL.COM', 'Ds. Kutoharjo, Rt. 01, Rw. 01, Kec. Pati, Kab. Pati', '1', '1', 'Kutoharjo', 'Pati', 'Pati', 'Jawa Tengah', 'Ds. Kutoharjo, Rt. 01, Rw. 01, Kec. Pati, Kab. Pati', '001', '001', 'Kutoharjo', 'Pati', 'Pati', 'Jawa Tengah', 'Ds. Kutoharjo, Rt. 01, Rw. 01, Kec. Pati, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(471, NULL, NULL, 220022110949, '0', 'Non Aktif', 'Siti Nurhayati', '3318045108990000', 'Siti Nurhayati', 'Pati', '1999-08-11', '26 Tahun', 'P', 'Belum Menikah', 'O', '89698183800', 'SITINUR.SN324@GMAIL.COM', 'Ds. Degan, Rt. 04, Rw. 02, Kec. Winong, Kab. Pati', '4', '2', 'Degan', 'Winong', 'Pati', 'Jawa Tengah', 'Ds. Degan, Rt. 04, Rw. 02, Kec. Winong, Kab. Pati', '004', '002', 'Degan', 'Winong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(472, NULL, NULL, 220022110951, '1', 'Aktif', 'Lailatul Khusniyati', '3308044302030000', 'Lailatul Khusniyati', 'Magelang', '2003-02-03', '22 Tahun', 'P', 'Belum Menikah', 'AB', '895377000000', 'LAILATUL.KHUSNIYATI03@GMAIL.COM', 'Tegalrejo 003/004, Sucen, Salam, Magelang, Jawa Tengah', '3', '4', 'Sucen', 'Salam', 'Magelang', 'Jawa Tengah', 'Tegalrejo 003/004, Sucen, Salam, Magelang, Jawa Tengah', '003', '004', 'Sucen', 'Salam', 'Magelang', 'Jawa Tengah', 'Ds. Sucen, Rt. 03, Rw. 04, Kec. Kec. Salam, Kab. Magelang\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(474, NULL, NULL, 220022110953, '0', 'Non Aktif', 'Fiqi Mualim', '3328130510970010', 'Fiqi Mualim', 'Tegal', '1997-10-05', '28 Tahun', 'L', 'Belum Menikah', 'A', '82324798069', 'FIQIALIM@GMAIL.COM', 'Jl. Karya Bakti No.38', '3', '5', 'Pepedan', 'Dukuhturi', 'Tegal', 'Jawa Tengah', 'Jl. Karya Bakti No.38', '003', '005', 'Pepedan', 'Dukuhturi', 'Tegal', 'Jawa Tengah', 'Ds. Pepedan, Rt. 03, Rw. 05, Kec. Dukuhturi, Kab. Tegal\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(475, NULL, NULL, 220022110955, '1', 'Aktif', 'Maulida Romadlotin', '3522106301980000', 'Maulida Romadlotin', 'Bojonegoro', '1998-01-23', '27 Tahun', 'P', 'Menikah', 'O', '85749396791', 'MAULIDAROMADLOTIN1998@GMAIL.COM', 'Dusun Balongdowo', '13', '6', 'Karangdayu', 'Baureno', 'Bojonegoro', 'Jawa Timur', 'Dusun Balongdowo', '013', '006', 'Karangdayu', 'Baureno', 'Bojonegoro', 'Jawa Timur', 'Ds. Karangdayu, Rt. 13, Rw. 06, Kec. Baureno, Kab. Bojonegoro\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(476, NULL, NULL, 220022110956, '1', 'Aktif', 'Tri Nuari Wisnu Mukti', '3318130301000000', 'Tri Nuari Wisnu Mukti', 'Pati', '2000-01-03', '25 Tahun', 'L', 'Menikah', 'Tidak Tahu', '81548961217', 'TRINUARIWISNU31@GMAIL.COM', 'Dk. Wonosemi', '1', '7', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Wonosemi', '001', '007', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Semirejo. Rt. 01, Rw. 07, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(477, NULL, NULL, 220022110957, '1', 'Aktif', 'Fajar Shiddeiq', '3206343001900000', 'Fajar Shiddeiq', 'Tasikmalaya', '1990-01-30', '35 Tahun', 'L', 'Menikah', 'B', '81320579347', 'FAJARSHIDDEIQ90@GMAIL.COM', 'Kp. Ciawitali', '5', '10', 'Citeureup', 'Cimahi Utara', 'Cimahi', 'Jawa Barat', 'Komplek Graha Bukit Raya', '003', '025', 'Cilame', 'Ngamprah', 'Bandung Barat', 'Jawa Barat', 'Kp. Ciawitali, Rt. 05, Rw. 10, Kel. Citeureup, Kec. Cimahi Utara, Kota Cimahi\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(478, NULL, NULL, 220022111958, '1', 'Aktif', 'Lukmanul Khakim', '3328141608980000', 'Lukmanul Khakim', 'Tegal', '1998-08-16', '27 Tahun', 'L', 'Belum Menikah', 'O', '89674872715', 'LUKMANULKHAKIM168@GMAIL.COM', 'Jalan Sukirman', '2', '2', 'Lebeteng', 'Tarub', 'Tegal', 'Jawa Tengah', 'Jalan Sukirman', '002', '002', 'Lebeteng', 'Tarub', 'Tegal', 'Jawa Tengah', 'Ds. Lebeteng, Rt. 02, Rw. 02, Kec. Tarub, Kab. Tegal\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(479, NULL, NULL, 2202021080005, '1', 'Aktif', 'Septina Fatasya Aulya', '3317034909030000', 'Septina Fatasya Aulya', 'Pati', '2003-09-09', '22 Tahun', 'P', 'Belum Menikah', 'Tidak Tahu', '83129432915', 'SEPTINAFATASYAA09@GMAIL.COM', 'Ds Muktiharjo, Perumahan Griya Kusuma Indah Blok C No 30', '6', '1', 'Muktiharjo', 'Margorejo', 'Pati', 'Jawa Tengah', 'Ds. Sarirejo Gang 5 ', '005', '001', 'Sarirejo', 'Pati', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(480, NULL, NULL, 2202021020004, '1', 'Aktif', 'Suwanto', '3318140707830010', 'Suwanto', 'Pati', '1983-07-07', '42 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85540430552', 'ALAQIL967@GMAIL.COM', 'Tlogosari', '3', '4', 'Tlogosari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Tlogosari', '003', '004', 'Tlogosari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds .Tlogosari Rt 03 Rw 04, Kec. Tlogowungu ,Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(481, NULL, NULL, 2202021090006, '0', 'Non Aktif', 'Rudiyanto', '3508151408920000', 'Rudiyanto', 'Lumajang', '1992-08-14', '33 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85925395661', 'ALFONSORUDI429@GMAIL.COM', 'Dusun Parasgowang ', '3', '9', 'Pandanarum', 'Tempeh', 'Lumajang', 'Jawa Timur', 'Dusun Parasgowang', '003', '009', 'Pandanarum', 'Tempeh', 'Lumajang', 'Jawa Timur', 'Ds. Pandanarum Rt 03 Rw 09, Kec. Tempeh, Kab. Lumajang\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(482, NULL, NULL, 2202021020003, '1', 'Aktif', 'Angga Dela Sukma', '3318134710020000', 'Angga Dela Sukma', 'Pati', '2002-10-07', '23 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85700250956', 'ANGGADOHLOMPONG@GMAIL.COM', 'Ngablak', '1', '7', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Ngablak', '001', '007', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(483, NULL, NULL, 220202103001, '1', 'Aktif', 'Jumarno', '3321020201980000', 'Jumarno', 'Demak', '1998-01-02', '27 Tahun', 'L', 'Belum Menikah', 'AB', '85886876254', 'JUMARNO.MWB@GMAIL.COM', 'Dusun Bengkah', '2', '13', 'Wonosekar', 'Karangawen', 'Demak', 'Jawa Tengah', 'Dusun Bengkah', '002', '013', 'Wonosekar', 'Karangawen', 'Demak', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(484, NULL, NULL, 220202105002, '1', 'Aktif', 'Ilham Nur Firdaus', '3374150311980000', 'Ilham Nur Firdaus', 'Semarang', '1998-11-03', '27 Tahun', 'L', 'Belum Menikah', 'B', '87849149425', 'ILHAMNURFIRDAUS@GMAIL.COM', 'Kp Kalilangse 253A', '1', '5', 'Gajahmungkur', 'Gajah Mungkur', 'Semarang', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(485, NULL, NULL, 120202001001, '1', 'Aktif', 'Edi Faisal', '3374110810700010', 'Edi Faisal', 'Malang', '1970-10-08', '55 Tahun', 'L', 'Menikah', 'O', '81390048167', 'EDIFAISAL08@GMAIL.COM', 'Jl Puri Utama Ii D1-14 Puri Asri Perdana', '1', '16', 'Padangsari', 'Banyumanik', 'Kota Semarang', 'Jawa Tengah', 'Jl Puri Utama Ii-D1 No 14 Puri Asri Perdana ', '001', '016', 'Padangsari', 'Banyumanik', 'Kota Semarang', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(486, NULL, NULL, 120202001002, '1', 'Aktif', 'Elkaf Rahmawan Pramudya', '3374091206750000', 'Elkaf Rahmawan Pramudya', 'Temanggung', '1975-06-12', '50 Tahun', 'L', 'Menikah', 'A', '8156534856', 'ELKANOVICHMAXIMUS9@GMAIL.COM', 'Jatisari Permai Blok A11/21', '7', '9', 'Jatisari', 'Mijen', 'Semarang', 'Jawa Tengah', 'Jatisari Permai Blok A11/21', '007', '009', 'Jatisari', 'Mijen', 'Semarang', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(487, NULL, NULL, 220022111960, '0', 'Non Aktif', 'Ghooda Phateena Taqie Haneefa', '3318104310980000', 'Ghooda Phateena Taqie Haneefa', 'Rembang', '1998-10-03', '27 Tahun', 'P', 'Belum Menikah', 'O', '895401000000', 'GHOODAPTH@GMAIL.COM', 'Dsn Gambiran, Sukoharjo, Margorejo, Pati', '4', '4', 'Sukoharjo', 'Margorejo', 'Pati', 'Jawa Tengah', 'Dsn Gambiran, Sukoharjo, Margorejo, Pati', '004', '004', 'Sukoharjo', 'Margorejo', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(488, NULL, NULL, 220022111961, '1', 'Aktif', 'Wahid Fahmiza Azhari, S.E.', '3318192006980000', 'Wahid Fahmiza Azhari, S.E.', 'Medan', '1998-06-20', '27 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85799228516', 'WAHIDFAHMIZA@GMAIL.COM', 'Margomulyo, Dk. Belah 02/02, Tayu, Pati', '2', '2', 'Margomulyo', 'Tayu', 'Pati', 'Jawa Tengah', 'Margomulyo, Dk. Belah 02/02, Tayu, Pati', '002', '002', 'Margomulyo', 'Tayu', 'Pati', 'Jawa Tengah', 'Margomulyo, Rt. 02, Rw. 02, Kec. Tayu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(490, NULL, NULL, 220022112965, '1', 'Aktif', 'Ahmad Khanif Kusumahadi', '3522091504980000', 'Ahmad Khanif Kusumahadi', 'Bojonegoro', '1998-04-15', '27 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85859004254', 'IFSUMA15@GMAIL.COM', 'Ds. Ngranggonanyar Rt. 3 Rw. 2 Kec. Kepohbaru Kab. Bojonegoro', '3', '2', 'Ngranggonanyar', 'Kepohbaru', 'Bojonegoro', 'Jawa Timur', 'Jl. Ngasinan Raya No.31', '003', '004', 'Rejomulyo', 'Kota Kediri', 'Kediri', 'Jawa Timur', 'Ds. Ngranggonanyar, Rt. 03, Rw. 02, Kec. Kepohbaru, Kab. Bojonegoro\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(491, NULL, NULL, 220022112966, '0', 'Non Aktif', 'Mohammad Hafidz Anugrah Pratama', '3604012603030570', 'Mohammad Hafidz Anugrah Pratama', 'Serang', '2003-03-26', '22 Tahun', 'L', 'Belum Menikah', 'A', '87820960198', 'HAFIDZANUGRAH27@GMAIL.COM', 'Jl. Kiuju Kaujon Kidul', '3', '3', 'Serang', 'Serang', 'Serang', 'Banten', 'Jl. Kiuju Kaujon Kidul', '003', '003', 'Serang', 'Serang', 'Serang', 'Banten', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(492, NULL, NULL, 220022112967, '1', 'Aktif', 'Doni Hidayanto', '3306060712910000', 'Doni Hidayanto', 'Jakarta', '1991-12-07', '34 Tahun', 'L', 'Menikah', 'O', '85777720441', 'DONIHIDA1991@GMAIL.COM', 'Kemantren 2', '1', '5', 'Desa Semawung', 'Purworejo', 'Purworejo', 'Jawa Tengah', 'Kemantren 1', '002', '004', 'Desa Semawung', 'Purworejo', 'Purworejo', 'Jawa Tengah', 'Dk. Kemantren, Rt. 02, Rw. 01, Ds. Semawung, Kec. Purworejo, Kab. Purworejo\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(493, NULL, NULL, 220022112968, '0', 'Non Aktif', 'Yusup Ramdani', '3211110502970010', 'Yusup Ramdani', 'Ciamis', '1997-02-05', '28 Tahun', 'L', 'Menikah', 'O', '895405000000', 'YUSUPRAMDANI86@GMAIL.COM', 'Majalaya', '2', '6', 'Imbanagara Raya', 'Ciamis', 'Ciamis', 'Jawa Barat', 'Majalaya', '002', '006', 'Imbanagara Raya', 'Ciamis', 'Ciamis', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(494, NULL, NULL, 220022112969, '0', 'Non Aktif', 'Leo Saputra', '3328011012940010', 'Leo Saputra', 'Tegal', '1994-12-10', '31 Tahun', 'L', 'Menikah', 'Tidak Tahu', '82137927196', 'SAPUTRALEK445@GMAIL.COM', 'Desa Kedawung', '4', '6', 'Kedawung', 'Margasari', 'Tegal', 'Jawa Tengah', 'Desa Kedawung', '004', '006', 'Kedawung', 'Margasari', 'Tegal', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(495, NULL, NULL, 220022112970, '1', 'Aktif', 'Wuli Fitri Aryani', '3318104902970000', 'Wuli Fitri Aryani', 'Pati', '1997-02-09', '28 Tahun', 'P', 'Belum Menikah', 'Tidak Tahu', '82183236281', 'WULLYARYANI21@GMAIL.COM', 'Ds Tambaharjo, Runting', '3', '2', 'Tambaharjo', 'Pati', 'Pati', 'Jawa Tengah', 'Ds Tambaharjo, Runting', '3', '002', 'Tambaharjo', 'Pati', 'Pati', 'Jawa Tengah', 'Ds. Tambaharjo, Rt. 03, Rw. 02, Kec. Pati, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(496, NULL, NULL, 220022112971, '1', 'Aktif', 'Rasyid Sidik', '3318130110970000', 'Rasyid Sidik', 'Pati', '1997-10-01', '28 Tahun', 'L', 'Belum Menikah', 'B', '81238857130', 'GPSRASYID@GMAIL.COM', 'Dk.Ngembes Rt.04 Rw.12 Kec.Gembong Kab.Pati', '4', '12', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk.Ngembes Rt.04 Rw.12 Kec.Gembong Kab.Pati', '004', '012', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Gembong, Rt. 04, Rw. 12, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(497, NULL, NULL, 220022112973, '1', 'Aktif', 'Teguh Wiranto', '3318141802960000', 'Teguh Wiranto', 'Pati', '1996-02-18', '29 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85291705792', 'TEGUHWIRANTO373@GMAIL.COM', 'Ds Purwosari Dk Sambikerep', '7', '3', 'Purwosari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds Purwosari Dukuh Sambikerep', '007', '003', 'Purwosari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Purwosari, Rt. 07, Rw. 03, Kec. Tlogowungu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(498, NULL, NULL, 220022112974, '0', 'Non Aktif', 'Annisa Rizka Noviana Dewi', '3318115011990000', 'Annisa Rizka Noviana Dewi', 'Pati', '1999-11-10', '26 Tahun', 'P', 'Belum Menikah', 'Tidak Tahu', '81904687815', 'ANNISARIZKA6@GMAIL.COM', 'Ds. Mintobasuki Rt 5 / Rw 3 Kec.Gabus / Kab. Pati', '5', '3', 'Mintobasuki', 'Gabus', 'Pati', 'Jawa Tengah', 'Ds. Mintobasuki Rt 5 / Rw 3 Kec.Gabus / Kab. Pati', '005', '003', 'Mintobasuki', 'Gabus', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(499, NULL, NULL, 220022112972, '0', 'Non Aktif', 'Adil Gholib', '3174080909980000', 'Adil Gholib', 'Jakarta', '1998-09-07', '27 Tahun', 'L', 'Menikah', 'O', '81213257798', 'GPSRASYID@GMAIL.COM', 'Jl. Darussalam Utara Ii No.17, ', '5', '5', 'Batusari', 'Batuceper', 'Tangerang ', 'Banten', 'Jalan Kalibata Utara', '004', '007', 'Kalibata', 'Pancoran', 'Jakarta Selatan', 'Dki Jakarta', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(500, NULL, NULL, 220022201975, '0', 'Non Aktif', 'Asep Suhendi Permana', '3211051207940000', 'Asep Suhendi Permana', 'Sumedang', '1994-07-12', '31 Tahun', 'L', 'Menikah', 'O', '82126822804', 'ASEPSUHENDIP@GMAIL.COM', 'Dusun Jatiputri ', '1', '1', 'Cilopang', 'Cisitu', 'Sumedang', 'Jawa Barat', 'Dusun Jatiputri', '01', '01', 'Cilopamg', 'Cisitu', 'Sumedang', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(501, NULL, NULL, 220022201976, '1', 'Aktif', 'Annisa Sukmawati', '3275057011980010', 'Annisa Sukmawati', 'Jakarta', '1998-11-30', '27 Tahun', 'P', 'Belum Menikah', 'O', '85780251612', 'ANISASKMW30@GMAIL.COM', 'Jl. Makrik, Kp. Rawa Roko No.81', '5', '4', 'Rawalumbu', 'Bojong Rawalumbu', 'Kota Bekasi', 'Jawa Barat', 'Jl. Makrik, Kp. Rawa Roko No.81', '005', '004', 'Rawalumbu', 'Bojong Rawalumbu', 'Kota Bekasi', 'Jawa Barat', 'Kp. Rawa Roko, RT. 05, RW. 04, Kel. Bojong Rawalumbu, Kec. Rawalumbu, Kota Bekasi\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(502, NULL, NULL, 220022201977, '1', 'Aktif', 'Lisa Zulianawati', '3506056507970000', 'Lisa Zulianawati', 'Kediri', '1997-07-25', '28 Tahun', 'P', 'Belum Menikah', 'O', '81351581650', 'LISA_ZUL25@YAHOO.COM', 'Jl. Raya Kandat Dusun Galuhan', '1', '1', 'Kandat', 'Kandat', 'Kediri', 'Jawa Timur', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Jl. Raya Kandat Dusun Galuhan Ds. Kandat Rt 01 Rw 01, Kec. Kandat, Kab. Kediri\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(503, NULL, NULL, 220022201988, '0', 'Non Aktif', 'Abdun Naim Fajari', '3318142107010010', 'Abdun Naim Fajari', 'Pati', '2001-07-21', '24 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '87882992203', 'ABDUNNAIM17@GMAIL.COM', 'Desa Tamansari', '1', '1', 'Tamansari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Desa Tamansari', '001', '001', 'Tamansari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Tamansari. Rt. 01, Rw. 01, Kec. Tlogowungu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(504, NULL, NULL, 220022201987, '0', 'Non Aktif', 'Aggi Rai Kusuma', '3175021602870000', 'Aggi Rai Kusuma', 'Jakarta', '1988-02-16', '37 Tahun', 'L', 'Menikah', 'A', '81933759199', 'RAIKUSUMAAGGI@GMAIL.COM', 'Perumahan  Bumi Jaya Indah Blok G No:1', '38', '11', 'Munjul Jaya', 'Purwakarta', 'Purwakarta', 'Jawa Barat', 'Perumahan  Bumi Jaya Indah Blok G No:1', '038', '011', 'Munjul Jaya', 'Purwakarta', 'Purwakarta', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(505, NULL, NULL, 220022202979, '0', 'Non Aktif', 'Mochamad Enjerni Adha S. Ag', '3275031106920020', 'Mochamad Enjerni Adha S. Ag', 'Jakarta', '1992-06-11', '33 Tahun', 'L', 'Menikah', 'Tidak Tahu', '81286047122', 'ADHAENJER@GMAIL.COM', 'Jl. Mangseng 1 No 23', '7', '24', 'Kelurahan Kaliabang Tengah', 'Bekasi Utara', 'Kota Bekasi', 'Jawa Barat', 'Jl. Awangga 5 Blok H 20/32 ', '10', '07', 'Desa Srimukti', 'Tambun Utara', 'Kabupaten Bekasi', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(506, NULL, NULL, 220022202982, '0', 'Non Aktif', 'Muhamad Andi', '3604222009970000', 'Muhamad Andi', 'Serang', '1997-09-20', '28 Tahun', 'L', 'Menikah', 'A', '87774155312', 'MUHAMADANDI1515@GMAIL.COM', 'Kp. Tejamari Pasir', '10', '3', 'Sukamenak', 'Baros', 'Serang', 'Banten', 'Kp. Baru', '008', '003', 'Sukacai', 'Baros', 'Serang', 'Banten', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(507, NULL, NULL, 220022202984, '0', 'Non Aktif', 'Arif Adi Pratama', '3578250312920000', 'Arif Adi Pratama', 'Surabaya', '1992-12-03', '33 Tahun', 'L', 'Menikah', 'B', '81390762301', 'ARIFADI76724@GMAIL.COM', 'Jl. Halmahera No. 37', '12', '10', 'Mintaragen', 'Tegal Timur', 'Tegal', 'Jawa Tengah', 'Griya Tiara Arum Dukuhturi No. 10', '3', '1', 'Dukuhturi', 'Dukuhturi', 'Kabupaten Tegal', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(508, NULL, NULL, 220022202985, '0', 'Non Aktif', 'Ditya Ligar Pratama', '3278022801940010', 'Ditya Ligar Pratama', 'Tasikmalaya', '1994-01-28', '31 Tahun', 'L', 'Menikah', 'O', '', 'DITYALIGARPRATAMA@GMAIL.COM', 'Jl. Gn. Goong Blok. Iii No. 45', '3', '17', 'Kel. Panglayungan', ' Cipedas', ' Tasikmalaya', 'Jawa Barat', 'Jl Padasuka No 31 ', '\'004', '\'013', 'Lengkongsari', 'Tawang', ' Tasikmalaya', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(509, NULL, NULL, 220022202986, '0', 'Non Aktif', 'U Ikhsan Fauzi', '3206091807960000', 'U Ikhsan Fauzi', 'Tasikmalaya', '1996-07-18', '29 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '', 'FAUZISAN196@GMAIL.COM', 'Kp. Bojongkoneng', '1', '7', 'Bojongasih', 'Bojongasih', 'Tasikmalaya', 'Jawa Barat', 'Kp. Bojongkoneng', '01', '07', 'Bojongasih', 'Bojongasih', 'Tasikmalaya', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(511, NULL, NULL, 220022202989, '0', 'Non Aktif', 'Muhammad Sholihudin Syatoto', '351903271290002', 'Muhammad Sholihudin Syatoto', 'Madiun', '1997-12-27', '28 Tahun', 'L', 'Belum Menikah', 'A', '', 'TATO271297@GMAIL.COM', 'Jl. Diponegoro, No. 700', '16', '6', ' Uteran', 'Geger', ' Madiun', 'Jawa Timur', 'Jl. Diponegoro, No. 700', '16', '6', ' Uteran', 'Geger', ' Madiun', 'Jawa Timur', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(512, NULL, NULL, 220022203990, '0', 'Non Aktif', 'Sudrajat', '3201240402000000', 'Sudrajat', 'Bogor', '2000-02-04', '25 Tahun', 'L', 'Menikah', 'Tidak Tahu', '', 'SUDRAJAT51925@GMAIL.COM', 'Kp. Gadog', '1', '1', 'Pandansari', 'Ciawi', 'Bogor', 'Jawa Barat', 'Kp. Gadog', '01', '01', 'Pandansari', 'Ciawi', 'Bogor', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(513, NULL, NULL, 320202112003, '0', 'Non Aktif', 'Furqon Nugroho', '3373042904000000', 'Furqon Nugroho', 'Bau-Bau', '2000-04-29', '25 Tahun', 'L', 'Belum Menikah', 'B', '', 'FRQNNUGROHO@GMAIL.COM', 'Jl. Papua - Magersari', '1', '7', 'Tegalrejo', 'Argomulyo', 'Salatiga', 'Jawa Tengah', 'Jl. Gondang Raya Gg. Patlot Iii No. 24 A', '', '', 'Tembalang', 'Tembalang', 'Semarang', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(515, NULL, NULL, 3202022020008, '0', 'Non Aktif', 'Mohamad Yusup Nasruloh', '510122709040002', 'Mohamad Yusup Nasruloh', 'Banyuwangi', '2004-09-27', '21 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '', 'YUSUFNASRULLOH849@GMAIL.COM', 'Ds Singolatren Kec Singojuruh Banyuwangi', '2', '2', 'Singolatren', 'Singojuruh', 'Banyuwangi', 'Jawa Timur', 'Ds Singolatren  Kec Singojuruh Banyuwangi', '02', '02', 'Singolatren', ' Singojuruh', 'Banyuwangi', 'Jawa Timur', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(516, NULL, NULL, 220022203991, '0', 'Non Aktif', 'Hadi Panji Saputro', '3318021009980000', 'Hadi Panji Saputro', 'Pati', '1998-09-10', '27 Tahun', 'L', 'Belum Menikah', 'O', '6282290000000', 'TVSANTRI8@GMAIL.COM', 'Jimbaran', '3', '2', 'Jimbaran', 'Kayen', 'Pati', 'Jawa Tengah', 'Jimbaran', ' 03', '02', 'Jimbaran', 'Kayen', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(517, NULL, NULL, 220022203992, '1', 'Aktif', 'Ekas Apriana', '3201190204910010', 'Ekas Apriana', 'Bogor', '1991-04-02', '34 Tahun', 'L', 'Menikah', 'B', '', 'APRIANAEKAS0@GMAIL.COM', ' Hegarsari', '2', '1', ' Cibeber', 'Leuwiling', 'Bogor', 'Jawa Barat', ' Hegarsari', ' 02', '01 ', ' Cibeber', 'Leuwiling', 'Bogor', 'Jawa Barat', 'Kp. Hegarsari RT. 02, Rw. 01 Ds. Cibeber I Kec. Leuwiling Kab Bogor Jawa Barat\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(518, NULL, NULL, 220022203993, '1', 'Aktif', 'Amelia Fauziah', '3214134505030000', 'Amelia Fauziah', 'Purwakarta', '2003-05-05', '22 Tahun', 'P', 'Menikah', 'O', '', 'AMELIAFAUZIAH61@GMAIL.COM', 'Kp. Tirta Raya', '4', '2', 'Bungursari', 'Bungursari', 'Purwakarta ', 'Jawa Barat', 'Kp. Tirta Raya', '04', '02', 'Bungursari', 'Bungursari', 'Purwakarta ', 'Jawa Barat', 'Kp. Tirta Raya, Rt 04 Rw 02 Ds, Bungursari Kec, Bungursari Kab, Purwakarta \r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(520, NULL, NULL, 220022203995, '1', 'Aktif', 'Muhammad A\'la Almaududi', '3672081709990000', 'Muhammad A\'la Almaududi', 'Cilegon', '1999-09-17', '26 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '87881747887', 'MAUDUDIQKLA897@GMAIL.COM', 'Link. Kubanglesung', '2', '5', 'Tamanbaru', 'Citangkil', 'Cilegon', 'Jawa Barat', 'Idem', '', '', '', '', '', '', 'Link. Kubang Lesung Brangbang Rt 02 Rw 05 Kel. Tamanharu, Kec. Citangkil, Kota Cilegon\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(521, NULL, NULL, 220022203996, '0', 'Non Aktif', 'Agus Mulyaningsih', '3302184908950000', 'Agus Mulyaningsih', 'Banyumas', '1995-08-09', '30 Tahun', 'P', 'Belum Menikah', 'Tidak Tahu', '87733795265', 'AGUSMULYANINGSIH95@GMAIL.COM', 'Pasir Lor', '4', '1', 'Karanglewas', 'Karanglewas', 'Banyumas', 'Jawa Tengah', 'Idem', '', '', '', '', '', '', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(522, NULL, NULL, 220022203997, '1', 'Aktif', 'Lutfiana', '3376026503010000', 'Lutfiana', 'Tegal', '2001-03-25', '24 Tahun', 'P', 'Belum Menikah', 'Tidak Tahu', '85293800706', 'LUTFIANA.2503@GMAIL.COM', 'Jl. Kemuning', '4', '3', 'Kejambon', 'Tegal Timur', 'Tegal', 'Jawa Tengah', 'Idem', '', '', '', '', '', '', 'Jl. Kemuning No. 22 rt 04 Rw 03 Kel. Kejambon, Kec. Tegal \r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(523, NULL, NULL, 220022203998, '1', 'Aktif', 'Iyen Aprilia', '3274056304010010', 'Iyen Aprilia', 'Cirebon', '2001-04-23', '24 Tahun', 'P', 'Menikah', 'Tidak Tahu', '89664939891', 'IYENAPRILLIA66@GMAIL.COM', 'Jl. Evakuasi', '1', '2', 'Karyamulya', '', 'Cirebon', 'Jawa Barat', 'Idem', '', '', '', '', '', '', 'Jln. Evakuasi Gg. Sigaran Rt 01 Rw 02 Kel. Karyamulya, Kota Cirebon\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(524, NULL, NULL, 220022203999, '0', 'Non Aktif', 'Dwi Kurnianto', '3319022203880000', 'Dwi Kurnianto', 'Tanjungkarang', '1988-03-22', '37 Tahun', 'L', 'Menikah', 'O', '81355288778', 'MD_KURNIANTO@ROCKETMAIL.COM', 'Jl. Khr. Asnawi No. 21 C ', '2', '1', 'Damaran', 'Kota Kudus', 'Kudus', 'Jawa Tengah', 'Idem', '', '', '', '', '', '', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(525, NULL, NULL, 220022204002, '0', 'Non Aktif', 'Muhammad Rizki Setiawan', '3278062807940010', 'Muhammad Rizki Setiawan', 'Tasikmalaya', '1994-07-28', '31 Tahun', 'L', 'Belum Menikah', 'AB', '85224131700', 'MD.RIZKISETIAWAN@GMAIL.COM', 'Jl. Rajawali Kp. Negla No. 94 Rt 02 Rw 06 Kelurahan Setiajaya Kecamatan Cibeureum Kota Tasikmalaya', '2', '6', 'Setiajaya', 'Cibeureum', 'Kota Tasikmalaya', 'Jawa Barat', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Jln. Rajawali Kp. Negla No. 94 Rt 02 Rw 06 Kel. Setiajaya Kec. Cibereum, Kota Tasikmalaya \r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(526, NULL, NULL, 220022204003, '0', 'Non Aktif', 'Andrian Herdiyana', '3207022403980000', 'Andrian Herdiyana', 'Ciamis', '1998-03-24', '27 Tahun', 'L', 'Belum Menikah', 'O', '82319588334', 'andriherdiyan123@gmail.com', 'Dusun Desa', '6', '2', 'Margaluyu', 'Cikoneng', 'Ciamis', 'Jawa Barat', 'Dusun Desa', '006', '002', 'Margaluyu', 'Cikoneng', 'Ciamis', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(527, NULL, NULL, 220022204004, '0', 'Non Aktif', 'Muhammad Ikbal Maulana', '3376030904020000', 'Muhammad Ikbal Maulana', '', '0000-00-00', '', 'L', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(528, NULL, NULL, 220022204001, '0', 'Non Aktif', 'Muhammad Hali Mukron', '3318081605990040', 'Muhammad Hali Mukron', 'Pati', '1999-05-16', '26 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '895415000000', 'HALIMUKRON16@GMAIL.COM', 'Ngebruk', '1', '1', 'Bumirejo', 'Juwana', 'Pati', 'Jawa Tengah', 'Idem', '', '', '', '', '', '', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(529, NULL, NULL, 220022204005, '1', 'Aktif', 'Ali Mahmudi', '3318043112950000', 'Ali Mahmudi', 'Pati', '1995-12-31', '29 Tahun', 'L', 'Menikah', 'Tidak Tahu', '89688058550', 'ALIMAHMUDI.M95@GMAIL.COM', 'Ds. Tlogorejo ', '5', '1', 'Tlogorejo', 'Winong', 'Pati', 'Jawa Tengah', 'Idem', '', '', '', '', '', '', 'Ds. Tlogorejo Rt. 05 Rw. 01 Kec. Winong Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(530, NULL, NULL, 220022206008, '0', 'Non Aktif', 'Muhammad Hilal Haidar', '3319081111020000', 'Muhammad Hilal Haidar', 'Kudus', '2002-11-11', '23 Tahun', 'L', 'Belum Menikah', 'O', '81774151764', 'HILALHAIDAR951@GMAIL.COM', 'Ds. Gribig', '1', '3', 'Gribig', 'Gebog', 'Kudus', 'Jawa Tengah', 'Jln. Sudirman No 58,Gribig, Gebog, Kudus', '', '', '', '', '', '', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(531, NULL, NULL, 220022206009, '1', 'Aktif', 'Yossie Luchyawan Prasetya', '3515141604980000', 'Yossie Luchyawan Prasetya', 'Sidoarjo', '1998-04-16', '27 Tahun', 'L', 'Belum Menikah', 'AB', '85784851066', 'YOSSIEPRASETYA98@GMAIL.COM', 'Ds. Pekarungan, Sukodono Sidoarjo', '22', '7', 'Pekarungan', 'Sukodono', 'Sidoarjo', 'Jawa Timur', 'Perumahan Grand Indraprasta B6-19', '3', '7', 'Simogirang', 'Prambon', 'Sidoarjo', 'Jawa Timur', 'Grand Indrprasta, Blok B6-19 Simogirang, prambon, Sidoarjo\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(532, NULL, NULL, 220022206010, '0', 'Non Aktif', 'Ikhwan Panji Ibrahim', '3376042705890000', 'Ikhwan Panji Ibrahim', 'Tegal', '1989-05-27', '36 Tahun', 'L', 'Menikah', 'B', '85973043467', 'IKHWAN.PANJI@GMAIL.COM', 'Perum Griya Mijen Permai Blok-K No. 9', '9', '7', 'Mijen', 'Mijen', 'Semarang', 'Jawa Tengah', 'Jl. Probolinggo No. 15', '05', '07', 'Margadana', 'Margadana', 'Tegal', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(533, NULL, NULL, 220022206011, '1', 'Aktif', 'Nurul Faizah ', '6371016309970000', 'Nurul Faizah ', 'Subang', '1997-09-23', '28 Tahun', 'P', 'Menikah', 'B', '81326085253', 'NFAIZAH970@GMAIL.COM', 'Jalan Pandu Ii Gang 2 No 4', '1', '1', 'Margorejo', 'Muktiharjo', 'Pati', 'Jawa Tengah', 'Jalan Astina 2 No 46 Perum Sukoharjo Indah', '05', '07', 'Sukoharjo', 'Margorejo', 'Pati', 'Jawa Tengah', 'Jln. Pandu II RT/RW 01/01, Ds. Muktiharjo, Kec. Margorejo, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(534, NULL, NULL, 220022205006, '1', 'Aktif', 'Fitria Khoirun Nisa\'', '3318136012990000', 'Fitria Khoirun Nisa\'', 'Pati', '1999-12-20', '26 Tahun', 'P', 'Belum Menikah', 'O', '85875543842', 'FITRIAKHOIRUN99@GMAIL.COM', 'Bageng 2/1 Gembong Pati', '2', '1', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', 'Bageng 2/1 Gembong Pati', '02', '01', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Bageng, RT. 02, RW. 01, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(535, NULL, NULL, 220022205007, '1', 'Aktif', 'Okky Zaenur Endrawan, A.Md.', '3318050111990000', 'Okky Zaenur Endrawan, A.Md.', 'Pati', '1999-11-01', '26 Tahun', 'L', 'Belum Menikah', 'A', '82210354079', 'OKKYZAENUR@GMAIL.COM', 'Dopang', '6', '1', 'Triguno', 'Pucakwangi', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Dk. Dopang, Rt. 06, Rw. 01, Ds. Triguno, Kec. Pucakwangi, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(536, NULL, NULL, 220022206015, '1', 'Aktif', 'Nur Alviah', '1409025405960000', 'Nur Alviah', 'Pati', '1996-05-14', '29 Tahun', 'P', 'Menikah', 'B', '81365394951', 'NURALVIAH15@GMAIL.COM', 'Dk. Domo', '2', '1', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Domo', '002', '001', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Domo, Rt. 002/001, Ds. Klakahkasihan, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(537, NULL, NULL, 220022205008, '1', 'Aktif', 'Muhammad Annas Taufiqur Rahman', '3318133103960000', 'Muhammad Annas Taufiqur Rahman', 'Pati', '1996-03-31', '29 Tahun', 'L', 'Menikah', 'O', '81802797201', 'MUHANNAS31@GMAIL.COM', 'Dk Domo Ds Klakahkasihan Rt 02 Rw 01', '2', '1', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk Domo Ds Klakahkasihan', '02', '01', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Klakahkasihan RT/RW 02/01 Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(538, NULL, NULL, 220022206012, '0', 'Non Aktif', 'Muhammad Amrizal Nashrudin', '352515270198003', 'Muhammad Amrizal Nashrudin', 'Sidoarjo', '1998-01-27', '27 Tahun', 'L', 'Belum Menikah', 'B', '82331879949', 'UDINAMRIZAL@GMAIL.COM', 'Ds. Bambe', '7', '2', 'Bambe', 'Driyorejo', 'Sidoarjo', 'Jawa Timur', 'Jl. Merapi No. 94 ', '07', '02', 'Bambe', 'Driyorejo', 'Sidoarjo', 'Jawa Timur', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(539, NULL, NULL, 220022206013, '1', 'Aktif', 'Bima Jonanda', '3276010501970010', 'Bima Jonanda', 'Depok', '1997-01-05', '28 Tahun', 'L', 'Menikah', 'O', '81288347430', 'BIMAJONANDA05@GMAIL.COM', 'Jl. Pemuda No.93A', '1', '4', 'Depok', 'Pancoran Mas', 'Depok', 'Jawa Barat', 'Jl. Pemuda No.93A', '01', '08', 'Depok', 'Pancoran Mas', 'Depok', 'Jawa Barat', 'Jl. Pemuda No.93A, Rt. 001/008, Depok, Kec. Pancoran Mas, Kota Depok, Jawa Barat\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(540, NULL, NULL, 220022206014, '1', 'Aktif', 'Agus Salman Farizi ', '3203121708880010', 'Agus Salman Farizi ', 'Cianjur', '1988-08-17', '37 Tahun', 'L', 'Menikah', 'O', '88292211785', 'AGUSALMANFARIZI17@GMAIL.COM', 'Kp. Parasu Ds. Cijagagang', '1', '4', 'Cijagang', 'Cikalongkulon', 'Cianjur', 'Jawa Barat', 'Idem', '', '', '', '', '', '', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(541, NULL, NULL, 220022206016, '0', 'Non Aktif', 'Naufal Mafazi', '3522151505950010', 'Naufal Mafazi', 'Bojonegoro', '1995-05-15', '30 Tahun', 'L', 'Menikah', 'B', '85740287731', 'NAUFAL.MAFAZI@GMAIL.COM', 'Jl. Klaling Kambang Jekulo Kudus', '2', '3', 'Klaling', 'Jekulo', 'Kudus', 'Jawa Tengah', 'Jl. Klaling Kambang, Jekulo Kudus', '02', '03', 'Klaling', 'Jekulo', 'Kudus', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(542, NULL, NULL, 220022207017, '0', 'Non Aktif', 'Radita Safitri Dewi', '3202175103940000', 'Radita Safitri Dewi', 'Sukabumi', '1994-03-11', '31 Tahun', 'P', 'Menikah', 'A', '8811202848', 'BARRANRADITA@GMAIL.COM', 'Perumahan Bumi Tirta Nirwana Blok E3 No 7', '1', '13', 'Gekbrong', 'Gekbrong', 'Cianjur', 'Jawa Barat', 'Idem', '', '', '', '', '', '', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(543, NULL, NULL, 220022207018, '1', 'Aktif', 'Sayyid Fajri Nur Fauzi ', '3318152608000000', 'Sayyid Fajri Nur Fauzi ', 'Pati', '2000-08-26', '25 Tahun', 'L', 'Belum Menikah', 'A', '85326518599', 'S.F.N.FAUZI@GMAIL.COM', 'Desa Ngurensiti Rt 004 Rw 001, Kecamatan Wedarijaksa, Kabupaten Pati, Jawa Tengah', '4', '1', 'Ngurensiti', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Desa Ngurensiti Rt 004 Rw 001, Kecamatan Wedarijaksa, Kabupaten Pati, Jawa Tengah', '004', '001', 'Ngurensiti', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Ds. Ngurensiti RT/RW 04/01 Kec. Wedarijaksa Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(544, NULL, NULL, 220022207019, '0', 'Non Aktif', 'Muhammad Kadir', '3318132611990000', 'Muhammad Kadir', 'Pati', '1999-11-26', '26 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '83848060938', 'MUHAMMADKHADZIR99@GMAIL.COM', 'Dk. Rubiyah', '1', '7', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk Rubiyah', '01', '08', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Rubiyah, RT/RW 01/08, Ds. Bageng, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(545, NULL, NULL, 220022207020, '1', 'Aktif', 'Aldo Nugroho', '3318131410020000', 'Aldo Nugroho', 'Pati', '2002-10-14', '23 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85877654458', 'ALDONUGROHO763@GMAIL.COM', 'Ds Pohgading', '1', '1', 'Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Ds. Pohgading, RT/RW 01/01, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(546, NULL, NULL, 220022207021, '1', 'Aktif', 'Helmy Yanuar Priyono', '3374101901810000', 'Helmy Yanuar Priyono', 'Semarang', '1981-01-19', '44 Tahun', 'L', 'Menikah', 'B', '82135533553', 'HELMYYANUAR@YAHOO.COM', 'Jl. Gemah Sari Vii No.201', '5', '', 'Kedungmundu', 'Tembalang', 'Semarang', 'Jawa Tengah', 'Jl. Gemah Sari Vii No.207B', '05', '04', 'Kedungmundu', 'Tembalang', 'Semarang', 'Jawa Tengah', 'Jl. Gemah Sari VII No.207B Ds.Kedungmundu Rt 5 Rw 4 Kec. Tembalang, Kota Semarang\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(547, NULL, NULL, 220022207022, '0', 'Non Aktif', 'Septian Bayu Kurniawan', '3509112509960000', 'Septian Bayu Kurniawan', 'Jember', '1996-09-25', '29 Tahun', 'L', 'Belum Menikah', 'A', '85234219554', 'SBKURNIAWAN53@GMAIL.COM', 'Jl Teuku Umar No 5 Wuluhan ', '3', '9', 'Dukuh Dempok', 'Wuluhan', 'Jember', 'Jawa Timur', 'Jl Teuku Umar No 5 Wuluhan', '003', '009', 'Dukuh Dempok', 'Wuluhan', 'Jember', 'Jawa Timur', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(548, NULL, NULL, 220022207025, '1', 'Aktif', 'Sinta Khusniya', '3318135804000000', 'Sinta Khusniya', 'Pati', '2000-04-18', '25 Tahun', 'P', 'Belum Menikah', 'Tidak Tahu', '88980930541', 'SINTAKHUSNIYA2000@GMAIL.COM', 'Dukuh Soko', '3', '1', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Ds. Semirejo, RT/RW 03/01, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(549, NULL, NULL, 220022207026, '1', 'Aktif', 'Muhammad Akbar,  S.Pd.', '3318122503990000', 'Muhammad Akbar,  S.Pd.', 'Pati', '1999-03-25', '26 Tahun', 'L', 'Belum Menikah', 'AB', '89602608262', 'AKBARFSEIEI7@GMAIL.COM', 'Jl. Mandura 3 Perum. Sukoharjo Indah Rt 02/07 Sukoharjo Margorejo', '2', '7', 'Sukoharjo', 'Margorejo', 'Pati', 'Jawa Tengah', 'Jl. Mandura 3 Perum. Sukoharjo Indah Rt 02/07 Sukoharjo Margorejo Pati', '02', '07', 'Sukoharjo', 'Margorejo', 'Pati', 'Jawa Tengah', 'Jln. Mandura 2 RT/RW 02/07, Ds. Sukoharjo, Kec. Margorejo, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(550, NULL, NULL, 220022207027, '1', 'Aktif', 'Febry Prayuda', '3318122602990000', 'Febry Prayuda', 'Pati', '1999-02-26', '26 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85733234478', 'FEBRYPRAYUDA2@GMAIL.COM', 'Ds. Wangunrejo Rt 05 Rw 01 Kec. Margorejo Kab. Pati', '5', '1', 'Wangunrejo', 'Margorejo', 'Pati', 'Jawa Tengah', 'Ds. Wangunrejo Rt 05 Rw 01', '05', '01', 'Wangunrejo', 'Margorejo', 'Pati', 'Jawa Tengah', 'Ds. Wangunrejo, RT/RW 05/01, Kec. Margorejo, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(551, NULL, NULL, 220022207028, '1', 'Aktif', 'Sigit Prasetyo', '3318021312970000', 'Sigit Prasetyo', 'Pati', '1997-12-13', '28 Tahun', 'L', 'Menikah', 'Tidak Tahu', '81391639799', 'PRASETYOSIGIT084@GMAIL.COM', 'Ds.Tamansari Rt02/ Rw03 Kec.Tlogowungu Kab.Pati', '2', '3', 'Tamansari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds.Tamansari Rt02 /Rw03 Kec.Tlogowungu Kab.Pati', '02', '03', 'Tamansari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Tamansari, RT/RW 02/03, Kec. Tlogowungu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(552, NULL, NULL, 220022207029, '0', 'Non Aktif', 'Muhammad Arief Hidayat', '3318123107980000', 'Muhammad Arief Hidayat', 'Pati', '1998-07-31', '27 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85641192321', 'ARIPHK131@GMAIL.COM', 'Perumahan Rendole Indah Blok C Jl. Muria 2 No.91', '4', '6', 'Muktiharjo', 'Margorejo', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'BTN Rondolo Indah, RT/RW 04/06, Ds. Muktiharjo, Kec. Margorejo, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(553, NULL, NULL, 220022207030, '1', 'Aktif', 'Ahmad Rudi Setiawan ', '1508070210940000', 'Ahmad Rudi Setiawan ', 'Tuo Limbur ', '1994-10-02', '31 Tahun', 'L', 'Belum Menikah', 'B', '', 'AHMADRUDISETIAWAN1@GMAIL.COM', 'Ds. Limbur Baru', '2', '0', 'Limbur Baru', 'Limbur Lubuk Mengkuang', 'Kabupaten Bungo', 'Jambi', 'Perum Bukit Santika Baru Blok D No. 2', '0', '0', 'Kedungbulus', 'Gembong', 'Kabupaten Pati', 'Jawa Tengah', 'Perum. Bukit Santika baru, Blok. D, No. 2, Ds. Kedungbulus, Gembong, Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(554, NULL, NULL, 220022207031, '1', 'Aktif', 'Muhammad Anshori', '3319092305970000', 'Muhammad Anshori', 'Kudus', '1997-05-23', '28 Tahun', 'L', 'Menikah', 'A', '', '47ANSHORI@GMAIL.COM', 'Dukuh Pohdengkol', '3', '4', 'Rejosari', 'Dawe', 'Kudus', 'Jawa Tengah', 'Idem', '3', '04', 'Rejosari', 'Dawe', 'Kudus', 'Jawa Tengah', 'Ds. Rejosari, RT/RW 03/04, Kec. Dawe, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(555, NULL, NULL, 220022207023, '1', 'Aktif', 'Angelia Arum Arizana', '3318106911030010', 'Angelia Arum Arizana', 'Pati', '2003-11-29', '22 Tahun', 'P', 'Belum Menikah', 'AB', '81325483335', 'ANGELIA.ARUM@GMAIL.COM', 'Ds. Geritan', '8', '2', 'Geritan', 'Pati', 'Pati', 'Jawa Tengah', 'Idem', '', '', '', '', '', '', 'Ds. Geritan RT/RW 08/02 Kec. Pati Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30');
+INSERT INTO `karyawan` (`id_karyawan`, `user_id`, `atasan_id`, `NIK`, `Status`, `Kode`, `Nama_Sesuai_KTP`, `NIK_KTP`, `Nama_Lengkap_Sesuai_Ijazah`, `Tempat_Lahir_Karyawan`, `Tanggal_Lahir_Karyawan`, `Umur_Karyawan`, `Jenis_Kelamin_Karyawan`, `Status_Pernikahan`, `Golongan_Darah`, `Nomor_Telepon_Aktif_Karyawan`, `Email`, `Alamat_KTP`, `RT`, `RW`, `Kelurahan_Desa`, `Kecamatan`, `Kabupaten_Kota`, `Provinsi`, `Alamat_Domisili`, `RT_Sesuai_Domisili`, `RW_Sesuai_Domisili`, `Kelurahan_Desa_Domisili`, `Kecamatan_Sesuai_Domisili`, `Kabupaten_Kota_Sesuai_Domisili`, `Provinsi_Sesuai_Domisili`, `Alamat_Lengkap`, `created_at`, `updated_at`) VALUES
+(556, NULL, NULL, 220022208032, '0', 'Non Aktif', 'Mega Jumah January', '3328083105030000', 'Mega Jumah January', 'Tegal', '2003-05-31', '22 Tahun', 'L', 'Belum Menikah', 'O', '881010000000', 'MEGAJUMAHJanuary@GMAIL.COM', 'Kedungbanteng', '20', '10', 'Kedungbanteng', 'Kedungbanteng', 'Tegal', 'Jawa Tengah', 'Kedungbanteng', '20', '10', 'Kedungbanteng', 'Kedungbanteng', 'Tegal', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(557, NULL, NULL, 220022208033, '0', 'Non Aktif', 'Alfian Daffa Ilyasa ', '3374133105990000', 'Alfian Daffa Ilyasa ', 'Semarang', '1999-05-31', '26 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82265212109', 'DAFFA310599@GMAIL.COM', 'Jl Pamularsih Buntu', '2', '8', 'Bojong Salaman', 'Semarang Barat', 'Kota', 'Jawa Tengah', 'Jl Gedung Batu Utara Ii No 30', '03', '07', 'Bongsari', 'Semarang Barat', 'Kota Semarang', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(558, NULL, NULL, 220022208034, '1', 'Aktif', 'Acep Yahya Wijaya', '3205022009960000', 'Acep Yahya Wijaya', 'Garut', '1996-09-26', '29 Tahun', 'L', 'Menikah', 'B', '82297200281', 'ACEPYAHYA26@GMAIL.COM', 'Kp. Ciparay', '2', '4', 'Lebakjaya', 'Karangpawitan', 'Garut', 'Jawa Barat', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Kp. Ciparay, Ds. Lebakjaya, Kec. Karangpawitan, Garut\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(559, NULL, NULL, 220022208035, '0', 'Non Aktif', 'Muhammad Ainul Yaqin ', '3319012904950000', 'Muhammad Ainul Yaqin ', 'Kudus', '1995-04-29', '30 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85712736683', 'MUHAMMADAINULYAQIN127@GMAIL.COM', 'Karangampel', '4', '', 'Karangampel', 'Kaliwungu', 'Kudus', 'Jawa Tengah', 'Karangampel', '04', 'IV', 'Karangampel', 'Kaliwungu', 'Kudus', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(560, NULL, NULL, 220022208036, '0', 'Non Aktif', 'Muhammad Zaini Ichsan', '3319080310020000', 'Muhammad Zaini Ichsan', 'Kudus', '2002-10-03', '23 Tahun', 'L', 'Belum Menikah', 'A', '85700968023', 'MZAINII190@GMAIL.COM', 'Klumpit', '2', '5', 'Klumpit', 'Gebog', 'Kudus', 'Jawatengah', 'Ds Klumpit Rt2/5 Gebog Kudus', '02', '05', 'Klumpit', 'Gebog', 'Kudus', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(561, NULL, NULL, 220022208037, '0', 'Non Aktif', 'Slamet Riyadi', '3509092402840000', 'Slamet Riyadi', 'Jember', '1984-02-24', '41 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82266662376', 'DJADOEL0102@GMAIL.COM', 'Jl.Ahmat Yani 32 - Bangsalsari', '1', '7', 'Bangsalsari', 'Bangsalsari', 'Jember', 'Jawa Timur', 'Idem', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(562, NULL, NULL, 220022208038, '1', 'Aktif', 'Muhammad Abdul Lathif', '3318130109960000', 'Muhammad Abdul Lathif', 'Pati', '1996-09-01', '29 Tahun', 'L', 'Menikah', 'O', '8156608614', 'ALGYMBONGI@GMAIL.COM', 'Dk Domo Ds Klakahkasihan Rt 02 Rw 01', '2', '1', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Idem', '', '', '', '', '', '', 'Ds. Klakahkasihan, RT/RW 02/01, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(563, NULL, NULL, 220022208039, '0', 'Non Aktif', 'Savitri Kusumawati', '3318105812010000', 'Savitri Kusumawati', 'Pati', '2001-12-18', '24 Tahun', 'P', 'Belum Menikah', 'O', '82241697101', 'SAVITRIKUSUMAWATI182001@GMAIL.COM', 'Ds. Kutoharjo Dk. Randu', '1', '4', 'Kutoharjo', 'Pati', 'Pati', 'Jawa Tengah', 'Ds. Kutoharjo Dk. Randu Rt 01 Rw 04 \nKec. Pati Kab. Pati', '01', '04', 'Kutoharjo', 'Pati', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(564, NULL, NULL, 220022208040, '1', 'Aktif', 'Elvinita', '3318064309980000', 'Elvinita', 'Pati', '1998-09-03', '27 Tahun', 'P', 'Belum Menikah', 'Tidak Tahu', '895430000000', 'ELVINITA09@GMAIL.COM', 'Desa Kebonturi', '5', '1', 'Kebonturi', 'Jaken', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Ds. Kebonturi, RT/RW 05/01, Kec. Jaken, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(565, NULL, NULL, 220022208041, '0', 'Non Aktif', 'Muhammad Nur Alim', '3318020205990000', 'Muhammad Nur Alim', 'Pati', '1999-05-02', '26 Tahun', 'L', 'Belum Menikah', 'A', '895413000000', 'MUHAM.NURALIM@GMAIL.COM', 'Boloagung', '7', '1', 'Boloagung', 'Kayen', 'Pati', 'Jawa Tengah', 'Boloagung', '07', '01', 'Boloagung', 'Kayen', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(566, NULL, NULL, 220022208042, '0', 'Non Aktif', 'Nur Jaelani Putro Hadianto S,E', '3518030401900000', 'Nur Jaelani Putro Hadianto S,E', 'Nganjuk', '1990-01-04', '35 Tahun', 'L', 'Menikah', 'O', '8563643233', 'NURJAELANI@YMAIL.COM', 'Dsn. Dadapan', '7', '1', 'Boyolangu', 'Boyolangu', 'Tulungagung', 'Jawa Timur', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(567, NULL, NULL, 220022208043, '0', 'Non Aktif', 'Munjiyat Al Romadhon', '3506142103920000', 'Munjiyat Al Romadhon', 'Kediri', '1992-03-21', '33 Tahun', 'L', 'Menikah', 'Tidak Tahu', '82140759061', 'RIDHO.ALSUBAKIR@GMAI.COM', 'Ringinsari', '4', '3', 'Ringinsari', 'Kandat', 'Kediri', 'Jawa Timur', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(568, NULL, NULL, 220022208044, '0', 'Non Aktif', 'Hafidz Rahmatullah', '3604012104980900', 'Hafidz Rahmatullah', 'Serang', '1998-04-21', '27 Tahun', 'L', 'Menikah', 'O', '89687022574', 'HAFIDZRAHMATULLAH653@GMAIL.COM', 'Komp. Bmi Blok A4 No. 4 Ciracas, Serang Banten', '3', '9', 'Serang', 'Serang', 'Serang', 'Banten', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(569, NULL, NULL, 220022208045, '0', 'Non Aktif', 'Mochamad Indra Kosasih', '3214021607940000', 'Mochamad Indra Kosasih', 'Purwakarta', '1994-07-16', '31 Tahun', 'L', 'Menikah', 'O', '81298139010', 'MOHAMMAD.INDRA167@GMAIL.COM', 'Kp Pasar Minggu', '4', '1', 'Cikumpay', 'Campaka', 'Purwakarta', 'Jawabarat', 'Perum Griya Ebony, Blok Angsana 5, No 3', '21', '03', 'Campakasari', 'Campaka', 'Purwakarta', 'Jawabarat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(570, NULL, NULL, 220022208046, '0', 'Non Aktif', 'Hendriyana Firdaus', '3214122009920000', 'Hendriyana Firdaus', 'Purwakarta', '1992-09-20', '33 Tahun', 'L', 'Menikah', 'O', '881026000000', 'HENDRIYANAFIRDAUS212@GMAIL.COM', 'Kp Gandasoli', '15', '3', 'Cigelam', 'Babakancikao', 'Purwakarta', 'Jawa Barat', 'Gg Kelapa \n', 'RT 026', 'RW 06', 'Ciwangi', 'Babakancikao', 'Purwakarta', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(571, NULL, NULL, 220022208047, '1', 'Aktif', 'Reksiyandi', '3204100606940000', 'Reksiyandi', 'Bandung', '1994-06-06', '31 Tahun', 'L', 'Menikah', 'O', '82111229961', 'REKSIYANDI66@GMAIL.COM', 'Kp. Cipangeran', '4', '2', 'Cipangeran', 'Saguling', 'Kabupaten Bandung Barat', 'Jawa Barat', 'Kp. Cipangeran', '04', '02', 'Desa Cipangeran', 'Saguling', 'Kabupaten Bandung Barat', 'Jawa Barat', 'Kp. Cipangerang, RT/RW 04/02, Ds. Cipangerang, Kec. Saguling, Kab. Bandung Barat\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(572, NULL, NULL, 220022208048, '0', 'Non Aktif', 'Muhammad Rofiq Takhiudin', '3523110403030000', 'Muhammad Rofiq Takhiudin', 'Tuban', '2003-03-04', '22 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '', 'ROFIQTAKHIUDIN14@GMAIL.COM', 'Ds.Menilo', '4', '1', 'Menilo', 'Soko', 'Tuban', 'Jawa Timur', 'Ds Menilo', '04', '01', 'Menilo', 'Soko', 'Tuban', 'Jawa Timur', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(573, NULL, NULL, 220022208049, '1', 'Aktif', 'Imam Shobirin', '3318132110000000', 'Imam Shobirin', 'Pati', '2000-10-21', '25 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85842882722', 'IMAMKIKUK55@GMAIL.COM', 'Desa Kedungbulus', '2', '2', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Ds. Kedungbulus, RT/RW 02/02, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(574, NULL, NULL, 220022208051, '1', 'Aktif', 'Laula Luthfia Shohibul Fadhila ', '3318132010030000', 'Laula Luthfia Shohibul Fadhila ', 'Pati', '2003-10-20', '22 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85702867909', 'SHOHIBULFADHIL123@GMAIL.COM', 'Dk. Posono Rt03/07 Ds. Klakahkasihan', '3', '7', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Posono Rt03/07 Ds. Klakahkasihan', '03', '07', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Klakahkasihan, RT/RW 03/07, Kec. Gembong, Kab. Pati, Jawa Tengah\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(575, NULL, NULL, 220022208052, '0', 'Non Aktif', 'Farih Tifrohan', '3308190105930000', 'Farih Tifrohan', 'Magelang', '1993-07-05', '32 Tahun', 'L', 'Menikah', 'AB', '85600008054', 'FARIHTIFROHAN@GMAIL.COM', 'Dlimas', '1', '2', 'Dlimas', 'Tegalrejo', 'Magelang', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Ds. Dlimas, RT/RW 01/02, Kec. Tegalrejo, Kab. Magelang\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(576, NULL, NULL, 220022208054, '0', 'Non Aktif', 'Tri Joko Wiyono', '3509191101880000', 'Tri Joko Wiyono', 'Jember', '1988-01-11', '37 ', 'L', 'Menikah', 'B', '82132775775', 'TRIJOKOW1101@GMAIL.COM', 'Perum Bumi Mangli Permai Ia/12A', '5', '15', 'Mangli', 'Kaliwates', 'Jember', 'Jawa Timur', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(577, NULL, NULL, 220022208055, '0', 'Non Aktif', 'Septa Nanda Yoke Fadinna', '3317135809990000', 'Septa Nanda Yoke Fadinna', 'Pati', '1999-09-18', '26 Tahun', 'P', 'Belum Menikah', 'Tidak Tahu', '81575710924', 'NANDA.NATARA18@GMAIL.COM', 'Ds.Jurangjero 06/01 Kec.Sluke Kab Rembang-Jawa Tengah', '6', '1', 'Jurangjero', 'Sluke', 'Rembang', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(578, NULL, NULL, 2200222080056, '0', 'Non Aktif', 'Muhammad Toat Fatir Habbi', '3508030307070000', 'Muhammad Toat Fatir Habbi', 'Lumajang', '2007-07-03', '18 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '', 'BIMBIMTOAT@GMAIL.COM', 'Desa Sungkup', '3', '', 'Sungkup', 'Bulik Timur', 'Lamandau/Nanga Bulik', 'Kalimantan Tengah', 'Desa Sungkup', '003', '.', 'Sungkup', 'Bulik Timur', 'Lamandau/Nanga Bulik', 'Kalimantan Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(579, NULL, NULL, 220022208057, '1', 'Aktif', 'Adi Cahyono Putro', '3502172001860000', 'Adi Cahyono Putro', 'Ponorogo', '1986-01-20', '39 Tahun', 'L', 'Menikah', 'A', '82218940020', 'ADEECP@GMAIL.COM', 'Jln Tanggul Angin', '1', '1', 'Purwosari', 'Babadan', 'Ponorogo', 'Jawa Timur', 'Jln Tanggul Angin', '01', '01', 'Purwosari', 'Babadan', 'Ponorogo', 'Jawa Timur', 'Jl. Tanggul Angin 14 Babadan Ponorogo\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(580, NULL, NULL, 220022208058, '0', 'Non Aktif', 'Nishfa Mufatihah', '3318145111000000', 'Nishfa Mufatihah', 'Pati', '2000-11-11', '25 Tahun', 'P', 'Belum Menikah', 'O', '85817280917', 'MUFATIHAHNISHFA@STUDENTS.UNNES.AC.ID', 'Gg Peluru 1, Ds Lahar Dk Nggajah', '2', '6', 'Lahar', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Gg Peluru 1', '02', '06', 'Lahar', 'Tlogowungu', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(581, NULL, NULL, 220022208059, '0', 'Non Aktif', 'Muhammad Kusrianto', '3320092801000000', 'Muhammad Kusrianto', 'Jepara', '1999-12-28', '26 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85229955413', 'MUHAMMADKUSRIANTO64@GMAIL.COM', 'Desa Bumiharjo', '4', '2', 'Bumiharjo', 'Keling', 'Jepara', 'Jawa Tengah', 'Bumiharjo', '04', '02', 'Bumiharjo', 'Keling', 'Jepara', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(583, NULL, NULL, 220022208061, '1', 'Aktif', 'Ayuk Dian Noviana', '3318126011010000', 'Ayuk Dian Noviana', 'Pati', '2001-11-20', '24 Tahun', 'P', 'Menikah', 'Tidak Tahu', '85747850191', 'AYUKDIAN089@GMAIL.COM', 'Margorejo', '3', '6', 'Desa Margorejo', 'Margorejo', 'Pati', 'Jawa Tengah', 'Idem', '03', '06', 'Margorejo', 'Margorejo', 'Pati', 'Jawa Tengah', '#N/A\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(584, NULL, NULL, 220022209062, '0', 'Non Aktif', 'Bagus Indra Suwaji', '3318072710990000', 'Bagus Indra Suwaji', 'Pati', '1999-10-27', '26 Tahun', 'L', 'Menikah', 'B', '85713092835', 'BAGUSINDRA421@GMAIL.COM', 'Jl. Raya Batangan-Jaken', '1', '4', 'Kedalon', 'Batangan', 'Pati', 'Jawa Tengah', 'Rendole', '04', '01', 'Muktiharjo', 'Margorejo', 'Kabupaten Pati', 'Jawa Tengah', 'Jln. Raya Batangan-Jaken KM 1,5 Ds. Kedalon, RT/RW 01/04, Kec. Batangan, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(585, NULL, NULL, 220022209063, '0', 'Non Aktif', 'Hasan', '3318100501000000', 'Hasan', 'Pati', '2000-01-05', '25 Tahun', 'L', 'Menikah', 'O', '81326412451', 'IDRUS.HASAN05@GMAIL.COM', 'Desa Puri', '3', '2', 'Puri', 'Pati', 'Pati', 'Jawa Tengah', 'Desa Wonosekar', '06', '01', 'Wonosekar', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(586, NULL, NULL, 220022209064, '0', 'Non Aktif', 'Nanang Prasetyo ', '3318101711000000', 'Nanang Prasetyo ', 'Pati', '2000-11-17', '25 Tahun', 'L', 'Menikah', 'O', '87812456523', 'PRASETYONANANG2810@GMAIL.COM', 'Ds. Trangkil Rt 1/ Rw 6', '1', '6', 'Trangkil', 'Trangkil', 'Pati', 'Jawa Tengah', 'Ds. Trangkil Rt 1/Rw 6', '01', '06', 'Trangkil', 'Trangkil', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(587, NULL, NULL, 220022209065, '0', 'Non Aktif', 'Siti Mu\'allifah ', '3318165204990000', 'Siti Mu\'allifah ', 'Pati', '1999-04-12', '26 Tahun', 'P', 'Belum Menikah', 'AB', '82147142394', 'MUALLIFASH@GMAIL.COM', 'Jalan Kyai Ranten 02 Desa Sidomukti Rt 02 Rw 02 Kec. Margoyoso Kab. Pati', '2', '2', 'Sidomukti', 'Margoyoso', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(588, NULL, NULL, 220022209066, '0', 'Non Aktif', 'Anis showam', '3317011311940000', 'Anis showam', 'Rembang', '1994-11-13', '31 Tahun', 'L', 'Menikah', 'O', '82232651872', 'ANISSOWAM1994@GMAIL.COM', 'Ronggomulyo', '4', '2', 'Ronggomulyo', 'Sumber', 'Rembang', 'Jawa Tengah', 'Kedalon', '01', '01', 'Gadel', 'Batangan', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(589, NULL, NULL, 220022209081, '1', 'Aktif', 'Tri Febriyanto', '3318140202050000', 'Tri Febriyanto', 'Pati', '2005-02-02', '20 Tahun', 'L', 'Belum Menikah', 'O', '81391705090', 'TRIFEBRI207@GMAIL.COM', 'Ds. Guwo', '4', '2', 'Guwo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Guwo', '004', '002', 'Guwo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Guwo, RT/RW 04/02, Kec. Tlogowungu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(590, NULL, NULL, 220022209067, '0', 'Non Aktif', 'Rizky Pratama ', '3207222806950000', 'Rizky Pratama ', 'CIamis', '1995-06-28', '30 Tahun', 'L', 'Menikah', 'B', '81350533638', 'RIZKYPRATAMA.0203@GMAIL.COM', 'Dusun Parapat', '4', '7', 'Pangandaran', 'Pangandaran', 'Pangandaran', 'Jawa Barat', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(591, NULL, NULL, 220022209068, '0', 'Non Aktif', 'Nurma Fatianisa', '3318106501020000', 'Nurma Fatianisa', 'Pati', '2002-01-25', '23 Tahun', 'P', 'Menikah', 'Tidak Tahu', '85727569285', 'NURMANISA2506@GMAIL.COM', 'Desa Tambaharjo', '5', '2', 'Tambaharjo', 'Pati', 'Pati', 'Jawa Tengah', 'Tambaharjo', '05', '02', 'Tambaharjo', 'Pati', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(592, NULL, NULL, 220022209069, '0', 'Non Aktif', 'Iva Nur Ilma', '3308145311970000', 'Iva Nur Ilma', 'Magelang', '1997-11-13', '28 Tahun', 'P', 'Menikah', 'O', '', 'IVANRLM23@GMAIL.COM', 'Semen Salamkanci, Magelang, Jawa Tengah', '2', '7', 'Salamkanci', 'Bandongan', 'Magelang', 'Jawa Tengah', 'Jl. Pemuda No.302 A, Cengkok, Sidoharjo, Kec. Pati, Kabupaten Pati, Jawa Tengah', '-', '-', 'Sidoharjo', 'Pati', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(593, NULL, NULL, 220022209070, '1', 'Aktif', 'Sona Ardhyan', '3275032001940020', 'Sona Ardhyan', 'Jakarta', '1994-01-20', '31 Tahun', 'L', 'Menikah', 'A', '83897776438', 'ARDHYANSONA@GMAIL.COM', 'Jl. Bulustalan Gang 3A No. 362C', '4', '3', 'Bulustalan', 'Semarang Selatan', 'Semarang', 'Jawa Tengah', 'Perum. Griya Kusuma Indah, Blok B No. 18', '07', '01', 'Muktiharjo', 'Margorejo', 'Pati', 'Jawa Tengah', 'Perum Griya Kusuma Indah, Gang Gareng, Blok B No. 18, RT/RW 07/01 Rendole, Muktiharjo, Kec. Margorejo, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(594, NULL, NULL, 220022209071, '0', 'Non Aktif', 'Alfi Alfu Adama Junean Achmad', '3318120506990000', 'Alfi Alfu Adama Junean Achmad', 'Magetan', '1999-06-05', '26 Tahun', 'L', 'Belum Menikah', 'A', '85234290932', 'ALFIADAMA7@GMAIL.COM', 'Ngagul Asri Jl Flamboyan Rt 03 Rw 05 Muktiharjo Margorejo Pati', '3', '5', 'Muktiharjo', 'Margorejo', 'Pati', 'Jawa Tengah', 'Ngagul Asri Jl Flamboyan', '03', '05', 'Muktiharjo', 'Margorejo', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(595, NULL, NULL, 220022209072, '0', 'Non Aktif', 'Muftikhatur Rohmah', '3318185709040000', 'Muftikhatur Rohmah', 'Pati', '2004-09-17', '21 Tahun', 'P', 'Belum Menikah', 'Tidak Tahu', '85226981600', 'MUFTIKHATURROHMAH17@GMAIL.COM', 'Medani, Rt 1 Rw 3, Cluwak, Pati', '1', '3', 'Medani', 'Cluwak', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(596, NULL, NULL, 220022209073, '0', 'Non Aktif', 'Azillatin Qisthian Diny', '3510054505980010', 'Azillatin Qisthian Diny', 'Ende', '1998-05-05', '27 Tahun', 'P', 'Belum Menikah', 'AB', '82237226032', 'AZILLATINQISTHIAN05@GMAIL.COM', 'Dusun Sumberayu Rt 3 Rw 3 Desa Sumberberas Kec Muncar Banyuwangi', '3', '3', 'Sumberberas', 'Muncar', 'Banyuwangi', 'Jatim', 'Perum Griya Sekar Winong Asri Blok A. No.98 -100 Rt. 05 Rw. 06 Winong - Pati', '05', '06', 'Winong', 'Winong', 'Pati', 'Jateng', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(597, NULL, NULL, 220022209074, '1', 'Aktif', 'Muhamad Zainal Muttaqin', '3276031504770010', 'Muhamad Zainal Muttaqin', 'Pekalongan ', '1977-04-15', '48 Tahun', 'L', 'Menikah', 'O', '82139689833', 'ZAINAL_MTTQN@YAHOO.COM', 'Perum De Perigi Regency Blok E No. 3', '1', '7', 'Bedahan', 'Sawangan', 'Depok', 'Jawa Barat', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Perum De Perigi Regency Blok E No. 3, Rt. 001/007, Bedahan, Sawangan, Depok Jawa Barat\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(598, NULL, NULL, 220022209075, '0', 'Non Aktif', 'Aziz Nur Sholekhuddin ', '3273161004040000', 'Aziz Nur Sholekhuddin ', 'Bandung', '2004-04-10', '21 Tahun', 'L', 'Belum Menikah', 'O', '85891069560', 'ANUR2835@GMAIL.COM', 'Jalan Babakan Sari 3', '3', '15', 'Babakan Sari', 'Kiaracondong', 'Bandung', 'Jawa Barat', 'Jalan Babakan Sari 3', '03', '015', 'Babakan Sari', 'Kiaracondong', 'Bandung', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(600, NULL, NULL, 220022209077, '0', 'Non Aktif', 'Moh Hisbulloh Addaroini', '3506161110930000', 'Moh Hisbulloh Addaroini', 'Kediri', '1993-10-11', '32 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85777704874', 'KHASBULLAHADD@GMAIL.COM', 'Dsn Ngino Kec Plemahan Kab Kediri', '1', '4', 'Ngino', 'Plemahan', 'Kediri', 'Jatim', 'Dsn Ngino Kec Plemahan', '001', '004', 'Ngino', 'Plemahan', 'Kediri', 'Jatim', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(602, NULL, NULL, 220022209079, '1', 'Aktif', 'Novia Metallica Agusta', '3318100811910000', 'Novia Metallica Agusta', 'Pati', '1991-11-08', '34 Tahun', 'L', 'Menikah', 'O', '85774211000', 'METALLIZEER@GMAIL.COM', 'Perum Griya Permai Muktiharjo No 29', '7', '2', 'Muktiharjo', 'Margorejo', 'Pati', 'Jawa Tengah', 'Desa Puri', '02', '05', 'Puri', 'Pati', 'Pati', 'Jawa Tengah', 'Perum Griya Permai Muktiharjo No 29 Ds. Muktiharjo, Kec. Pati, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(604, NULL, NULL, 220022209080, '0', 'Non Aktif', 'Fajri tadarus', '3201150203900000', 'Fajri tadarus', 'Bogor', '1990-03-02', '35 Tahun', 'L', 'Belum Menikah', 'A', '85861796668', 'FAJRI.TADARUS90@GMAIL.COM', 'Kp Cibanteng', '1', '3', 'Cibanteng', 'Ciampea', 'Bogor', 'Jawa Barat', 'Kp Cibanteng', '001', '003', 'Cibanteng', 'Ciampea', 'Bogor', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(605, NULL, NULL, 220022209083, '1', 'Aktif', 'Eka Oktaviyaningrum', '3318154410990000', 'Eka Oktaviyaningrum', 'Pati', '1999-10-04', '26 Tahun', 'P', 'Menikah', 'O', '89646601075', 'OKTAVIYAEKA0@GMAIL.COM', 'Dukuh Runting', '1', '1', 'Tambaharjo', 'Pati', 'Pati', 'Jawa Tengah', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Ds. Tambaharjo, RT/RW 01/01, Kec. Pati, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(606, NULL, NULL, 220022209084, '0', 'Non Aktif', 'Diky supriyadi', '3209142205010010', 'Diky supriyadi', 'Cirebon', '2001-05-05', '24 Tahun', 'L', 'Belum Menikah', 'B', '89513094305', 'DIKYSUPRIYADI70@GMAIL.COM', 'Ciperna Blok Gemulung 2 Rt/Rw : 003/001 Kec.Talun Kab.Cirebon', '3', '1', 'Ciperna', 'Talun', 'Cirebon', 'Jawa Barat', 'Ciperna Blok Gemulung 2 Rt/Rw : 003/001 Kec.Talun Kab.Cirebon', '003', '001', 'Ciperna', 'Talun', 'Cirebon', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(607, NULL, NULL, 220022209085, '0', 'Non Aktif', 'M Ramdani', '3602182702950000', 'M Ramdani', 'Lebak', '1995-02-27', '30 Tahun', 'L', 'Menikah', 'AB', '83853810496', 'DANIROCOB@GMAIL.COM', 'Kp Rancasema', '2', '1', 'Kaduagung Timur', 'Cibadak', 'Lebak', 'Banten', 'Kp Rancasema', '002', '001', 'Kaduagung Timur', 'Cibadak', 'Lebak', 'Banten', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(609, NULL, NULL, 220022209087, '0', 'Non Aktif', 'Istiqomah', '3603285411790010', 'Istiqomah', 'Pati', '1979-11-14', '46 Tahun', 'P', 'Menikah', 'A', '82246178488', 'istinm0622@gmail.com', 'Jln.Mendut Raya No 29', '1', '11', 'Bencongan', 'Kelapa Dua', 'Tangerang', 'Banten', 'Lavon 1 Swancity, Cluster Enchanta 2 No 8', '00', '00', 'Wanakerta', 'Sindang Jaya', 'Tangerang', 'Banten', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(610, NULL, NULL, 220022209088, '1', 'Aktif', 'Suharto', '3175081011750010', 'Suharto', 'Jakarta', '1975-11-10', '50 Tahun', 'L', 'Menikah', 'O', '81315066128', 'Suharto.dows@gmail.com', 'Cipinang melayu no 9', '6', '2', 'Cipinang melayu', 'Makasar', 'Jakarta timur', 'Indonesia', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Cipinang Melayu No. 9, RT/RW 006/02, Kel. Cipinang Melayu, Kec. Makasar, Jakarta Timur\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(611, NULL, NULL, 220022209089, '1', 'Aktif', 'Nadya Laila Nur Shaelawaty', '3318136405980000', 'Nadya Laila Nur Shaelawaty', 'Pati', '1998-05-24', '27 Tahun', 'P', 'Belum Menikah', 'Tidak Tahu', '82221872773', 'NADYALAILANSW24@GMAIL.COM', 'Desa Bageng Rt.03/Rw.03, Kecamatan.Gembong, Kabupaten. Pati', '3', '3', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', 'Desa Bageng Rt.03/Rw.03, Kecamatan. Gembong, Kabupaten. Pati', '03', '03', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Bageng, RT/RW 03/03, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(612, NULL, NULL, 220022210090, '0', 'Non Aktif', 'Ujang Saeful Rohman', '3214101005940000', 'Ujang Saeful Rohman', 'Purwakarta', '1994-05-10', '31 Tahun', 'L', 'Belum Menikah', 'B', '85759125494', 'UJESAEFUL94@GMAIL.COM', 'Kp Parapatan', '18', '9', 'Selaawi', 'Pasawahan', 'Purwakarta', 'Jawa Barat', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(613, NULL, NULL, 220022210091, '0', 'Non Aktif', 'Umar  Dino Syidik', '3217062609990010', 'Umar  Dino Syidik', 'Bandung', '1999-08-24', '26 Tahun', 'L', 'Belum Menikah', 'B', '89513706809', 'UDINOSYIDIK@GMAIL.COM', 'Kp. Cibuntu', '2', '9', 'Cilame', 'Ngamprah', 'Bandung Barat', 'Jawa Barat', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(614, NULL, NULL, 220022210092, '0', 'Non Aktif', 'Aditya Budi Hermawan', '3318151507940000', 'Aditya Budi Hermawan', 'Pati', '1994-07-14', '31 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85728998580', 'ADITYABUDIHERMAWAN1@GMAIL.COM', 'Ds. Ngurensiti', '1', '3', 'Ngurensiti', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Idem', '01', '03', 'Ngurensiti', 'Wedarijaksa', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(615, NULL, NULL, 220022210093, '1', 'Aktif', 'Rizky Risdyakrisna Putra', '3509191704930000', 'Rizky Risdyakrisna Putra', 'Semarang', '1993-04-17', '32 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85640689660', 'RIZKYRISDYAKRISNAP@GMAIL.COM', 'Perum Griya Sekar Asri', '5', '3', 'Muktiharjo', 'Margorejo', 'Pati', 'Jateng', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Perum Griya Sekar Asri, RT/RW 05/03, Ds. Muktiharjo, Kec. Margorejo, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(616, NULL, NULL, 220022210094, '1', 'Aktif', 'Dwi Andra oktarianto', '3513181010980010', 'Dwi Andra oktarianto', 'Probolinggo', '1998-10-10', '27 Tahun', 'L', 'Belum Menikah', 'O', '81336500961', 'DWIANDRAOKTARIANTO98@GMAIL.COM', 'Dusun 1 Pasar 1 Desa Klaseman', '10', '5', 'Klaseman', 'Gending', 'Probolinggo', 'Jawa Timur', 'Dusun 1 Pasar 1 Klaseman', '010', '005', 'Klaseman', 'Gending', 'Probolinggo', 'Jawa Timur', 'Ds. Klaseman, RT/RW 10/05, Kec. Gending, Kab. Probolinggo\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(617, NULL, NULL, 220022210095, '0', 'Non Aktif', 'Khoerudin', '3202170703990010', 'Khoerudin', 'Sukabumi', '1998-06-27', '27 Tahun', 'L', 'Menikah', 'O', '85779008010', 'KHOERUDIN270@GMAIL.COM', 'Kp.Babakan Peundeuy', '3', '3', 'Bojongkokosan', 'Parungkuda', 'Sukabumi', 'Jawa Barat', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(618, NULL, NULL, 220022210097, '0', 'Non Aktif', 'Chavita putri ', '3276015001990000', 'Chavita putri ', 'Bogor ', '1999-01-10', '26 Tahun', 'P', 'Menikah', 'O', '88222239975', 'PUTRICHAVITA99@GMAIL.COM', 'Jl Gandaria 1', '3', '6', 'Ratujaya', 'Cipayung', 'Kota Depok', 'Jawa Barat', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(619, NULL, NULL, 220022210098, '0', 'Non Aktif', 'Djaenal', '3215171109010000', 'Djaenal', 'Karawang', '2001-09-11', '24 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '8999097882', 'DJAENAL004@GMAIL.COM', 'Dusun Krajan 2', '8', '5', 'Talagasari', 'Telagasari', 'Karawang', 'Jawa Barat', 'Idem', 'IDEM', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(620, NULL, NULL, 220022210099, '0', 'Non Aktif', 'Akbar Rusmansyah', '3578270205940000', 'Akbar Rusmansyah', 'Kediri', '1994-05-02', '31 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82288644644', 'AKBARRUSMANSYAH@YAHOO.COM', 'Jl Tanjungsari Teratai No 15', '2', '5', 'Tanjungsari', 'Sukomanunggal', 'Surabaya', 'Jawa Timur', 'Idem', 'Iden', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(621, NULL, NULL, 220022210001, '0', 'Non Aktif', 'Setya adjie Triyono', '3318162012980000', 'Setya adjie Triyono', 'Pati', '1998-12-20', '27 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '81386375242', 'SETYAADJIETRIYONO20@GMAIL.COM', 'Desa Sidomukti kecematan Margoyoso kabupaten Pati', '2', '3', 'Sidomukti', 'Margoyoso', 'Pati', 'Jawa tengah', 'Desa Sidomukti', '02', '03', 'Sidomukti', 'Margoyoso', 'Pati', 'Jawa tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(622, NULL, NULL, 220022210002, '0', 'Non Aktif', 'Slamet harsodiq', '3321020303920000', 'Slamet harsodiq', 'Demak', '1992-03-03', '33 Tahun', 'L', 'Menikah', 'O', '81329325347', 'HARSODIQS@GMAIL.COM', 'Bumirejo turus', '1', '1', 'Turus', 'Karangawen', 'Demak', 'Jateng', 'Bumirejo turus', '01', '01', 'Bumirejo', 'Karangawen', 'Demak', 'Jateng', 'Villa Siberi, RT/RW 06/04, Banjarejo Boja, Demak\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(623, NULL, NULL, 220022210003, '0', 'Non Aktif', 'Uki Maisar', '3303070310960000', 'Uki Maisar', 'Purbalingga', '1996-10-03', '29 Tahun', 'L', 'Belum Menikah', 'AB', '8989100697', 'UKIMAISAR0619@GMAIL.COM', 'Sumingkir', '12', '5', 'Sumingkir', 'Kutasari', 'Purbalingga', 'Jawa Tengah', 'Villa Gading Harapan 3 Blok D24 no.2A', '23', '13', 'Kedungjaya', 'Babelan', 'Bekasi', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(624, NULL, NULL, 220022210004, '0', 'Non Aktif', 'Tsalis Fawwaz Bysi', '325012510950013', 'Tsalis Fawwaz Bysi', 'Bekasi', '1995-10-25', '30 Tahun', 'L', 'Menikah', 'O', '87777790022', 'TSALISBYSI@GMAIL.COM', 'Perumahan Margahayu C/574', '1', '16', 'Margahayu', 'Bekasi Timur', 'Bekasi', 'Jawa Barat', 'Komplek PHI', '04', '06', 'Sukamaju', 'Cilodong', 'Depok', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(625, NULL, NULL, 220022210005, '0', 'Non Aktif', 'Sabar Abdullah', '3671131202980000', 'Sabar Abdullah', 'Jakarta', '1998-02-12', '27 Tahun', 'L', 'Menikah', 'O', '89677137954', 'SABARABDULLAHHH@GMAIL.COM', 'Kp Sangiang GG kijakang RT 05 RW 001 Periuk jaya Periuk Tangerang', '5', '1', 'Periuk Jaya', 'Periuk', 'Tangerang', 'Banten', 'IDEM', '005', '001', 'Periuk Jaya', 'Periuk', 'Tangerang', 'Banten', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(626, NULL, NULL, 220022210006, '0', 'Non Aktif', 'Naufal Rinto', '1371092901970010', 'Naufal Rinto', 'Lampung', '1997-01-29', '28 Tahun', 'L', 'Belum Menikah', 'AB', '8815714125', 'naufalrianto99@gmail.com', 'Komp taruko II blok G4', '4', '6', 'Korong gadang', 'Kuranji', 'Padang', 'Sumatera barat', 'Jl kali mulya', '001', '002', 'Pondok raja', 'Cibinong', 'Bogor', 'Jawa barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(627, NULL, NULL, 220022210007, '0', 'Non Aktif', 'Arifin Hendra', '3273242105980000', 'Arifin Hendra', 'Bandung', '1998-05-21', '27 Tahun', 'L', 'Belum Menikah', 'B', '8987953855', 'ARIFINHENDRA21@GMAIL.COM', 'Jl. Parakansaat no.13', '3', '6', 'Cisaranten Endah', 'Arcamanik', 'Kota Bandung', 'Jawa Barat', 'Jl. Parakansaat No.13', '03', '06', 'Cisaranten Endah', 'Arcamanik', 'Kota Bandung', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(628, NULL, NULL, 220022210008, '1', 'Aktif', 'Saiful Aji Saputro', '3319011110970000', 'Saiful Aji Saputro', 'Kudus', '1997-10-11', '28 Tahun', 'L', 'Menikah', 'O', '81328178391', 'saifulfujina97@gmail.com', 'Bapangan', '2', '2', 'Bakalan Krapyak', 'Kaliwungu', 'Kudus', 'Jawa tengah', 'Bapangan', '02', '02', 'Bakalan Krapyak', 'Kaliwungu', 'Kudus', 'Jawa tengah', 'Bapangan, RT/RW 02/02, Bakalan Krapyak, Kaliwungu, Kudus\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(629, NULL, NULL, 220022211001, '0', 'Non Aktif', 'Boedi Saksono', '3174090411760000', 'Boedi Saksono', 'Bogor', '1976-11-04', '49 Tahun', 'L', 'Menikah', 'Tidak Tahu', '81286787819', 'saksonoboedi1976@gmail.com', 'Ds. Lenteng Agung, RT/RW 003/010, Kec. Jagakarsa, Kab. Jakarta Selatan, Jakarta', '3', '10', 'Lenteng Agung', 'Jagakarsa', 'Jakarta Selatan', 'DKI Jakarta', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(630, NULL, NULL, 220022211002, '1', 'Aktif', 'Sumarno', '3172022807650000', 'Sumarno', 'Jakarta', '1965-07-28', '60 Tahun', 'L', 'Menikah', 'O', '8161171676', 'sumarno0728@gmail.com', 'Ds. Sunter Agung, RT/RW 002/009, Kec. Tanjung Priok, Jakarta', '2', '9', 'Sunter Agung ', 'Tanjung Priok', 'Jakarta Utara', 'DKI Jakarta', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'Komplek PLN Blok A15/20, RT/RW 02/09, Sunter Agung, Jakarta Utara\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(631, NULL, NULL, 220022211003, '0', 'Non Aktif', 'Dani sudrajat', '3201141810900000', 'Dani sudrajat', 'Bogor', '1990-10-18', '35 Tahun', 'L', 'Menikah', 'B', '85716050246', 'sudrajatdani866@gmail.com', 'Kp sadeng kaum', '4', '5', 'Sibanteng', 'Leuwisadeng', 'Kab.bogor', 'Jawa barat', 'Amanah asri II blok a37', '05', '13', 'Leuwiliang', 'Leuwiliang', 'Bogor', 'Jawa barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(632, NULL, NULL, 220022211004, '0', 'Non Aktif', 'Arif Nanda Irawan', '3318101802960000', 'Arif Nanda Irawan', 'Pati', '1996-02-18', '29 Tahun', 'L', 'Belum Menikah', 'O', '82333936866', 'arifnandairawan243@gmail.com', 'Kelurahan kalidoro RT2 RW1 kecamatan Pati, kabupaten Pati', '2', '1', 'Kalidoro', 'Pati', 'Pati', 'Jawa tengah', 'Kelurahan kalidoro RT2 RW1 kecamatan Pati, kabupaten Pati', '02', '01', 'Kalidoro', 'Pati', 'Pati', 'Jawa tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(633, NULL, NULL, 220022211005, '0', 'Non Aktif', 'Antoni', '3603320606980000', 'Antoni', 'Tangerang', '1998-06-06', '27 Tahun', 'L', 'Belum Menikah', 'O', '83812389666', 'Antonofficial3@gmail.com', 'Kampung talok', '2', '1', 'Talok', 'Kresek', 'Kab. Tangrang', 'Banten', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(634, NULL, NULL, 220022211006, '1', 'Aktif', 'Windi putra Maryadi', '3329041903940000', 'Windi putra Maryadi', 'Brebes', '1994-03-19', '31 Tahun', 'L', 'Menikah', 'A', '882008000000', 'windiputramaryadi@gmail.com', 'Laren', '4', '4', 'Laren', 'Bumiayu', 'Brebes', 'Jawa tengah', 'Jl Krakatau', '03', '12', 'Sidanegara', 'Cilacap tengah', 'Cilacap', 'Jawa tengah', 'Jl. Nusa Indah, Kesugihan Kidul, Kec. Kesugihan, Kab. Cilacap\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(635, NULL, NULL, 220022211007, '1', 'Aktif', 'Nur Jannah', '3318046208950000', 'Nur Jannah', 'Pati', '1995-08-22', '30 Tahun', 'P', 'Belum Menikah', 'A', '85741699268', 'nj732945@gmail.com', 'Ds Tawangrejo', '1', '4', 'Tawangrejo', 'Winong', 'Pati', 'Jawa tengah', 'Idem', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'Ds. Tawangrejo, RT/RW 01/04, Kec. Winong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(636, NULL, NULL, 220022211008, '0', 'Non Aktif', 'Ayun Widiyanti', '3318215208000000', 'Ayun Widiyanti', 'Pati', '2000-08-12', '25 Tahun', 'P', 'Menikah', 'A', '89681804163', 'ayunwidiyanti12@gmail.com', 'Trangkil RT 4 RW 3, Trangkil, Pati', '4', '3', 'Trangkil', 'Trangkil', 'Pati', 'Jawa Tengah', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'Trangkil, RT/RW 04/03, Kec. Trangkil, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(637, NULL, NULL, 220022211009, '1', 'Aktif', 'Anggi Yuvita Asmianik', '3318085204010020', 'Anggi Yuvita Asmianik', 'Pati', '2001-04-12', '24 Tahun', 'P', 'Belum Menikah', 'O', '82324495320', 'anggi.yuvita62@gmail.com', 'Ngerang Kidul', '4', '3', 'Trimulyo', 'Juwana', 'Pati', 'Jawa Tengah', 'Ngerang Kidul', '004', '003', 'Trimulyo', 'Juwana', 'Pati', 'Jawa Tengah', 'Ngerang Kidul, RT/RW 04/03, Ds. Trimulyo, Kec. Juwana, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(638, NULL, NULL, 220022211010, '0', 'Non Aktif', 'ahmad febriana dwi efendi', '3523072202000000', 'ahmad febriana dwi efendi', 'tuban', '2000-02-22', '25 Tahun', 'L', 'Belum Menikah', 'O', '85730644331', 'fendisinnegar86@gmail.com', 'jl kh syarbini dsn krajan', '2', '1', 'Lajo Lor', 'Singgahan', 'Tuban', 'Jawa Timur', 'jl smolowaru utara II no 4 sukolilo surabaya', '007', '002', 'smolowaru', 'sukolilo', 'surabaya', 'jawa timur', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(639, NULL, NULL, 220022211011, '0', 'Non Aktif', 'Feby Afiful Yahya', '3318132402000000', 'Feby Afiful Yahya', 'Pati', '2000-02-24', '25 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82247229916', 'febyafiful@gmail.com', 'Ds Bermi kec Gembong Kab Pati', '3', '1', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds Bermi kec Gembong Kab Pati', '03', '01', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(640, NULL, NULL, 220022211012, '0', 'Non Aktif', 'Andhika Bayu Nur Syahid', '3318082212990040', 'Andhika Bayu Nur Syahid', 'Pati', '1999-12-22', '26 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '8985834367', 'andhikabayu960@gmail.com', 'Desa Bendar RT 03 RW 02, Juwana, Pati', '3', '2', 'Bendar', 'Juwana', 'Pati', 'Jawa Tengah', 'Desa Bendar RT 03 RW 03, Juwana, Pati', '03', '02', 'Bendar', 'Juwana', 'Pati', 'Jawa Tengah', 'Ds. Bendar, RT/RW 03/02, Kec. Juwana, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(641, NULL, NULL, 220022211013, '1', 'Aktif', 'rizki amalia zakia', '3203035401940000', 'rizki amalia zakia', 'sukabumi', '1994-01-14', '31 Tahun', 'P', 'Belum Menikah', 'O', '82249669737', 'ameliadawei1401@gmail.com', 'perumahan green apple blok c.14', '6', '5', 'subangjaya', 'cikole', 'kota sukabumi', 'jawabarat', 'asraama polsek pasar kemis', '002', '003', 'kp sukaasih', 'pasarkemis', 'tangerang', 'banten', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(642, NULL, NULL, 220022211015, '1', 'Aktif', 'Guruh tiar muslim', '3172042009900010', 'Guruh tiar muslim', 'Jakarta', '1990-09-20', '35 Tahun', 'L', 'Menikah', 'O', '87837050795', 'romemuslim88@gmail.com', 'Jl Sunter muara', '18', '5', 'Sunter agung', 'Tanjung Priok', 'Jakarta Utara', 'DKI JAKARTA', 'Jl lap pors GG 5 NO.11 Serdang Kemayoran Jakarta pusat', '06', '04', 'Serdang', 'Kemayoran', 'Jakarta pusat', 'DKI JAKARTA', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(643, NULL, NULL, 220022211016, '1', 'Aktif', 'Hayati Nupus', '3603117009900000', 'Hayati Nupus', 'Tangerang', '1990-09-30', '35 Tahun', 'P', 'Belum Menikah', 'O', '85710718378', 'nupus2990@gmail.com', 'Kp.Baru', '13', '3', 'Pangarengan', 'Rajeg', 'Tangerang', 'Banten', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(644, NULL, NULL, 220022211017, '1', 'Aktif', 'Ahmad sobandi', '3205142005870000', 'Ahmad sobandi', 'Cianjur', '1987-05-20', '38 Tahun', 'L', 'Menikah', 'O', '8122470588', 'adena8918@gmail.com', 'Kp pasir batu', '1', '10', 'Ciharashas', 'Cilaku', 'Cianjur', 'Jawa barat', 'Asrama polsek pasar kemis', '002', '003', 'Kp sukaasih', 'Pasar kemis', 'Tangerang', 'Banten', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(645, NULL, NULL, 220022211019, '0', 'Non Aktif', 'Linggar Dani Uli Nuha', '3374102609950000', 'Linggar Dani Uli Nuha', 'Semarang', '1995-09-26', '30 Tahun', 'L', 'Menikah', 'B', '81225137721', 'linggardaniulinuha@gmail.com', 'Graha Harapan Regency Blok E8 /51', '10', '12', 'Babelan Kota', 'Babelan', 'Bekasi', 'Jawa Barat', 'Klipang Permai Blok VII / B. 1', '11', '16', 'Sendangmulyo', 'Tembalang', 'Semarang', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(646, NULL, NULL, 220022211020, '0', 'Non Aktif', 'Iqbal Wijaya', '3671092702020000', 'Iqbal Wijaya', 'Tangerang', '2002-02-27', '23 Tahun', 'L', 'Belum Menikah', 'O', '89653119725', 'iqbalwijaya270202@gmail.com', 'Kp. Cibodas', '3', '3', 'Cibodas', 'Cibodas', 'Kota Tangerang', 'Banten', 'Kp. Cibodas', '003', '003', 'Cibodas', 'Cibodas', 'Kota Tangerang', 'Banten', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(647, NULL, NULL, 220022211021, '0', 'Non Aktif', 'Rafli Risdya Ramadhan', '3509192511000000', 'Rafli Risdya Ramadhan', 'Semarang', '2000-11-25', '25 Tahun', 'L', 'Belum Menikah', 'A', '895424000000', 'raflirisdya01@gmail.com', 'Perum Gumuk Indah D11', '10', '26', 'Sidoarum', 'Godean', 'Sleman', 'Daerah Istimewa Yogyakarta', 'Perum Darussalam Blok i 7', '012', '05', 'Ambarketawang', 'Gamping', 'Sleman', 'Daerah Istimewa Yogyakarta', 'Perum. Darusalam, Blok I 07, Mijeng Wetan, Ambarketawang, Gamping Sleman \r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(648, NULL, NULL, 220022211022, '1', 'Aktif', 'Ari indra lesmana', '3273061705920000', 'Ari indra lesmana', 'Bandung', '1992-05-17', '33 Tahun', 'L', 'Menikah', 'AB', '81573003548', 'ariindralesmana92@gmail.com', 'Jl. Baladewa 2 No.3', '6', '8', 'Pajajaran', 'Cicendo', 'Bandung', 'Jawa barat', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Jl. Baladewa 2, No. 03, RT/RW 06/08, Bandung\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(649, NULL, NULL, 220022211025, '0', 'Non Aktif', 'Attariq Dewa Cannavaro', '3315141209990000', 'Attariq Dewa Cannavaro', 'Grobogan', '1999-11-12', '26 Tahun', 'L', 'Belum Menikah', 'O', '85798017654', 'attariq1299@gmail.com', 'Dusun Temon', '2', '1', 'Temon', 'Brati', 'Grobogan', 'Jawa Tengah', 'Jalan Sunan Kalijaga No. 426, Ndekeso', '-', '-', 'Sidokerto', 'Pati', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(650, NULL, NULL, 220022211024, '1', 'Aktif', 'Mochammad rifan abdi pratama', '3515131305960000', 'Mochammad rifan abdi pratama', 'Sidoarjo', '1996-12-13', '29 Tahun', 'L', 'Belum Menikah', 'O', '83830308444', 'rifanabdilejel@gmail.com', 'Bebekan selatan rt 25 rw 07 taman sidoarjo', '25', '7', 'Bebekan', 'Taman', 'Sidoarjo', 'Jawa timur', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'Bebekan Selatan, RT/RW, 25/07, Taman Sidoarjo\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(651, NULL, NULL, 220022211023, '0', 'Non Aktif', 'Mahiyaur Rosyad ', '3525071603990000', 'Mahiyaur Rosyad ', 'Gresik ', '1999-03-21', '23 Tahun', 'L', 'Belum Menikah', 'O', '85791431999', 'mahiyaur@gmail.com', 'Jl. Diponegoro RT 03/RW 02, Karangrejo, Ujungpangkah, Gresik ', '3', '2', 'Karangrejo ', 'Ujungpangkah ', 'Gresik ', 'Jawa Timur ', 'Karangrejo, Ujungpangkah, Gresik ', '03', '02', 'Karangrejo ', 'Ujungpangkah ', 'Gresik ', 'Jawa Timur ', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(652, NULL, NULL, 220022212028, '0', 'Non Aktif', 'Ifan Amrullah', '3210101204010060', 'Ifan Amrullah', 'Majalengka', '2001-12-04', '24 Tahun', 'L', 'Belum Menikah', 'O', '82311176299', 'ifanamrullah12@gmail.com', 'Petamburan', '9', '3', 'Petamburan', 'Tanah Abang ', 'Jakarta pusat ', 'Dki jakarta', 'Jl keadilan', '04', '02', 'Batuceper', 'Batuceper', 'Tangerang', 'Banten', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(653, NULL, NULL, 220022212029, '0', 'Non Aktif', 'Aldi Pradipta Febriyanto, S.I.Kom', '3673051202960000', 'Aldi Pradipta Febriyanto, S.I.Kom', 'Cikampek', '1996-11-02', '29 Tahun', 'L', 'Menikah', 'A', '81218817719', 'aldifebriyantopr@gmail.com', 'Komp Permata Banjar Asri Blok A 13 No 11 RT 005 RW 009 Kel Banjar Sari Kec Cipocok Jaya Kota Serang Banten', '5', '9', 'Banjar Sari ', 'Cipocok Jaya', 'Kota Serang ', 'Banten', 'Komp Permata Banjar Asri Blok A 13 No 11 RT 005 RW 009 Kel Banjar Sari Kec Cipocok Jaya Kota Serang Banten', '005', '009', 'Banjar Sari', 'Cipocok Jaya', 'Kota Serang', 'Banten', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(654, NULL, NULL, 220022212030, '0', 'Non Aktif', 'Abdul Aziz Darus Ubaedilah', '3207281802930000', 'Abdul Aziz Darus Ubaedilah', 'Ciamis', '1993-02-18', '32 Tahun', 'L', 'Menikah', 'B', '81322856208', 'adu17262@gmail.com', 'Dsn Karangkamiri kec. Langkaplancar ', '2', '1', 'Karangkamiri', 'Langkaplancar', 'Pangandaran', 'Jawa Barat', 'IDem', 'Idem', 'Idem', 'IDEM', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(655, NULL, NULL, 220022212035, '1', 'Aktif', 'Syahrur Rojab', '3318131709020000', 'Syahrur Rojab', 'Pati', '2002-09-17', '23 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '81383373317', 'rojabsyahrur6@gmail.com', 'Desa bermi rt 1 rw 7', '1', '7', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', 'Bermi', '001', '007', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Bermi, RT/RW 01/07, Kec.Gembong, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(656, NULL, NULL, 220022212039, '0', 'Non Aktif', 'Khoirul Arifin', '3318130501990000', 'Khoirul Arifin', 'Pati', '1999-01-05', '26 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82225707441', 'khoirularifin467@gmail.com', 'KENDIL', '2', '3', 'Klakah kasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'KENDIL', '02', '03', 'KLAKAH KASIHAN', 'GEMBONG', 'PATI', 'JAWA TENGAH', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(657, NULL, NULL, 220022212037, '1', 'Aktif', 'M. Dhanus Shobaruddin', '3320091803030000', 'M. Dhanus Shobaruddin', 'JEPARA', '2003-03-18', '22 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '882004000000', 'muhaammaddhanus6@gmail.com', 'CLERING DONOROJO JEPARA', '3', '2', 'CLERING', 'DONOROJO', 'JEPARA', 'JAWA TENGAH', 'CLERING', '003', '002', 'CLERING', 'DONOROJO', 'JEPARA', 'JAWA TENGAH', 'Ds. Clering, RT/RW 03/02, Kec. Donorojo, Kab.Jepara\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(658, NULL, NULL, 220022405025, '1', 'Aktif', 'Faliqul Isbakh', '3318132602040000', 'Faliqul Isbakh', 'Pati', '2004-02-26', '21 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '87735215720', 'bosmbendo@gmail.com', 'BERMI', '1', '8', 'BERMI', 'GEMBONG', 'PATI', 'JAWA TENGAH', 'BERMI', '001', '008', 'BERMI', 'GEMBONG', 'PATI', 'JAWA TENGAH', 'Ds. Bermi RT/RW 01/08, Kec.Gembong, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(659, NULL, NULL, 220022212041, '1', 'Aktif', 'Andi setiawan', '3318130802000000', 'Andi setiawan', 'Pati', '2000-02-08', '25 Tahun', 'L', 'Belum Menikah', 'B', '85727869175', 'andiset447@gmail.com', 'Pati', '4', '4', 'Sitiluhur', 'Gembong', 'Pati', 'Jawa tengah', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Ds. Sitiluhur RT/RW 04/04 Kec.Gembong, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(660, NULL, NULL, 220022212036, '0', 'Non Aktif', 'Riski Sevtianto', '3318041909020000', 'Riski Sevtianto', 'Pati', '2002-09-19', '23 Tahun', 'L', 'Belum Menikah', 'A', '81772896379', 'riskipratama5094@gmail.com', 'Ds.karangkonang', '3', '2', 'Karangkonang ', 'Winong', 'Pati', 'Jawa tengah ', 'Ds karangkonang rt03 rw02 kec.winong kab.pati', '03', '02', 'Karangkonang', 'Winong', 'Pati', 'Jawa tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(661, NULL, NULL, 220022212034, '1', 'Aktif', 'Pauji', '3318140710920000', 'Pauji', 'Pati', '1992-10-07', '33 Tahun', 'L', 'Menikah', 'A', '82313714636', 'ozzifauzi27@gmail.com', 'Dk.karangdowo', '5', '1', 'Kutoharjo', 'Pati', 'Pati', 'Jawa tengah', 'IDEM', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Ds.Kutoharjo, Dk.Karangdowo RT/RW 05/01 Kec.Pati, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(662, NULL, NULL, 220022212042, '0', 'Non Aktif', 'Ali Mustofa', '3318133110030000', 'Ali Mustofa', 'Pati', '2003-10-31', '22 Tahun', 'L', 'Belum Menikah', 'O', '88238741500', 'mues730@gmail.com', 'Dk. Ngembes', '1', '13', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Ngembes', '001', '013', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Ngembes RT/RW 01/13 Kec.Gembong, Kec.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(663, NULL, NULL, 220022212038, '0', 'Non Aktif', 'Dimas ardian', '3318101110040000', 'Dimas ardian', 'Pati', '2005-10-11', '20 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85775770548', 'dimasardian15460@gmail.com', 'Desa Ngepungrojo', '3', '4', 'Ngepungrojo', 'Pati', 'Pati', 'Jawa tengah', 'Desa Ngepungrojo', '3', '4', 'Ngepungrojo', 'Pati', 'Pati', 'Jawa tengah', 'Ds. Ngapungrejo RT/RW 03/04 Kec.Pati, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(664, NULL, NULL, 2202021020008, '0', 'Non Aktif', 'Agus Saiful Ridho', '', 'Agus Saiful Ridho', '', '0000-00-00', '126 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '', '', 'Ds.Sumberjo', '2', '2', 'Ds.Sumberjo', 'Candipuro', 'Lumajang', 'Jawa Timur', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(665, NULL, NULL, 220022212043, '0', 'Non Aktif', 'DION AKBAR', '1307062806990000', 'DION AKBAR', 'Pangkalan', '1999-06-28', '26 Tahun', 'L', 'Belum Menikah', 'A', '81276295878', 'dionakbar195@gmail.com', 'Pasar Manggilang', '', '', 'Manggilang', 'Pangkalan Koto Baru', 'Lima Puluh Kota', 'Sumatera Barat', 'Jl Kramat, Gang Al Kharomah No 51', 'RT04', 'RW11', 'Mustika Jaya', 'Mustika Jaya', 'Kabupaten Bekasi', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(666, NULL, NULL, 220022301002, '0', 'Non Aktif', 'Dinar Nabil Salam', '3202270102010000', 'Dinar Nabil Salam', 'Sukabumi ', '2001-02-01', '24 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85862755843', 'salamdinar6@gmail.com', 'Kp. Tanjungsari Rt. 003 Rw. 007 Desa. Sirnaresmi Kecamatan. Gunungguruh Kabupaten. Sukabumi Kode Pos. 43156', '3', '7', 'Sirnaresmi', 'Gunungguruh', 'Sukabumi ', 'Jawa barat', 'Kp. Kedung Lotong Rt.002 Rw. 006 Desa. Bantarjaya Kecamatan. Pebayuran Kabupaten. Bekasi Kode Pos. 17710', '002', '006', 'Bantarjaya', 'Pebayuran', 'Bekasi', 'Jawa barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(667, NULL, NULL, 220022301006, '0', 'Non Aktif', 'Rizki Saputra', '3302242308950000', 'Rizki Saputra', 'Banyumas', '1995-08-23', '30 Tahun', 'L', 'Menikah', 'AB', '85291756578', 'riizki062@gmail.com', 'Pageraji', '6', '10', 'Pageraji', 'Cilongok', 'Banyumas', 'Jawa Tengah', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(668, NULL, NULL, 220022301007, '0', 'Non Aktif', 'Akhmmad Rijalul Haq', '3328142507990000', 'Akhmmad Rijalul Haq', 'Tegal', '1999-07-25', '26 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85869290062', 'akhmmadrijalul@gmail.com', 'Jl luwungri no 28 ', '2', '1', 'Bumiharja ', 'Tarub ', 'Kabupaten Tegal ', 'Jawa Tengah ', 'Jl luwungri no 28 ', '02', '01', 'Bumiharja ', 'Tarub', 'Kabupaten Tegal ', 'Jawa Tengah ', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30');
+INSERT INTO `karyawan` (`id_karyawan`, `user_id`, `atasan_id`, `NIK`, `Status`, `Kode`, `Nama_Sesuai_KTP`, `NIK_KTP`, `Nama_Lengkap_Sesuai_Ijazah`, `Tempat_Lahir_Karyawan`, `Tanggal_Lahir_Karyawan`, `Umur_Karyawan`, `Jenis_Kelamin_Karyawan`, `Status_Pernikahan`, `Golongan_Darah`, `Nomor_Telepon_Aktif_Karyawan`, `Email`, `Alamat_KTP`, `RT`, `RW`, `Kelurahan_Desa`, `Kecamatan`, `Kabupaten_Kota`, `Provinsi`, `Alamat_Domisili`, `RT_Sesuai_Domisili`, `RW_Sesuai_Domisili`, `Kelurahan_Desa_Domisili`, `Kecamatan_Sesuai_Domisili`, `Kabupaten_Kota_Sesuai_Domisili`, `Provinsi_Sesuai_Domisili`, `Alamat_Lengkap`, `created_at`, `updated_at`) VALUES
+(669, NULL, NULL, 220022301003, '0', 'Non Aktif', 'Arif Rahman Hakim ', '3214010104000000', 'Arif Rahman Hakim ', 'Purwakarta ', '2000-04-01', '25 Tahun', 'L', 'Belum Menikah', 'O', '85794354065', 'arif.rahman5875@gmail.com', 'BJI Blok I No. 9', '42', '11', 'Munjuljaya ', 'Purwakarta ', 'Purwakarta ', 'Jawa Barat ', 'BJI Blok I No. 9', '42', '11', 'Munjuljaya ', 'Purwakarta ', 'Purwakarta ', 'Jawa Barat ', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(670, NULL, NULL, 220022301004, '0', 'Non Aktif', 'Moch Misbahul Munir ', '3510161304930010', 'Moch Misbahul Munir ', 'Banyuwangi ', '1993-04-13', '32 Tahun', 'L', 'Menikah', 'A', '81615227096', 'bahulmisbah48@gmail.com', 'Jalan Pancoran Rogojampi kabupaten Banyuwangi ', '2', '5', 'Rogojampi ', 'Rogojampi ', 'Banyuwangi ', 'Jawa timur ', 'Jalan Pancoran Rogojampi ', '02', '05', 'Rogojampi ', 'Rogojampi ', 'Banyuwangi ', 'Jawa timur ', 'Jl.Pancoran RT/RW 02/05, Kec.Rogojampi Utara, Rogojampi Banyuwangi\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(671, NULL, NULL, 220022301001, '0', 'Non Aktif', 'Imam Konian', '3326020407970000', 'Imam Konian', 'Pekalongan', '1997-07-04', '28 Tahun', 'L', 'Belum Menikah', 'O', '85866057864', 'imamkonian04@gmail.com', 'Kulon kali rt.2 rw.2, Ds. Krandegan, Kec. Paninggaran, Kab. Pekalongan, Jawa Tengah', '2', '2', 'Krandegan', 'Paninggaran', 'Pekalongan', 'Jawa Tengah', 'Kulon kali rt.2 rw.2, Ds. Krandegan, Kec. Paninggaran, Kab. Pekalongan, Jawa Tengah', '02', '02', 'Krandegan', 'Paninggaran', 'Pekalongan', 'Jawa Tengah', 'Kulon Kali RTR/RW 02/02, Ds. Krandengan, Kec.Paninggaran, Kab.Pekalongan\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(672, NULL, NULL, 220022301005, '0', 'Non Aktif', 'Pirmansyah', '3201213008900000', 'Pirmansyah', 'Bogor', '1990-08-30', '35 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85773104550', 'firna816@gmail.com', 'Kp Babakan', '2', '2', 'Sukaharja', 'Ciomas', 'Bogor', 'Jawa Barat', 'Kp Babakan', '002', '002', 'Sukaharja', 'Ciomas', 'Bogor', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(673, NULL, NULL, 220022212033, '0', 'Non Aktif', 'Deny Nugraha Moch Suparta', '3210200910020120', 'Deny Nugraha Moch Suparta', 'Majalengka', '2002-10-09', '23 Tahun', 'L', 'Belum Menikah', 'O', '81280712631', 'denyn0910@gmail.com', 'Lingkung puspa, Cigasong, Majalengka', '16', '4', 'Cigasong', 'Cigasong', 'Majalengka', 'Jawa Barat', 'Lingkung Puspa, Majalengka', '16', '04', 'Cigasong', 'Cigasong', 'Majalengka', 'Jawa Barat', 'Jl. Jakalalana, Ds.Cigasong RT/RW 16/04, Kec.Cigasong, Kab.Majalengka-Jawa Barat\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(674, NULL, NULL, 220022301010, '1', 'Aktif', 'Sarip hidayat', '3211023108960000', 'Sarip hidayat', 'Sumedang', '1996-08-31', '29 Tahun', 'L', 'Menikah', 'O', '81223582602', 'syarief25rina@gmail.com', 'Dsn.Suka mukti RT/RW, 02/07, Desa Sarimekar, Kec.Jatinunggal, Kab.Sumedang', '2', '7', 'Sarimekar', 'Jatinunggal', 'Sumedang', 'Jawa Barat', 'Jln Sindang barang', 'Rt 003', '011', 'Loji', 'Bogor barat', 'Bogor', 'Jawa barat', 'Dsn.Suka mukti RT/RW, 02/07, Desa Sarimekar, Kec.Jatinunggal, Kab.Sumedang\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(675, NULL, NULL, 320022212008, '0', 'Non Aktif', 'Farhan Nur Alifian', '3318100609020010', 'Farhan Nur Alifian', 'Pati', '2002-09-06', '23 Tahun', 'L', 'Belum Menikah', 'O', '81228718504', 'farhan124id@gmail.com', 'Dk.ngipik rt 01/03 , kec.pati, kab.pati', '1', '3', 'Kutoharjo', 'Pati', 'Pati', 'Jawa Tengah', 'Dk.ngipik ds.kutoharjo rt 01/03 ,kec.pati, kab.pati', '01', '03', 'Kutoharjo', 'Pati', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(677, NULL, NULL, 220022212026, '0', 'Non Aktif', 'Arif Kurniawan Santoso', '', 'Arif Kurniawan Santoso', 'Tegal', '1999-10-13', '26 Tahun', 'L', '', '', '', '', 'KP. Sawah, RT/RW, 06/07, Tarikolot, Citeureup, Bogor', '6', '7', 'Traikolot', 'Citeureup', 'Citeureup', 'Jawa Barat', 'KP. Sawah, RT/RW, 06/07, Tarikolot, Citeureup, Bogor', '6', '7', 'Traikolot', 'Citeureup', 'Citeureup', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(678, NULL, NULL, 220022301011, '0', 'Non Aktif', 'M Avan Baharsyah', '3522092706980000', 'M Avan Baharsyah', 'Bojonegoro', '1996-06-27', '29 Tahun', 'L', 'Menikah', 'O', '85749771541', 'baharsyahavan@gmail.com', 'Dsn.Kawung RT/RW, 15/03, Ds.Bumirejo, Kec.Kupohbaru, Kab.Bojonegoro', '15', '3', 'Bumirejo', 'Kupohbaru', 'Bojonegoro', 'Jawa Tengah', 'Kawung', '15', '03', 'Bumirejo', 'Kepohbaru', 'Bojonegoro', 'Jawa timur', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(679, NULL, NULL, 220022301013, '0', 'Non Aktif', 'Azis Abdul Rohman', '3601151207980000', 'Azis Abdul Rohman', 'Pandeglang', '1998-12-15', '27 Tahun', 'L', 'Menikah', 'B', '89516410270', 'rohmaan1083@gmail.com', 'Ko. Parakabn binong Ds. Palanyar', '5', '5', 'Palanyar', 'Cipeucang', 'Pandeglang', 'Banten', 'Kp. Parakan binong', '005', '005', 'Palanyar', 'Cipeucang', 'Pandeglang', 'Banten', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(680, NULL, NULL, 220022301015, '0', 'Non Aktif', 'Sovian Yogi', '1809050811930000', 'Sovian Yogi', 'Pesawaran', '1993-11-08', '32 Tahun', 'L', 'Belum Menikah', 'O', '85664310317', 'sovianyogi811@gmail.com', 'Ranterejo II', '4', '2', 'Banjaran', 'Padang Cermin ', 'Pesawaran', 'Lampung', 'Jl.Nuri 2 No 15 Pondok Sejahtera ', '001', '010', 'Kutabaru', 'Pasar Kemis', 'Tangerang ', 'Banten', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(681, NULL, NULL, 220022301016, '0', 'Non Aktif', 'Muhammad Rizki Fadillah ', '3671063010970000', 'Muhammad Rizki Fadillah ', 'Tangerang', '1997-10-30', '28 Tahun', 'L', 'Belum Menikah', 'O', '85710185860', 'rizkifadillahmrf@gmail.com', 'Jl sunan gunung jati no 28', '2', '4', 'Paninggilan', 'Ciledug', 'Tangerang', 'Banten', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(682, NULL, NULL, 220022301017, '1', 'Aktif', 'Nanda Arief Ariyanto', '3318132706030000', 'Nanda Arief Ariyanto', 'Pati', '2003-06-27', '22 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '87804555553', 'arieffnan@gmail.com', 'Ds. Bermi 1/6 Kec. Gembong kab. Pati', '1', '6', 'BERMI', 'GEMBONG ', 'PATI', 'JAWA TENGAH ', 'IDEM', '01', '06', 'BERMI', 'GEMBONG ', 'PATI', 'JAWA TENGAH ', 'Ds. Bermi RT/RW 01/06, Kec.Gembong, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(683, NULL, NULL, 220022301018, '1', 'Aktif', 'Muh Aldi fuztarosyad', '3318130305010000', 'Muh Aldi fuztarosyad', 'Pati', '2001-05-03', '24 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85293955698', 'aldifuztarosyad@gmail.com', 'Desa Gembong', '1', '13', 'Gembong', 'Gembong', 'Pati', 'Jawa tengah', 'Dukuh Ngembes ', '01', '13', 'Gembong', 'Gembong', 'Pati', 'Jawa tengah ', 'Dk. Ngembes, Ds. Gembong, RT/RW 01/03, Kec.Gembong, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(684, NULL, NULL, 220022301019, '1', 'Aktif', 'Triyono', '3318142411930000', 'Triyono', 'Pati', '1993-11-09', '32 Tahun', 'L', 'Belum Menikah', 'A', '8970554190', 'triboyss@gmail.com', 'Ds. Purwosari Dk. Sambikerep', '1', '3', 'Purwosari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'Ds.purwosari, RT/RW 01/03, Kec.Tlogowungu, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(685, NULL, NULL, 220022301020, '1', 'Aktif', 'Muhammad Mustaqim', '3319090908950000', 'Muhammad Mustaqim', 'Kudus', '1995-08-09', '30 Tahun', 'L', 'Menikah', 'B', '85870855062', 'mustaqim9.mm@gmail.com', 'Dk. Salak Ds. Klakahkasihan Rt 3 Rw 2 Gembong Pati ', '3', '2', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'Dk.Salak, Ds.Klakahkasihan RT/RW 03/02, Kec.Gembong, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(686, NULL, NULL, 220022301021, '0', 'Non Aktif', 'Reza Septa Aditia', '3318130809020000', 'Reza Septa Aditia', 'Pati', '2002-09-08', '23 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85725328293', 'tioktia92@gmail.com', 'Dukuh segawe ', '5', '1', 'Desa klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Dukuh segawe', '05', '01', 'Desa klakahkasihan', 'Gembong', 'Pati', 'Jawa tengah', 'Ds.Klakahkasihan RT/RW 05/01, Kec.Gembong, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(687, NULL, NULL, 220022301022, '0', 'Non Aktif', 'Muhammad Abdul Faqih ', '3318212808990000', 'Muhammad Abdul Faqih ', 'Pati', '1999-08-28', '26 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '89648858702', 'mohammadabdulfatih@gmail.com', 'DS.kadilangu', '4', '2', 'Kadilangu ', 'Trangkil ', 'Pati', 'Jawa tengah ', 'DS kadilangu RT 04 RW 02 kec trangkil kab Pati Jawa tengah ', '04', '02', 'Kadilangu ', 'Trangkil ', 'Pati', 'Jawa tengah ', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(688, NULL, NULL, 220022301023, '0', 'Non Aktif', 'Muhammad Agimtyar Sholih', '3318130204040000', 'Muhammad Agimtyar Sholih', 'Pati', '2004-04-02', '21 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85941375096', 'agimtyar177@gmail.com', 'BERMI', '1', '6', 'BERMI', 'GEMBONG', 'PATI', 'JAWA TENGAH', 'BERMI', '001', '006', 'BERMI', 'GEMBONG', 'PATI', 'JAWA TENGAH', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(689, NULL, NULL, 220022301024, '1', 'Aktif', 'Muhammad Nur Khamdani ', '3318131909020000', 'Muhammad Nur Khamdani ', 'Pati', '2002-09-19', '23 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82323994937', 'denydiny231@gmail.com', 'Dk.Posonk klakahkasihan RT/RW 04/07 Kec. Gembong Kab.Pati', '4', '7', 'Klakahkasihan ', 'Gembong ', 'Pati', 'Jawa Tengah ', 'Dk.Posono klakahkasihan kec.Gembong pati', '4', '7', 'Klakahkasihan ', 'Gembong ', 'Pati', 'Jawa tengah ', 'Dk.Posono, Ds.Klakahkasihan RT/RW 04/07, Kec. Gembong, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(690, NULL, NULL, 220022301025, '0', 'Non Aktif', 'Ikhwan Luthfi', '3318210309970000', 'Ikhwan Luthfi', 'Pati', '1997-09-03', '28 Tahun', 'L', 'Belum Menikah', 'AB', '8990140899', 'ikhwanluth02@gmail.com', 'Ds. Tegalharjo, Dk. Ketekputih', '4', '4', 'Tegalharjo', 'Trangkil', 'Pati', 'Jawa Tengah', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(692, NULL, NULL, 220022302030, '0', 'Non Aktif', 'Ni\'mal maulana', '3318131810980000', 'Ni\'mal maulana', 'Pati', '1998-10-18', '27 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '88224298174', 'nimalmaulana241@gmail.com', 'DK. Blimbing\nDS. Bageng\nKec. Gembong\nKan. Pati', '3', '5', 'Bageng', 'Gembong ', 'Pati', 'Jawa tengah ', 'DK. Blimbing\nDS.bageng\nKec. Gembong\nKab. pati', '003', '005', 'Bageng', 'Gembong ', 'Pati', 'Jawa tengah ', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(693, NULL, NULL, 220022302031, '0', 'Non Aktif', 'Faiz aqil ibqon', '3318210305020000', 'Faiz aqil ibqon', 'Pati', '2002-05-03', '23 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '89510186783', 'andrereza053@gmail.com', 'Ds.guyangan ', '4', '1', 'Desa guyangan', 'Trangkil', 'Pati', 'Jawa tengah', 'Desa guyangan kecamatan trangkil kabupaten pati', '04', '01', 'Guyangan', 'Trangkil', 'Pati', 'Jawa tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(694, NULL, NULL, 220022302032, '0', 'Non Aktif', 'Moch Benny Prayogy Wibowo', '3318112302970000', 'Moch Benny Prayogy Wibowo', 'Pati', '1997-02-23', '28 Tahun', 'L', 'Belum Menikah', 'AB', '895397000000', 'bennyprayogy40@gmail.com', 'Desa Gabus', '1', '5', 'Gabus', 'Gabus', 'Pati', 'Jawa Tengah', 'Desa Gabus', '01', '05', 'Gabus', 'Gabus', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(695, NULL, NULL, 220022302033, '0', 'Non Aktif', 'Daniel Erlangga Maulana Syahputra', '3319091105040000', 'Daniel Erlangga Maulana Syahputra', 'Kudus', '2004-05-11', '21 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85879376994', 'danielerlangga53@gmail.com', 'Glagah kulon rt 02/01 Dawe Kudus', '2', '1', 'Glagah kulon', 'Dawe', 'Kudus', 'Jawa Tengah', 'Glagah kulon RT02/01 Dawe Kudus', '02', '01', 'Glagah kulon', 'Dawe', 'Kudus', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(696, NULL, NULL, 220022302034, '0', 'Non Aktif', 'Fery ferdianto', '3318132301000000', 'Fery ferdianto', 'Pati', '2000-01-23', '25 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82242481428', 'ferypati46@gmail.com', 'Dk.kendil klakah kasihan rt/rw 02/03 kec.gembong kab.pati', '2', '3', 'Klakah kasihan', 'Gembong', 'Pati', 'Jawa tengah', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(697, NULL, NULL, 220022302035, '1', 'Aktif', 'Irawan safa\'udin', '3318132209000000', 'Irawan safa\'udin', 'Pati', '2000-09-22', '25 Tahun', 'L', 'Belum Menikah', 'A', '85846143740', 'irawansafaudin@gmail.com', 'Dk.dengan DS.sitiluhur kec.gembong kab.pati', '2', '5', 'Sitiluhur', 'Gembong', 'Pati', 'Jawa tengah', 'Dk dengan', '02', 'O5', 'Sitiluhur', 'Gembong', 'Pati', 'Jawa tengah', 'Ds. Sitiluhur, Dkh.Degan RT/RW 02/05, Kec.Gembong, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(698, NULL, NULL, 220022302036, '0', 'Non Aktif', 'Muhammad Ariz Munirussihab', '3318100712980000', 'Muhammad Ariz Munirussihab', 'Pati', '1998-12-07', '27 Tahun', 'L', 'Menikah', 'B', '8979931693', 'sihab6860@gmail.com', 'Desa Semampir', '5', '2', 'Semampir', 'Pati', 'Pati', 'Jawa Tengah', 'Perum Bukit Santika Baru ', '-', '-', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(699, NULL, NULL, 220022302037, '0', 'Non Aktif', 'Rifan Arfianto', '3318133005990000', 'Rifan Arfianto', 'Pati', '1999-05-30', '26 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85728827196', 'arfiantorifan49@gmail.com', 'Dk ngembes RT 04/12 ds gembong kec gembong kab pati', '', '12', 'Gembong', 'Gembong', 'Pati', 'Jawa tengah', 'Dk ngembes RT 04/12 ds gembong kec gembong kab pati', '04', '12', 'Gembong', 'Gembong', 'Pati', 'Jawa tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(700, NULL, NULL, 220022302039, '0', 'Non Aktif', 'Ah saifulloh Mujtab', '3318130106030010', 'Ah saifulloh Mujtab', 'Pati', '2003-06-01', '22 Tahun', 'L', 'Belum Menikah', 'O', '85862872521', 'ahsaifullohm@gmail.com', 'desa semirejo 3/1 gembong pati', '3', '1', 'Semirejo', 'Gembong ', 'Pati', 'Jawa Tengah', 'desa semirejo 3/1 gembong pati', '03', '01', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(701, NULL, NULL, 220022302040, '0', 'Non Aktif', 'Muhammad Hasanuddin', '3318132011010000', 'Muhammad Hasanuddin', 'Pati', '2001-11-20', '24 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '83102681126', 'mazherex11@gmail.com', 'KENDIL', '3', '3', 'KLAHKAHKASIHAN', 'GEMBONG', 'PATI', 'JAWA TENGAH', 'KENDIL', '03', '03', 'KLAKAHKASIHAN', 'GEMBONG', 'PATI', 'JAWA TENGAH', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(702, NULL, NULL, 220022302041, '0', 'Non Aktif', 'Adib Ubaidillah', '3318131809980000', 'Adib Ubaidillah', 'Pati', '1998-09-18', '27 Tahun', 'L', 'Belum Menikah', 'AB', '81232212853', 'adibptfs123@gmail.com', 'Dk.Domo,DS.Klakahkasihan,kec.Gembong,Kab.Pati', '1', '1', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk.Domo,Ds.Klakahkasihan,Kec.gembong,Kab.Pati', '01', '01', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(703, NULL, NULL, 220022302042, '1', 'Aktif', 'Faiz Nur Rohim', '3318130901010000', 'Faiz Nur Rohim', 'Pati', '2001-01-09', '24 Tahun', 'L', 'Menikah', 'Tidak Tahu', '82232920946', 'faiz.klakah434@gmail.com', 'Ds.klakah kasihan dukuh klakah', '4', '5', 'Klakah kasihan ', 'Gembong ', 'Pati', 'Jawa tengah', 'DK KLAKAH', '004', '005', 'KLAKAH KASIHAN', 'GEMBONG ', 'PATI', 'JAWA TENGAH', 'Ds. Klakahkasiahan RT/RW 04/05, Kec. Gembong, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(704, NULL, NULL, 220022302043, '1', 'Aktif', 'ahmad mahfud al hamdani', '3318140808020000', 'ahmad mahfud al hamdani', 'Pati', '2002-08-08', '23 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '87764674327', 'apukalhamdani@gmail.com', 'asumbermulyo', '6', '1', 'sumbermulyo', 'tlogowungu', 'pati', 'jawatengah', 'sumbermulyo', '06', '01', 'sumbermulyo', 'tlogowungu', 'pati', 'jawatengah', 'Ds. Sumbermulyo RT/RW 06/01 Kec.Tlogowungu, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(705, NULL, NULL, 220022302044, '1', 'Aktif', 'Fandy Ahmad Nur Alif', '3318132403030000', 'Fandy Ahmad Nur Alif', 'Pati', '2003-03-24', '22 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85700168371', 'fandyana24@gmail.com', 'Ketanggan', '1', '3', 'Ketanggan', 'Gembong', 'Pati', 'Jawa Tengah', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'Ds. Ketanggan RT/RW 01/03 Kec.Gembong, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(706, NULL, NULL, 220022302045, '1', 'Aktif', 'Alaika Husnul Huda', '3318131101050000', 'Alaika Husnul Huda', 'Pati', '2005-01-11', '20 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85642627858', 'hudaalex768@gmail.com', 'DUKUH BENGKAL', '2', '6', 'PLUKARAN', 'GEMBONG', 'PATI', 'JAWA TENGAH', 'DK.BENGKAL', '2', '6', 'PLUKARAN', 'GEMBONG', 'PATI', 'JAWA TENGAH', 'Ds. Plukaran, Dkh.Bengkal RT/RW 02/06 Kec.Gembong, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(707, NULL, NULL, 220022302046, '1', 'Aktif', 'Muhammad Nafi\'ul Umam', '3318132212190000', 'Muhammad Nafi\'ul Umam', 'Pati', '1999-12-22', '26 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '87830949641', 'Nafiyuliana092@gmail.com', 'DK SENTUL', '1', '2', 'Gembong', 'Gembong', 'Pati', 'Jawa tengah', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'Ds. Gembong, Dkh. Sentul RT/RW 01/02, Kec.Gembong, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(708, NULL, NULL, 220022302047, '1', 'Aktif', 'Ardiyansah', '3318040306030000', 'Ardiyansah', 'Pati', '2003-06-03', '22 Tahun', 'L', 'Belum Menikah', 'B', '87733243362', 'ardiyansahputra109@gmail.com', 'Ds.Tlogorejo Julu', '9', '2', 'Tlogorejo', 'Winong', 'Pati', 'Jawa tengah', 'Ds. Tlogorejo julu', '09', '02', 'Tlogorejo', 'Winong', 'Pati', 'Jawa tengah', 'Ds. Tlogorejo RT/RW. 19/02 Kec. Winong, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(709, NULL, NULL, 220022302048, '0', 'Non Aktif', 'Islakhul Faizin', '3318192411030000', 'Islakhul Faizin', 'Pati', '2003-11-24', '22 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85877127654', 'islakhulfaizin20@gmail.com', 'Ds DOROREJO', '4', '1', 'DOROREJO', 'Tayu', 'Pati', 'Jawa Tengah', 'DS DOROREJO', '04', '01', 'DOROREJO', 'Tayu', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(710, NULL, NULL, 220022302049, '1', 'Aktif', 'Nuha ariful anam', '3318132812000000', 'Nuha ariful anam', 'Pati', '2000-12-28', '25 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85747960338', 'mazary872@gmail.com', 'Dengan sitiluhur', '1', '5', 'Sitiluhur', 'Gembong', 'Pati', 'Jawa tengah', 'Dengan sitiluhur', '1', '5', 'Sitiluhur', 'Gembong', 'Pati', 'Jawa tengah', 'Ds. Sitiluhur, Dkh.Degan RT/RW 01/05, Kec.Gembong, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(712, NULL, NULL, 220022302028, '0', 'Non Aktif', 'Leo ilham adi prakasa', '3320122303980000', 'Leo ilham adi prakasa', 'Jepara', '1998-03-23', '27 Tahun', 'L', 'Belum Menikah', 'B', '82133143259', 'leoilham76455@gmail.com', 'Ds dorang', '5', '2', 'Dorang', 'Nalumsari', 'Jepara', 'Jawa tengah', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(713, NULL, NULL, 220022302029, '0', 'Non Aktif', 'Robbi M.S', '3203180110970000', 'Robbi M.S', 'Cianjur', '1997-10-01', '28 Tahun', 'L', 'Menikah', 'B', '81284703957', 'robbimuhammad117@gmail.com', 'Kp. Pangadegan Hilir', '1', '2', 'Pagelaran', 'Pagelaran', 'Cianjur', 'Jawa Barat', 'Kp pangadegan hilir', '01', '02', 'Pagelaran', 'Pagelaran', 'Cianjur', 'Jawa barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(714, NULL, NULL, 220022302050, '0', 'Non Aktif', 'R. Muh. Daud Darda', '3206362606920000', 'R. Muh. Daud Darda', 'Tasikmalaya', '1992-06-10', '33 Tahun', 'L', 'Menikah', 'B', '82217097559', 'asdadaud2615@gmail.com', 'Dsn. Bengang ', '1', '7', 'Buahdua ', 'Buahdua ', 'Sumedang ', 'Jawa Barat ', 'IDEM', 'IDEM ', 'IDEM ', 'IDEM ', 'IDEM ', 'IDEM ', 'IDEM ', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(717, NULL, NULL, 220022302055, '1', 'Aktif', 'Ahmal huda', '3318131304980000', 'Ahmal huda', 'Pati', '1998-04-13', '27 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85865332876', 'hudhambois@gmail.com', 'Dk. Sumuran ', '2', '3', 'Ds. Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Sumuran', '02', '03', 'Ds. Pohgading', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds.Pohgading, Dkh.Sumuran RT/RW 02/03, Kec.Gembong, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(718, NULL, NULL, 220022302056, '0', 'Non Aktif', 'Ahmad Mauludin', '3318131005030000', 'Ahmad Mauludin', 'Pati', '2003-05-10', '22 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '6287820000000', 'rajaolleng0@gmail.com', 'Bermi', '1', '4', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', 'BERMI RT01 RW04 GEMBONG PATI', '01', '04', 'Bermi', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(719, NULL, NULL, 220022302057, '0', 'Non Aktif', 'Joko Pitono', '3318160902030000', 'Joko Pitono', 'Pati', '2003-02-09', '22 Tahun', 'L', 'Belum Menikah', 'A', '85163209239', 'jokopitono0293@gmail.com', 'Jl. Brojoyudho', '3', '5', 'Waturoyo', 'Margoyoso', 'Pati', 'Jawa Tengah', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(720, NULL, NULL, 220022302058, '0', 'Non Aktif', 'Muhtar gozali', '3301141508970000', 'Muhtar gozali', 'Cilacap', '1997-08-15', '28 Tahun', 'L', 'Menikah', 'AB', '82134578029', 'gozalimuhtar5@gmail.com', 'Dk.ngipik', '6', '3', 'Kutoharjo', 'Pati', 'Pati', 'Jawa tengah', 'Dk.ngipik', '06', '03', 'Kutoharjo', 'Pati', 'Pati', 'Jawa tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(721, NULL, NULL, 220022302059, '0', 'Non Aktif', 'Muhammad Alief Tegar Wicaksono', '3318100102010010', 'Muhammad Alief Tegar Wicaksono', 'Pati', '2001-02-01', '24 Tahun', 'L', 'Belum Menikah', 'B', '895427000000', 'tegarrwicaksono7@gmail.com', 'Desa Semampir', '5', '2', 'Semampir', 'Pati', 'Pati', 'Jawa Tengah', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(722, NULL, NULL, 220022302060, '0', 'Non Aktif', 'Bagas Ariyanto Dwi Saputro', '3318111101000000', 'Bagas Ariyanto Dwi Saputro', 'Pati', '2000-01-11', '25 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '895367000000', 'bagazputra02@gmail.com', 'Desa Gabus', '3', '5', 'Gabus ', 'Gabus', 'Pati', 'Jawa Tengah', 'Gabus', '03', '05', 'Gabus', 'Gabus', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(723, NULL, NULL, 220022302062, '0', 'Non Aktif', 'Ahmad Musthofa', '3318130911040000', 'Ahmad Musthofa', 'Pati', '2004-11-04', '21 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85878766048', 'ahmadmusthofa717@gmail.com', 'Ds.kedungbulus rt.03 rw.01 Gembong Pati', '3', '1', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds.kedungbulus rt.03 rw.01 Gembong Pati', '03', '01', 'Kedungbulus', 'Gembong', 'Pati', 'jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(724, NULL, NULL, 220022302063, '0', 'Non Aktif', 'Muhammad zaenal musthofa', '3318133012040000', 'Muhammad zaenal musthofa', 'Pati', '2004-12-30', '20 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85335620570', 'zaenalmustofaa646@gmail.com', 'DK. Kendil, DS. Klakah kasihan', '3', '3', 'Klakah kasihan', 'Gembong', 'Pati', 'Jawa tenggah', 'DK. Kendil, DS. Klakah kasihan', '03', '03', 'Klakah kasihan', 'Gembong', 'Pati', 'Jawa tenggah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(725, NULL, NULL, 220022302064, '1', 'Aktif', 'Toyib Muhamad Kholil', '3318133105010000', 'Toyib Muhamad Kholil', 'Pati', '2001-05-31', '24 Tahun', 'L', 'Belum Menikah', 'B', '88226581223', 'toyibkholil10@gmail.com', 'Dk, rubiyah', '3', '7', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'Ds. Bageng, Dkh.Rubiyah RT/RW 03/07, Kec.Gembong, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(726, NULL, NULL, 220022302065, '1', 'Aktif', 'Sugeng Riyadi ', '3318022712000000', 'Sugeng Riyadi ', 'Pati', '2000-12-27', '25 Tahun', 'L', 'Belum Menikah', 'B', '81776055275', 'riyadysugeng7@gmail.com', 'Rogomulyo ', '2', '1', 'Rogomulyo ', 'Kayen', 'Pati', 'Jawa Tengah ', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'Ds.Rogomulyo, RT/RW 02/01 Kec.Kayen, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(727, NULL, NULL, 220022302066, '0', 'Non Aktif', 'Yogi purwadi ', '32020808020002', 'Yogi purwadi ', 'Sukabumi ', '2003-02-08', '22 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85721114985', 'purwadiyogi58@gmail.com', 'Kp.surupan jaya ', '31', '8', 'Sindangresmi ', 'Jampang Tengah ', 'Sukabumi ', 'Jawabarat', 'Jl.raya Pati gembong km.4 kereparebarat ', '01', '01', 'Tamansari ', 'Tlogowungu', 'Pati', 'Jawa tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(728, NULL, NULL, 220022302067, '0', 'Non Aktif', 'Eka Nanda Adi Prasetyo', '3318142308030000', 'Eka Nanda Adi Prasetyo', 'Pati', '2003-08-23', '22 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '6287770000000', 'ekanandaadiprasetyo975@gmail.com', 'Desa Tajungsari', '3', '6', 'Tajungsari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(729, NULL, NULL, 220022302068, '1', 'Aktif', 'Fiki Candra bagus santoso ', '3318020811980000', 'Fiki Candra bagus santoso ', 'Pati', '1998-11-08', '27 Tahun', 'L', 'Menikah', 'B', '82287458258', 'fikicandra081198@gmail.com', 'Desa sundoluhur (dukuh Gatak) kecamatan Kayen kabupaten pati', '16', '2', 'Desa sundoluhur/dukuh gatak', 'Kayen', 'Pati', 'Jawa tengah ', 'Desa sundoluhur ', '16', '02', 'Desa sundoluhur ', 'Kayen', 'Pati', 'Jawa tengah ', 'Ds. Sundoluhur, Dkh.Gatak RT/RW 16/02, Kec.Kayen, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(730, NULL, NULL, 220022302069, '0', 'Non Aktif', 'Muhammad ali irfan', '3318132705000000', 'Muhammad ali irfan', 'Pati', '2000-05-27', '25 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85727707534', 'maliirfan275@gmail.com', 'Dengan sitiluhur', '2', '5', 'Sitiluhur', 'Gembong', 'Pati', 'Jawa Tengah', 'Dengan', '02', '05', 'Sitiluhur', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(731, NULL, NULL, 220022302070, '0', 'Non Aktif', 'Aditya Bayu Rekso', '3318131106010000', 'Aditya Bayu Rekso', 'Pati', '2001-06-11', '24 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '81327535176', 'adityabayu2001@gmail.com', 'DS GEMBONG DK KEMBANG', '2', '5', 'GEMBONG', 'GEMBONG', 'PATI', 'JAWA TENGAH', 'DS.GEMBONG DK.KEMBANG', '2', '5', 'GEMBONG', 'GEMBONG', 'PATI', 'JAWA TENGAH', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(732, NULL, NULL, 220022302053, '0', 'Non Aktif', 'Dede Rinaldi Rozak', '3212082912930000', 'Dede Rinaldi Rozak', 'Indramayu', '1993-12-29', '32 Tahun', 'L', 'Belum Menikah', 'O', '85892866448', 'rinaldiozak@gmail.com', 'Blok Jengkok Barat. Desa Jengkok', '7', '2', 'Jengkok', 'Kertasemaya', 'Indramayu', 'Jawa Barat', 'IDEM', '07', '02', 'Jengkok', 'Kertasemaya', 'Indramayu', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(733, NULL, NULL, 220022302054, '0', 'Non Aktif', 'Mustofa Kamal', '3214131603000000', 'Mustofa Kamal', 'Purwakarta ', '2000-03-16', '25 Tahun', 'L', 'Belum Menikah', 'O', '81294596613', 'mk9391431@gmail.com', 'Kp. Cibaragalan Ds. Ciwangi', '29', '6', 'Ciwangi', 'Bungursari', 'Purwakarta', 'Jawa barat', 'Kp. Cibaragalan', '29', '06', 'Ciwangi', 'Bungursari', 'Purwakarta', 'Jawa Barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(734, NULL, NULL, 220022302071, '0', 'Non Aktif', 'Dio Akbar Ferdiansa ', '3318101811030010', 'Dio Akbar Ferdiansa ', 'Pati', '2003-11-18', '22 Tahun', 'L', 'Belum Menikah', 'O', '82141492969', 'akbardio685@gmail.com', 'Jl. syeh jangkung', '7', '4', 'pati kidul', 'pati', 'pati', 'jawa tengah', 'jl syeh jangkung', '7', '4', 'pati kidul', 'pati', 'pati', 'jawa tengah', 'Lhn.Syeh Jangkung RT/RW 07/04 Ds.Pati Kidul, Kec.Pati, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(735, NULL, NULL, 2202023020009, '1', 'Aktif', 'Febri Ardiyanto', '3321112902880000', 'Febri Ardiyanto', 'Demak', '1988-02-29', '37 Tahun', 'L', 'Menikah', 'O', '6281330000000', 'febriarditanto@gmail.com', 'PRUM GRIYA BHAKTI PRAJA BLOK D. 6', '5', '7', 'Mangunjiwan', 'Demak', 'Demak', 'Jawa Tengah', 'PRUM GRIYA BHAKTI PRAJA BLOK D. 6', 'O5', 'O7', 'Mangunjiwan', 'Demak', 'Demak', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(736, NULL, NULL, 220022303075, '0', 'Non Aktif', 'Ahmad victor musalas', '3319071408010000', 'Ahmad victor musalas', 'Kudus', '2001-08-14', '24 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '8995710525', 'musalasvictor@gmail.com', 'Dersalam 2/5 bae kudus', '2', '5', 'Dersalam', 'Bae', 'Kudus', 'Jawa tengah', 'Dersalam rt 2/5 bae kudus', '2', '5', 'Dersalam', 'Bae', 'Kudus', 'Jawa tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(738, NULL, NULL, 220022303078, '0', 'Non Aktif', 'I K Yasa Abadi', '1871032904860000', 'I K Yasa Abadi', 'Bandar Lampung', '1986-04-29', '39 Tahun', 'L', 'Menikah', 'B', '85279907770', 'yasaabadi@gmail.com', 'Jl.Sultan Badarudin No.56', '3', '0', 'Gunung Agung ', 'Lamgkapura', 'Bandar Lampung', 'Lampung', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(739, NULL, NULL, 220022302079, '1', 'Aktif', 'khasan fauzi', '3318130807950000', 'khasan fauzi', 'pati', '1995-07-08', '30 Tahun', 'L', 'Menikah', 'Tidak Tahu', '89515923476', 'khasanfauzi0807@gmail.com', 'Bageng', '3', '3', 'bageng', 'gembong', 'pati', 'jawa tengah', 'bageng', '03', '03', 'bageng', 'gembong', 'pati', 'jawa tengah', 'Ds.Bageng RT/RW 03/03, Kec.Gembong, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(741, NULL, NULL, 220022303082, '0', 'Non Aktif', 'Muhammad Fikri Anni syafaah ', '3509081304960000', 'Muhammad Fikri Anni syafaah ', 'Jember', '1996-04-13', '29 Tahun', 'L', 'Belum Menikah', 'B', '81216586552', 'mf13041996.fp@gmail.com', 'Jl sriwijaya dusun krajan', '1', '2', 'Kasiyan', 'Puger', 'Jember', 'Jawatimur', 'Iden', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Dsn.Krajan RT/RW 1/2, Ds. Kasiyan Kec.Puger, Kab.Jember\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(742, NULL, NULL, 220022303083, '0', 'Non Aktif', 'PRATAMA ANGGY A.K PUTRA', '1871071401960010', 'PRATAMA ANGGY A.K PUTRA', 'Panjang', '1996-01-14', '29 Tahun', 'L', 'Menikah', 'B', '82185464244', 'Prathamaanggi5@gmail.com', 'Jalan ikan tembakang, gang ikan gabus no.18 ', '11', '', 'SUKARAJA ', 'BUMIWARAS ', 'BANDARLAMPUNG ', 'LAMPUNG', 'PERUMAHAN PANTAI PURI GADING BLOK I3 No.11, JALAN RE MARTADINATA ', '004', '001', 'SUKAMAJU', 'TELUK BETUNG BARAT', 'BANDARLAMPUNG ', 'LAMPUNG', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(743, NULL, NULL, 220022303086, '0', 'Non Aktif', 'Nur Indah Istiqomah', '3318046601010000', 'Nur Indah Istiqomah', 'Pati', '2001-01-26', '24 Tahun', 'P', 'Belum Menikah', 'A', '82313722010', 'nurindah2615@gmail.com', 'Desa Karangkonang', '7', '1', 'Karangkonang', 'Winong', 'Pati', 'Jawa Tengah', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', '#N/A\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(744, NULL, NULL, 220022304087, '1', 'Aktif', 'Amiruddin dwi saputra', '3318133101030000', 'Amiruddin dwi saputra', 'Pati', '2003-01-31', '22 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82125145751', 'amiruddindwi0@gmail.com', 'Ds bermi rt 01 rw06 gembong pati', '1', '6', 'Bermi', 'Gembong', 'Pati', 'Jawa tengah', 'DESA BERMI RT01RW06 GEMBONG PATI', '1', '6', 'Bermi', 'Gembong', 'Pati', 'Jawa tengah', 'Ds. Bermi RT/RW 01/06, Kec.Gembong, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(745, NULL, NULL, 220022304088, '0', 'Non Aktif', 'Andrew Maulana ', '3318121203040000', 'Andrew Maulana ', 'Pati', '2004-03-12', '21 Tahun', 'L', 'Belum Menikah', 'O', '87743632413', 'andrewmaulana4@gmail.com', 'Kaborongan, gang 3', '7', '1', 'Pati Lor', 'Pati', 'Pati', 'Jawa Tengah', 'Kaborongan gang 3', '07', '01', 'Pati Lor', 'Pati', 'Pati', 'Jawa Tengah ', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(746, NULL, NULL, 220022304089, '1', 'Aktif', 'MUHAMMAD ISMAIL', '3318100704980000', 'MUHAMMAD ISMAIL', 'PATI', '1998-04-07', '27 Tahun', 'L', 'Menikah', 'AB', '87737319515', 'muh.ismail0704@gmail.com', 'Ds. Kedungbulus', '5', '3', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa tengah', 'Kedungbulus', '005', '003', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa tengah', 'Ds.Kedungbulus, RT/RW 05/03, Kec.Pati, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(747, NULL, NULL, 220022407040, '0', 'Aktif', 'MUHAMMAD HENDRO SETIAWAN', '3318130607990000', 'MUHAMMAD HENDRO SETIAWAN', 'Pati', '1999-06-07', '26 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85785622603', 'muhammaduna90@gmail.com', 'DK. SALAK', '4', '2', 'KLAKAHKASIHAN', 'GEMBONG', 'PATI', 'JAWA TENGAH', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'Ds. Klakahkasihan RT/RW 04/02, Kec.Gembong, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(748, NULL, NULL, 220022304091, '0', 'Non Aktif', 'Muhammad saiful ulum', '3318141603040000', 'Muhammad saiful ulum', 'Pati', '2004-03-16', '21 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82323995110', 'saiflulum@gmail.com', 'Ds. Purwosari', '4', '2', 'Purwosari', 'Tlogowungu', 'Pati', 'Jawa tengah', 'Ds. Purwosari', '4', '2', 'Purwosari', 'Tlogowungu', 'Pati', 'Jawa tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(749, NULL, NULL, 220022304092, '0', 'Non Aktif', 'Ahmad Syamsul Arifin ', '3318110412990000', 'Ahmad Syamsul Arifin ', 'Pati', '1999-04-12', '26 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85238839608', 'ahmadsyamsularifin04@gmail.com', 'Desa Gempolsari ', '1', '1', 'Gempolsari ', 'Gabus', 'Pati', 'Jawa Tengah ', 'Desa Gempolsari ', '1', '1', 'Gempolsari ', 'Gabus', 'Pati', 'Jawa Tengah ', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(750, NULL, NULL, 220022405027, '0', 'Non Aktif', 'AINUN NAJIB', '3318132104040000', 'AINUN NAJIB', 'Pati', '2004-04-21', '21 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '88238368141', 'najibinun75@gmail.com', 'PLUKARAN', '2', '4', 'PLUKARAN', 'GEMBONG', 'PATI', 'Jawa tengah', 'PLUKARAN', '2', '2', 'PLUKARAN', 'GEMBONG', 'PATI', 'JAWA TENGAH', 'Ds.Plukaran RT/RW 2/4, Kec.Gembong, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(751, NULL, NULL, 220022304094, '0', 'Non Aktif', 'ARI BAGASKARA', '3318152804030000', 'ARI BAGASKARA', 'Pati', '2003-04-28', '22 Tahun', 'L', 'Belum Menikah', 'O', '82213367280', 'aribagaspati01@gmail.com', 'Ds. Bumiayu Dk. Bapoh', '5', '3', 'Bumiayu', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Ds. Bumiayu Dk. Bapoh', '5', '3', 'Bumiayu', 'Wedarijaksa', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(752, NULL, NULL, 220022304095, '0', 'Non Aktif', 'Firzal Abdul Khafis', '3318011107000000', 'Firzal Abdul Khafis', 'Pati', '2000-11-07', '25 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '81296106622', 'firzalak@gmail.com', 'Dukuh Tambang, RT 008/RW 004,Kec. Sukolilo, Kab. Pati -', '8', '4', 'Kedungwinong', 'Sukolilo', 'Pati', 'Jawa Tengah', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(753, NULL, NULL, 220022304096, '0', 'Non Aktif', 'ANDRIAN RIZKIANTO', '3318102602030000', 'ANDRIAN RIZKIANTO', 'Pati', '2003-02-26', '22 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '89514778459', 'andrianrizki56@gmail.com', 'DS.PURI JALAN PANGLIMA SUDIRMAN NO.10 F/PATI', '3', '1', 'PURI', 'PATI', 'PATI', 'JAWA TENGAH', 'DS.PURI', '3', '1', 'PURI', 'PATI', 'PATI', 'JAWA TENGAH', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(754, NULL, NULL, 220022304097, '0', 'Non Aktif', 'Anton Prastyo Adi Nugroho', '3318141001020000', 'Anton Prastyo Adi Nugroho', 'Pati', '2002-10-01', '23 Tahun', 'L', 'Belum Menikah', 'O', '87715382127', 'antonprastya0@gmail.com', 'Desa Tamansari dukuh kerep pare', '3', '2', 'Desa Tamansari', 'Tlogowungu', 'Pati', 'Jawa tengah', 'Ponpes Al Hikam Puri Pati', '1', '6', 'Puri', 'Pati', 'Pati', 'Jawa tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(755, NULL, NULL, 220022304098, '1', 'Aktif', 'HARIS WICAKSONO', '3318131706040000', 'HARIS WICAKSONO', 'Pati', '2004-06-17', '21 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82325258763', 'hariswicaksono05@gmail.com', 'Dk Kembang', '2', '5', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk kembang', '2', '5', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Dkh.Kembang, Ds.Gembong RT/RW 2/5, Kec.Gembong, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(756, NULL, NULL, 220022407039, '0', 'Non Aktif', 'Muhammad Saiful fariz', '3318130809010000', 'Muhammad Saiful fariz', 'Pati', '2001-08-09', '24 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '8813937789', 'saifulcimeng088@gmail.com', 'Pohgading', '1', '6', 'Pohgading', 'Gembong', 'Pati', 'Jawa tengah', 'Pohgading', '1', '6', 'Pohgading', 'Gembong', 'Pati', 'Jawa tengah', 'Dkh.Rambutan, Ds.Pohgading RT/RW 1/6, Kec.Gembong, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(757, NULL, NULL, 220022304100, '0', 'Non Aktif', 'Sultan amar muharom', '3318050505980000', 'Sultan amar muharom', 'Pati', '1998-05-05', '27 Tahun', 'L', 'Menikah', 'A', '89504224733', 'bangzult05@gmail.com', 'Ds Tlogosari kec Tlogowungu kab Pati', '2', '1', 'Tlogosari', 'Tlogowungu', 'Pati', 'Jawa tengah', 'DS Tlogosari kec Tlogowungu kab Pati', '2', '1', 'Tlogosari', 'Tlogowungu', 'Pati', 'Jawa tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(758, NULL, NULL, 220022304101, '0', 'Non Aktif', 'TAUFIK ADITYA', '3318132401030010', 'TAUFIK ADITYA', 'Pati', '2003-01-24', '22 Tahun', 'L', 'Belum Menikah', 'O', '85602735625', 'taditia31@gmail.com', 'Ds Semirejo Kec Gembong', '1', '3', 'Semirejo', 'Gembong', 'Pati', 'Jawa tengah', 'IDEM', '1', '3', 'Semirejo', 'Gembong', 'Pati', 'Jawa tengah', 'Ds.Semirejo RT/RW 1/3, Kec.Gembong, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(759, NULL, NULL, 220022304102, '0', 'Non Aktif', 'MUHAMMAD ZAINAL MAKHASIN', '3318190605030000', 'MUHAMMAD ZAINAL MAKHASIN', 'Pati', '2003-06-05', '22 Tahun', 'L', 'Belum Menikah', 'O', '895397000000', 'muhzainal14@gmail.com', 'Desa Sambiroto', '3', '1', 'Sambiroto', 'Tayu', 'Pati', 'Jawa Tengah', 'Desa Sambiroto', '03', '01', 'Sambiroto', 'Tayu', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(760, NULL, NULL, 220022304103, '1', 'Aktif', 'Joko Purnomo', '3318131210990000', 'Joko Purnomo', 'Pati', '1999-12-10', '26 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85803025219', 'jojo335721@gmail.com', 'Satak klakahkasihan gembong Pati', '1', '6', 'Kelakah kasihan', 'Gembong', 'Pati', 'Jawa tengah', 'Satak', '1', '6', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa tengah', 'Dkh Satak, Ds.Klakahkasihan RT/RW 1/6, Kec.gembong, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(761, NULL, NULL, 220022304104, '0', 'Non Aktif', 'Ifqi Faiz', '3318150205980010', 'Ifqi Faiz', 'Pati', '1998-02-05', '27 Tahun', 'L', 'Belum Menikah', 'B', '85786962470', 'ifqifaiz41@gmail.com', 'Desa Jontro RT03/RW02, Kec. Wedarijaksa, Kab. Pati', '3', '2', 'Jontro', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(762, NULL, NULL, 220022304105, '0', 'Non Aktif', 'Ramadan Ferdiansyah', '3318080611020000', 'Ramadan Ferdiansyah', 'Pati', '2002-06-11', '23 Tahun', 'L', 'Belum Menikah', 'O', '895333000000', 'ferdirama68@gmail.com', 'Desa Bumirejo dukuh ngebruk Rt/Rw 1/1 kec. Juwana', '1', '1', 'Bumirejo', 'Juwana', 'Pati', 'Jawa tengah', 'Desa bumirejo dukuh ngebruk Rt 1 rw 1 kec. Juwana', '1', '1', 'Bumirejo', 'Juwana', 'Pati', 'Jawa tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(763, NULL, NULL, 220022304106, '0', 'Non Aktif', 'Bayu Setiadi', '3318212911030000', 'Bayu Setiadi', 'Pati', '2003-11-29', '22 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82322691437', 'bayusetiadi447@gmail.com', 'Tegalharjo Trangkil Pati RT8 RW3', '8', '3', 'Tegalharjo', 'Trangkil', 'Pati', 'Jawa tengah', 'Tegalharjo Trangkil Pati RT8 RW3', '8', '3', 'Tegalharjo', 'Trangkil', 'Pati', 'Jawa tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(764, NULL, NULL, 220022304107, '0', 'Non Aktif', 'CAHYO IVAN PRAMUDYA', '3318132005040000', 'CAHYO IVAN PRAMUDYA', 'Pati', '2004-05-20', '21 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '8241959150', 'cahyoivanpramudya@gmail.com', 'dk tambak mijen', '2', '3', 'Ds wonosekar', 'Kec gembong', 'Kab pati', 'Prvn jawa tengah', 'Dk tambak mijen', '2', '3', 'Ds wonosekar', 'Gembong', 'Pati', 'Jawa tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(765, NULL, NULL, 220022304108, '0', 'Non Aktif', 'DWI NUR CAHYO ADI NUGROHO', '3318133108040000', 'DWI NUR CAHYO ADI NUGROHO', 'Pati', '2004-08-31', '21 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '87847532741', 'adinugrohopati76@gmail.com', 'Dk. Gondoriyo', '3', '8', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa tengah', 'Dk. Gondoriyo', '3', '8', 'Klakahkasihan', 'Gembong', 'Pati', 'Jawa tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(766, NULL, NULL, 220022405023, '0', 'Non Aktif', 'Abdul Muhith', '3318153008040000', 'Abdul Muhith', 'Pati', '2004-08-30', '21 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '89668200153', 'muhitha348@gmail.com', 'Dukuh Panggung, Desa Panggungroyom', '7', '2', 'Panggungroyom', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Dukuh Panggung, Desa Panggungroyom', '7', '2', 'Panggungroyom', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'Ds.Panggungroyom RT/RW 7/2, Kec.Wedarijaksa, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(767, NULL, NULL, 220022304110, '0', 'Non Aktif', 'Budianto', '3318022509890000', 'Budianto', 'Pati', '1989-09-25', '36 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '81367055320', 'budi.pasiron@gmail.com', 'JL merdeka', '17', '6', 'Pangkalan Balai', 'Banyuasin III', 'Banyuasin', 'Sumatra Selatan', 'JL melati 2 perumahan Grand jasmine Blok D 13', '001', '001', 'Talang Jambe', 'Sukarame', 'Palembang', 'Sumatra Selatan', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(768, NULL, NULL, 220022303111, '0', 'Non Aktif', 'Kharisma Noviana ', '3318134704020000', 'Kharisma Noviana ', 'Pati', '2002-04-07', '23 Tahun', 'P', 'Belum Menikah', 'Tidak Tahu', '81234456547', 'kharisma55548@gmail.com', 'Desa Semirejo Dk. Ndayan RT. 01 RW. 06 Kec. Gembong Kab. Pati', '1', '6', 'Semirejo', 'Gembong ', 'Pati', 'Jawa Tengah', 'IDEM', 'IDEM', 'IDEM ', 'IDEM', 'IDEM', 'IDEM', 'IDEM', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(769, NULL, NULL, 220022305120, '0', 'Non Aktif', 'Nur Afif Nasiruddin ', '3318132404000000', 'Nur Afif Nasiruddin ', 'Pati ', '2000-04-24', '25 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85866326178', 'afifnur2065@gmail.com', 'Dk.kendil', '3', '3', 'Klakahkasihan ', 'Gembong ', 'Pati', 'Jawa tengah ', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(770, NULL, NULL, 220022305121, '0', 'Non Aktif', 'Ali Ahmadi ', '3318080102980020', 'Ali Ahmadi ', 'Pati', '1998-02-01', '27 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '895708000000', 'aliahmadiii043@gmail.com', 'Desa Bakaran Kulon RT 03/03 kec. Juwana kab. Pati', '3', '3', 'Desa Bakaran Kulon ', 'Juwana', 'Pati', 'Jawa Tengah ', 'Desa Bakaran Kulon RT 03/03 kec Juwana kab. Pati', '03', '03', 'Bakaran Kulon ', 'Juwana', 'Pati', 'Jawa Tengah ', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(771, NULL, NULL, 220022305122, '0', 'Non Aktif', 'Didik tri wahyudi', '3318131710040000', 'Didik tri wahyudi', 'Pati', '2004-10-17', '21 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85926315079', 'dtriwahyudi37@gmail.com', 'Dk rubiyah ', '2', '7', 'Bageng', 'Gembong', 'Pati', 'Jawa tengah', 'rubiyah', '2', '7', ' bageng', 'Gembong', 'Pati', 'Jawa tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(772, NULL, NULL, 220022407038, '1', 'Aktif', 'Muhammad riko setiyawan', '3318130401030000', 'Muhammad riko setiyawan', 'Pati', '2003-01-04', '22 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85764523958', 'rikosetiawan686@gmail.com', 'Desa sitiluhur rt03 rw02 kec. Gembong kab. Pati', '3', '2', 'Sitiluhur', 'Gembong', 'Pati', 'Jawa tengah', 'Desa sitiluhur rt 03 rw 02 kec. Gembong kab. Pati', '03', '02', 'Sitiluhur', 'Gembong', 'Pati', 'Jawa tengah', 'Ds.Sitiluhur RT/RW, Kec.Gembong, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(773, NULL, NULL, 220022305124, '0', 'Non Aktif', 'Ahmad Syaifuddin ', '3318132601010200', 'Ahmad Syaifuddin ', 'Pati', '2002-01-26', '23 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85893868309', 'sesuka.26@gmail.com', 'Krekel/blimbing ', '3', '6', 'Bageng ', 'Gembong ', 'Pati', 'Jawa tengah ', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(774, NULL, NULL, 220022304112, '0', 'Non Aktif', 'Andry maulana hidayat', '3601180907980000', 'Andry maulana hidayat', 'Pandeglang', '1998-10-17', '27 Tahun', 'L', 'Menikah', 'AB', '87875523439', 'andrymhidayat98@gmail.com', 'Kp cimanuk masjid 003/001 kec cimanuk pandeglang Banten', '3', '1', 'Cimanuk masjid', 'Cimanuk', 'Pandeglang', 'Banten', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(775, NULL, NULL, 220022305113, '0', 'Non Aktif', 'Syaifup Rochman Aji', '3318051706970000', 'Syaifup Rochman Aji', 'Pati', '1998-06-17', '27 Tahun', 'L', 'Belum Menikah', 'B', '87834466722', 'syaifulaji76@gmail.com', 'Ds Triguno Rt. 03 Rw. 01 Kec. Pucakwangi Kab. Pati', '3', '1', 'Triguno', 'Pucakwangi', 'Pati', 'Jawa Tengah', 'Ds. Triguno Rt. 03 Rw. 01 Kec. Pucakwangi Kab. Pati', '03', '01', 'Triguno', 'Pucakwangi', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(776, NULL, NULL, 220022305117, '0', 'Non Aktif', 'ZANDIAR ANJARSACH', '3573021906980000', 'ZANDIAR ANJARSACH', 'MALANG', '1998-06-19', '27 Tahun', 'L', 'Belum Menikah', 'O', '81249317674', 'zanjarsach@gmail.com', 'JL BRIGJEN SLAMET RIADI VII/21', '2', '3', 'ORO ORO DOWO', 'KLOJEN', 'KOTA MALANG', 'JAWA TIMUR', 'JL BRIGJEN SLAMET RIADI VII/21', '02', '03', 'ORO ORO DOWO', 'KLOJEN', 'MALANG', 'JAWA TIMUR', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(777, NULL, NULL, 220022305119, '0', 'Non Aktif', 'Dendy Ahmad Rifai', '3213010607930000', 'Dendy Ahmad Rifai', 'Subang', '1993-07-06', '32 Tahun', 'L', 'Menikah', 'AB', '81296459332', 'dendy060793@gmail.com', 'Kp. Krajan ', '15', '4', 'Sagalaherang Kidul', 'Sagalaherang', 'Subang', 'Jawa Barat', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(778, NULL, NULL, 220022305126, '0', 'Non Aktif', 'Alfi Alfu Adama Junean Achmad', '3318120506990000', 'Alfi Alfu Adama Junean Achmad', 'Magetan', '1999-06-05', '26 Tahun', 'L', 'Belum Menikah', 'A', '85234290932', 'ALFIADAMA7@GMAIL.COM', 'Ngagul Asri Jl Flamboyan Rt 03 Rw 05 Muktiharjo Margorejo Pati', '3', '5', 'Muktiharjo', 'Margorejo', 'Pati', 'Jawa Tengah', 'Ngagul Asri Jl Flamboyan', '03', '05', 'Muktiharjo', 'Margorejo', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(779, NULL, NULL, 220022305127, '0', 'Non Aktif', 'Anisa Fatma Aulia', '3318105507980000', 'Anisa Fatma Aulia', 'Pati', '1998-07-15', '27 Tahun', 'P', 'Belum Menikah', 'B', '85730794293', 'anisaftmaulia@gmail.com', 'Kaborongan RT 02 RW 01 Pati, Jawa Tengah', '2', '1', 'Pati Lor', 'Pati', 'Pati', 'Jawa Tengah', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(780, NULL, NULL, 2202023040010, '1', 'Aktif', 'Sugiyanto', '3173070804820010', 'Sugiyanto', 'Pati', '1982-04-08', '43 Tahun', 'L', 'Menikah', 'Tidak Tahu', '83866326935', 'sugiyanto8482@gmail.com', 'DS karangkonang ', '3', '2', 'Karangkonang', 'Winong', 'Pati', 'Jawa tengah', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(781, NULL, NULL, 220022305128, '0', 'Non Aktif', 'Benny Andi Sukirno ', '3528081803870000', 'Benny Andi Sukirno ', 'Pamekasan ', '1987-03-18', '38 Tahun', 'L', 'Menikah', 'Tidak Tahu', '82337900041', 'bennyandi57@gmail.com', 'Dsn.sumberbatu', '4', '12', 'Blumbungan ', 'Larangan ', 'Pamekasan ', 'Jawa Timur ', 'Dsn.sumberbatu', '04', '12', 'Blumbungan ', 'Larangan ', 'Pamekasan ', 'Jawa Timur ', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(782, NULL, NULL, 220022305129, '1', 'Aktif', 'Fakhri Kirom', '3529112311000000', 'Fakhri Kirom', 'Sumenep', '2000-11-23', '25 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82338877436', 'fakhrikirom26@gmail.com', 'Dusun Ares Timur', '1', '1', 'Palongan', 'Bluto', 'Sumenep', 'Jawa Timur', 'Dusun Ares Timur', '01', '01', 'Palongan', 'Bluto', 'Sumenep', 'Jawa Timur', 'Dsn Ares Timur RT/RW 1/1, Palongan Bluton, Sumenep\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30');
+INSERT INTO `karyawan` (`id_karyawan`, `user_id`, `atasan_id`, `NIK`, `Status`, `Kode`, `Nama_Sesuai_KTP`, `NIK_KTP`, `Nama_Lengkap_Sesuai_Ijazah`, `Tempat_Lahir_Karyawan`, `Tanggal_Lahir_Karyawan`, `Umur_Karyawan`, `Jenis_Kelamin_Karyawan`, `Status_Pernikahan`, `Golongan_Darah`, `Nomor_Telepon_Aktif_Karyawan`, `Email`, `Alamat_KTP`, `RT`, `RW`, `Kelurahan_Desa`, `Kecamatan`, `Kabupaten_Kota`, `Provinsi`, `Alamat_Domisili`, `RT_Sesuai_Domisili`, `RW_Sesuai_Domisili`, `Kelurahan_Desa_Domisili`, `Kecamatan_Sesuai_Domisili`, `Kabupaten_Kota_Sesuai_Domisili`, `Provinsi_Sesuai_Domisili`, `Alamat_Lengkap`, `created_at`, `updated_at`) VALUES
+(783, NULL, NULL, 220022305130, '0', 'Non Aktif', 'Eko Ardianto ', '3319080104930000', 'Eko Ardianto ', 'Kudus', '1993-04-01', '32 Tahun', 'L', 'Menikah', 'A', '85960403859', 'eko.ardianto1299@gmail.com', 'Mlati lor', '3', '3', 'Mlati lor ', 'Kota Kudus ', 'Kudus ', 'Jawa Tengah ', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(784, NULL, NULL, 220022305133, '1', 'Aktif', 'Ahmad Husen', '3209160201950010', 'Ahmad Husen', 'Cirebon', '1995-01-02', '30 Tahun', 'L', 'Menikah', '', '82128901468', '', 'Umbulbalong Rt/Rw 06/04, Ds. Sindangjawa, Kec. Dukupuntang, Kab. Cirebon', '6', '4', 'Sindangjawa', 'Dukupuntang', 'Cirebon', 'Jawa barat', 'Umbulbalong Rt/Rw 06/04, Ds. Sindangjawa, Kec. Dukupuntang, Kab. Cirebon', '6', '4', 'Sindangjawa', 'Dukupuntang', 'Cirebon', 'Jawa barat', 'Umbul Balong Rt 06/04 Desa Sindangjawa, Kec. Dukupuntang, Kab. Cirebon \r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(785, NULL, NULL, 220022305134, '0', 'Non Aktif', 'Eris Munandar', '', 'Eris Munandar', '', '0000-00-00', '126 Tahun', 'L', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(786, NULL, NULL, 220022306137, '0', 'Non Aktif', 'Muhamad Roby Husada', '3604091405960000', 'Muhamad Roby Husada', 'Serang', '1996-05-14', '29 Tahun', 'L', 'Belum Menikah', 'O', '8980942444', '', 'Kp. Citerep Rt/Rw 03/04, Ds. Citerep, Kec. Ciruas, Kab Serang', '3', '4', 'Citerep', 'Ciruas', 'Serang', 'Banten', 'Kp. Citerep Rt/Rw 03/04, Ds. Citerep, Kec. Ciruas, Kab Serang', '3', '4', 'Citerep', 'Ciruas', 'Serang', 'Banten', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(787, NULL, NULL, 220022306138, '0', 'Non Aktif', 'Muhammad Fariej Rezky', '1671092005980000', 'Muhammad Fariej Rezky', 'Palembang', '1998-05-20', '27 Tahun', 'L', 'Belum Menikah', 'A', '81276598926', 'frjrezky@gmail.com', 'Perum Sukarela Indah Blok. A 17 RT/RW 021/007, Ds. Sukarami, Kec. Sukarami, Kota Palembang', '21', '7', 'Sukarami', 'Sukarami', 'Palembang', 'Sumatera Selatan', 'Perum Sukarela Indah Blok. A 17 RT/RW 021/007, Ds. Sukarami, Kec. Sukarami, Kota Palembang', '21', '7', 'Sukarami', 'Sukarami', 'Palembang', 'Sumatera Selatan', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(788, NULL, NULL, 220022306139, '1', 'Aktif', 'Achmad Taufandi Rizal', '3573012608890000', 'Achmad Taufandi Rizal', 'Malang', '1989-08-26', '36 Tahun', 'L', 'Menikah', '', '85655514976', '', 'Jl. Puntodewo 2 No.16 Rt/Rw 016/003, Ds. Polehan, Kec. Blimbing, Kota Malang', '16', '3', 'Polehan', 'Blimbing', 'Malang', 'Jawa Timur', 'Jl. Puntodewo 2 No.16 Rt/Rw 016/003, Ds. Polehan, Kec. Blimbing, Kota Malang', '16', '3', 'Polehan', 'Blimbing', 'Malang', 'Jawa Timur', 'Jln Puntodewo 2 No.16 RT RW 10/03 Kel.Polehan Kec.Blimbing Kota Malang\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(790, NULL, NULL, 220022306150, '1', 'Aktif', 'Edi Prasetya', '3318142910910000', 'Edi Prasetya', 'Pati', '1991-10-29', '34 Tahun', 'L', 'Menikah', '', '85726114798', '', 'Ds. Tamansari RT/RW 01/05, Kec. Tlogowungu, Kab. Pati', '1', '5', 'Tamansari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Tamansari RT/RW 01/05, Kec. Tlogowungu, Kab. Pati', '1', '5', 'Tamansari', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Ds. Tamansari RT/RW 01/05, Kec. Tlogowungu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(791, NULL, NULL, 220022306151, '0', 'Non Aktif', 'Irul mustofa', '3522151205860000', 'Irul mustofa', 'Bojonegoro', '1986-05-12', '39 Tahun', 'L', 'Menikah', 'B', '81545066383', 'iruelmustofa86@gmail.com', 'Dusun plumpung ', '2', '4', 'Sumurcinde', 'Soko', 'Tuban', 'Jatim', 'Dusun plumpung', '02', '04', 'Sumurcinde', 'Soko', 'Tuban', 'Jatim', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(792, NULL, NULL, 220022306141, '1', 'Aktif', 'Mega Fatmawati ', '1871046208020000', 'Mega Fatmawati ', 'Panjang', '2001-08-21', '24 Tahun', 'P', 'Belum Menikah', 'Tidak Tahu', '89632690301', 'megafatmawati19@gmail.com', 'KP SUKA JADI LK I ', '11', '0', 'Pidada', 'Panjang', 'Kota Bandar Lampung ', 'Lampung ', 'KP SUKA JADI LK I', '011', '0', 'Pidada', 'Panjang ', 'Kota Bandar Lampung ', 'Lampung ', 'Kp. Suka Jadi, Lk. 1, RT. 11, Kec. Panjang, Kota Bandar Lampung\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(793, NULL, NULL, 220022307143, '0', 'Non Aktif', 'Achmad Fahrul Rozi ', '3318141909040000', 'Achmad Fahrul Rozi ', 'Pati', '2004-09-19', '21 Tahun', 'L', 'Belum Menikah', 'B', '85602705917', 'achmadfahrulrozi05@gmail.com', 'DS sumbermulyo dk sangklur', '2', '2', 'Sumbermulyo ', 'Tlogowungu ', 'Pati', 'Jawa tengah ', 'DS sumbermulyo ', '02', '02', 'Sumbermulyo ', 'Tlogowungu ', 'Pati', 'Jawa tengah ', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(794, NULL, NULL, 220022307144, '0', 'Non Aktif', 'Mohammad Nasikhul Yahya Yustico', '331813180903001', 'Mohammad Nasikhul Yahya Yustico', 'Pati', '2003-09-18', '22 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '88214833268', 'ticoyahya@gmail.com', 'Dk.Blimbing', '1', '6', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk.Blimbing', '01', '06', 'Bageng', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(795, NULL, NULL, 220022307145, '0', 'Non Aktif', 'Sholihul Huda ', '3318143103980000', 'Sholihul Huda ', 'Pati', '1998-03-31', '27 Tahun', 'L', 'Belum Menikah', 'O', '85801166569', 'takurhuda@gmail.com', 'DS Tamansari ', '1', '1', 'Tamansari ', 'Tlogowungu ', 'Pati ', 'Jawa Tengah ', 'Dk Kerep Pare Barat ', '1', '1', 'Tamansari ', 'Tlogowungu ', 'Pati ', 'Jawa Tengah ', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(796, NULL, NULL, 220022307146, '1', 'Aktif', 'Dian agus setiawan', '3318130708960000', 'Dian agus setiawan', 'Pati', '1996-08-07', '29 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85769100311', 'dianagussetiawan080@gmail.com', 'Desa kedungbulus kidul', '2', '1', 'Desa kedungbulus', 'Gembong', 'Pati', 'Jawa tengah', 'Desa kedungbulus', '02', '01', 'Desa kedungbulus', 'Gembong', 'Pati', 'Jawa tengah', 'Ds.Kedungbulus RT/RW 02/01 Kec.Gembong, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(797, NULL, NULL, 220022307149, '0', 'Non Aktif', 'UJANG MANARUL MUTAQIN', '3202242601010010', 'UJANG MANARUL MUTAQIN', 'SUKABUMI', '2001-01-26', '24 Tahun', 'L', 'Menikah', 'AB', '82295404937', 'ujangmnrul9702@gmail.com', 'Jl.Talagasari ', '1', '4', 'Bojongsari', 'Jampangkulon', 'Sukabumi', 'Jawabarat', 'Perum Griya Putra Residence Blok E No 56', '001', '002', 'Pasirkareumbi', 'Subang', 'Subang', 'Jawabarat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(798, NULL, NULL, 220022307152, '0', 'Non Aktif', 'Muhammad Refsha Satya ', '1671030906000000', 'Muhammad Refsha Satya ', 'Palembang', '2000-06-09', '25 Tahun', 'L', 'Belum Menikah', 'B', '85155115915', 'refsha09@gmail.com', 'Jl. Jaya No. 1189', '21', '7', '16 Ulu', 'Seberang Ulu II', 'Kota Palembang ', 'Sumatera Selatan ', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(799, NULL, NULL, 220022307153, '1', 'Aktif', 'NATASYA YUNIDA PUTRI', '3507235806990000', 'NATASYA YUNIDA PUTRI', 'MALANG', '1999-06-18', '26 Tahun', 'P', 'Menikah', 'B', '89656520474', 'natasyayunida123@gmail.com', 'JALAN TANJUNGSARI GG IV', '24', '8', 'KEPUHARJO', 'KARANGPLOSO', 'KAB. MALANG', 'JAWA TIMUR', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'Jln. Tanjungsari Gg IV RT/RW 24/08 Desa Kepuharjo Kec Karangploso Kab Malang\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(800, NULL, NULL, 220022307154, '1', 'Aktif', 'Yunita Anggi Pratiwi', '3302244806010000', 'Yunita Anggi Pratiwi', 'Kebumen', '2001-06-08', '24 Tahun', 'P', 'Belum Menikah', 'A', '89529086863', 'yunitaanggi8601@gmail.com', 'Jl. HOS Notosuwiryo ', '1', '15', 'Teluk', 'Purwokerto Selatan', 'Banyumas', 'Jawa Tengah', 'Jl. HOS Notosuwiryo', '01', '15', 'Teluk', 'Purwokerto Selatan', 'Banyumas', 'Jawa Tengah', 'Jln HOS Notosuwiryo RT/RW 01/15, Teluk, Purwokerto Selatan\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(801, NULL, NULL, 220022307155, '1', 'Aktif', 'Rini Nurjihan', '3274054204980000', 'Rini Nurjihan', 'Jakarta', '1998-04-02', '27 Tahun', 'P', 'Belum Menikah', 'B', '8993107777', 'nurjihan806@gmail.com', 'Suradinaya Utara Gg. Sialon-alon', '7', '6', 'Pekiringan', 'Kesambi', 'Kota Cirebon', 'Jawa Barat', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'Jln. Suradinaya Utara Gg. Sialon-alon RT/RW 07/06 Kel. Pekiringan, Kec. Kesambi, Kab. Cirebon\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(802, NULL, NULL, 220022307156, '0', 'Non Aktif', 'Ridwan ', '3527100704990000', 'Ridwan ', 'Sampang ', '1999-06-07', '26 Tahun', 'L', 'Belum Menikah', 'O', '81259105161', 'mridhwankamil@gmail.com', 'Rungnunggal Lepelle Robatal Sampang ', '0', '0', 'Lepelle ', 'Robatal ', 'Sampang ', 'Jawa Timur', 'Jl. Trunojoyo 3b Pejagan Bangkalan Madura ', '02', '03', 'Pejagan ', 'Bangkalan ', 'Bangkalan ', 'Jawa Timur ', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(803, NULL, NULL, 220022307157, '1', 'Aktif', 'HERIANSYAH', '3601182811950000', 'HERIANSYAH', 'PANDEGLANG', '1995-11-21', '30 Tahun', 'L', 'Menikah', 'O', '83877350341', 'ansyahheri67@gmail.com', 'KP CIPURINGIN', '7', '2', 'KADUMADANG', 'CIMANUK', 'PANDEGLANG', 'BANTEN', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'Jln TB H Ghozali Kp Cipuringin RT/RW 07/02, Desa Kadumadang, Kec. Cimanuk, Kab. Pandeglang, Banten\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(805, NULL, NULL, 220022308159, '0', 'Non Aktif', 'Ali Prasetiyo ', '3505100807950000', 'Ali Prasetiyo ', 'Blitar ', '1995-07-08', '30 Tahun', 'L', 'Belum Menikah', 'O', '81358991070', 'aliprasetiyo95@gmail.com', 'Sawentar 04/02 Sawentar, Kanigoro, Blitar ', '4', '2', 'Sawentar ', 'Kanigoro ', 'Blitar ', 'Jawa Timur ', 'Sawentar 04/02 Sawentar, Kanigoro, Blitar ', '04', '02', 'Sawentar ', 'Kanigoro ', 'Blitar ', 'Jawa Timur ', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(806, NULL, NULL, 220022308160, '0', 'Non Aktif', 'Taufikur Rahman ', '3528061303000000', 'Taufikur Rahman ', 'Pamekasan ', '2000-03-13', '25 Tahun', 'L', 'Belum Menikah', 'O', '82334178744', 'taufikurrahman069@gmail.com', 'Dusun Batulabang Desa Akkor', '1', '1', 'Akkor', 'Palengaan ', 'Pamekasan ', 'Jawa Timur ', 'Dusun Batulabang Desa Akkor ', '001', '001', 'Akkor', 'Palengaan ', 'Pamekasan ', 'Jawa Timur ', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(807, NULL, NULL, 220022307161, '1', 'Aktif', 'MUHAMMAD IRFAN FADHILA', '3318132204980000', 'MUHAMMAD IRFAN FADHILA', 'PATI', '1998-04-22', '27 Tahun', 'L', 'Menikah', 'Tidak Tahu', '87871363815', 'irfanfadhil22@gmail.com', 'DK. SERUT DS. KEDUNGBULUS GEMBONG PATI', '3', '3', 'KEDUNGBULUS', 'GEMBONG', 'PATI', 'JAWA TENGAH', 'DK. SERUT DS. KEDUNGBULUS GEMBONG PATI', '003', '003', 'KEDUNGBULUS', 'GEMBONG', 'PATI', 'JAWA TENGAH', 'Kedungbulus RT/RW 03/03 Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(808, NULL, NULL, 220022307162, '0', 'Non Aktif', 'Yudha Adhitya', '3319021607890000', 'Yudha Adhitya', 'Kudus', '1989-07-16', '36 Tahun', 'L', 'Menikah', 'B', '81575075043', 'yudha.yycell@gmail.com', 'Dk.Randangan rt.002/003 Ds.Semirejo Kec.Gembong Kab.Pati', '2', '3', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk.Randangan rt.002/003 Ds.Semirejo Kec.Gembong Kab.Pati', '002', '003', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Randangan RT/RW 02/03 Desa Samirejo, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(809, NULL, NULL, 220022308163, '0', 'Non Aktif', 'Ahmad Rizal Syahroni ', '3316042109910000', 'Ahmad Rizal Syahroni ', 'Blora ', '1991-09-21', '34 Tahun', 'L', 'Belum Menikah', 'O', '81226298523', 'mujabsaiful8@gmail.com', 'Dusun Kemantren Desa Kemantren ', '3', '2', 'Kemantren ', 'Kedungtuban', 'Blora', 'Jawa Tengah ', 'IDEM', 'IDEM ', 'IDEM ', 'IDEM ', 'IDEM ', 'IDEM ', 'IDEM ', 'Desa Kemantren RT/RW 03/02, Kec. Kedungtuban, Kab. Blora\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(810, NULL, NULL, 220022308164, '1', 'Aktif', 'Yoga Aji Kartiko', '3517091802980000', 'Yoga Aji Kartiko', 'Jombang', '1998-02-18', '27 Tahun', 'L', 'Menikah', 'O', '81217611288', 'yogaaji998@gmail.com', 'Dsn. Karangkletak 003/005 Ds. Tunggorono Kec. Jombang Kab. Jombang Jawa Timur', '3', '5', 'Tunggorono', 'Jombang', 'Jombang', 'Jawa Timur', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'Ds. Tunggorono, RT/RW 03/05, Kec. Jombang, Kab. Jombang\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(811, NULL, NULL, 220022308165, '1', 'Aktif', 'Nuri Firdausiyah', '3528087006010000', 'Nuri Firdausiyah', 'Pamekasan ', '2001-06-30', '24 Tahun', 'P', 'Belum Menikah', 'Tidak Tahu', '85931124762', 'nurifirdausiyah1234@gmail.com', 'Dsn. Sakolaan, desa Duko Timur, kec. Larangan, kab. Pamekasan ', '0', '0', 'Duko Timur ', 'Larangan ', 'Pamekasan ', 'Jawa Timur ', 'Dusun Sakolaan, desa Duko Timur, kec. Larangan, kab. Pamekasan ', '00', '00', 'Duko Timur ', 'Larangan ', 'Pamekasan ', 'Jawa Timur ', 'Dusun Sakola\'an, Desa Duko Timur, Kec. Larangan, Kab. Pamekasan\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(812, NULL, NULL, 220022307148, '1', 'Aktif', 'Sitra Anggara', '1871094407980010', 'Sitra Anggara', 'Teluk betung', '1998-07-04', '27 Tahun', 'L', 'Menikah', 'A', '895610000000', 'sitraanggara04@gmail.com', 'Jl. Dr. Ciptomangunkusumo gg. Haji rebo', '9', '3', 'Sumur batu', 'Teluk Betung utara', 'Bandar Lampung', 'Lampung', 'Jl. Dr. Ciptomangunkusumo gg. Haji rebo no. 14', '009', '003', 'Sumur batu', 'Teluk Betung utara', 'Bandar Lampung', 'Lampung', 'Jln. Ciptomangunkusumo, Gg Haji Rebo, RT. 09, RW. 03, Ds. Sumurbaru, Kec. Telukbetung Utara, Bandar Lampung\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(813, NULL, NULL, 220022308166, '1', 'Aktif', 'Jimmie Refa Fauzan', '3318142508990000', 'Jimmie Refa Fauzan', 'Pati', '1999-08-25', '26 Tahun', 'L', 'Menikah', 'A', '85867752796', 'jrfjimmie21@gmail.com', 'Ds. Regaloh ', '1', '5', 'Regaloh', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Regaloh', '01', '05', 'Regaloh', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'Dk Regaloh RT/RW 01/05 Desa Regaloh, Kec. Tlogowungu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(814, NULL, NULL, 220022308167, '1', 'Aktif', 'Sendi Bagus Apriyono', '3318150204010000', 'Sendi Bagus Apriyono', 'Pati', '2001-04-02', '24 Tahun', 'L', 'Menikah', 'O', '895423000000', 'sendybagus02@gmail.com', 'Jontro Rt:1/3 , Wedarijaksa , Pati', '1', '3', 'Jontro', 'Wedarijaksa', 'Pati', 'Jawa Tengah', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'Desa Jontro RT/RW 01/03, Kec. Wedarijaksa, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(815, NULL, NULL, 220022308168, '0', 'Non Aktif', 'Hasan Robbani', '3305161611940000', 'Hasan Robbani', 'Kebumen', '1994-11-16', '31 Tahun', 'L', 'Menikah', 'A', '85743258457', 'hasanrobbani9@gmail.com', 'Dukuh Karangmangu 1', '2', '1', 'Banjareja', 'Kuwarasan', 'Kebumen', 'Jawa Tengah', 'Dukuh Srikoyo', '51', '08', 'Bleberan', 'Playen', 'Gunungkidul', 'D. I. Yogyakarta', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(816, NULL, NULL, 220022308169, '0', 'Non Aktif', 'MUHAMMAD AZIS IRAWAN', '3318141612030000', 'MUHAMMAD AZIS IRAWAN', 'PATI', '2003-12-16', '22 Tahun', 'L', 'Belum Menikah', 'O', '81392550261', 'azisirawan8888@gmail.com', 'Dk rambutan ,tajungsari,tlogowungu,pati,jawatengah', '3', '1', 'Tajungsari', 'tlogowungu', 'pati', 'jawa tengah', 'dk rambutan rt03 rw01 tajungsari,tlogowungu,pati', '03', '01', 'tajungsari', 'tlgowungu', 'pati', 'jawa tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(817, NULL, NULL, 220022308170, '1', 'Aktif', 'RIZKY AGUNG AFRIZAL ', '3318130101050000', 'RIZKY AGUNG AFRIZAL ', 'Pati ', '2005-01-01', '20 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82136280374', 'agungafrizal86@gmail.com', 'Dk.posono,RT.4/Rw. 7,Ds.klalahkasihan,kec. Gembong, kab. Pati ', '4', '7', 'Klalahkasihan', 'Gembong ', 'Pati', 'Jawa Tengah ', 'Ds. Klalahkasihan, dk. Posono,kec. Gembong, kab. Pati ', '4', '7', 'Klalahkasihan ', 'Gembong ', 'Pati ', 'Jawa Tengah ', 'Dk. Posono RT/RW 04/07 Desa Klakahkasian, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(818, NULL, NULL, 220022308171, '0', 'Non Aktif', 'IKHSAN ARJU ANFA ', '3318160606050000', 'IKHSAN ARJU ANFA ', 'Pati', '2005-06-06', '20 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85700567517', 'icanarju@gmail.com', 'Bulumanis Kidul RT02 RW04, Margoyoso, Pati ', '2', '4', 'Bulumanis Kidul ', 'Margoyoso ', 'Pati ', 'Jawa Tengah ', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM ', 'IDEM', 'IDEM', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(819, NULL, NULL, 220022308172, '1', 'Aktif', 'Muhammad rafiansyah', '3318130403040000', 'Muhammad rafiansyah', 'Ngnjuk', '2004-03-04', '21 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85803005871', 'rafaferdi14@gmail.com', 'Ds.gwmbong Dk.ngembes', '2', '12', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah ', 'DS.gembong Dk.ngembes', '02', '12', 'Gembong ', 'Gembong', 'Pati', 'Jawa Tengah ', 'Dk. Ngembes, Ds. Gembong, RT/RW 02/12, Kec.Gembong, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(820, NULL, NULL, 220022308173, '0', 'Non Aktif', 'AL HAFIZ MAHDA AULIYANSYAH', '3318101602010000', 'AL HAFIZ MAHDA AULIYANSYAH', 'BOJONEGORO', '2001-02-16', '24 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '81389707161', 'hafizhanimauliyansyah@gmail.com', 'DS. KUTOHARJO DK. KARANGDOWO', '1', '1', 'KUTOHARJO', 'PATI', 'PATI', 'JAWA TENGAH', 'DS. BENDAN PATI KIDUL', '10', '04', 'PATI KIDUL', 'PATI', 'PATI', 'JAWA TENGAH', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(821, NULL, NULL, 220022308174, '1', 'Aktif', 'RIZKY ANANDA OKTAVIAN', '3318111110030000', 'RIZKY ANANDA OKTAVIAN', 'PATI', '2003-10-11', '22 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '81391878707', 'rizkyananda27493@gmail.com', 'Ds.Karaban rt7 rw5, Kec.Gabus, Kab.Patu', '7', '5', 'Karaban', 'Gabus', 'Pati', 'Jawa Tengah', 'Ds.Karaban rt7 rw5, Kec.Gabus, Kab.Pati', '7', '5', 'Karaban', 'Gabus', 'Pati', 'Jawa Tengah', 'Desa Karaban RT/RW 07/05, Kec. Gabus, kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(822, NULL, NULL, 220022308175, '0', 'Non Aktif', 'Muhammad Riyo ', '3318152503030000', 'Muhammad Riyo ', 'Pati', '2003-03-25', '22 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '81233513600', 'riomaman123@gmail.com', 'Ds. Jontro ', '4', '2', 'Ds. Jontro ', 'Wedarijaksa ', 'Pati', 'Jawa tengah ', 'Ds. Jontro ', '4', '02', 'Jontro ', 'Wedarijaksa ', 'Pati', 'Jawa tengah ', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(823, NULL, NULL, 220022308177, '0', 'Non Aktif', 'Muhammad Ahya Al Anshori', '3318132101000000', 'Muhammad Ahya Al Anshori', 'Serut Kedungbulus Gembong Pati', '2000-01-21', '25 Tahun', 'L', 'Belum Menikah', 'A', '87890582391', 'muhammadahya900@gmail.com', 'Serut Kedungbulus 02/03 Gembong Pati', '2', '3', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', 'Serut Kedungbulus 02/03 Gembong Pati', '02', '03', 'Kedungbulus', 'Gembong', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(824, NULL, NULL, 220022308178, '0', 'Non Aktif', 'Ahmad Khoirun Naim', '3318022509890000', 'Ahmad Khoirun Naim', 'PATI', '2005-10-05', '20 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '83895693169', 'ahmadkhoirunnaim43@gmail.com', 'Desa Tegalharjo RT 4/ RW 3 kecamatan Trangkil kabupaten Pati provinsi Jawa tenggah', '4', '3', 'Tegalharjo ', 'Trangkil', 'Pati', 'Jawa Tenggah', 'TEGALHARJO', '004', '003', 'TEGALHARJO', 'TRANGKIL', 'PATI', 'JAWA TENGGAH', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(825, NULL, NULL, 220022308179, '0', 'Non Aktif', 'IQBAL LEKSONO ', '3318163101050000', 'IQBAL LEKSONO ', 'Pati', '2005-01-31', '20 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '82113975392', 'iqballeksono771@gmail.com', 'WATUROYO', '3', '3', 'WATUROYO', 'MARGOYOSO', 'PATI', 'JAWA TENGAH', 'WATUROYO ', '03', '03', 'WATUROYO ', 'MARGOYOSO', 'PATI', 'JAWA TENGAH ', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(826, NULL, NULL, 220022308180, '1', 'Aktif', 'Emanda Indriastuti', '3318145606980000', 'Emanda Indriastuti', 'Pati', '1998-06-16', '27 Tahun', 'P', 'Belum Menikah', 'O', '83106533325', 'nda.emanda16@gmail.com', 'Desa Wonorejo', '1', '1', 'Wonorejo', 'Tlogowungu', 'Pati', 'Jawa Tengah', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'Dk. Wonorejo RT/RW 01/01 Desa Wonorejo, Kec. Tlogowungu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(827, NULL, NULL, 220022309181, '0', 'Non Aktif', 'Putra awaludin umar', '3172022412960000', 'Putra awaludin umar', 'Jakarta', '1996-12-24', '29 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85155112624', 'putraawaludin2412@gmail.com', 'Buntalan ', '13', '2', 'Buntalan', 'Temayang', 'Bojonegoro', 'Jawa timur', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(828, NULL, NULL, 220022309182, '0', 'Non Aktif', 'Diana Sri Kurniawati', '3371025803010000', 'Diana Sri Kurniawati', 'Magelang', '2001-03-18', '24 Tahun', 'P', 'Belum Menikah', 'Tidak Tahu', '85701521423', 'diana.sri.kurniawati@gmail.com', 'Samban Kidul', '7', '6', 'Kelurahan Panjang', 'Magelang Tengah', 'Kota Magelang', 'Jawa Tengah', 'Samban Kidul', '07', '06', 'Kelurahan Panjang', 'Magelang Tengah', 'Kota Magelang', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(829, NULL, NULL, 220022309183, '0', 'Non Aktif', 'Naufal Muhammad Rabbani', '3214012209990010', 'Naufal Muhammad Rabbani', 'Bandung', '1999-09-22', '26 Tahun', 'L', 'Belum Menikah', 'O', '89616847019', 'rabbanifood10@gmail.com', 'Perum Panorama Indah Blok B6 No 25', '4', '13', 'Ciseureuh', 'Purwakarta', 'Purwakarta', 'Jawa Barat', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(830, NULL, NULL, 220022309184, '0', 'Non Aktif', 'Rafi Akbar Restu Winarso', '3572032508980000', 'Rafi Akbar Restu Winarso', 'Blitar', '1998-04-25', '27 Tahun', 'L', 'Belum Menikah', 'O', '82230915864', 'raafiiaakbaar2112@gmail.com', 'Perum Asabri Gedog Blok i no.2 kel gedog kec. Sananwetan kota blitar jawa timur', '1', '15', 'Gedog', 'Sananwetan', 'Kota', 'Jawa timur', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'Perum Asabri Blok I 02 RT/RW 01/15, Ds. Gedog, Sananwetan, Blitar\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(831, NULL, NULL, 220022309185, '0', 'Non Aktif', 'HARTO WIDODO', '1802052302050000', 'HARTO WIDODO', 'ADIPURO', '2005-02-23', '20 Tahun', 'L', 'Belum Menikah', 'B', '88287426568', 'hartowidodo113@gmail.com', 'Dusun 3', '10', '5', 'Depok Rejo', 'Trimurjo', 'Lampung Tengah', 'Lampung', 'Dusun 3', '010', '005', 'Depok Rejo', 'Trimurjo', 'Lampung Tengah', 'Lampung', 'Dusun 3 RT/RW 10/05 Desa Depok Rejo, Kec. Trimurjo, Kab. Lampung Tengah\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(832, NULL, NULL, 320022309009, '0', 'Non Aktif', 'Ahmad Syaiful Arif', '3320110202990000', 'Ahmad Syaiful Arif', 'Jepara', '1999-02-02', '26 Tahun', 'L', 'Belum Menikah', 'B', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'Ds. Sukodono RT/RW 01/02, Kec. Tahunan, Kab. Jepara\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(833, NULL, NULL, 220022310186, '1', 'Aktif', 'Andika Maulana ', '3318101005050010', 'Andika Maulana ', 'Pati', '2005-05-10', '20 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '87876068174', 'mandika319@gmail.com', 'Ds.Widorokandang ', '8', '1', 'Widorokandang ', 'Pati ', 'Pati', 'Jawa Tengah ', 'Ds.Widorokandang ', '08', '01', 'Widorokandang ', 'Pati', 'Pati', 'Jawa Tengah ', 'Ds. Widorokandang RT/RW 08/01, Kec. Pati, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(834, NULL, NULL, 220022310187, '1', 'Aktif', 'Eko mulat setiawan', '3310151009920000', 'Eko mulat setiawan', 'Madugondo, tegalgondo, wonosari, klaten', '1992-09-10', '33 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85701841210', 'mulatsetyawaneko@gmail.com', 'Brambang', '1', '2', 'Blimbing', 'Gatak', 'Sukoharjo', 'Jawa tengah', 'Brambang', '01', '02', 'Blimbing', 'Gatak', 'Sukoharjo', 'Jawa tengah', 'Brambang RT/RW 01/02, Desa Blimbing, Kec. Gatak, Kab. Sukoharjo\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(835, NULL, NULL, 220022310188, '0', 'Non Aktif', 'EVAN BASWARA PHALOSA', '3173031206010000', 'EVAN BASWARA PHALOSA', 'Jakarta', '2001-06-12', '24 Tahun', 'L', 'Belum Menikah', 'O', '895376000000', 'evansbaswara@gmail.com', 'JL MANGGA BESAR IV.Q 241 JAKARTA BARAT', '14', '6', 'Taman sari', 'Taman sari', 'Jakarta barat', 'DKI JAKARTA', 'TAMAN GRIYA ASRI BLOK C11 NO 09 CILEBUT KABUPATEN BOGOR', '004', '012', 'clebut barat', 'sukaraja', 'kabupaten bogor', 'jawa barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(836, NULL, NULL, 220022310189, '0', 'Non Aktif', 'Agung Gumelar', '3604200602950000', 'Agung Gumelar', 'Serang', '1995-02-06', '30 Tahun', 'L', 'Menikah', 'Tidak Tahu', '895370000000', 'agung.gume95@gmail.com', 'Kp. Cilandak cau', '7', '1', 'Bojong Menteng', 'Tunjung Teja', 'Serang', 'Banten', 'Kp. Cilandak Cau', '007', '001', 'Bojong Menteng', 'Tunjung Teja', 'Serang', 'Banten', 'Kp. Cilandak Cau RT/RW 07/01, Desa Bojong Menteng, Kec. Tunjung Teja, Kab. Serang, Banten\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(837, NULL, NULL, 220022310190, '1', 'Aktif', 'Melani Novita Sari', '3201036601000010', 'Melani Novita Sari', 'Bogor', '2000-01-26', '25 Tahun', 'P', 'Belum Menikah', 'O', '89652313517', 'melaninovitasr@gmail.com', 'Kp. Puspanegara', '3', '1', 'Puspanegara', 'Citeureup ', 'Bogor', 'Jawa Barat ', 'Kp. Puspanegara ', '003', '001', 'Puspanegara ', 'Citeureup ', 'Bogor', 'Jawa Barat ', 'Kp. Puspanegara RT/RW 03/01, Kec. Citeureup, Kab. Bogor\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(838, NULL, NULL, 220022310191, '1', 'Aktif', 'Amirul Ihsan', '3171031506991000', 'Amirul Ihsan', 'Jakarta', '1999-06-15', '26 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '81393080480', 'amirulihsan50@gmail.com', 'Sumur Batu, kemayoran, Jakarta Pusat', '1', '2', 'Sumur Batu', 'Kemayoran ', 'JAKARTA Pusat', 'DKI JAKARTA', 'Jl. Kh Samanhudi, Ngemplak, Jetis, Sukoharjo ', '4', '6', 'Jetis', 'Sukoharjo ', 'Sukoharjo ', 'Jawa Tengah', 'Jln. KH Samanhudi RT/RW 04/06 Ngeplak, Jetis, Kec. Sukoharjo, Kab. Sukoharjo\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(839, NULL, NULL, 220022310192, '1', 'Aktif', 'Almar\'atul Afuwwah Q. A. Mubarak', '6472025412000050', 'Almar\'atul Afuwwah Q. A. Mubarak', 'Sleman', '2000-12-14', '25 Tahun', 'P', 'Belum Menikah', 'A', '82382247833', 'ain3282@gmail.com', 'Jl. Adi Sucipto Gg. Mawar 1 ', '1', '1', 'Rawa Makmur', 'Palaran', 'Samarinda', 'Kalimantan Timur', 'Jl. Kolonel Sunandar No. 33', '02', '08', 'Puri', 'Pati', 'Pati', 'Jawa Tengah', 'Jln. Kol. Sunandar No. 33 Desa Puri, Kec. Puri, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(840, NULL, NULL, 220022311193, '0', 'Non Aktif', 'Fadel Muhammad', '3318101806010000', 'Fadel Muhammad', 'Pati', '2001-06-18', '24 Tahun', 'L', 'Belum Menikah', 'B', '89677345914', 'muhfadel1801@gmail.com', 'Ds. Plangitan, No. 537', '7', '2', 'Plangitan', 'Pati', 'Pati', 'Jawa tengah', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(841, NULL, NULL, 220022306142, '0', 'Non Aktif', 'Hary Wasinton', '3311031509930000', 'Hary Wasinton', 'Sukoharjo', '1993-09-15', '32 Tahun', 'L', 'Menikah', 'B', '85691116061', 'harywasinton@gmail.com', 'Meruya Utara', '1', '6', 'Meruya Utara', 'Kembangan', 'Jakarta Barat', 'DKI Jakarta', 'Jalan Citarum Raya No.28', '001', '003', 'Cipayung', 'Ciputat', 'Tangerang Selatan', 'Banten', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(842, NULL, NULL, 220022311194, '0', 'Non Aktif', 'Adik Nurharyanto ', '3308043001810000', 'Adik Nurharyanto ', 'Magelang ', '1981-01-30', '44 Tahun', 'L', 'Menikah', 'O', '81239070442', 'nurharyanto2400@gmail.com', 'Jagang lor RT 03 RW 10 salam salam Magelang Jawa Tengah ', '3', '10', 'Salam ', 'Salam ', 'Magelang ', 'Jawa Tengah ', 'Jagang lor salam', '03', '10', 'Salam ', 'Salam ', 'Magelang ', 'Jawa Tengah ', 'Ds. Salam, RT/RW 03/08, Kec. Salam, Kab. Magelang\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(843, NULL, NULL, 220022311195, '0', 'Non Aktif', 'Muhammad Ali Muzamil', '3319060507050000', 'Muhammad Ali Muzamil', 'Pati', '2005-07-05', '20 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85879166531', 'alimuzamil0507@gmail.com', 'Desa gondoharum rt01 rw2 jekulo kudus ', '1', '2', 'Gondoharum', 'Jekulo', 'Kudus', 'Jawatengah', 'Gondoharum rt01 rw02 jekulo kudus', '01', '02', 'Gondoharum ', 'Jekulo ', 'Kudus', 'Jawa tengah ', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(844, NULL, NULL, 220022311196, '0', 'Non Aktif', 'aldi ardiansyah', '3208192505980000', 'aldi ardiansyah', 'Bandung', '1998-05-25', '27 Tahun', 'L', 'Belum Menikah', 'AB', '89531395341', 'alsiardian@gmail.com', 'Jl. Mangun jaya, singkup, pasawahan, kuningan', '2', '4', 'singkup', 'pasawahan', 'kuningan', 'jawa barat', 'Jl. Mangun jaya, singkup, pasawahan', '02', '04', 'Singkup', 'Pasawahan', 'Kuningan ', 'Jawa barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(845, NULL, NULL, 320022311010, '0', 'Non Aktif', 'Nafi\'atul Rahma Khairunnisa\'', '3318126911050000', 'Nafi\'atul Rahma Khairunnisa\'', 'Pati', '2005-11-29', '20 Tahun', 'P', 'Belum Menikah', 'A', '895362000000', 'nafiatulrahmakhairunnisa@gmail.com', 'Dukuh Ngagul', '2', '5', 'Muktiharjo', 'Margorejo', 'Pati', 'Jawa Tengah', 'Dukuh Ngagul', '2', '5', 'Muktiharjo', 'Margorejo', 'Pati', 'Jawa Tengah', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(846, NULL, NULL, 220022311197, '1', 'Aktif', 'Wanda agustina', '5105036608930000', 'Wanda agustina', 'Tasikmalaya', '1993-08-26', '32 Tahun', 'P', 'Menikah', 'O', '81558160726', 'wandaradclitte@gmal.com', 'Perumahan uma lombok indah kamasan no 04', '0', '0', 'Gel gel', 'Klungkung', 'Klungkung', 'Bali', 'Btn wahana permai no 04 sema agung', '0', '0', 'Tusan', 'Banjarangkan', 'Klungkung', 'Bali', 'BTN Wahana Permai No.4, Sema Agung, Desa Tusan, Kec. Banjarangkan, Kab. Klungkung, Bali\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(847, NULL, NULL, 220022311198, '1', 'Aktif', 'PRASETIYO WIBOWO ', '3306150607920000', 'PRASETIYO WIBOWO ', 'Purworejo ', '1992-07-06', '33 Tahun', 'L', 'Menikah', 'A', '81578528707', 'prasfoody@gmail.com', 'Karangjati', '2', '2', 'Karangrejo ', 'Loano ', 'Purworejo ', 'Jawa tengah', 'IDEM ', 'IDEM ', 'IDEM ', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'Karangjati RT/RW 02/02 Desa Karangrejo, Kec. Laono, Kab. Purworejo\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(848, NULL, NULL, 220022311199, '1', 'Aktif', 'Muhammad Fatkhun Nadhif ', '3318131801970000', 'Muhammad Fatkhun Nadhif ', 'Pati', '1997-01-18', '28 Tahun', 'L', 'Menikah', 'Tidak Tahu', '87775420194', 'nadhifpati335@gmail.com', 'Jl. Bermi Sukobubuk, Bringin Kidul, RT.04/RW. 09, Bermi, Kec. Gembong, Kabupaten Pati.', '4', '9', 'Bermi', 'Gembong ', 'Pati', 'Jawa Tengah ', 'Jl. Bermi Sukobubuk, Bringin Kidul, RT.04/RW. 09, Bermi, Kec. Gembong, Kabupaten Pati', '04', '09', 'Bermi ', 'Gembong ', 'Pati', 'Jawa Tengah ', 'Bermi RT/RW 04/09 Desa Bermi, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(849, NULL, NULL, 220022312200, '0', 'Non Aktif', 'Nanang Faisal Akbar', '3671081606990000', 'Nanang Faisal Akbar', 'Tangerang', '1999-06-16', '26 Tahun', 'L', 'Belum Menikah', 'A', '895611000000', 'nanangfaisalakbar@gmail.com', 'Keroncong Permai, Blok EB.30 NO.27', '6', '3', 'Gebang Raya', 'Periuk', 'Kota Tangerang', 'Banten', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(850, NULL, NULL, 220022312201, '0', 'Non Aktif', 'Rofiqi Wijaya ', '3529052707010000', 'Rofiqi Wijaya ', 'Sumenep', '2001-07-27', '24 Tahun', 'L', 'Belum Menikah', 'AB', '87865030111', 'wijayarofiki@gmail.com', 'Dusun Biyan', '1', '1', 'Kapedi ', 'Bluto', 'Sumenep ', 'Jawa timur ', 'Dusun biyan', '01', '01', 'Kapedi ', 'Bluto', 'Sumenep ', 'Jawa timur', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(851, NULL, NULL, 220022312202, '1', 'Aktif', 'Dimas Putra Pamungkas', '3318101112960010', 'Dimas Putra Pamungkas', 'Pati', '1996-12-11', '29 Tahun', 'L', 'Menikah', 'O', '87830158949', 'dimasputrapersib@gmail.com', 'Ds. Kaborongan gang 1 no 224', '5', '1', 'PATI LOR', 'PATI', 'PATI', 'JAWA TENGAH', 'Ds. Kaborongan gang 1 no 224', '05', '01', 'PATI LOR', 'PATI', 'PATI', 'JAWA TENGAH', 'Desa Kaborongan Gang 1 No. 225 RT/RW 05/01, Kec. Pati, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(852, NULL, NULL, 220022312203, '1', 'Aktif', 'MUHAMMAD RIDWAN CHANIAGO', '5105030807940000', 'MUHAMMAD RIDWAN CHANIAGO', 'Klungkung', '1994-07-08', '31 Tahun', 'L', 'Menikah', 'A', '81703035670', 'ridwanc798@gmail.com', 'Kaliunda lingkungan pande semarapura kelod kangin', '0', '0', 'Semarapura kelod kangin', 'Klungkung', 'Klungkung', 'Bali', 'Lingkungan pande semarapura kelod kangin', '000', '000', 'Semarapura kelod kangin', 'Klungkung', 'Klungkung', 'Bali', 'Kaliunda Lingkungan Pande, Desa Samarapura Kelod Kangin, Kec. Klungkung, Kab. Klungkung Bali\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(855, NULL, NULL, 220022312206, '1', 'Aktif', 'Oksi alfarisy', '3318172911960000', 'Oksi alfarisy', 'Pati', '1996-11-29', '29 Tahun', 'L', 'Menikah', 'B', '85743460478', 'Oksifariz4@gmail.com', 'Ds. Sambiroto', '5', '2', 'Sambiroto', 'Tayu', 'Pati', 'Jawa tengah', 'Ds. Sambiroto', '5', '2', 'Sambiroto', 'Tayu', 'Pati', 'Jawa tengah', 'Desa Sambiroto RT/RW 05/02, Kec. Tayu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(856, NULL, NULL, 220022401002, '0', 'Non Aktif', 'Marudin roberto', '3213081302000000', 'Marudin roberto', 'Subang', '2000-02-13', '25 Tahun', 'L', 'Belum Menikah', 'O', '85156288702', 'marudinroberto013@gmail.com', 'Dusun cigadung\n', '18', '5', 'Binong', 'Binong', 'Subang', 'Jawa barat', 'Dusun cigadung', '18', '05', 'Binong', 'Binong', 'Subang', 'Jawa barat', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(857, NULL, NULL, 220022401003, '1', 'Aktif', 'Anisa Layanti ', '1607096303010000', 'Anisa Layanti ', 'Banyuasin ', '2001-03-23', '24 Tahun', 'P', 'Belum Menikah', 'A', '83848123693', 'anisalayanti2301301@gmail.com', 'Dusun III RT 009 RW 004 Desa Purwosari Kecamatan Makarti Jaya', '9', '4', 'Purwosari', 'Makarti Jaya', 'Banyuasin ', 'Sumatera Selatan ', 'Dusun III RT 009 RW 004 Desa Purwosari Kecamatan Makarti Jayaa', '009', '004', 'Purwosari ', 'Makarti Jaya ', 'Banyuasin ', 'Sumatera Selatan ', 'Dusun III RT/RW 09/04, Desa Purwosari, Kec. Makarti Jaya, Kab. Banyuasin, Sumatera Selatan\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(858, NULL, NULL, 220022401004, '1', 'Aktif', 'FURQON SUBHANA', '3506250904010000', 'FURQON SUBHANA', 'KEDIRI', '2001-04-09', '24 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '8978937737', 'furqonsubhana@gmail.com', 'Jl. Dandang Gendis, No.222', '20', '4', 'DOKO', 'NGASEM', 'KEDIRI', 'JAWA TIMUR', 'Jl. Dandang Gendis, No.222', '20', '04', 'DOKO', 'NGASEM', 'KEDIRI', 'JAWA TIMUR', 'Jln dandang Gendis RT/RW 20/04 Desa Doko, Kec. Ngasem, Kab. Kediri\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(859, NULL, NULL, 220022402006, '1', 'Aktif', 'RAMDANI SAEFULLOH', '3305150301000000', 'RAMDANI SAEFULLOH', 'kebumen', '2000-01-03', '25 Tahun', 'L', 'Menikah', 'B', '895631000000', 'ramdani.saefulloh@gmail.com', 'Sugihwaras Selatan', '1', '2', 'Sugihwaras', 'Adimulyo', 'Kebumen', 'Jawa Tengah', 'Gentan Lor', '01', '01', 'Caruban', 'Adimulyo', 'Kebumen', 'JawaTengah', 'Dusun Sugihwaras Selatan RT/RW 01/02 Desa Sugihwaras, Kec. Adimulyo, Kab. Kebumen\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(860, NULL, NULL, 220022402007, '0', 'Non Aktif', 'NANDAR', '7306102707020000', 'NANDAR', 'BONTOMANAI,DESA ERELEMBANG,KEC TOMBOLOPAO,KAB GOWA', '2002-07-25', '23 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85824737770', 'nndrrr7@gmail.com', 'BONTOMANAI', '3', '2', 'ERELEMBANG', 'TOMBOLOPAO', 'GOWA', 'SULAWESI SELATAN', 'JL.INSPEKSI KANAL NO.18', '008', '003', 'BANTA BANTAENG', 'RAPPOCINI', 'MAKASSAR', 'SULAWESI SELATAN', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(861, NULL, NULL, 220022402009, '0', 'Non Aktif', 'Muhamad dicki aziz', '3671072905980000', 'Muhamad dicki aziz', 'Tangerang', '1998-05-29', '27 Tahun', 'L', 'Belum Menikah', 'O', '895619000000', 'azizdicki29@gmail.com', 'Jl. Dharma bakti', '2', '4', 'Pabuaran', 'Karawaci', 'Kota tangerang', 'Banten', 'Jl. Dharma bakti ', '002', '004', 'Pabuaran', 'Karawaci', 'Kota Tangerang', 'Banten', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(862, NULL, NULL, 220022309207, '0', 'Non Aktif', 'Ihza Fikry Aryaditama Arrozi', '', 'Ihza Fikry Aryaditama Arrozi', 'Pati', '2001-07-07', '24 Tahun', 'L', 'Belum Menikah', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 'Klipang Pesona Asri III Blok C/56A, Sendangmulyo, Tembalang, Semarang\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(863, NULL, NULL, 220022402011, '0', 'Non Aktif', 'Arfin Yudawan', '3318191312970000', 'Arfin Yudawan', 'Pati', '1997-12-13', '28 Tahun', 'L', 'Menikah', 'A', '85642648139', 'arfinyudawan@gmail.com', 'Ds. Jepatlor Rt 07/03 Kec. Tayu - Kab. Pati - Jawa Tengah', '7', '3', 'Ds. Jepatlor', 'Tayu', 'Pati', 'Jawa Tengah', 'Id', 'Id', 'Id', 'Id', 'Id', 'Id', 'Id', 'Jepat Lor RT/RW 07/03, Desa Jepat Lor, Kec. Tayu, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(864, NULL, NULL, 220232402010, '0', 'Non Aktif', 'Hairuddin', '', 'Hairuddin', 'Gowa', '1997-09-30', '28 Tahun', 'L', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(865, NULL, NULL, 220022402012, '1', 'Aktif', 'VITA ARIYANI', '3308014401980000', 'VITA ARIYANI', 'MAGELANG', '1998-01-04', '27 Tahun', 'P', 'Belum Menikah', 'O', '82111707703', 'vitaariyani44@gmail.com', 'MANDIRAN', '1', '5', 'KEBONREJO', 'SALAMAN', 'MAGELANG', 'JAWA TENGAH', 'IDEM', '1', '5', 'KEBONREJO', 'SALAMAN', 'MAGELANG', 'JAWA TENGAH', 'Mandiran RT/RW 01/05 Desa Kebonjero, Kec. Salaman, Kab. Magelang\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(866, NULL, NULL, 220022403015, '0', 'Non Aktif', 'Irwansyah Asrul', '3604220603980000', 'Irwansyah Asrul', 'Serang', '1998-03-06', '27 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '81213679101', 'irwansyahasrul123@gmail.com', 'Kp Nangerang', '9', '4', 'Sukacai', 'Baros', 'Serang', 'Banten', 'Serang', '009', '004', 'Sukacai', 'Baros', 'Serang', 'Banten', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(867, NULL, NULL, 220022403016, '1', 'Aktif', 'Fendi Ardiawan', '3403162607930000', 'Fendi Ardiawan', 'Gunungkidul', '1993-07-26', '32 Tahun', 'L', 'Menikah', 'Tidak Tahu', '82249219052', 'pendokyeah@gmail.com', 'Bandung ', '3', '2', 'Karangawen', 'Girisubo', 'Gunungkidul', 'Di. Yogyakarta', 'Bandung, Karangawen, Girisubo, Gunungkidul', '003', '002', 'karangawen', 'girisubo', 'gunungkidul', 'yogyakarta', 'Dusun Bandung RT/RW 03/02 Desa Karangawen, Kec. Girisubo, Kab. Gunungkidul\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(868, NULL, NULL, 220022403017, '0', 'Non Aktif', 'Fiki andriyansyah ', '3271042110970010', 'Fiki andriyansyah ', 'Bogor', '1997-10-21', '28 Tahun', 'L', 'Menikah', 'Tidak Tahu', '81292145574', 'ikiandriyansyah21@gmail.com', 'Cimoboran hilir', '3', '9', 'Ciherang ', 'Dramaga ', 'Bogor', 'Jawa barat ', 'Cimoboran hilir', '03', '09', 'Ciherang ', 'Dramaga ', 'Bogor', 'Jawa barat ', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(869, NULL, NULL, 220232403018, '0', 'Non Aktif', 'Heri Darmawan', '7304100612950000', 'Heri Darmawan', 'Pa\'dekoang', '1995-12-06', '30 Tahun', 'L', 'Belum Menikah', 'A', '81938825860', 'heridarmawan2024@gmail.com', 'Bontosunggu', '0', '0', 'Bontotiro', 'Rumbia', 'Jeneponto', 'Sulawesi Selatan', 'Bumi Zarindah Blok A No. 47, Pattallassang, Kab. Gowa (Batas Kota Makassar - Gowa - Maros)', '000', '000', 'Sunggumanai', 'Pattallassang', 'Gowa', 'Sulawesi Selatan', '\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(870, NULL, NULL, 220022405020, '1', 'Aktif', 'Ecep Lutfi Abdul Halim ', '3278072908950000', 'Ecep Lutfi Abdul Halim ', 'Tasikmalaya ', '1995-08-29', '30 Tahun', 'L', 'Menikah', 'O', '87748495512', 'lutfiecep29@gmail.com', 'Sirnasari ', '1', '8', 'Setiawargi ', 'Tamansari ', 'Kota Tasikmalaya ', 'Jawa Barat ', 'Sirnasari ', '001', '008', 'Setiawargi ', 'Tamansari ', 'Kota Tasikmalaya ', 'Jawa Barat ', 'Sirnasari, RT/RW 01/08 Kel. Setiawargi, Kec. Tamansari, Kota Tasikmalaya\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(871, NULL, NULL, 220022405021, '0', 'Non Aktif', 'Herwahyu Lambang Setyo aji', '3504010406990000', 'Herwahyu Lambang Setyo aji', 'Surabaya', '1999-06-04', '26 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '85155223767', 'herwahyu004@gmail.com', 'Kel. Sembung RT:001/RW:001 No:155A, Kec. Tulungagung, Kab. Tulungagung', '1', '1', 'Sembung', 'Tulungagung', 'Tulungagung', 'Jawa Timur', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'Kel. Sembung, RT/RW 01/01 Kec. Tulungagung, Kab. Tulungangung\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(872, NULL, NULL, 220022405022, '1', 'Aktif', 'Siti Anisa', '3203045209990000', 'Siti Anisa', 'Cianjur', '1999-09-12', '26 Tahun', 'P', 'Menikah', 'O', '895332000000', 'sitianisaanisasiti4@gmail.com', 'Jl. Ahmad Tarmiji ', '9', '1', 'Pinangranti ', 'Makasar', 'Jakarta timur ', 'Jakarta', 'Kp. Balong', '002', '005', 'Ciharashas ', 'Cilaku', 'Cianjur', 'Jawa Barat', 'Kp. Balong RT/RW 02/05 Desa Ciharashas, Kec. Cikalu, Kab. Cianjur\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(874, NULL, NULL, 220022406030, '0', 'Non Aktif', 'Muhammad Rifqi Nawwar', '3201012909981000', 'Muhammad Rifqi Nawwar', 'Jakarta', '1998-09-29', '27 Tahun', 'L', 'Belum Menikah', 'A', '81909290998', 'muhammadrifqimr7@gmail.com', 'Ciriung Cemerlang Blok O No.21', '5', '14', 'Ciriung', 'Cibinong', 'Bogor', 'Jawa Barat', 'Ciriung Cemerlang Blok O No.21', '05', '14', 'Ciriung', 'Cibinong', 'Bogor', 'Jawa Barat', 'Ciriung Cemerlang Blok O, No. 21 RT/RW 05/14 Kel. Ciriung, Kec. Cibinong, Kab. Bogor\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(875, NULL, NULL, 220022406031, '1', 'Aktif', 'Usmaya', '3216131411960000', 'Usmaya', 'Bekasi', '1996-11-14', '29 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85893313033', 'usmayabois21@gmail.com', 'Kp teko tengah', '2', '4', 'Kertajaya', 'Pebayuran', 'Bekasi', 'Jawa barat', 'Kp. Teko tengah', '02', '04', 'Kertajaya', 'Pebayuran', 'Bekasi', 'Jawa barat', 'Kp Teko Tengah RT/RW 02/04 Desa Kertajaya, Kec. Pebayuran, Kab. Bekasi\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(876, NULL, NULL, 220232405023, '1', 'Aktif', 'Muh rasul', '7371101507020010', 'Muh rasul', 'Makasaar', '2002-07-15', '23 Tahun', 'L', 'Menikah', 'Tidak Tahu', '81245263880', 'muhammadrasul044@gmail.com', 'Jl asrama haji bakung', '1', '8', 'Sudiang', 'Biringkanaya', 'Makassar', 'Sulawesi selatan', 'Jl asrama haji bakung', '001', '008', 'Sudiang ', 'Biringkanaya', 'Makassar', 'Sulawesi selatan ', 'Jl asrama haji bakung Ds. Sudiang Kec. Biringkanaya Kota.Makassar\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(879, NULL, NULL, 220022407041, '0', 'Non Aktif', 'Reno Galih Surya winata ', '3318100612050000', 'Reno Galih Surya winata ', 'Pati', '2005-12-06', '20 Tahun', 'L', 'Belum Menikah', 'O', '89530964787', 'bocahkondang123@gmail.com', 'Desa Sarirejo ', '10', '1', 'Sarirejo ', 'Pati', 'Pati ', 'Jawa Tengah ', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'IDEM', 'Ds. Sarirejo, RT/RW 10/01, Kec. Pati, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(881, NULL, NULL, 220022407042, '0', 'Non Aktif', 'Kholif Muarif', '3203280307960010', 'Kholif Muarif', 'Cianjur', '1996-07-03', '29 Tahun', 'L', 'Menikah', 'B', '85156827920', 'kholifmuarif@gmail.com', 'Kp. Sukamahi', '7', '2', 'Cidadap', 'Pagaden Barat', 'Subang', 'Jawa barat', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Kp. Sukamahi RT/RW 07/02, Desa Cidadap, Kec. Pagaden Barat, Kab. Subang\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(882, NULL, NULL, 220022407043, '0', 'Non Aktif', 'Riki Ricardo', '1671092811020000', 'Riki Ricardo', 'Palembang', '2002-11-28', '23 Tahun', 'L', 'Belum Menikah', '', '82374345464', 'rikircrd11@gmail.com', 'Jl. AKBP H. Umar No. 56, Rt. 013/001, Ario Kemuning, Kec. Kemuning, Kota Palembang', '13', '1', 'Ario Kemuning', 'Kemuning', 'Kota Palembang', 'Sumatera Selatan', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Idem', 'Jln. AKBP H. Umar No. 56 RT/RW 13/01 Desa Ario Kemuning, Kec. Kemuning, Kota Palembang\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(883, NULL, NULL, 220022407044, '0', 'Non Aktif', 'Yoga indrianto', '3271061110970020', 'Yoga indrianto', 'Bogor', '1997-10-11', '28 Tahun', 'L', 'Menikah', 'B', '89669729909', 'yogaindtianto77@gmail.com', 'Benda kaum', '2', '4', 'Kedung waringin', 'Tanah sareal', 'Kota bogor', 'Jawa barat', 'Benda kaum', '02', '04', 'Kedung waringin', 'Tanah sareal', 'Kota bogor', 'Jawa barat', 'Benda Kaum RT/RW 02/04 Desa Kedungwaringin, Kec. Tanah Sareal, Kab. Bogor\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(884, NULL, NULL, 220022407045, '0', 'Non Aktif', 'SATRIA PRATAMA', '331810240806005', 'SATRIA PRATAMA', 'PATI ', '2006-08-24', '19 Tahun', 'L', 'Belum Menikah', 'Tidak Tahu', '89530964540', 'iyokchill024@gmail.com', 'Ds Ngepungrojo', '5', '2', 'Ngepungrojo', 'Pati', 'Pati', 'Jawa Tengah', 'Ds Ngepungrojo', '05', '02', 'Ngepungrojo', 'Pati', 'Pati', 'Jawa Tengah', 'Ds. Ngepungrojo, Rt. 005/002, Kec. Pati, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(885, NULL, NULL, 220232406035, '1', 'Aktif', 'Rivaldi saputra', '7371110203960000', 'Rivaldi saputra', 'Makassar', '1996-03-02', '29 Tahun', 'L', 'Menikah', 'O', '89695455932', 'rivalsaputra02@gmail.com', 'Jl. Printis kemerdekaan km 18', '1', '2', 'Pai', 'Biringkanaya', 'Makassar', 'Sulawesi selatan', 'Jl. Printis kemerdekaan km 18', '001', '002', 'Pai', 'Biringkanaya', 'Makassar', 'Sulawesi selatan', 'Jl. P Kemerdekaan Km. 18, Rt. 002/001, Pai, Kec. Biring Kanaya, Kota Makassar\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(886, NULL, NULL, 220022407046, '0', 'Non Aktif', 'Dwi Cahaya', '7371130808950010', 'Dwi Cahaya', 'Ujung Pandang', '1995-08-08', '30 Tahun', 'L', 'Belum Menikah', 'O', '87854444625', 'dwicahaya@gmail.com', 'Jl. Halim Perdana Kusuma, Rt. 001/004, Mlajah, Bangkalan, Kab. Madura', '1', '4', 'Mlajah', 'Bangkalan', 'Madura', 'Jawa Timur', 'Jl. Halim Perdana Kusuma, Rt. 001/004, Mlajah, Bangkalan, Kab. Madura', '001', '004', 'Mlajah', 'Bangkalan', 'Madura', 'Jawa Timur', 'Jl. Halim Perdana Kusuma, Rt. 001/004, Mlajah, Bangkalan, Kab. Madura\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(887, NULL, NULL, 220022408048, '1', 'Aktif', 'Faisal Rizqulloh Saputra', '3273163004020010', 'Faisal Rizqulloh Saputra', 'Bandung', '2002-04-30', '23 Tahun', 'L', 'Belum Menikah', 'O', '8979870669', 'faisalwb12@gmail.com', 'Jalan Babakan Sari III', '5', '15', 'Babakan Sari', 'Kiaracondong', 'Bandung', 'Jawa Barat', 'Jalan Babakan Sari III', '05', '15', 'Babakan Sari', 'Kiaracondong', 'Bandung', 'Jawa Barat', 'Jl. Babakan Sari II Rt. 005/015, No. 238/A, Kiaracondong, Bandung, Jawab Barat\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(888, NULL, NULL, 220022408049, '1', 'Aktif', 'Aji Tri Kuncoro', '3306030601970000', 'Aji Tri Kuncoro', 'Purworejo', '1997-01-06', '28 Tahun', 'L', 'Menikah', 'O', '87783060352', 'ajitrikuncoro097@gmail.com', 'Asrama Polres Metro Bekasi, Rt. 001/002, Desa Marga Jaya, Kec. Bekasi Selatan, Kota Bekasi', '1', '2', 'Marga Jaya', 'Bekasi SElatan', 'Kota Bekasi', 'Jawa Barat', 'Asrama Polres Metro Bekasi, Rt. 001/002, Desa Marga Jaya, Kec. Bekasi Selatan, Kota Bekasi', '001', '002', 'Marga Jaya', 'Bekasi Selatan', 'Kota Bekasi', 'Jawa Barat', 'Asrama Polres Metro Bekasi, Rt. 001/002, Desa Marga Jaya, Kec. Bekasi Selatan, Kota Bekasi\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(889, NULL, NULL, 220022407050, '0', 'Non Aktif', 'Robiul Aliv', '3319093004950000', 'Robiul Aliv', 'Kudus', '1995-04-30', '30 Tahun', 'L', 'Menikah', 'Tidak Tahu', '85720635133', 'ROBIULALIV69@GMAIL.COM', 'Dk.Karang Dalem ', '3', '3', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk.Karang Dalem', '003', '003', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds. Glagah Kulon, Rt. 001/002, Kec. Dawe, Kab. Kudus\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(890, NULL, NULL, 220022407051, '1', 'Aktif', 'TAUFIK ADITYA', '3318132401030010', 'TAUFIK ADITYA', 'Pati', '2003-01-24', '22 Tahun', 'L', 'Menikah', 'O', '85602735625', 'taditia31@gmail.com', 'Ds Semirejo Kec Gembong', '1', '3', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', 'IDEM', '1', '3', 'Semirejo', 'Gembong', 'Pati', 'Jawa Tengah', 'Ds.Semirejo RT/RW 1/3, Kec.Gembong, Kab.Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(891, NULL, NULL, 220022408052, '1', 'Aktif', 'Varadila Putri Ayu Budiarti', '3374084509000000', 'Varadila Putri Ayu Budiarti', 'Pati', '2000-09-05', '25 Tahun', 'P', 'Belum Menikah', '', '81903388955', 'varadilla45@gmail.com', 'Ds. Sarirejo, Rt. 008/002, Kec. Pati, Kab. Pati', '8', '2', 'Sarirejo', 'Pati', 'Pati', 'Jawa Tengah', 'Ds. Sarirejo, Rt. 008/002, Kec. Pati, Kab. Pati', '008', '002', 'Sarirejo', 'Pati', 'Pati', 'Jawa Tengah', 'Ds. Sarirejo, Rt. 008/002, Kec. Pati, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30');
+INSERT INTO `karyawan` (`id_karyawan`, `user_id`, `atasan_id`, `NIK`, `Status`, `Kode`, `Nama_Sesuai_KTP`, `NIK_KTP`, `Nama_Lengkap_Sesuai_Ijazah`, `Tempat_Lahir_Karyawan`, `Tanggal_Lahir_Karyawan`, `Umur_Karyawan`, `Jenis_Kelamin_Karyawan`, `Status_Pernikahan`, `Golongan_Darah`, `Nomor_Telepon_Aktif_Karyawan`, `Email`, `Alamat_KTP`, `RT`, `RW`, `Kelurahan_Desa`, `Kecamatan`, `Kabupaten_Kota`, `Provinsi`, `Alamat_Domisili`, `RT_Sesuai_Domisili`, `RW_Sesuai_Domisili`, `Kelurahan_Desa_Domisili`, `Kecamatan_Sesuai_Domisili`, `Kabupaten_Kota_Sesuai_Domisili`, `Provinsi_Sesuai_Domisili`, `Alamat_Lengkap`, `created_at`, `updated_at`) VALUES
+(892, NULL, NULL, 220022408053, '0', 'Non Aktif', 'Rafikamatsali Kurniawan', '3603110209990000', 'Rafikamatsali Kurniawan', 'Kudus', '1999-09-02', '26 Tahun', 'L', 'Belum Menikah', '', '81388475884', 'kamatsali41@gmail.com', 'Desa Kendangmas, RT. 004/011, Kec. Dawe, Kab. Kudus', '4', '11', 'Kandangmas', 'Dawe', 'Kudus', 'Jawa Tengah', 'Desa Kendangmas, RT. 004/011, Kec. Dawe, Kab. Kudus', '004', '011', 'Kandangmas', 'Dawe', 'Kudus', 'Jawa Tengah', 'Desa Kendangmas, RT. 004/011, Kec. Dawe, Kab. Kudus\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(893, NULL, NULL, 220022408054, '1', 'Aktif', 'Mischa Anwar Saputra', '3318133011050000', 'Mischa Anwar Saputra', 'Pati', '2005-11-30', '20 Tahun', 'L', 'Belum Menikah', '', '82313961233', 'mischaanwar098@gmail.com', 'Dk. Godang RT. 001/010, Ds. Gembong, Kec. Gembong, Kab. Pati', '1', '10', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Godang RT. 001/010, Ds. Gembong, Kec. Gembong, Kab. Pati', '001', '010', 'Gembong', 'Gembong', 'Pati', 'Jawa Tengah', 'Dk. Godang RT. 001/010, Ds. Gembong, Kec. Gembong, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(894, NULL, NULL, 220022409055, '1', 'Aktif', 'Wahyu Alfian Irfansah', '3318173108050000', 'Wahyu Alfian Irfansah', 'Rembang', '2005-08-31', '20 Tahun', 'L', 'Belum Menikah', '', '82331233374', 'al07938523@gmail.com', 'Sumberrejo, RT. 005/003, Ds. Sumberrejo, Kec. Gunungwungkal, Kab. Pati', '5', '3', 'Sumberrejo', 'Gunungwungkal', 'Pati', 'Jawa Tengah', 'Sumberrejo, RT. 005/003, Ds. Sumberrejo, Kec. Gunungwungkal, Kab. Pati', '005', '003', 'Sumberrejo', 'Gunungwungkal', 'Pati', 'Jawa Tengah', 'Sumberrejo, RT. 005/003, Ds. Sumberrejo, Kec. Gunungwungkal, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(895, NULL, NULL, 0, '0', 'Non Aktif', 'Eko Puji Erwanto', '3318022205980000', 'Eko Puji Erwanto', 'Pati', '1998-05-22', '27 Tahun', 'L', 'Menikah', '', '81393317850', 'irwaneko135@gmail.com', 'Sumbersari, RT. 005/005, Ds. Sumbersari, Kec. Kayen, Kab. Pati', '5', '5', 'Sumbersari', 'Kayen', 'Pati', 'Jawa Tengah', 'Sumbersari, RT. 005/005, Ds. Sumbersari, Kec. Kayen, Kab. Pati', '005', '005', 'Sumbersari', 'Kayen', 'Pati', 'Jawa Tengah', 'Sumbersari, RT. 005/005, Ds. Sumbersari, Kec. Kayen, Kab. Pati\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(896, NULL, NULL, 220022409056, '0', 'Non Aktif', 'Wildan Fauzi', '3215060806030000', 'Wildan Fauzi', 'Karawang', '2003-06-08', '22 Tahun', 'L', 'Belum Menikah', '', '81388918386', 'whiell0806@gmail.com', 'Dusun Jati', '9', '6', 'Rengasdengklok Utara', 'Rengasdengklok', 'Karawang', 'Jawa Barat', 'Dusun Jati', '009', '006', 'Rengasdengklok Utara', 'Rengasdengklok', 'Karawang', 'Jawa Barat', 'Dusun Jati, Rt. 009/006, Rengasdengklok, Kec. Rengasdengklok, Kab. Karawang, Jawa Barat\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(897, NULL, NULL, 220022409057, '0', 'Non Aktif', 'Anang Makruf', '3323030112980010', 'Anang Makruf', 'Temanggung', '1998-12-01', '27 Tahun', 'L', 'Belum Menikah', 'O', '82313313641', 'anangmkrp5@gmail.com', 'Maliyan', '3', '1', 'Sidorejo', 'Temanggung', 'Temanggung', 'Jawa Tengah', 'Maliyan', '003', '001', 'Sidorejo', 'Temanggung', 'Temanggung', 'Jawa Tengah', 'Maliyan, Rt. 003/001, Kel. Sidorejo, Kec. Temanggung, Kab. Temanggung, Jawa Tengah\r', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(898, NULL, NULL, 220022409058, '1', 'Aktif', 'Kiky Arif Budiman', '3302242704970000', 'Kiky Arif Budiman', 'Purwokerto', '1997-04-27', '28 Tahun', 'L', 'Menikah', '', '85747008588', 'kikyarifbc@gmail.com', 'Jl. Pancurawis Gg Nusa Indah', '2', '7', 'Purwokerto Kidul', 'Purwokerto Selatan', 'Banyumas', 'Jawa Tengah', 'Jl. Pancurawis Gg Nusa Indah', '002', '007', 'Purwokerto Kidul', 'Purwokerto Selatan', 'Banyumas', 'Jawa Tengah', 'Jl. Pancurawis Gg. Nusa Indah, Purwokerto Kidul, Kec. Purwokerto Selatan, Kab. Banyumas, Jawa Tengah\r\"\r\n220022409059;0;Non Aktif;Teddy Saputra;1671120909990000;Teddy Saputra;Palembang;1999-09-09;26 Tahun;L;Menikah;A+;89699046957;teddysaputra679@gmail.com;', '2025-12-23 03:48:30', '2025-12-23 03:48:30'),
+(900, NULL, NULL, 1, '1', 'Aktif', 'Pip', '1111', 'Pip', 'Pati', '2000-01-01', '26 Tahun', 'L', 'Menikah', 'A', '081999999999', 'pip@gmail.com', 'pati', '01', '02', 'BLARU', 'PATI', 'KABUPATEN PATI', 'JAWA TENGAH', 'pati', '01', '02', 'BLARU', 'PATI', 'KABUPATEN PATI', 'JAWA TENGAH', 'pati', '2026-01-09 04:34:14', '2026-01-09 04:34:14'),
+(902, NULL, NULL, 123123, '1', 'Aktif', 'qwerty', '1111', 'qwerty', 'Pati', '1996-05-06', '29 Tahun', 'P', 'Belum Menikah', 'Tidak Tahu', '081999999999', 'qwerty@gmail.com', 'pati', '01', '02', 'PURWOSARI', 'TLOGOWUNGU', 'KABUPATEN PATI', 'JAWA TENGAH', 'pati', '01', '02', 'PURWOSARI', 'TLOGOWUNGU', 'KABUPATEN PATI', 'JAWA TENGAH', 'pati', '2026-01-09 06:16:41', '2026-01-09 06:16:41');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `kbi_assessments`
+--
+
+CREATE TABLE `kbi_assessments` (
+  `id_kbi_assessment` bigint(20) UNSIGNED NOT NULL,
+  `karyawan_id` bigint(20) UNSIGNED NOT NULL,
+  `penilai_id` bigint(20) UNSIGNED NOT NULL,
+  `tipe_penilai` enum('DIRI_SENDIRI','ATASAN','BAWAHAN') NOT NULL,
+  `tahun` year(4) NOT NULL,
+  `periode` varchar(255) NOT NULL DEFAULT 'Semester 1',
+  `rata_rata_akhir` double NOT NULL DEFAULT 0,
+  `status` varchar(255) NOT NULL DEFAULT 'DRAFT',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `kbi_items`
+--
+
+CREATE TABLE `kbi_items` (
+  `id_kbi_item` bigint(20) UNSIGNED NOT NULL,
+  `kategori` varchar(255) NOT NULL,
+  `perilaku` text NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `kbi_scores`
+--
+
+CREATE TABLE `kbi_scores` (
+  `id_kbi_score` bigint(20) UNSIGNED NOT NULL,
+  `kbi_assessment_id` bigint(20) UNSIGNED NOT NULL,
+  `kbi_item_id` bigint(20) UNSIGNED NOT NULL,
+  `skor` int(11) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `kontrak`
+--
+
+CREATE TABLE `kontrak` (
+  `id_kontrak` bigint(20) NOT NULL,
+  `id_karyawan` bigint(20) DEFAULT NULL,
+  `Tanggal_Mulai_Tugas` date DEFAULT NULL,
+  `PKWT_Berakhir` date DEFAULT NULL,
+  `Tanggal_Diangkat_Menjadi_Karyawan_Tetap` date DEFAULT NULL,
+  `Riwayat_Penempatan` varchar(255) DEFAULT NULL,
+  `Tanggal_Riwayat_Penempatan` date DEFAULT NULL,
+  `Mutasi_Promosi_Demosi` varchar(255) DEFAULT NULL,
+  `Tanggal_Mutasi_Promosi_Demosi` date DEFAULT NULL,
+  `Masa_Kerja` varchar(255) DEFAULT NULL,
+  `NO_PKWT_PERTAMA` varchar(255) DEFAULT NULL,
+  `NO_SK_PERTAMA` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `kontrak`
+--
+
+INSERT INTO `kontrak` (`id_kontrak`, `id_karyawan`, `Tanggal_Mulai_Tugas`, `PKWT_Berakhir`, `Tanggal_Diangkat_Menjadi_Karyawan_Tetap`, `Riwayat_Penempatan`, `Tanggal_Riwayat_Penempatan`, `Mutasi_Promosi_Demosi`, `Tanggal_Mutasi_Promosi_Demosi`, `Masa_Kerja`, `NO_PKWT_PERTAMA`, `NO_SK_PERTAMA`, `created_at`, `updated_at`) VALUES
+(1, 3, '2021-03-05', '2020-02-15', '2020-03-15', 'Sales', '2017-07-15', 'Promosi', '2021-01-15', '4 Tahun 9 Bulan 10 Hari', '001/PKWT', '001/SK', '2025-12-10 06:58:20', '2025-12-29 04:16:12'),
+(2, 5, '2025-11-24', '2026-05-02', NULL, NULL, NULL, NULL, NULL, '0 Tahun 0 Bulan 18 Hari', NULL, NULL, '2025-12-12 03:17:08', '2025-12-29 04:16:12'),
+(6, 2, '2018-03-08', '2026-01-14', '2025-12-15', 'Akuntan', '2025-12-23', 'Promosi', '2025-12-09', '7 Tahun 9 Bulan 21 Hari', 'Npkwt11', 'Nsk11', '2025-12-14 15:19:47', '2025-12-29 06:07:59'),
+(7, 8, '2021-03-15', NULL, NULL, NULL, NULL, NULL, NULL, '4 Tahun 9 Bulan 1 Hari', NULL, NULL, '2025-12-16 03:25:51', '2025-12-29 04:16:12'),
+(9, 900, '2023-01-02', '2027-01-02', '2025-09-24', 'staff hr', '2024-01-02', 'Promosi', '2025-10-06', '3 Tahun 0 Bulan 7 Hari', 'Npkwt11', 'Nsk11', '2026-01-09 04:34:14', '2026-01-09 04:34:14'),
+(11, 902, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', NULL, NULL, '2026-01-09 06:16:43', '2026-01-09 06:16:43'),
+(12, 242, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', NULL, NULL, '2026-01-09 07:22:28', '2026-01-09 07:22:28');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `kpi_assessments`
+--
+
+CREATE TABLE `kpi_assessments` (
+  `id_kpi_assessment` bigint(20) UNSIGNED NOT NULL,
+  `karyawan_id` bigint(20) NOT NULL,
+  `penilai_id` bigint(20) DEFAULT NULL,
+  `tahun` varchar(4) NOT NULL,
+  `periode` varchar(50) NOT NULL,
+  `tanggal_penilaian` date DEFAULT NULL,
+  `total_skor_akhir` decimal(8,2) NOT NULL DEFAULT 0.00,
+  `grade` varchar(50) DEFAULT NULL,
+  `grade_akhir` varchar(20) DEFAULT NULL,
+  `status` enum('DRAFT','SUBMITTED','APPROVED') NOT NULL DEFAULT 'DRAFT',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data untuk tabel `kpi_assessments`
+--
+
+INSERT INTO `kpi_assessments` (`id_kpi_assessment`, `karyawan_id`, `penilai_id`, `tahun`, `periode`, `tanggal_penilaian`, `total_skor_akhir`, `grade`, `grade_akhir`, `status`, `created_at`, `updated_at`) VALUES
+(4, 2, 3, '2025', 'Tahunan', '2025-12-18', '0.00', NULL, NULL, 'DRAFT', '2025-12-18 00:31:49', '2025-12-18 00:31:49'),
+(5, 3, 3, '2025', 'Tahunan', '2025-12-18', '0.00', NULL, NULL, 'DRAFT', '2025-12-18 00:33:24', '2025-12-18 00:33:24'),
+(6, 5, 3, '2025', 'Tahunan', '2025-12-18', '0.00', NULL, NULL, 'DRAFT', '2025-12-18 00:33:36', '2025-12-18 00:33:36'),
+(8, 8, NULL, '2025', 'Tahunan', NULL, '0.00', NULL, NULL, 'DRAFT', '2025-12-23 18:53:10', '2025-12-23 18:53:10'),
+(9, 2, NULL, '2026', 'Tahunan', NULL, '0.00', NULL, NULL, 'DRAFT', '2026-01-02 08:25:41', '2026-01-02 08:25:41'),
+(10, 3, NULL, '2026', 'Tahunan', NULL, '0.00', NULL, NULL, 'DRAFT', '2026-01-09 04:26:50', '2026-01-09 04:26:50');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `kpi_items`
+--
+
+CREATE TABLE `kpi_items` (
+  `id_kpi_item` bigint(20) UNSIGNED NOT NULL,
+  `kpi_assessment_id` bigint(20) UNSIGNED NOT NULL,
+  `perspektif` varchar(255) NOT NULL,
+  `key_result_area` varchar(255) DEFAULT NULL,
+  `key_performance_indicator` text NOT NULL,
+  `polaritas` varchar(100) DEFAULT NULL,
+  `satuan` varchar(255) DEFAULT NULL,
+  `realisasi` varchar(255) DEFAULT '0',
+  `skor` double(8,2) DEFAULT 0.00,
+  `skor_akhir` double(8,2) DEFAULT 0.00,
+  `bobot` decimal(5,2) NOT NULL,
+  `target` varchar(255) DEFAULT NULL,
+  `target_tahunan` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data untuk tabel `kpi_items`
+--
+
+INSERT INTO `kpi_items` (`id_kpi_item`, `kpi_assessment_id`, `perspektif`, `key_result_area`, `key_performance_indicator`, `polaritas`, `satuan`, `realisasi`, `skor`, `skor_akhir`, `bobot`, `target`, `target_tahunan`, `created_at`, `updated_at`) VALUES
+(1, 4, 'Financial', 'Efisiensi Anggaran', 'Persentase penggunaan anggaran operasional sesuai budget', 'Minimize', '%', '0', 0.00, 0.00, '10.00', '100', NULL, '2025-12-18 00:31:49', '2025-12-18 00:31:49'),
+(2, 4, 'Customer', 'Kepuasan Pelanggan (Internal/Eksternal)', 'Nilai rata-rata kepuasan user/klien (Survey)', 'Maximize', 'Skala', '0', 0.00, 0.00, '20.00', '4.5', NULL, '2025-12-18 00:31:49', '2025-12-18 00:31:49'),
+(3, 4, 'Customer', 'Penanganan Komplain', 'Jumlah komplain yang tidak terselesaikan (Unresolved)', 'Minimize', 'Kasus', '0', 0.00, 0.00, '10.00', '0', NULL, '2025-12-18 00:31:49', '2025-12-18 00:31:49'),
+(4, 4, 'Internal Process', 'Penyelesaian Tugas Utama', 'Persentase penyelesaian project/tugas tepat waktu (On-time)', 'Maximize', '%', '0', 0.00, 0.00, '30.00', '100', NULL, '2025-12-18 00:31:49', '2025-12-18 00:31:49'),
+(5, 4, 'Internal Process', 'Kualitas Kerja', 'Jumlah kesalahan (error/rework) major dalam pekerjaan', 'Minimize', 'Kasus', '0', 0.00, 0.00, '15.00', '0', NULL, '2025-12-18 00:31:49', '2025-12-18 00:31:49'),
+(6, 4, 'Learning & Growth', 'Pengembangan Diri', 'Jumlah jam pelatihan / training yang diikuti', 'Maximize', 'Jam', '0', 0.00, 0.00, '10.00', '20', NULL, '2025-12-18 00:31:49', '2025-12-18 00:31:49'),
+(7, 4, 'Learning & Growth', 'Kedisiplinan', 'Persentase kehadiran kerja (Absensi)', 'Maximize', '%', '0', 0.00, 0.00, '5.00', '98', NULL, '2025-12-18 00:31:49', '2025-12-18 00:31:49'),
+(8, 5, 'Financial', 'Efisiensi Anggaran', 'Persentase penggunaan anggaran operasional sesuai budget', 'Minimize', '%', '0', 0.00, 0.00, '10.00', '100', NULL, '2025-12-18 00:33:24', '2025-12-18 00:33:24'),
+(9, 5, 'Customer', 'Kepuasan Pelanggan (Internal/Eksternal)', 'Nilai rata-rata kepuasan user/klien (Survey)', 'Maximize', 'Skala', '0', 0.00, 0.00, '20.00', '4.5', NULL, '2025-12-18 00:33:24', '2025-12-18 00:33:24'),
+(10, 5, 'Customer', 'Penanganan Komplain', 'Jumlah komplain yang tidak terselesaikan (Unresolved)', 'Minimize', 'Kasus', '0', 0.00, 0.00, '10.00', '0', NULL, '2025-12-18 00:33:24', '2025-12-18 00:33:24'),
+(11, 5, 'Internal Process', 'Penyelesaian Tugas Utama', 'Persentase penyelesaian project/tugas tepat waktu (On-time)', 'Maximize', '%', '0', 0.00, 0.00, '30.00', '100', NULL, '2025-12-18 00:33:24', '2025-12-18 00:33:24'),
+(12, 5, 'Internal Process', 'Kualitas Kerja', 'Jumlah kesalahan (error/rework) major dalam pekerjaan', 'Minimize', 'Kasus', '0', 0.00, 0.00, '15.00', '0', NULL, '2025-12-18 00:33:24', '2025-12-18 00:33:24'),
+(13, 5, 'Learning & Growth', 'Pengembangan Diri', 'Jumlah jam pelatihan / training yang diikuti', 'Maximize', 'Jam', '0', 0.00, 0.00, '10.00', '20', NULL, '2025-12-18 00:33:24', '2025-12-18 00:33:24'),
+(14, 5, 'Learning & Growth', 'Kedisiplinan', 'Persentase kehadiran kerja (Absensi)', 'Maximize', '%', '0', 0.00, 0.00, '5.00', '98', NULL, '2025-12-18 00:33:24', '2025-12-18 00:33:24'),
+(15, 6, 'Financial', 'Efisiensi Anggaran', 'Persentase penggunaan anggaran operasional sesuai budget', 'Minimize', '%', '0', 0.00, 0.00, '10.00', '100', NULL, '2025-12-18 00:33:36', '2025-12-18 00:33:36'),
+(16, 6, 'Customer', 'Kepuasan Pelanggan (Internal/Eksternal)', 'Nilai rata-rata kepuasan user/klien (Survey)', 'Maximize', 'Skala', '0', 0.00, 0.00, '20.00', '4.5', NULL, '2025-12-18 00:33:36', '2025-12-18 00:33:36'),
+(17, 6, 'Customer', 'Penanganan Komplain', 'Jumlah komplain yang tidak terselesaikan (Unresolved)', 'Minimize', 'Kasus', '0', 0.00, 0.00, '10.00', '0', NULL, '2025-12-18 00:33:36', '2025-12-18 00:33:36'),
+(18, 6, 'Internal Process', 'Penyelesaian Tugas Utama', 'Persentase penyelesaian project/tugas tepat waktu (On-time)', 'Maximize', '%', '0', 0.00, 0.00, '30.00', '100', NULL, '2025-12-18 00:33:36', '2025-12-18 00:33:36'),
+(19, 6, 'Internal Process', 'Kualitas Kerja', 'Jumlah kesalahan (error/rework) major dalam pekerjaan', 'Minimize', 'Kasus', '0', 0.00, 0.00, '15.00', '0', NULL, '2025-12-18 00:33:36', '2025-12-18 00:33:36'),
+(20, 6, 'Learning & Growth', 'Pengembangan Diri', 'Jumlah jam pelatihan / training yang diikuti', 'Maximize', 'Jam', '0', 0.00, 0.00, '10.00', '20', NULL, '2025-12-18 00:33:36', '2025-12-18 00:33:36'),
+(21, 6, 'Learning & Growth', 'Kedisiplinan', 'Persentase kehadiran kerja (Absensi)', 'Maximize', '%', '0', 0.00, 0.00, '5.00', '98', NULL, '2025-12-18 00:33:36', '2025-12-18 00:33:36'),
+(29, 8, 'Internal Business Process', 'Kualitas produk', 'Presentase Barang Defect Pada Semeseter 1 Tahun 2025', 'Negatif', NULL, '0', 0.00, 0.00, '30.00', '100', NULL, '2025-12-23 18:53:10', '2025-12-23 18:53:10'),
+(30, 8, 'Financial', 'Produktivitas karyawan', 'Presentase Capaian Produksi Factory 1 pada semester 1 Tahun 2025', 'Positif', NULL, '0', 0.00, 0.00, '40.00', '4.5', NULL, '2025-12-23 18:53:11', '2025-12-23 18:53:11'),
+(31, 8, 'Learning & Growth', 'Kepatuhan dan keselamatan kerja', 'Tingkat Kedisiplinan Penggunaan APD Factory 1 pada semseter 1 Tahun 2025', 'Positif', NULL, '0', 0.00, 0.00, '20.00', '0', NULL, '2025-12-23 18:53:11', '2025-12-23 18:53:11'),
+(32, 8, 'Learning & Growth', 'Pengembangan Kompetensi & Keterlibatan Karyawan', 'Presentease Kehadiran Kegiatan TEMPA', 'Positif', NULL, '0', 0.00, 0.00, '10.00', '100', NULL, '2025-12-23 18:53:11', '2025-12-23 18:53:11'),
+(33, 9, 'Internal Business Process', 'Kualitas produk', 'Presentase Barang Defect Pada Semeseter 1 Tahun 2025', 'Negatif', NULL, '0', 0.00, 0.00, '30.00', '100', NULL, '2026-01-02 08:25:41', '2026-01-02 08:25:41'),
+(34, 9, 'Financial', 'Produktivitas karyawan', 'Presentase Capaian Produksi Factory 1 pada semester 1 Tahun 2025', 'Positif', NULL, '0', 0.00, 0.00, '40.00', '4.5', NULL, '2026-01-02 08:25:41', '2026-01-02 08:25:41'),
+(35, 9, 'Learning & Growth', 'Kepatuhan dan keselamatan kerja', 'Tingkat Kedisiplinan Penggunaan APD Factory 1 pada semseter 1 Tahun 2025', 'Positif', NULL, '0', 0.00, 0.00, '20.00', '0', NULL, '2026-01-02 08:25:41', '2026-01-02 08:25:41'),
+(36, 9, 'Learning & Growth', 'Pengembangan Kompetensi & Keterlibatan Karyawan', 'Presentease Kehadiran Kegiatan TEMPA', 'Positif', NULL, '0', 0.00, 0.00, '10.00', '100', NULL, '2026-01-02 08:25:41', '2026-01-02 08:25:41');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `kpi_scores`
+--
+
+CREATE TABLE `kpi_scores` (
+  `id_kpi_score` bigint(20) UNSIGNED NOT NULL,
+  `kpi_item_id` bigint(20) UNSIGNED NOT NULL,
+  `tipe_periode` enum('SEMESTER','BULAN') NOT NULL,
+  `nama_periode` varchar(255) NOT NULL,
+  `bulan_urutan` int(11) DEFAULT NULL,
+  `target` varchar(255) NOT NULL,
+  `realisasi` varchar(255) DEFAULT NULL,
+  `skor` decimal(8,2) NOT NULL DEFAULT 0.00,
+  `skor_akhir` decimal(8,2) NOT NULL DEFAULT 0.00,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `target_smt1` decimal(10,2) DEFAULT 0.00,
+  `real_smt1` decimal(10,2) DEFAULT 0.00,
+  `adjustment_real_smt1` double DEFAULT NULL,
+  `adjustment_smt1` double DEFAULT NULL,
+  `target_jul` decimal(10,2) DEFAULT 0.00,
+  `real_jul` decimal(10,2) DEFAULT 0.00,
+  `target_aug` decimal(10,2) DEFAULT 0.00,
+  `real_aug` decimal(10,2) DEFAULT 0.00,
+  `target_sep` decimal(10,2) DEFAULT 0.00,
+  `real_sep` decimal(10,2) DEFAULT 0.00,
+  `target_okt` decimal(10,2) DEFAULT 0.00,
+  `real_okt` decimal(10,2) DEFAULT 0.00,
+  `target_nov` decimal(10,2) DEFAULT 0.00,
+  `real_nov` decimal(10,2) DEFAULT 0.00,
+  `target_des` decimal(10,2) DEFAULT 0.00,
+  `real_des` decimal(10,2) DEFAULT 0.00,
+  `total_target_smt2` double DEFAULT 0,
+  `total_real_smt2` double DEFAULT 0,
+  `adjustment_target_smt2` double DEFAULT NULL,
+  `adjustment_real_smt2` double DEFAULT NULL,
+  `adjustment_smt2` double DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data untuk tabel `kpi_scores`
+--
+
+INSERT INTO `kpi_scores` (`id_kpi_score`, `kpi_item_id`, `tipe_periode`, `nama_periode`, `bulan_urutan`, `target`, `realisasi`, `skor`, `skor_akhir`, `created_at`, `updated_at`, `target_smt1`, `real_smt1`, `adjustment_real_smt1`, `adjustment_smt1`, `target_jul`, `real_jul`, `target_aug`, `real_aug`, `target_sep`, `real_sep`, `target_okt`, `real_okt`, `target_nov`, `real_nov`, `target_des`, `real_des`, `total_target_smt2`, `total_real_smt2`, `adjustment_target_smt2`, `adjustment_real_smt2`, `adjustment_smt2`) VALUES
+(1, 1, 'SEMESTER', 'Semester 1', NULL, '100', '0', '0.00', '0.00', '2025-12-18 00:31:49', '2025-12-18 00:31:49', '0.00', '0.00', NULL, NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', 0, 0, NULL, NULL, NULL),
+(2, 2, 'SEMESTER', 'Semester 1', NULL, '4.5', '0', '0.00', '0.00', '2025-12-18 00:31:49', '2025-12-18 00:31:49', '0.00', '0.00', NULL, NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', 0, 0, NULL, NULL, NULL),
+(3, 3, 'SEMESTER', 'Semester 1', NULL, '0', '0', '0.00', '0.00', '2025-12-18 00:31:49', '2025-12-18 00:31:49', '0.00', '0.00', NULL, NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', 0, 0, NULL, NULL, NULL),
+(4, 4, 'SEMESTER', 'Semester 1', NULL, '100', '0', '0.00', '0.00', '2025-12-18 00:31:49', '2025-12-18 00:31:49', '0.00', '0.00', NULL, NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', 0, 0, NULL, NULL, NULL),
+(5, 5, 'SEMESTER', 'Semester 1', NULL, '0', '0', '0.00', '0.00', '2025-12-18 00:31:49', '2025-12-18 00:31:49', '0.00', '0.00', NULL, NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', 0, 0, NULL, NULL, NULL),
+(6, 6, 'SEMESTER', 'Semester 1', NULL, '20', '0', '0.00', '0.00', '2025-12-18 00:31:49', '2025-12-18 00:31:49', '0.00', '0.00', NULL, NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', 0, 0, NULL, NULL, NULL),
+(7, 7, 'SEMESTER', 'Semester 1', NULL, '98', '0', '0.00', '0.00', '2025-12-18 00:31:49', '2025-12-18 00:31:49', '0.00', '0.00', NULL, NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', 0, 0, NULL, NULL, NULL),
+(8, 8, 'SEMESTER', 'Semester 1', NULL, '100', '0', '0.00', '0.00', '2025-12-18 00:33:24', '2025-12-18 00:33:24', '0.00', '0.00', NULL, NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', 0, 0, NULL, NULL, NULL),
+(9, 9, 'SEMESTER', 'Semester 1', NULL, '4.5', '0', '0.00', '0.00', '2025-12-18 00:33:24', '2025-12-18 00:33:24', '0.00', '0.00', NULL, NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', 0, 0, NULL, NULL, NULL),
+(10, 10, 'SEMESTER', 'Semester 1', NULL, '0', '0', '0.00', '0.00', '2025-12-18 00:33:24', '2025-12-18 00:33:24', '0.00', '0.00', NULL, NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', 0, 0, NULL, NULL, NULL),
+(11, 11, 'SEMESTER', 'Semester 1', NULL, '100', '0', '0.00', '0.00', '2025-12-18 00:33:24', '2025-12-18 00:33:24', '0.00', '0.00', NULL, NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', 0, 0, NULL, NULL, NULL),
+(12, 12, 'SEMESTER', 'Semester 1', NULL, '0', '0', '0.00', '0.00', '2025-12-18 00:33:24', '2025-12-18 00:33:24', '0.00', '0.00', NULL, NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', 0, 0, NULL, NULL, NULL),
+(13, 13, 'SEMESTER', 'Semester 1', NULL, '20', '0', '0.00', '0.00', '2025-12-18 00:33:24', '2025-12-18 00:33:24', '0.00', '0.00', NULL, NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', 0, 0, NULL, NULL, NULL),
+(14, 14, 'SEMESTER', 'Semester 1', NULL, '98', '0', '0.00', '0.00', '2025-12-18 00:33:24', '2025-12-18 00:33:24', '0.00', '0.00', NULL, NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', 0, 0, NULL, NULL, NULL),
+(15, 15, 'SEMESTER', 'Semester 1', NULL, '100', '0', '0.00', '0.00', '2025-12-18 00:33:36', '2025-12-18 00:33:36', '0.00', '0.00', NULL, NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', 0, 0, NULL, NULL, NULL),
+(16, 16, 'SEMESTER', 'Semester 1', NULL, '4.5', '0', '0.00', '0.00', '2025-12-18 00:33:36', '2025-12-18 00:33:36', '0.00', '0.00', NULL, NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', 0, 0, NULL, NULL, NULL),
+(17, 17, 'SEMESTER', 'Semester 1', NULL, '0', '0', '0.00', '0.00', '2025-12-18 00:33:36', '2025-12-18 00:33:36', '0.00', '0.00', NULL, NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', 0, 0, NULL, NULL, NULL),
+(18, 18, 'SEMESTER', 'Semester 1', NULL, '100', '0', '0.00', '0.00', '2025-12-18 00:33:36', '2025-12-18 00:33:36', '0.00', '0.00', NULL, NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', 0, 0, NULL, NULL, NULL),
+(19, 19, 'SEMESTER', 'Semester 1', NULL, '0', '0', '0.00', '0.00', '2025-12-18 00:33:36', '2025-12-18 00:33:36', '0.00', '0.00', NULL, NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', 0, 0, NULL, NULL, NULL),
+(20, 20, 'SEMESTER', 'Semester 1', NULL, '20', '0', '0.00', '0.00', '2025-12-18 00:33:36', '2025-12-18 00:33:36', '0.00', '0.00', NULL, NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', 0, 0, NULL, NULL, NULL),
+(21, 21, 'SEMESTER', 'Semester 1', NULL, '98', '0', '0.00', '0.00', '2025-12-18 00:33:36', '2025-12-18 00:33:36', '0.00', '0.00', NULL, NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', 0, 0, NULL, NULL, NULL),
+(29, 29, 'SEMESTER', 'Semester 1', NULL, '100', '0', '0.00', '0.00', '2025-12-23 18:53:11', '2025-12-23 18:53:11', '0.00', '0.00', NULL, NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', 0, 0, NULL, NULL, NULL),
+(30, 30, 'SEMESTER', 'Semester 1', NULL, '4.5', '0', '0.00', '0.00', '2025-12-23 18:53:11', '2025-12-23 18:53:11', '0.00', '0.00', NULL, NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', 0, 0, NULL, NULL, NULL),
+(31, 31, 'SEMESTER', 'Semester 1', NULL, '0', '0', '0.00', '0.00', '2025-12-23 18:53:11', '2025-12-23 18:53:11', '0.00', '0.00', NULL, NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', 0, 0, NULL, NULL, NULL),
+(32, 32, 'SEMESTER', 'Semester 1', NULL, '100', '0', '0.00', '0.00', '2025-12-23 18:53:11', '2025-12-23 18:53:11', '0.00', '0.00', NULL, NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', 0, 0, NULL, NULL, NULL),
+(33, 33, 'SEMESTER', 'Semester 1', NULL, '100', '0', '0.00', '0.00', '2026-01-02 08:25:41', '2026-01-02 08:25:41', '0.00', '0.00', NULL, NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', 0, 0, NULL, NULL, NULL),
+(34, 34, 'SEMESTER', 'Semester 1', NULL, '4.5', '0', '0.00', '0.00', '2026-01-02 08:25:41', '2026-01-02 08:25:41', '0.00', '0.00', NULL, NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', 0, 0, NULL, NULL, NULL),
+(35, 35, 'SEMESTER', 'Semester 1', NULL, '0', '0', '0.00', '0.00', '2026-01-02 08:25:41', '2026-01-02 08:25:41', '0.00', '0.00', NULL, NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', 0, 0, NULL, NULL, NULL),
+(36, 36, 'SEMESTER', 'Semester 1', NULL, '100', '0', '0.00', '0.00', '2026-01-02 08:25:41', '2026-01-02 08:25:41', '0.00', '0.00', NULL, NULL, '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', '0.00', 0, 0, NULL, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `migrations`
+--
+
+CREATE TABLE `migrations` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `migration` varchar(255) NOT NULL,
+  `batch` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data untuk tabel `migrations`
+--
+
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
+(1, '2025_12_17_000000_create_rekrutmen_daily_table', 1),
+(2, '2025_12_17_074546_create_kpi_tables', 2),
+(3, '2025_12_18_042424_add_columns_to_kpi_items_table', 3),
+(4, '2025_12_20_022325_add_status_to_posisi_table', 4),
+(5, '2025_12_22_132758_add_monthly_columns_to_kpi_scores_table', 5),
+(6, '2025_12_30_040824_add_total_smt2_to_kpi_scores_table', 6),
+(7, '2025_12_30_042614_add_adjustment_columns_to_kpi_scores', 7),
+(8, '2025_12_30_102541_add_real_adjustment_to_kpi_scores', 8),
+(9, '2025_12_31_060700_create_kbi_tables', 9),
+(10, '2026_01_14_084756_create_roles_table', 10),
+(11, '2026_01_14_084900_create_role_user_table', 11),
+(12, '2026_01_14_091032_drop_role_from_users_table', 12),
+(13, '2026_01_15_091924_add_activated_at_to_posisi_table', 13),
+(14, '2026_01_15_105032_add_mentor_id_to_tempa_peserta_table', 14),
+(15, '2026_01_15_105135_add_tahun_to_tempa_absensi_table', 15),
+(16, '2026_01_15_141739_add_unit_shift_to_tempa_peserta_table', 16),
+(17, '2026_01_15_143248_add_tanggal_to_tempa_absensi_table', 17),
+(18, '2026_01_15_143427_make_created_by_nullable_in_tempa_absensi_table', 18),
+(19, '2026_01_17_090111_add_keterangan_pindah_to_tempa_peserta_table', 19),
+(20, '2026_01_16_000000_add_mentor_id_to_tempa_kelompok_table', 20);
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `onboarding_karyawan`
+--
+
+CREATE TABLE `onboarding_karyawan` (
+  `id_onboarding` int(11) NOT NULL,
+  `kandidat_id` int(11) NOT NULL,
+  `posisi_id` int(11) NOT NULL,
+  `pendidikan_terakhir` varchar(150) DEFAULT NULL,
+  `nama_sekolah` varchar(150) DEFAULT NULL,
+  `alamat_domisili` text DEFAULT NULL,
+  `nomor_wa` varchar(20) DEFAULT NULL,
+  `jadwal_ttd_kontrak` date DEFAULT NULL,
+  `tanggal_resign` date DEFAULT NULL,
+  `masa_kerja_hari` int(11) DEFAULT NULL,
+  `status_turnover` enum('turnover','lolos','belum') DEFAULT 'belum',
+  `tanggal_lolos_probation` date DEFAULT NULL,
+  `alasan_resign` text DEFAULT NULL,
+  `id_card_status` enum('proses','jadi','diambil') DEFAULT 'proses',
+  `id_card_proses` date DEFAULT NULL,
+  `id_card_jadi` date DEFAULT NULL,
+  `id_card_diambil` date DEFAULT NULL,
+  `no_rekening` varchar(50) DEFAULT NULL,
+  `fingerprint_status` enum('belum','sudah') DEFAULT 'belum',
+  `fingerprint_sudah` date DEFAULT NULL,
+  `link_data_dikirim_hr` date DEFAULT NULL,
+  `link_data_dilengkapi_karyawan` date DEFAULT NULL,
+  `ijazah_diterima_hr` date DEFAULT NULL,
+  `kontrak_ttd_pusat` date DEFAULT NULL,
+  `visi_misi` tinyint(1) DEFAULT 0,
+  `wadja_philosophy` tinyint(1) DEFAULT 0,
+  `sejarah_perusahaan` tinyint(1) DEFAULT 0,
+  `kondisi_perizinan` tinyint(1) DEFAULT 0,
+  `tata_tertib` tinyint(1) DEFAULT 0,
+  `bpjs` tinyint(1) DEFAULT 0,
+  `k3` tinyint(1) DEFAULT 0,
+  `tanggal_induction` date DEFAULT NULL,
+  `evaluasi` text DEFAULT NULL,
+  `status_onboarding` enum('draft','progress','selesai') DEFAULT 'draft',
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `onboarding_karyawan`
+--
+
+INSERT INTO `onboarding_karyawan` (`id_onboarding`, `kandidat_id`, `posisi_id`, `pendidikan_terakhir`, `nama_sekolah`, `alamat_domisili`, `nomor_wa`, `jadwal_ttd_kontrak`, `tanggal_resign`, `masa_kerja_hari`, `status_turnover`, `tanggal_lolos_probation`, `alasan_resign`, `id_card_status`, `id_card_proses`, `id_card_jadi`, `id_card_diambil`, `no_rekening`, `fingerprint_status`, `fingerprint_sudah`, `link_data_dikirim_hr`, `link_data_dilengkapi_karyawan`, `ijazah_diterima_hr`, `kontrak_ttd_pusat`, `visi_misi`, `wadja_philosophy`, `sejarah_perusahaan`, `kondisi_perizinan`, `tata_tertib`, `bpjs`, `k3`, `tanggal_induction`, `evaluasi`, `status_onboarding`, `created_at`, `updated_at`) VALUES
+(1, 3, 1, 'S1', 'Universitas Gadjah Mada', 'Jl. Contoh No. 118', '084342924392', '2025-09-11', NULL, NULL, 'lolos', '2025-12-03', NULL, 'jadi', '2025-12-20', '2025-12-31', NULL, NULL, 'sudah', '2025-12-30', NULL, NULL, '2025-12-17', '2025-12-30', 1, 0, 0, 0, 1, 0, 0, '2026-01-01', NULL, 'selesai', '2026-01-12 06:27:55', '2026-01-14 07:54:15'),
+(2, 22, 1, 'S1', 'SMA Negeri 1 Jakarta', 'Jl. Contoh No. 220', '083125326297', '2025-11-17', '2025-12-22', NULL, 'lolos', '2026-02-08', 'Masalah Keluarga', 'proses', NULL, NULL, NULL, NULL, 'belum', NULL, '2025-12-10', NULL, '2025-11-17', '2025-11-17', 1, 0, 0, 0, 1, 1, 1, '2025-11-18', NULL, 'selesai', '2026-01-12 06:27:55', '2026-01-13 06:14:01'),
+(3, 9, 2, 'S1', 'Universitas Gadjah Mada', 'Jl. Contoh No. 213', '089542837759', '2025-05-22', '2025-06-14', 30, 'turnover', NULL, 'Masalah keluarga', 'jadi', '2025-12-14', '2025-12-30', NULL, NULL, 'sudah', '2026-01-09', '2025-12-23', NULL, '2026-01-01', '2025-12-26', 1, 0, 0, 1, 0, 0, 0, '2025-11-30', 'Onboarding berjalan sesuai SOP dan kebutuhan unit kerja.', 'selesai', '2026-01-12 06:27:55', '2026-01-12 06:27:55'),
+(4, 12, 3, 'SMA', 'SMA Negeri 1 Jakarta', 'Jl. Contoh No. 75', '082390772198', '2026-01-18', '2026-02-09', NULL, 'lolos', '2026-02-08', 'Masalah Keluarga', 'proses', NULL, NULL, NULL, NULL, 'sudah', '2026-01-26', '2026-01-18', NULL, '2026-01-18', '2026-01-18', 0, 1, 1, 1, 1, 0, 0, '2026-01-11', 'Onboarding berjalan sesuai SOP dan kebutuhan unit kerja.', 'selesai', '2026-01-12 06:27:55', '2026-01-13 06:16:39'),
+(5, 13, 4, 'S1', 'Politeknik Negeri Jakarta', 'Jl. Contoh No. 67', '082106666439', '2025-06-25', NULL, NULL, 'lolos', '2025-09-16', NULL, 'jadi', '2025-12-27', '2025-12-29', NULL, NULL, 'sudah', '2026-01-08', NULL, NULL, NULL, NULL, 0, 1, 0, 1, 1, 1, 0, NULL, 'Onboarding berjalan sesuai SOP dan kebutuhan unit kerja.', 'selesai', '2026-01-12 06:27:55', '2026-01-12 06:27:55'),
+(6, 20, 4, 'S1', 'Politeknik Negeri Jakarta', 'Jl. Contoh No. 170', '086277137021', '2025-04-04', NULL, NULL, 'lolos', '2025-06-26', NULL, 'jadi', '2025-12-14', '2026-01-02', NULL, NULL, 'belum', NULL, NULL, '2025-12-30', NULL, '2026-01-03', 1, 1, 1, 1, 0, 1, 0, NULL, NULL, 'selesai', '2026-01-12 06:27:55', '2026-01-12 06:27:55'),
+(7, 4, 5, 'S2', 'Politeknik Negeri Jakarta', 'Jl. Contoh No. 87', '083951433910', '2025-07-12', NULL, NULL, 'lolos', '2025-10-03', NULL, 'proses', NULL, NULL, NULL, NULL, 'belum', NULL, '2025-11-30', '2025-12-18', NULL, NULL, 0, 0, 0, 0, 1, 0, 0, NULL, 'Onboarding berjalan sesuai SOP dan kebutuhan unit kerja.', 'progress', '2026-01-12 06:27:55', '2026-01-12 06:27:55'),
+(8, 11, 7, 'SMA', 'SMA Negeri 1 Jakarta', 'Jl. Contoh No. 198', '087028760869', '2025-02-01', NULL, NULL, 'lolos', '2025-04-25', NULL, 'jadi', '2026-01-02', '2025-12-28', NULL, NULL, 'belum', NULL, NULL, '2025-12-14', NULL, '2026-01-01', 1, 1, 1, 1, 1, 1, 0, '2025-12-20', 'Onboarding berjalan sesuai SOP dan kebutuhan unit kerja.', 'progress', '2026-01-12 06:27:55', '2026-01-12 06:27:55'),
+(9, 16, 7, 'D3', 'Institut Teknologi Bandung', 'Jl. Contoh No. 37', '081020315181', '2025-05-12', NULL, NULL, 'lolos', '2025-08-03', NULL, 'proses', NULL, NULL, NULL, NULL, 'belum', NULL, NULL, '2025-12-29', NULL, NULL, 0, 0, 0, 1, 0, 0, 1, NULL, 'Onboarding berjalan sesuai SOP dan kebutuhan unit kerja.', 'selesai', '2026-01-12 06:27:55', '2026-01-12 06:27:55'),
+(10, 17, 7, 'S1', 'Institut Teknologi Bandung', 'Jl. Contoh No. 45', '085281604892', '2025-07-08', NULL, NULL, 'lolos', '2025-09-29', NULL, 'jadi', '2025-12-13', '2026-01-04', NULL, NULL, 'sudah', '2026-01-08', NULL, '2025-12-21', NULL, '2025-12-30', 1, 0, 0, 1, 0, 1, 0, '2025-11-28', NULL, 'progress', '2026-01-12 06:27:56', '2026-01-12 06:27:56'),
+(11, 18, 7, 'S1', 'Universitas Indonesia', 'Jl. Contoh No. 63', '086895414315', '2025-06-21', NULL, NULL, 'lolos', '2025-09-12', NULL, 'jadi', '2026-01-01', '2025-12-28', NULL, NULL, 'sudah', '2026-01-11', NULL, '2025-12-30', '2025-12-09', NULL, 1, 0, 0, 1, 1, 0, 1, '2025-11-26', NULL, 'selesai', '2026-01-12 06:27:56', '2026-01-12 06:27:56'),
+(12, 25, 11, 'D3', 'Universitas Gadjah Mada', 'Jl. Contoh No. 77', '089777251040', '2025-10-17', NULL, NULL, 'lolos', '2026-01-08', NULL, 'diambil', '2025-12-29', '2025-12-29', '2026-01-08', NULL, 'sudah', '2025-12-31', NULL, '2025-12-28', '2025-12-29', NULL, 1, 0, 0, 0, 0, 0, 0, '2025-12-12', NULL, 'selesai', '2026-01-12 06:27:56', '2026-01-12 06:27:56'),
+(13, 15, 12, 'D3', 'Politeknik Negeri Jakarta', 'Jl. Contoh No. 234', '083982122648', '2025-04-11', '2025-12-06', 246, 'turnover', NULL, 'Masalah keluarga', 'proses', NULL, NULL, NULL, NULL, 'belum', NULL, '2025-12-23', NULL, NULL, NULL, 0, 1, 0, 0, 0, 1, 0, NULL, 'Onboarding berjalan sesuai SOP dan kebutuhan unit kerja.', 'selesai', '2026-01-12 06:27:56', '2026-01-12 06:27:56'),
+(14, 7, 13, 'S2', 'SMA Negeri 1 Jakarta', 'Jl. Contoh No. 159', '086594949608', '2025-07-13', NULL, NULL, 'lolos', '2025-10-04', NULL, 'jadi', '2025-12-18', '2026-01-04', NULL, NULL, 'belum', NULL, '2025-12-17', '2026-01-06', '2025-12-30', '2025-12-26', 1, 0, 0, 0, 0, 1, 1, NULL, 'Onboarding berjalan sesuai SOP dan kebutuhan unit kerja.', 'selesai', '2026-01-12 06:27:56', '2026-01-12 06:27:56');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pekerjaan`
+--
+
+CREATE TABLE `pekerjaan` (
+  `id_pekerjaan` bigint(20) NOT NULL,
+  `id_karyawan` bigint(20) DEFAULT NULL,
+  `Jabatan` enum('Staff','Kepala Regu','Kepala Unit','Kepala Shift','Head Of Brances (HOB)','Supervisor','Manager','General Manager (GM)','Direktur') DEFAULT NULL,
+  `Bagian` varchar(255) DEFAULT NULL,
+  `Departement` enum('BUSINESS','BUSINESS DEVELOPMENT','DIREKSI','FINANCE & ACCOUNTING','MARKETING & SALES','OPERASIONAL','RESEARCH & ENGINEERING','STABLE') DEFAULT NULL,
+  `Divisi` enum('Accounting','Branches Bali','Branches Bandung','Branches Bekasi','Branches Bogor','Branches Cianjur','Branches Cirebon','Branches Jember','Branches Kediri','Branches Lampung','Branches Latubo','Branches Madiun','Branches Madura','Branches Magelang','Branches Malang','Branches Pati','Branches Purwakarta','Branches Purwokerto','Branches Semarang','Branches Serang','Branches Sidoarjo','Branches Surakarta','Branches Tangerang','Branches Tasikmalaya','Branches Tegal','Business','Design Product','Development','Direktur Umum','Div. Business Development','Div. Marketing & Sales','Div. Research & Engineering','Divisi Operasional','East Area Sales','Engineering Service','Fabrikasi F1 (WKD)','Fabrikasi F2 (Residensial Door)','Fabrikasi F2 (Wadja)','Factory','Finance','Finance & Accounting','Finance & Invesment','Finance Center','General Affair & Logistik','General Affairs','HR Center','HRD','Logistik','Logistik Marketing & Sales','Marcom','Marketing','Online Direct Selling','Project Spesialist','Prototype','Research','Research & Engineering','West Area Sales') DEFAULT NULL,
+  `Unit` enum('Branches Bali','Branches Bandung','Branches Bekasi','Branches Bogor','Branches Bojonegoro','Branches Cianjur','Branches Cirebon','Branches Jember','Branches Kediri','Branches Lampung','Branches Latubo','Branches Madiun','Branches Madura','Branches Magelang','Branches Makassar','Branches Malang','Branches Palembang','Branches Pati','Branches Purwakarta','Branches Purwokerto','Branches Semarang','Branches Serang','Branches Sidoarjo','Branches Surakarta','Branches Tangerang','Branches Tasikmalaya','Branches Tegal','Branches Yogyakarta','Divisi Operasional','Factory','Factory 1','Factory 2','Factory 2 Residensial & Project','Factory 3','Factory 4','Finance','General Affair','Logistic','Maintanance','Online & Project Selling','Organization Development','Specialist K3') DEFAULT NULL,
+  `Jenis_Kontrak` enum('PKWT','PKWTT') DEFAULT NULL,
+  `Perjanjian` enum('Harian Lepas','Kontrak','Tetap') DEFAULT NULL,
+  `Lokasi_Kerja` enum('Central Java - Pati','Central Java - Pekalongan','Central Java - Purwokerto','Central Java - Surakarta','Central Java - Magelang','Central Java - Semarang','Central Java - Tegal','West Java - Purwakarta','West Java - Cianjur','West Java - Bandung','West Java - Bogor','West Java - Cirebon','West Java - Tangerang','West Java - Bekasi','West Java - Tasikmalaya','Banten - Serang','East Java - Bojonegoro','East Java - Jember','East Java - Madiun','East Java - Madura','East Java - Sidoarjo','Bali - Bali','East Java - Malang','East Java - Kediri','South Sumatra - Lampung','South Sumatra - Palembang','DIY - Yogyakarta','South Sulawesi - Makassar') DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `pekerjaan`
+--
+
+INSERT INTO `pekerjaan` (`id_pekerjaan`, `id_karyawan`, `Jabatan`, `Bagian`, `Departement`, `Divisi`, `Unit`, `Jenis_Kontrak`, `Perjanjian`, `Lokasi_Kerja`, `created_at`, `updated_at`) VALUES
+(1, 3, 'General Manager (GM)', 'Sales & Marketing', 'MARKETING & SALES', 'Marketing', 'Factory 1', 'PKWTT', 'Tetap', 'Central Java - Pati', '2025-12-10 06:54:30', '2025-12-29 04:19:04'),
+(2, 5, 'Staff', 'Web Dev', 'BUSINESS DEVELOPMENT', 'HRD', 'Factory 1', NULL, 'Kontrak', 'Central Java - Pati', '2025-12-12 03:17:08', '2025-12-29 04:19:04'),
+(4, 8, 'Staff', 'Marketing', 'FINANCE & ACCOUNTING', 'Finance & Accounting', 'Factory 1', 'PKWT', 'Kontrak', 'Central Java - Pati', '2025-12-14 08:42:52', '2025-12-29 04:19:04'),
+(5, 9, 'Staff', 'Sales', 'MARKETING & SALES', 'Div. Marketing & Sales', 'Factory 1', 'PKWTT', 'Tetap', 'South Sumatra - Lampung', '2025-12-14 10:21:21', '2025-12-29 04:19:04'),
+(6, 2, 'Staff', 'finance', 'FINANCE & ACCOUNTING', 'Finance & Accounting', 'Finance', 'PKWT', 'Kontrak', 'Central Java - Pati', '2025-12-14 14:03:43', '2025-12-29 06:07:59'),
+(7, 900, 'Staff', 'HR', 'BUSINESS DEVELOPMENT', 'HRD', 'Factory 1', 'PKWT', 'Kontrak', 'Central Java - Pati', '2026-01-09 04:34:14', '2026-01-09 04:34:14'),
+(9, 902, 'Staff', 'Sales & Marketing', 'MARKETING & SALES', 'Marketing', 'Factory 1', 'PKWTT', 'Tetap', 'Central Java - Pati', '2026-01-09 06:16:42', '2026-01-09 06:44:53'),
+(10, 242, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-01-09 07:22:28', '2026-01-09 07:22:28');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pemberkasan`
+--
+
+CREATE TABLE `pemberkasan` (
+  `id_pemberkasan` int(11) NOT NULL,
+  `kandidat_id` int(11) DEFAULT NULL,
+  `posisi_id` int(11) DEFAULT NULL,
+  `follow_up` date DEFAULT NULL,
+  `kandidat_kirim_berkas` date DEFAULT NULL,
+  `selesai_recruitment` date DEFAULT NULL,
+  `selesai_skgk_finance` date DEFAULT NULL,
+  `selesai_ttd_manager_hrd` date DEFAULT NULL,
+  `selesai_ttd_user` date DEFAULT NULL,
+  `selesai_ttd_direktur` date DEFAULT NULL,
+  `jadwal_ttd_kontrak` date DEFAULT NULL,
+  `background_checking` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `pemberkasan`
+--
+
+INSERT INTO `pemberkasan` (`id_pemberkasan`, `kandidat_id`, `posisi_id`, `follow_up`, `kandidat_kirim_berkas`, `selesai_recruitment`, `selesai_skgk_finance`, `selesai_ttd_manager_hrd`, `selesai_ttd_user`, `selesai_ttd_direktur`, `jadwal_ttd_kontrak`, `background_checking`, `created_at`, `updated_at`) VALUES
+(15, 11, NULL, '2025-12-31', '2026-01-05', '2026-01-06', '2026-01-07', '2026-01-08', '2026-01-08', '2026-01-08', '2026-01-12', 'Clear weqweqwe', '2026-01-09 07:57:35', '2026-01-14 07:48:55'),
+(16, 17, NULL, '2026-01-07', '2026-01-07', '2026-01-07', '2026-01-07', '2026-01-07', '2026-01-07', '2026-01-07', '2026-01-07', 'Clear', '2026-01-14 07:48:41', '2026-01-14 07:48:41');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pendidikan`
+--
+
+CREATE TABLE `pendidikan` (
+  `id_pendidikan` bigint(20) NOT NULL,
+  `id_karyawan` bigint(20) DEFAULT NULL,
+  `Pendidikan_Terakhir` enum('SD','SLTP','SLTA','DIPLOMA I','DIPLOMA II','DIPLOMA III','DIPLOMA IV','S1','S2') DEFAULT NULL,
+  `Nama_Lengkap_Tempat_Pendidikan_Terakhir` varchar(255) DEFAULT NULL,
+  `Jurusan` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `pendidikan`
+--
+
+INSERT INTO `pendidikan` (`id_pendidikan`, `id_karyawan`, `Pendidikan_Terakhir`, `Nama_Lengkap_Tempat_Pendidikan_Terakhir`, `Jurusan`, `created_at`, `updated_at`) VALUES
+(1, 3, 'S2', 'Universitas Diponegoro', 'Manajemen', '2025-12-10 06:59:33', '2025-12-29 04:19:43'),
+(2, 5, 'S1', 'Universitas PGRI Semarang', 'Informatika', '2025-12-12 03:17:08', '2025-12-29 04:19:43'),
+(4, 8, 'S1', 'Universitas Negeri Semarang', 'Manajemen', '2025-12-14 08:42:52', '2025-12-29 04:19:43'),
+(5, 9, 'S1', 'Universitas Diponegoro', 'Manajemen', '2025-12-14 10:21:22', '2025-12-29 04:19:43'),
+(6, 2, 'S1', 'Universitas Diponegoro', 'Akuntansi', '2025-12-14 15:11:34', '2025-12-29 06:07:59'),
+(8, 900, 'S1', 'Universitas Sultan Agung Semarang', 'Teknik Informatika', '2026-01-09 04:34:14', '2026-01-09 04:34:14'),
+(10, 902, 'S1', 'Universitas Diponegoro', 'Manajemen', '2026-01-09 06:16:43', '2026-01-09 06:19:00'),
+(11, 242, NULL, NULL, NULL, '2026-01-09 07:22:28', '2026-01-09 07:22:28');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `perusahaan`
+--
+
+CREATE TABLE `perusahaan` (
+  `id_perusahaan` bigint(20) NOT NULL,
+  `id_karyawan` bigint(20) DEFAULT NULL,
+  `Perusahaan` enum('CV BERKAH NEGERI MULIA','PT INTI DUNIA MANDIRI','PT SOCHA INTI INFORMATIKA','PT TIMUR SEMESTA ABADI','PT WADJA INTI MULIA','PT WADJA INTI MULIA PERSADA','PT WADJA KARYA DUNIA','TAMANSARI EQUESTRIAN PARK') DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `perusahaan`
+--
+
+INSERT INTO `perusahaan` (`id_perusahaan`, `id_karyawan`, `Perusahaan`, `created_at`, `updated_at`) VALUES
+(1, 3, 'PT WADJA INTI MULIA', '2025-12-10 07:04:07', '2025-12-29 04:20:19'),
+(2, 5, 'PT WADJA KARYA DUNIA', '2025-12-12 03:17:08', '2025-12-29 04:20:19'),
+(4, 8, 'PT WADJA INTI MULIA', '2025-12-14 08:42:52', '2025-12-29 04:20:19'),
+(5, 9, 'PT WADJA KARYA DUNIA', '2025-12-14 10:21:22', '2025-12-29 04:20:19'),
+(6, 2, 'PT WADJA KARYA DUNIA', '2025-12-14 14:34:16', '2025-12-29 04:20:19'),
+(7, 900, 'PT WADJA KARYA DUNIA', '2026-01-09 04:34:14', '2026-01-09 04:34:14'),
+(9, 902, 'PT WADJA KARYA DUNIA', '2026-01-09 06:16:43', '2026-01-09 06:19:00'),
+(10, 242, NULL, '2026-01-09 07:22:28', '2026-01-09 07:22:28');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `posisi`
+--
+
+CREATE TABLE `posisi` (
+  `id_posisi` int(11) NOT NULL,
+  `nama_posisi` varchar(150) NOT NULL,
+  `status` enum('Aktif','Nonaktif') NOT NULL DEFAULT 'Aktif',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `progress_rekrutmen` varchar(50) DEFAULT 'Menerima Kandidat',
+  `total_pelamar` int(11) DEFAULT 0,
+  `activated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `posisi`
+--
+
+INSERT INTO `posisi` (`id_posisi`, `nama_posisi`, `status`, `created_at`, `updated_at`, `progress_rekrutmen`, `total_pelamar`, `activated_at`) VALUES
+(1, 'Software Engineer', 'Aktif', '2025-12-16 21:53:11', '2026-01-15 02:27:40', 'Interview HR', 2, '2025-12-16 21:53:11'),
+(2, 'Quality Assurance', 'Aktif', '2025-12-16 21:53:11', '2026-01-15 02:27:40', 'Interview HR', 1, '2025-12-16 21:53:11'),
+(3, 'Product Manager', 'Aktif', '2025-12-16 21:53:11', '2026-01-15 02:27:40', 'Pre Interview', 1, '2025-12-16 21:53:11'),
+(4, 'UI/UX Designer', 'Aktif', '2025-12-16 21:53:11', '2026-01-15 02:27:40', 'Interview HR', 2, '2025-12-16 21:53:11'),
+(5, 'Sales Tangerang', 'Aktif', '2025-12-16 21:53:11', '2026-01-15 02:27:40', 'Pre Interview', 1, '2025-12-16 21:53:11'),
+(6, 'Smoke Test Position', 'Aktif', '2025-12-16 23:26:27', '2026-01-15 02:27:40', 'Menerima Kandidat', 0, '2025-12-16 23:26:27'),
+(7, 'Sales Pati', 'Aktif', '2025-12-16 23:26:27', '2026-01-15 02:27:40', 'Rekrutmen Selesai', 4, '2025-12-16 23:26:27'),
+(11, 'Sales Bali', 'Aktif', '2025-12-16 23:33:58', '2026-01-15 02:27:40', 'Interview HR', 1, '2025-12-16 23:33:58'),
+(12, 'Sales Bandung', 'Aktif', '2025-12-17 19:03:24', '2026-01-15 02:27:40', 'Interview HR', 1, '2025-12-17 19:03:24'),
+(13, 'Sales Jakarta', 'Aktif', '2025-12-18 20:09:45', '2026-01-15 02:27:40', 'Pre Interview', 1, '2025-12-18 20:09:45'),
+(15, 'Sales Lampung', 'Aktif', '2025-12-21 20:06:55', '2026-01-15 02:27:40', 'Menerima Kandidat', 0, '2025-12-21 20:06:55'),
+(21, 'Sales Makassar', 'Nonaktif', '2025-12-21 21:03:08', '2025-12-31 03:26:08', 'Tidak Menerima Kandidat', 0, NULL),
+(38, 'R', 'Aktif', '2026-01-15 01:53:07', '2026-01-15 02:27:40', 'Menerima Kandidat', 0, '2026-01-15 01:53:07');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `proses_rekrutmen`
+--
+
+CREATE TABLE `proses_rekrutmen` (
+  `id_proses_rekrutmen` int(11) NOT NULL,
+  `kandidat_id` int(11) NOT NULL,
+  `cv_lolos` tinyint(1) DEFAULT NULL,
+  `tanggal_cv` date DEFAULT NULL,
+  `psikotes_lolos` tinyint(1) DEFAULT NULL,
+  `tanggal_psikotes` date DEFAULT NULL,
+  `tes_kompetensi_lolos` tinyint(1) DEFAULT NULL,
+  `tanggal_tes_kompetensi` date DEFAULT NULL,
+  `interview_hr_lolos` tinyint(1) DEFAULT NULL,
+  `tanggal_interview_hr` date DEFAULT NULL,
+  `interview_user_lolos` tinyint(1) DEFAULT NULL,
+  `tanggal_interview_user` date DEFAULT NULL,
+  `tahap_terakhir` varchar(100) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `rekrutmen_daily`
+--
+
+CREATE TABLE `rekrutmen_daily` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `posisi_id` int(11) NOT NULL,
+  `date` date NOT NULL,
+  `total_pelamar` int(11) NOT NULL DEFAULT 0,
+  `lolos_cv` int(11) NOT NULL DEFAULT 0,
+  `lolos_psikotes` int(11) NOT NULL DEFAULT 0,
+  `lolos_kompetensi` int(11) NOT NULL DEFAULT 0,
+  `lolos_hr` int(11) NOT NULL DEFAULT 0,
+  `lolos_user` int(11) NOT NULL DEFAULT 0,
+  `notes` text DEFAULT NULL,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data untuk tabel `rekrutmen_daily`
+--
+
+INSERT INTO `rekrutmen_daily` (`id`, `posisi_id`, `date`, `total_pelamar`, `lolos_cv`, `lolos_psikotes`, `lolos_kompetensi`, `lolos_hr`, `lolos_user`, `notes`, `created_by`, `created_at`, `updated_at`) VALUES
+(1, 2, '2025-12-22', 0, 1, 0, 0, 0, 0, NULL, NULL, '2025-12-31 07:57:36', '2026-01-02 02:05:57'),
+(2, 3, '2025-12-03', 0, 0, 1, 0, 0, 0, NULL, NULL, '2025-12-31 07:57:36', '2026-01-02 02:05:58'),
+(3, 4, '2025-12-31', 0, 1, 0, 0, 0, 0, NULL, NULL, '2025-12-31 07:57:36', '2026-01-02 02:05:57'),
+(4, 7, '2025-12-30', 0, 0, 0, 0, 0, 1, NULL, NULL, '2025-12-31 07:57:36', '2026-01-02 02:05:58'),
+(5, 12, '2025-12-29', 0, 0, 0, 0, 0, 0, NULL, NULL, '2025-12-31 07:57:36', '2026-01-02 02:05:56'),
+(6, 13, '2025-12-22', 0, 0, 0, 1, 0, 0, NULL, NULL, '2025-12-31 07:57:36', '2026-01-02 02:05:58'),
+(7, 3, '2025-12-01', 1, 0, 0, 0, 0, 0, NULL, 3, '2025-12-31 07:58:12', '2026-01-02 02:05:56'),
+(8, 2, '2025-12-01', 1, 0, 0, 0, 0, 0, NULL, 3, '2025-12-31 07:58:20', '2026-01-02 02:05:56'),
+(9, 7, '2025-12-22', 0, 1, 0, 0, 0, 0, NULL, NULL, '2025-12-31 07:59:33', '2026-01-02 02:05:57'),
+(10, 7, '2025-12-23', 0, 1, 0, 0, 0, 0, NULL, NULL, '2025-12-31 08:02:59', '2026-01-02 02:05:57'),
+(11, 12, '2026-01-02', 0, 0, 1, 0, 0, 0, NULL, NULL, '2026-01-02 01:57:11', '2026-01-02 02:05:58'),
+(12, 7, '2026-01-02', 0, 1, 1, 0, 2, 0, NULL, NULL, '2026-01-02 01:57:56', '2026-01-02 03:52:24'),
+(13, 12, '2026-01-05', 0, 1, 0, 0, 0, 0, NULL, NULL, '2026-01-05 02:04:27', '2026-01-05 02:04:27'),
+(14, 1, '2026-01-05', 0, 1, 0, 0, 1, 0, NULL, NULL, '2026-01-05 13:08:16', '2026-01-05 13:09:08'),
+(15, 2, '2026-01-02', 3, 0, 0, 0, 0, 0, NULL, 16, '2026-01-06 03:41:25', '2026-01-14 07:44:30'),
+(16, 1, '2026-01-14', 0, 0, 0, 0, 0, 0, NULL, NULL, '2026-01-14 07:41:53', '2026-01-14 07:42:10'),
+(17, 2, '2026-01-03', 4, 0, 0, 0, 0, 0, NULL, 16, '2026-01-14 07:44:35', '2026-01-14 07:44:35'),
+(18, 4, '2026-01-14', 0, 1, 0, 0, 1, 0, NULL, NULL, '2026-01-14 07:45:43', '2026-01-14 07:46:03'),
+(19, 7, '2026-01-14', 0, 0, 0, 0, 0, 1, NULL, NULL, '2026-01-14 07:47:16', '2026-01-14 07:47:16');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `roles`
+--
+
+CREATE TABLE `roles` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data untuk tabel `roles`
+--
+
+INSERT INTO `roles` (`id`, `name`, `created_at`, `updated_at`) VALUES
+(1, 'superadmin', '2026-01-14 01:57:12', '2026-01-14 01:57:12'),
+(2, 'admin', '2026-01-14 01:57:13', '2026-01-14 01:57:13'),
+(3, 'manager', '2026-01-14 01:57:13', '2026-01-14 01:57:13'),
+(4, 'staff', '2026-01-14 01:57:13', '2026-01-14 01:57:13'),
+(5, 'ketua_tempa', '2026-01-14 01:57:13', '2026-01-14 01:57:13');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `role_user`
+--
+
+CREATE TABLE `role_user` (
+  `user_id` bigint(20) UNSIGNED NOT NULL,
+  `role_id` bigint(20) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data untuk tabel `role_user`
+--
+
+INSERT INTO `role_user` (`user_id`, `role_id`) VALUES
+(3, 1),
+(15, 4),
+(16, 1),
+(17, 3),
+(18, 3),
+(19, 4),
+(19, 5);
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `sessions`
+--
+
+CREATE TABLE `sessions` (
+  `id` varchar(80) NOT NULL,
+  `user_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` text DEFAULT NULL,
+  `payload` longtext NOT NULL,
+  `last_activity` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data untuk tabel `sessions`
+--
+
+INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
+('WgXuevimkJd4kwrlnxBLreTsRVmUjM36hgEizWOu', 19, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiWjBjVzljSDdLakZOMG9NaTRTZkNXemYzWndTbkZRbHZLeUdyaXhodSI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6NDM6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC90ZW1wYS9wZXNlcnRhLzI1L2VkaXQiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aToxOTt9', 1768620560);
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `status_karyawan`
+--
+
+CREATE TABLE `status_karyawan` (
+  `id_status` bigint(20) NOT NULL,
+  `id_karyawan` bigint(20) DEFAULT NULL,
+  `Tanggal_Non_Aktif` date DEFAULT NULL,
+  `Alasan_Non_Aktif` varchar(255) DEFAULT NULL,
+  `Ijazah_Dikembalikan` varchar(255) DEFAULT NULL,
+  `Bulan` double DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `status_karyawan`
+--
+
+INSERT INTO `status_karyawan` (`id_status`, `id_karyawan`, `Tanggal_Non_Aktif`, `Alasan_Non_Aktif`, `Ijazah_Dikembalikan`, `Bulan`, `created_at`, `updated_at`) VALUES
+(1, 3, NULL, '-', NULL, NULL, '2025-12-10 07:05:00', '2025-12-29 04:22:37'),
+(3, 8, '2025-10-16', 'Cuti Melahirkan', 'Tidak', NULL, '2025-12-14 08:42:52', '2025-12-29 04:22:37'),
+(4, 2, NULL, NULL, NULL, NULL, '2025-12-14 14:03:42', '2025-12-29 05:03:24'),
+(5, 900, NULL, NULL, NULL, NULL, '2026-01-09 04:34:14', '2026-01-09 04:34:14'),
+(7, 902, NULL, NULL, NULL, NULL, '2026-01-09 06:16:43', '2026-01-09 06:16:43'),
+(8, 242, NULL, NULL, NULL, NULL, '2026-01-09 07:22:28', '2026-01-09 07:22:28');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `tempa`
+--
+
+CREATE TABLE `tempa` (
+  `id_tempa` int(11) NOT NULL,
+  `jenis_tempa` enum('pusat','cabang') NOT NULL,
+  `cabang` varchar(100) DEFAULT NULL COMMENT 'Diisi jika TEMPA Cabang',
+  `nama_tempa` varchar(150) NOT NULL,
+  `periode` varchar(50) NOT NULL,
+  `jumlah_pertemuan` int(11) NOT NULL,
+  `created_by` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `tempa`
+--
+
+INSERT INTO `tempa` (`id_tempa`, `jenis_tempa`, `cabang`, `nama_tempa`, `periode`, `jumlah_pertemuan`, `created_by`, `created_at`, `updated_at`) VALUES
+(1, 'cabang', 'Jakarta', 'Program Pengembangan Talenta 2026', 'Januari - Juni 2026', 12, 3, '2026-01-15 03:52:42', '2026-01-15 03:52:42');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `tempa_absensi`
+--
+
+CREATE TABLE `tempa_absensi` (
+  `id_absensi` int(11) NOT NULL,
+  `id_peserta` int(11) NOT NULL,
+  `bulan` tinyint(4) NOT NULL COMMENT '1-12',
+  `tahun` year(4) NOT NULL,
+  `tanggal` date DEFAULT NULL,
+  `pertemuan_ke` tinyint(4) NOT NULL COMMENT '1-5',
+  `status_hadir` tinyint(4) NOT NULL COMMENT '1=Hadir,0=Tidak Hadir',
+  `bukti_foto` varchar(255) DEFAULT NULL,
+  `created_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `tempa_absensi`
+--
+
+INSERT INTO `tempa_absensi` (`id_absensi`, `id_peserta`, `bulan`, `tahun`, `tanggal`, `pertemuan_ke`, `status_hadir`, `bukti_foto`, `created_by`, `created_at`, `updated_at`) VALUES
+(81, 1, 1, 2026, '2026-01-05', 1, 1, NULL, NULL, '2026-01-15 07:41:36', '2026-01-15 07:41:36'),
+(82, 1, 1, 2026, '2026-01-12', 2, 1, NULL, NULL, '2026-01-15 07:41:36', '2026-01-15 07:41:36'),
+(83, 1, 1, 2026, '2026-01-19', 3, 1, NULL, NULL, '2026-01-15 07:41:37', '2026-01-15 07:41:37'),
+(84, 1, 1, 2026, '2026-01-26', 4, 1, NULL, NULL, '2026-01-15 07:41:37', '2026-01-15 07:41:37'),
+(85, 1, 1, 2026, '2026-01-30', 5, 1, NULL, NULL, '2026-01-15 07:41:37', '2026-01-15 07:41:37'),
+(86, 1, 2, 2026, '2026-02-05', 1, 1, NULL, NULL, '2026-01-15 07:41:37', '2026-01-15 07:41:37'),
+(87, 1, 2, 2026, '2026-02-12', 2, 1, NULL, NULL, '2026-01-15 07:41:37', '2026-01-15 07:41:37'),
+(88, 1, 2, 2026, '2026-02-19', 3, 1, NULL, NULL, '2026-01-15 07:41:37', '2026-01-15 07:41:37'),
+(89, 1, 2, 2026, '2026-02-26', 4, 1, NULL, NULL, '2026-01-15 07:41:37', '2026-01-15 07:41:37'),
+(90, 1, 2, 2026, '2026-02-28', 5, 1, NULL, NULL, '2026-01-15 07:41:37', '2026-01-15 07:41:37'),
+(91, 1, 3, 2026, '2026-03-05', 1, 1, NULL, NULL, '2026-01-15 07:41:37', '2026-01-15 07:41:37'),
+(92, 1, 3, 2026, '2026-03-12', 2, 1, NULL, NULL, '2026-01-15 07:41:37', '2026-01-15 07:41:37'),
+(93, 1, 3, 2026, '2026-03-19', 3, 1, NULL, NULL, '2026-01-15 07:41:37', '2026-01-15 07:41:37'),
+(94, 1, 3, 2026, '2026-03-26', 4, 1, NULL, NULL, '2026-01-15 07:41:37', '2026-01-15 07:41:37'),
+(95, 1, 3, 2026, '2026-03-31', 5, 1, NULL, NULL, '2026-01-15 07:41:37', '2026-01-15 07:41:37'),
+(96, 1, 4, 2026, '2026-04-05', 1, 1, NULL, NULL, '2026-01-15 07:41:37', '2026-01-15 07:41:37'),
+(97, 1, 4, 2026, '2026-04-12', 2, 1, NULL, NULL, '2026-01-15 07:41:37', '2026-01-15 07:41:37'),
+(98, 1, 4, 2026, '2026-04-19', 3, 1, NULL, NULL, '2026-01-15 07:41:37', '2026-01-15 07:41:37'),
+(99, 1, 4, 2026, '2026-04-26', 4, 1, NULL, NULL, '2026-01-15 07:41:37', '2026-01-15 07:41:37'),
+(100, 1, 4, 2026, '2026-04-30', 5, 1, NULL, NULL, '2026-01-15 07:41:37', '2026-01-15 07:41:37'),
+(101, 1, 5, 2026, '2026-05-05', 1, 1, NULL, NULL, '2026-01-15 07:41:37', '2026-01-15 07:41:37'),
+(102, 1, 5, 2026, '2026-05-12', 2, 1, NULL, NULL, '2026-01-15 07:41:37', '2026-01-15 07:41:37'),
+(103, 1, 5, 2026, '2026-05-19', 3, 1, NULL, NULL, '2026-01-15 07:41:37', '2026-01-15 07:41:37'),
+(104, 1, 5, 2026, '2026-05-26', 4, 1, NULL, NULL, '2026-01-15 07:41:37', '2026-01-15 07:41:37'),
+(105, 1, 5, 2026, '2026-05-31', 5, 1, NULL, NULL, '2026-01-15 07:41:37', '2026-01-15 07:41:37'),
+(106, 1, 6, 2026, '2026-06-05', 1, 1, NULL, NULL, '2026-01-15 07:41:38', '2026-01-15 07:41:38'),
+(107, 1, 6, 2026, '2026-06-12', 2, 1, NULL, NULL, '2026-01-15 07:41:38', '2026-01-15 07:41:38'),
+(108, 1, 6, 2026, '2026-06-19', 3, 1, NULL, NULL, '2026-01-15 07:41:38', '2026-01-15 07:41:38'),
+(109, 1, 6, 2026, '2026-06-26', 4, 1, NULL, NULL, '2026-01-15 07:41:38', '2026-01-15 07:41:38'),
+(110, 1, 6, 2026, '2026-06-30', 5, 1, NULL, NULL, '2026-01-15 07:41:38', '2026-01-15 07:41:38'),
+(111, 1, 7, 2026, '2026-07-05', 1, 1, NULL, NULL, '2026-01-15 07:41:38', '2026-01-15 07:41:38'),
+(112, 1, 7, 2026, '2026-07-12', 2, 1, NULL, NULL, '2026-01-15 07:41:38', '2026-01-15 07:41:38'),
+(113, 1, 7, 2026, '2026-07-19', 3, 1, NULL, NULL, '2026-01-15 07:41:38', '2026-01-15 07:41:38'),
+(114, 1, 7, 2026, '2026-07-26', 4, 1, NULL, NULL, '2026-01-15 07:41:38', '2026-01-15 07:41:38'),
+(115, 1, 7, 2026, '2026-07-31', 5, 1, NULL, NULL, '2026-01-15 07:41:38', '2026-01-15 07:41:38'),
+(116, 1, 8, 2026, '2026-08-05', 1, 1, NULL, NULL, '2026-01-15 07:41:38', '2026-01-15 07:41:38'),
+(117, 1, 8, 2026, '2026-08-12', 2, 1, NULL, NULL, '2026-01-15 07:41:38', '2026-01-15 07:41:38'),
+(118, 1, 8, 2026, '2026-08-19', 3, 1, NULL, NULL, '2026-01-15 07:41:38', '2026-01-15 07:41:38'),
+(119, 1, 8, 2026, '2026-08-26', 4, 1, NULL, NULL, '2026-01-15 07:41:38', '2026-01-15 07:41:38'),
+(120, 1, 8, 2026, '2026-08-31', 5, 1, NULL, NULL, '2026-01-15 07:41:38', '2026-01-15 07:41:38'),
+(121, 1, 9, 2026, '2026-09-05', 1, 1, NULL, NULL, '2026-01-15 07:41:38', '2026-01-15 07:41:38'),
+(122, 1, 9, 2026, '2026-09-12', 2, 1, NULL, NULL, '2026-01-15 07:41:38', '2026-01-15 07:41:38'),
+(123, 1, 9, 2026, '2026-09-19', 3, 1, NULL, NULL, '2026-01-15 07:41:38', '2026-01-15 07:41:38'),
+(124, 1, 9, 2026, '2026-09-26', 4, 1, NULL, NULL, '2026-01-15 07:41:39', '2026-01-15 07:41:39'),
+(125, 1, 9, 2026, '2026-09-30', 5, 1, NULL, NULL, '2026-01-15 07:41:39', '2026-01-15 07:41:39'),
+(126, 1, 10, 2026, '2026-10-05', 1, 1, NULL, NULL, '2026-01-15 07:41:39', '2026-01-15 07:41:39'),
+(127, 1, 10, 2026, '2026-10-12', 2, 1, NULL, NULL, '2026-01-15 07:41:39', '2026-01-15 07:41:39'),
+(128, 1, 10, 2026, '2026-10-19', 3, 1, NULL, NULL, '2026-01-15 07:41:39', '2026-01-15 07:41:39'),
+(129, 1, 10, 2026, '2026-10-26', 4, 1, NULL, NULL, '2026-01-15 07:41:39', '2026-01-15 07:41:39'),
+(130, 1, 10, 2026, '2026-10-31', 5, 1, NULL, NULL, '2026-01-15 07:41:39', '2026-01-15 07:41:39'),
+(131, 1, 11, 2026, '2026-11-05', 1, 1, NULL, NULL, '2026-01-15 07:41:39', '2026-01-15 07:41:39'),
+(132, 1, 11, 2026, '2026-11-12', 2, 1, NULL, NULL, '2026-01-15 07:41:39', '2026-01-15 07:41:39'),
+(133, 1, 11, 2026, '2026-11-19', 3, 1, NULL, NULL, '2026-01-15 07:41:40', '2026-01-15 07:41:40'),
+(134, 1, 11, 2026, '2026-11-26', 4, 1, NULL, NULL, '2026-01-15 07:41:40', '2026-01-15 07:41:40'),
+(135, 1, 11, 2026, '2026-11-30', 5, 1, NULL, NULL, '2026-01-15 07:41:40', '2026-01-15 07:41:40'),
+(136, 1, 12, 2026, '2026-12-05', 1, 1, NULL, NULL, '2026-01-15 07:41:40', '2026-01-15 07:41:40'),
+(137, 1, 12, 2026, '2026-12-12', 2, 1, NULL, NULL, '2026-01-15 07:41:40', '2026-01-15 07:41:40'),
+(138, 1, 12, 2026, '2026-12-19', 3, 1, NULL, NULL, '2026-01-15 07:41:40', '2026-01-15 07:41:40'),
+(139, 1, 12, 2026, '2026-12-26', 4, 1, NULL, NULL, '2026-01-15 07:41:40', '2026-01-15 07:41:40'),
+(140, 3, 1, 2026, '2026-01-05', 1, 1, NULL, NULL, '2026-01-15 07:41:40', '2026-01-15 07:41:40'),
+(141, 3, 1, 2026, '2026-01-12', 2, 1, NULL, NULL, '2026-01-15 07:41:40', '2026-01-15 07:41:40'),
+(142, 3, 1, 2026, '2026-01-19', 3, 1, NULL, NULL, '2026-01-15 07:41:40', '2026-01-15 07:41:40'),
+(143, 3, 1, 2026, '2026-01-26', 4, 1, NULL, NULL, '2026-01-15 07:41:40', '2026-01-15 07:41:40'),
+(144, 3, 1, 2026, '2026-01-30', 5, 1, NULL, NULL, '2026-01-15 07:41:40', '2026-01-15 07:41:40'),
+(145, 3, 2, 2026, '2026-02-05', 1, 1, NULL, NULL, '2026-01-15 07:41:40', '2026-01-15 07:41:40'),
+(146, 3, 2, 2026, '2026-02-12', 2, 1, NULL, NULL, '2026-01-15 07:41:40', '2026-01-15 07:41:40'),
+(147, 3, 2, 2026, '2026-02-19', 3, 1, NULL, NULL, '2026-01-15 07:41:40', '2026-01-15 07:41:40'),
+(148, 3, 2, 2026, '2026-02-26', 4, 1, NULL, NULL, '2026-01-15 07:41:40', '2026-01-15 07:41:40'),
+(149, 3, 2, 2026, '2026-02-28', 5, 1, NULL, NULL, '2026-01-15 07:41:40', '2026-01-15 07:41:40'),
+(150, 3, 3, 2026, '2026-03-05', 1, 1, NULL, NULL, '2026-01-15 07:41:40', '2026-01-15 07:41:40'),
+(151, 3, 3, 2026, '2026-03-12', 2, 1, NULL, NULL, '2026-01-15 07:41:41', '2026-01-15 07:41:41'),
+(152, 3, 3, 2026, '2026-03-19', 3, 1, NULL, NULL, '2026-01-15 07:41:41', '2026-01-15 07:41:41'),
+(153, 3, 3, 2026, '2026-03-26', 4, 1, NULL, NULL, '2026-01-15 07:41:41', '2026-01-15 07:41:41'),
+(154, 3, 3, 2026, '2026-03-31', 5, 1, NULL, NULL, '2026-01-15 07:41:41', '2026-01-15 07:41:41'),
+(155, 3, 4, 2026, '2026-04-05', 1, 1, NULL, NULL, '2026-01-15 07:41:41', '2026-01-15 07:41:41'),
+(156, 3, 4, 2026, '2026-04-12', 2, 1, NULL, NULL, '2026-01-15 07:41:41', '2026-01-15 07:41:41'),
+(157, 3, 4, 2026, '2026-04-19', 3, 1, NULL, NULL, '2026-01-15 07:41:41', '2026-01-15 07:41:41'),
+(158, 3, 4, 2026, '2026-04-26', 4, 1, NULL, NULL, '2026-01-15 07:41:41', '2026-01-15 07:41:41'),
+(159, 3, 4, 2026, '2026-04-30', 5, 1, NULL, NULL, '2026-01-15 07:41:41', '2026-01-15 07:41:41'),
+(160, 5, 6, 2026, '2026-06-05', 1, 1, NULL, NULL, '2026-01-15 07:41:41', '2026-01-15 07:41:41'),
+(161, 5, 6, 2026, '2026-06-12', 2, 1, NULL, NULL, '2026-01-15 07:41:41', '2026-01-15 07:41:41'),
+(162, 5, 6, 2026, '2026-06-19', 3, 1, NULL, NULL, '2026-01-15 07:41:41', '2026-01-15 07:41:41'),
+(163, 5, 6, 2026, '2026-06-26', 4, 1, NULL, NULL, '2026-01-15 07:41:41', '2026-01-15 07:41:41'),
+(164, 5, 6, 2026, '2026-06-30', 5, 1, NULL, NULL, '2026-01-15 07:41:41', '2026-01-15 07:41:41');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `tempa_kelompok`
+--
+
+CREATE TABLE `tempa_kelompok` (
+  `id_kelompok` int(11) NOT NULL,
+  `id_tempa` int(11) NOT NULL,
+  `nama_kelompok` varchar(100) NOT NULL,
+  `nama_mentor` varchar(100) NOT NULL,
+  `mentor_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `tempa_kelompok`
+--
+
+INSERT INTO `tempa_kelompok` (`id_kelompok`, `id_tempa`, `nama_kelompok`, `nama_mentor`, `mentor_id`, `created_at`, `updated_at`) VALUES
+(1, 1, 'Kelompok Alpha', 'Manager Alpha', NULL, '2026-01-15 03:52:42', '2026-01-15 03:52:42'),
+(2, 1, 'Kelompok Beta', 'Manager Beta', NULL, '2026-01-15 03:52:42', '2026-01-15 03:52:42'),
+(3, 1, 'Kelompok A', 'Mentor A', 19, '2026-01-17 02:32:41', '2026-01-17 02:32:41'),
+(4, 1, 'Kelompok B', 'Mentor B', 19, '2026-01-17 02:32:42', '2026-01-17 02:32:42'),
+(5, 1, 'Berkah', 'Pak Eko', 19, '2026-01-17 03:28:27', '2026-01-17 03:28:27');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `tempa_materi`
+--
+
+CREATE TABLE `tempa_materi` (
+  `id_materi` int(11) NOT NULL,
+  `id_tempa` int(11) NOT NULL,
+  `judul_materi` varchar(150) NOT NULL,
+  `file_materi` varchar(255) NOT NULL,
+  `uploaded_by` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `tempa_materi`
+--
+
+INSERT INTO `tempa_materi` (`id_materi`, `id_tempa`, `judul_materi`, `file_materi`, `uploaded_by`, `created_at`, `updated_at`) VALUES
+(1, 1, 'Materi Pengenalan TEMPA', 'tempa/materi/sample.pdf', 3, '2026-01-15 03:52:42', '2026-01-15 03:52:42');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `tempa_peserta`
+--
+
+CREATE TABLE `tempa_peserta` (
+  `id_peserta` int(11) NOT NULL,
+  `id_tempa` int(11) NOT NULL,
+  `id_kelompok` int(11) NOT NULL,
+  `status_peserta` int(11) NOT NULL DEFAULT 1,
+  `keterangan_pindah` text DEFAULT NULL,
+  `nama_peserta` varchar(150) NOT NULL,
+  `nik_karyawan` varchar(50) NOT NULL,
+  `mentor_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `unit` varchar(255) DEFAULT NULL,
+  `shift` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `tempa_peserta`
+--
+
+INSERT INTO `tempa_peserta` (`id_peserta`, `id_tempa`, `id_kelompok`, `status_peserta`, `keterangan_pindah`, `nama_peserta`, `nik_karyawan`, `mentor_id`, `unit`, `shift`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 1, NULL, 'John Doe', '1234567890', 17, NULL, NULL, '2026-01-15 03:52:42', '2026-01-15 03:52:42'),
+(2, 1, 1, 1, NULL, 'Jane Smith', '1234567891', 17, NULL, NULL, '2026-01-15 03:52:42', '2026-01-15 03:52:42'),
+(3, 1, 2, 1, NULL, 'Bob Johnson', '1234567892', 18, NULL, NULL, '2026-01-15 03:52:42', '2026-01-15 03:52:42'),
+(5, 1, 1, 1, NULL, 'Nashrul Ihsan', 'NIK001', 3, 'OPERASIONAL', 1, '2026-01-15 07:28:07', '2026-01-15 07:28:07'),
+(7, 1, 1, 1, NULL, 'Nashrul Ihsan', 'NIK001', 3, 'OPERASIONAL', 1, '2026-01-15 07:29:20', '2026-01-15 07:29:20'),
+(8, 1, 1, 2, NULL, 'Nurul Fatah', 'NIK002', 3, 'OPERASIONAL', 1, '2026-01-15 07:29:20', '2026-01-15 07:29:20'),
+(9, 1, 1, 0, NULL, 'Zaenal Marlis', 'NIK003', 3, 'OPERASIONAL', 1, '2026-01-15 07:29:21', '2026-01-15 07:29:21'),
+(10, 1, 1, 2, NULL, 'Bagus Cahyo', 'NIK004', 3, 'OPERASIONAL', 1, '2026-01-15 07:29:21', '2026-01-15 07:29:21'),
+(11, 1, 1, 1, NULL, 'M Syaiful Ulum', 'NIK005', 3, 'OPERASIONAL', 1, '2026-01-15 07:29:21', '2026-01-15 07:29:21'),
+(12, 1, 1, 1, NULL, 'Unggul Wahyu Leksono', 'NIK006', 3, 'OPERASIONAL', 1, '2026-01-15 07:29:21', '2026-01-15 07:29:21'),
+(13, 1, 1, 1, NULL, 'Nashrul Ihsan', 'NIK001', 3, 'OPERASIONAL', 1, '2026-01-17 02:33:18', '2026-01-17 02:33:18'),
+(14, 1, 1, 2, NULL, 'Nurul Fatah', 'NIK002', 3, 'OPERASIONAL', 1, '2026-01-17 02:33:18', '2026-01-17 02:33:18'),
+(15, 1, 1, 0, NULL, 'Zaenal Marlis', 'NIK003', 3, 'OPERASIONAL', 1, '2026-01-17 02:33:18', '2026-01-17 02:33:18'),
+(16, 1, 1, 2, NULL, 'Bagus Cahyo', 'NIK004', 3, 'OPERASIONAL', 1, '2026-01-17 02:33:18', '2026-01-17 02:33:18'),
+(17, 1, 1, 1, NULL, 'M Syaiful Ulum', 'NIK005', 3, 'OPERASIONAL', 1, '2026-01-17 02:33:18', '2026-01-17 02:33:18'),
+(18, 1, 1, 1, NULL, 'Unggul Wahyu Leksono', 'NIK006', 3, 'OPERASIONAL', 1, '2026-01-17 02:33:18', '2026-01-17 02:33:18'),
+(19, 1, 1, 1, NULL, 'Nashrul Ihsan', 'NIK001', 3, 'OPERASIONAL', 1, '2026-01-17 02:42:15', '2026-01-17 02:42:15'),
+(20, 1, 1, 2, NULL, 'Nurul Fatah', 'NIK002', 3, 'OPERASIONAL', 1, '2026-01-17 02:42:15', '2026-01-17 02:42:15'),
+(21, 1, 1, 0, NULL, 'Zaenal Marlis', 'NIK003', 3, 'OPERASIONAL', 1, '2026-01-17 02:42:15', '2026-01-17 02:42:15'),
+(22, 1, 1, 2, NULL, 'Bagus Cahyo', 'NIK004', 3, 'OPERASIONAL', 1, '2026-01-17 02:42:15', '2026-01-17 02:42:15'),
+(23, 1, 1, 1, NULL, 'M Syaiful Ulum', 'NIK005', 3, 'OPERASIONAL', 1, '2026-01-17 02:42:16', '2026-01-17 02:42:16'),
+(24, 1, 1, 1, NULL, 'Unggul Wahyu Leksono', 'NIK006', 3, 'OPERASIONAL', 1, '2026-01-17 02:42:16', '2026-01-17 02:42:16'),
+(25, 1, 5, 2, 'pindah f2', 'Bas', '123455', 19, NULL, NULL, '2026-01-17 03:28:28', '2026-01-17 03:28:28');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `training`
+--
+
+CREATE TABLE `training` (
+  `id_training` int(11) NOT NULL,
+  `kandidat_id` int(11) NOT NULL,
+  `posisi_id` int(11) NOT NULL,
+  `tanggal_mulai` date DEFAULT NULL,
+  `tanggal_selesai` date DEFAULT NULL,
+  `jadwal_ttd_kontrak` date DEFAULT NULL,
+  `hasil_evaluasi` enum('LULUS TRAINING','TIDAK LULUS TRAINING','MENGUNDURKAN DIRI') DEFAULT NULL,
+  `keterangan_tambahan` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `training`
+--
+
+INSERT INTO `training` (`id_training`, `kandidat_id`, `posisi_id`, `tanggal_mulai`, `tanggal_selesai`, `jadwal_ttd_kontrak`, `hasil_evaluasi`, `keterangan_tambahan`, `created_at`, `updated_at`) VALUES
+(2, 11, 7, '2026-01-05', '2026-01-10', '2026-01-05', 'LULUS TRAINING', 'Lulus', '2026-01-02 02:36:37', '2026-01-14 07:53:41');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `users`
+--
+
+CREATE TABLE `users` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `nik` varchar(50) DEFAULT NULL,
+  `jabatan` varchar(200) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data untuk tabel `users`
+--
+
+INSERT INTO `users` (`id`, `name`, `email`, `nik`, `jabatan`, `password`, `created_at`, `updated_at`) VALUES
+(3, 'Admin One', 'admin@example.com', '1111111111', 'HR Manager', '$2y$12$W9P9cpNxjAjDjuw/NsfZSuEUroH6NJfnBpmPF65x4qsBK52lJM3VS', '2025-12-07 23:46:38', '2026-01-06 04:03:00'),
+(4, 'Felicia Lind MD', 'fahey.cordia@example.net', NULL, '', '$2y$12$DwOeRYdbLK03bKLl0IZKDuL2a4.BX.QTHXepenOU3RabSO12/hLXm', '2025-12-07 23:46:38', '2025-12-07 23:46:38'),
+(5, 'Liam Brown', 'bogisich.zander@example.com', NULL, '', '$2y$12$DwOeRYdbLK03bKLl0IZKDuL2a4.BX.QTHXepenOU3RabSO12/hLXm', '2025-12-07 23:46:38', '2025-12-07 23:46:38'),
+(6, 'Prof. Catalina Goldner II', 'madyson47@example.org', NULL, '', '$2y$12$DwOeRYdbLK03bKLl0IZKDuL2a4.BX.QTHXepenOU3RabSO12/hLXm', '2025-12-07 23:46:38', '2025-12-07 23:46:38'),
+(7, 'Dr. Julius Hessel MD', 'ceasar07@example.org', NULL, '', '$2y$12$DwOeRYdbLK03bKLl0IZKDuL2a4.BX.QTHXepenOU3RabSO12/hLXm', '2025-12-07 23:46:38', '2025-12-07 23:46:38'),
+(8, 'Ms. Mona Mayert', 'mariana91@example.net', NULL, '', '$2y$12$DwOeRYdbLK03bKLl0IZKDuL2a4.BX.QTHXepenOU3RabSO12/hLXm', '2025-12-07 23:46:38', '2025-12-07 23:46:38'),
+(10, 'Zita Rempel', 'zroob@example.org', NULL, '', '$2y$12$DwOeRYdbLK03bKLl0IZKDuL2a4.BX.QTHXepenOU3RabSO12/hLXm', '2025-12-07 23:46:39', '2025-12-07 23:46:39'),
+(11, 'Dr. Jayda Kris DVM', 'connor.eichmann@example.net', NULL, '', '$2y$12$DwOeRYdbLK03bKLl0IZKDuL2a4.BX.QTHXepenOU3RabSO12/hLXm', '2025-12-07 23:46:39', '2025-12-07 23:46:39'),
+(14, 'Test User', 'test@example.com', NULL, NULL, '$2y$12$nZFZk6/LA1aL8TgRC58MOuBUzRYSDgK9kYlpOrHWTtkF9GjQe8dtG', '2025-12-09 07:20:01', '2025-12-09 07:20:01'),
+(15, 'tes', 'tes@gmail.com', '1234567889', 'Staff', '$2y$12$Oe5dxWOHz1baJT4tOjM3CexswGT3V15WqUa.HTuQmLdlBu30Dsov.', '2026-01-05 08:50:07', '2026-01-14 08:36:41'),
+(16, 'Marcell Bass', 'marcell@gmail.com', '21670004', 'Staff Akuntan', '$2y$12$z/G3mUs7TVuTw0actShM7.uDabObHLlkdYz0xzt5k/1C.MaIGEdu2', '2026-01-05 12:17:47', '2026-01-10 03:09:00'),
+(17, 'manager', 'manager@gmail.com', '111111111', 'Manager HR', '$2y$12$26XOVmjjkMFBigarTbGcNu2MpxK.XwA4Jb/qNp4GsjvgIA/WYvW4S', '2026-01-09 08:03:57', '2026-01-09 08:03:57'),
+(18, 'Mirai', 'mirai@gmail.com', '1111', 'Manager', '$2y$12$YGTUARZOVZ4FT5ojJOXYbegpbR099r9AzhtP.rbeSX7h48LO8CQuW', '2026-01-14 06:21:51', '2026-01-14 06:21:51'),
+(19, 'Tokio', 'tokio@gmail.com', '12345', 'staff', '$2y$12$zZ/BlrKtuALe3nItMiDCrON84hZYZh.bjNxcqtcaFD0TRvIbL3FP6', '2026-01-14 08:31:17', '2026-01-15 06:01:40');
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in struktur untuk tampilan `view_rekrutmen_dashboard`
+-- (Lihat di bawah untuk tampilan aktual)
+--
+CREATE TABLE `view_rekrutmen_dashboard` (
+`id_posisi` int(11)
+,`nama_posisi` varchar(150)
+,`status` enum('Aktif','Nonaktif')
+,`total_pelamar` bigint(21)
+,`progress_rekrutmen` varchar(17)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `wig_rekrutmen`
+--
+
+CREATE TABLE `wig_rekrutmen` (
+  `id_wig_rekrutmen` int(11) NOT NULL,
+  `posisi_id` int(11) NOT NULL,
+  `fpk_user` date DEFAULT NULL,
+  `fpk_hrd` date DEFAULT NULL,
+  `fpk_finance` date DEFAULT NULL,
+  `fpk_direktur` date DEFAULT NULL,
+  `tanggal_publish_loker` date DEFAULT NULL,
+  `total_pelamar` int(11) DEFAULT NULL,
+  `total_lead` int(11) DEFAULT NULL,
+  `total_lolos_psikotes` int(11) DEFAULT NULL,
+  `tanggal_tes_kompetensi` date DEFAULT NULL,
+  `dipanggil_tes_kompetensi` int(11) DEFAULT NULL,
+  `hadir_tes_kompetensi` int(11) DEFAULT NULL,
+  `lolos_tes_kompetensi` int(11) DEFAULT NULL,
+  `tanggal_interview_hr` date DEFAULT NULL,
+  `dipanggil_interview_hr` int(11) DEFAULT NULL,
+  `hadir_interview_hr` int(11) DEFAULT NULL,
+  `lolos_interview_hr` int(11) DEFAULT NULL,
+  `tanggal_interview_user` date DEFAULT NULL,
+  `dipanggil_interview_user` int(11) DEFAULT NULL,
+  `hadir_interview_user` int(11) DEFAULT NULL,
+  `lolos_interview_user` int(11) DEFAULT NULL,
+  `tanggal_bg_checking` date DEFAULT NULL,
+  `tanggal_mulai_training` date DEFAULT NULL,
+  `tanggal_selesai_training` date DEFAULT NULL,
+  `keterangan` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Struktur untuk view `view_rekrutmen_dashboard`
+--
+DROP TABLE IF EXISTS `view_rekrutmen_dashboard`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_rekrutmen_dashboard`  AS SELECT `p`.`id_posisi` AS `id_posisi`, `p`.`nama_posisi` AS `nama_posisi`, `p`.`status` AS `status`, count(`k`.`id_kandidat`) AS `total_pelamar`, CASE WHEN count(`k`.`id_kandidat`) = 0 THEN 'Menerima Kandidat' WHEN sum(case when `k`.`status_akhir` in ('Interview User Lolos','Diterima') then 1 else 0 end) > 0 THEN 'Pemberkasan' WHEN sum(case when `k`.`status_akhir` = 'Interview HR Lolos' then 1 else 0 end) > 0 THEN 'Interview User' WHEN sum(case when `k`.`status_akhir` in ('CV Lolos','Psikotes Lolos','Tes Kompetensi Lolos') then 1 else 0 end) > 0 THEN 'Interview HR' ELSE 'Pre Interview' END AS `progress_rekrutmen` FROM (`posisi` `p` left join `kandidat` `k` on(`p`.`id_posisi` = `k`.`posisi_id` and `k`.`status_akhir` <> 'Tidak Lolos')) GROUP BY `p`.`id_posisi`, `p`.`nama_posisi`, `p`.`status``status`  ;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indeks untuk tabel `biaya_promote_ta`
+--
+ALTER TABLE `biaya_promote_ta`
+  ADD PRIMARY KEY (`id_biaya_promote_ta`);
+
+--
+-- Indeks untuk tabel `bpjs`
+--
+ALTER TABLE `bpjs`
+  ADD PRIMARY KEY (`id_bpjs`),
+  ADD KEY `id_karyawan` (`id_karyawan`);
+
+--
+-- Indeks untuk tabel `data_keluarga`
+--
+ALTER TABLE `data_keluarga`
+  ADD PRIMARY KEY (`id_keluarga`),
+  ADD KEY `id_karyawan` (`id_karyawan`);
+
+--
+-- Indeks untuk tabel `interview_hr`
+--
+ALTER TABLE `interview_hr`
+  ADD PRIMARY KEY (`id_interview_hr`),
+  ADD KEY `fk_interview_hr_kandidat` (`kandidat_id`),
+  ADD KEY `fk_interview_hr_posisi` (`posisi_id`);
+
+--
+-- Indeks untuk tabel `kandidat`
+--
+ALTER TABLE `kandidat`
+  ADD PRIMARY KEY (`id_kandidat`),
+  ADD KEY `posisi_id` (`posisi_id`);
+
+--
+-- Indeks untuk tabel `kandidat_lanjut_user`
+--
+ALTER TABLE `kandidat_lanjut_user`
+  ADD PRIMARY KEY (`id_kandidat_lanjut_user`),
+  ADD KEY `kandidat_id` (`kandidat_id`),
+  ADD KEY `fk_lanjut_user_posisi` (`posisi_id`);
+
+--
+-- Indeks untuk tabel `karyawan`
+--
+ALTER TABLE `karyawan`
+  ADD PRIMARY KEY (`id_karyawan`);
+
+--
+-- Indeks untuk tabel `kbi_assessments`
+--
+ALTER TABLE `kbi_assessments`
+  ADD PRIMARY KEY (`id_kbi_assessment`);
+
+--
+-- Indeks untuk tabel `kbi_items`
+--
+ALTER TABLE `kbi_items`
+  ADD PRIMARY KEY (`id_kbi_item`);
+
+--
+-- Indeks untuk tabel `kbi_scores`
+--
+ALTER TABLE `kbi_scores`
+  ADD PRIMARY KEY (`id_kbi_score`),
+  ADD KEY `kbi_scores_kbi_assessment_id_foreign` (`kbi_assessment_id`),
+  ADD KEY `kbi_scores_kbi_item_id_foreign` (`kbi_item_id`);
+
+--
+-- Indeks untuk tabel `kontrak`
+--
+ALTER TABLE `kontrak`
+  ADD PRIMARY KEY (`id_kontrak`),
+  ADD KEY `id_karyawan` (`id_karyawan`);
+
+--
+-- Indeks untuk tabel `kpi_assessments`
+--
+ALTER TABLE `kpi_assessments`
+  ADD PRIMARY KEY (`id_kpi_assessment`),
+  ADD KEY `kpi_assessments_karyawan_id_foreign` (`karyawan_id`);
+
+--
+-- Indeks untuk tabel `kpi_items`
+--
+ALTER TABLE `kpi_items`
+  ADD PRIMARY KEY (`id_kpi_item`),
+  ADD KEY `kpi_items_kpi_assessment_id_foreign` (`kpi_assessment_id`);
+
+--
+-- Indeks untuk tabel `kpi_scores`
+--
+ALTER TABLE `kpi_scores`
+  ADD PRIMARY KEY (`id_kpi_score`),
+  ADD KEY `kpi_scores_kpi_item_id_foreign` (`kpi_item_id`);
+
+--
+-- Indeks untuk tabel `migrations`
+--
+ALTER TABLE `migrations`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indeks untuk tabel `onboarding_karyawan`
+--
+ALTER TABLE `onboarding_karyawan`
+  ADD PRIMARY KEY (`id_onboarding`),
+  ADD KEY `fk_onboarding_kandidat` (`kandidat_id`),
+  ADD KEY `fk_onboarding_posisi` (`posisi_id`);
+
+--
+-- Indeks untuk tabel `pekerjaan`
+--
+ALTER TABLE `pekerjaan`
+  ADD PRIMARY KEY (`id_pekerjaan`),
+  ADD KEY `id_karyawan` (`id_karyawan`);
+
+--
+-- Indeks untuk tabel `pemberkasan`
+--
+ALTER TABLE `pemberkasan`
+  ADD PRIMARY KEY (`id_pemberkasan`),
+  ADD KEY `kandidat_id` (`kandidat_id`),
+  ADD KEY `fk_pemberkasan_posisi` (`posisi_id`);
+
+--
+-- Indeks untuk tabel `pendidikan`
+--
+ALTER TABLE `pendidikan`
+  ADD PRIMARY KEY (`id_pendidikan`),
+  ADD KEY `id_karyawan` (`id_karyawan`);
+
+--
+-- Indeks untuk tabel `perusahaan`
+--
+ALTER TABLE `perusahaan`
+  ADD PRIMARY KEY (`id_perusahaan`),
+  ADD KEY `id_karyawan` (`id_karyawan`);
+
+--
+-- Indeks untuk tabel `posisi`
+--
+ALTER TABLE `posisi`
+  ADD PRIMARY KEY (`id_posisi`);
+
+--
+-- Indeks untuk tabel `proses_rekrutmen`
+--
+ALTER TABLE `proses_rekrutmen`
+  ADD PRIMARY KEY (`id_proses_rekrutmen`),
+  ADD KEY `kandidat_id` (`kandidat_id`);
+
+--
+-- Indeks untuk tabel `rekrutmen_daily`
+--
+ALTER TABLE `rekrutmen_daily`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `rekrutmen_daily_posisi_id_date_unique` (`posisi_id`,`date`),
+  ADD UNIQUE KEY `posisi_date_unique` (`posisi_id`,`date`);
+
+--
+-- Indeks untuk tabel `roles`
+--
+ALTER TABLE `roles`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `roles_name_unique` (`name`);
+
+--
+-- Indeks untuk tabel `role_user`
+--
+ALTER TABLE `role_user`
+  ADD PRIMARY KEY (`user_id`,`role_id`),
+  ADD KEY `role_user_role_id_foreign` (`role_id`);
+
+--
+-- Indeks untuk tabel `sessions`
+--
+ALTER TABLE `sessions`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `sessions_user_id_index` (`user_id`),
+  ADD KEY `sessions_last_activity_index` (`last_activity`);
+
+--
+-- Indeks untuk tabel `status_karyawan`
+--
+ALTER TABLE `status_karyawan`
+  ADD PRIMARY KEY (`id_status`),
+  ADD KEY `id_karyawan` (`id_karyawan`);
+
+--
+-- Indeks untuk tabel `tempa`
+--
+ALTER TABLE `tempa`
+  ADD PRIMARY KEY (`id_tempa`);
+
+--
+-- Indeks untuk tabel `tempa_absensi`
+--
+ALTER TABLE `tempa_absensi`
+  ADD PRIMARY KEY (`id_absensi`),
+  ADD UNIQUE KEY `unik_absensi` (`id_peserta`,`bulan`,`pertemuan_ke`);
+
+--
+-- Indeks untuk tabel `tempa_kelompok`
+--
+ALTER TABLE `tempa_kelompok`
+  ADD PRIMARY KEY (`id_kelompok`),
+  ADD KEY `id_tempa` (`id_tempa`),
+  ADD KEY `tempa_kelompok_mentor_id_foreign` (`mentor_id`);
+
+--
+-- Indeks untuk tabel `tempa_materi`
+--
+ALTER TABLE `tempa_materi`
+  ADD PRIMARY KEY (`id_materi`),
+  ADD KEY `id_tempa` (`id_tempa`);
+
+--
+-- Indeks untuk tabel `tempa_peserta`
+--
+ALTER TABLE `tempa_peserta`
+  ADD PRIMARY KEY (`id_peserta`),
+  ADD KEY `id_tempa` (`id_tempa`),
+  ADD KEY `id_kelompok` (`id_kelompok`),
+  ADD KEY `tempa_peserta_mentor_id_foreign` (`mentor_id`);
+
+--
+-- Indeks untuk tabel `training`
+--
+ALTER TABLE `training`
+  ADD PRIMARY KEY (`id_training`),
+  ADD KEY `fk_training_kandidat` (`kandidat_id`),
+  ADD KEY `fk_training_posisi` (`posisi_id`);
+
+--
+-- Indeks untuk tabel `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `users_email_unique` (`email`);
+
+--
+-- Indeks untuk tabel `wig_rekrutmen`
+--
+ALTER TABLE `wig_rekrutmen`
+  ADD PRIMARY KEY (`id_wig_rekrutmen`),
+  ADD KEY `posisi_id` (`posisi_id`);
+
+--
+-- AUTO_INCREMENT untuk tabel yang dibuang
+--
+
+--
+-- AUTO_INCREMENT untuk tabel `biaya_promote_ta`
+--
+ALTER TABLE `biaya_promote_ta`
+  MODIFY `id_biaya_promote_ta` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT untuk tabel `bpjs`
+--
+ALTER TABLE `bpjs`
+  MODIFY `id_bpjs` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT untuk tabel `data_keluarga`
+--
+ALTER TABLE `data_keluarga`
+  MODIFY `id_keluarga` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT untuk tabel `interview_hr`
+--
+ALTER TABLE `interview_hr`
+  MODIFY `id_interview_hr` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+
+--
+-- AUTO_INCREMENT untuk tabel `kandidat`
+--
+ALTER TABLE `kandidat`
+  MODIFY `id_kandidat` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+
+--
+-- AUTO_INCREMENT untuk tabel `kandidat_lanjut_user`
+--
+ALTER TABLE `kandidat_lanjut_user`
+  MODIFY `id_kandidat_lanjut_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
+-- AUTO_INCREMENT untuk tabel `karyawan`
+--
+ALTER TABLE `karyawan`
+  MODIFY `id_karyawan` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=903;
+
+--
+-- AUTO_INCREMENT untuk tabel `kbi_assessments`
+--
+ALTER TABLE `kbi_assessments`
+  MODIFY `id_kbi_assessment` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT untuk tabel `kbi_items`
+--
+ALTER TABLE `kbi_items`
+  MODIFY `id_kbi_item` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT untuk tabel `kbi_scores`
+--
+ALTER TABLE `kbi_scores`
+  MODIFY `id_kbi_score` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT untuk tabel `kontrak`
+--
+ALTER TABLE `kontrak`
+  MODIFY `id_kontrak` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT untuk tabel `kpi_assessments`
+--
+ALTER TABLE `kpi_assessments`
+  MODIFY `id_kpi_assessment` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT untuk tabel `kpi_items`
+--
+ALTER TABLE `kpi_items`
+  MODIFY `id_kpi_item` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+
+--
+-- AUTO_INCREMENT untuk tabel `kpi_scores`
+--
+ALTER TABLE `kpi_scores`
+  MODIFY `id_kpi_score` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+
+--
+-- AUTO_INCREMENT untuk tabel `migrations`
+--
+ALTER TABLE `migrations`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+
+--
+-- AUTO_INCREMENT untuk tabel `onboarding_karyawan`
+--
+ALTER TABLE `onboarding_karyawan`
+  MODIFY `id_onboarding` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
+-- AUTO_INCREMENT untuk tabel `pekerjaan`
+--
+ALTER TABLE `pekerjaan`
+  MODIFY `id_pekerjaan` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT untuk tabel `pemberkasan`
+--
+ALTER TABLE `pemberkasan`
+  MODIFY `id_pemberkasan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+
+--
+-- AUTO_INCREMENT untuk tabel `pendidikan`
+--
+ALTER TABLE `pendidikan`
+  MODIFY `id_pendidikan` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT untuk tabel `perusahaan`
+--
+ALTER TABLE `perusahaan`
+  MODIFY `id_perusahaan` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT untuk tabel `posisi`
+--
+ALTER TABLE `posisi`
+  MODIFY `id_posisi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+
+--
+-- AUTO_INCREMENT untuk tabel `proses_rekrutmen`
+--
+ALTER TABLE `proses_rekrutmen`
+  MODIFY `id_proses_rekrutmen` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT untuk tabel `rekrutmen_daily`
+--
+ALTER TABLE `rekrutmen_daily`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+
+--
+-- AUTO_INCREMENT untuk tabel `roles`
+--
+ALTER TABLE `roles`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT untuk tabel `status_karyawan`
+--
+ALTER TABLE `status_karyawan`
+  MODIFY `id_status` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT untuk tabel `tempa`
+--
+ALTER TABLE `tempa`
+  MODIFY `id_tempa` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT untuk tabel `tempa_absensi`
+--
+ALTER TABLE `tempa_absensi`
+  MODIFY `id_absensi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=165;
+
+--
+-- AUTO_INCREMENT untuk tabel `tempa_kelompok`
+--
+ALTER TABLE `tempa_kelompok`
+  MODIFY `id_kelompok` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT untuk tabel `tempa_materi`
+--
+ALTER TABLE `tempa_materi`
+  MODIFY `id_materi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT untuk tabel `tempa_peserta`
+--
+ALTER TABLE `tempa_peserta`
+  MODIFY `id_peserta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+
+--
+-- AUTO_INCREMENT untuk tabel `training`
+--
+ALTER TABLE `training`
+  MODIFY `id_training` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT untuk tabel `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+
+--
+-- AUTO_INCREMENT untuk tabel `wig_rekrutmen`
+--
+ALTER TABLE `wig_rekrutmen`
+  MODIFY `id_wig_rekrutmen` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- Ketidakleluasaan untuk tabel pelimpahan (Dumped Tables)
+--
+
+--
+-- Ketidakleluasaan untuk tabel `bpjs`
+--
+ALTER TABLE `bpjs`
+  ADD CONSTRAINT `bpjs_ibfk_1` FOREIGN KEY (`id_karyawan`) REFERENCES `karyawan` (`id_karyawan`);
+
+--
+-- Ketidakleluasaan untuk tabel `data_keluarga`
+--
+ALTER TABLE `data_keluarga`
+  ADD CONSTRAINT `data_keluarga_ibfk_1` FOREIGN KEY (`id_karyawan`) REFERENCES `karyawan` (`id_karyawan`);
+
+--
+-- Ketidakleluasaan untuk tabel `interview_hr`
+--
+ALTER TABLE `interview_hr`
+  ADD CONSTRAINT `fk_interview_hr_kandidat` FOREIGN KEY (`kandidat_id`) REFERENCES `kandidat` (`id_kandidat`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_interview_hr_posisi` FOREIGN KEY (`posisi_id`) REFERENCES `posisi` (`id_posisi`) ON DELETE SET NULL,
+  ADD CONSTRAINT `interview_hr_ibfk_1` FOREIGN KEY (`kandidat_id`) REFERENCES `kandidat` (`id_kandidat`) ON DELETE CASCADE;
+
+--
+-- Ketidakleluasaan untuk tabel `kandidat`
+--
+ALTER TABLE `kandidat`
+  ADD CONSTRAINT `kandidat_ibfk_1` FOREIGN KEY (`posisi_id`) REFERENCES `posisi` (`id_posisi`);
+
+--
+-- Ketidakleluasaan untuk tabel `kandidat_lanjut_user`
+--
+ALTER TABLE `kandidat_lanjut_user`
+  ADD CONSTRAINT `fk_lanjut_user_posisi` FOREIGN KEY (`posisi_id`) REFERENCES `posisi` (`id_posisi`) ON DELETE SET NULL,
+  ADD CONSTRAINT `kandidat_lanjut_user_ibfk_1` FOREIGN KEY (`kandidat_id`) REFERENCES `kandidat` (`id_kandidat`);
+
+--
+-- Ketidakleluasaan untuk tabel `kbi_scores`
+--
+ALTER TABLE `kbi_scores`
+  ADD CONSTRAINT `kbi_scores_kbi_assessment_id_foreign` FOREIGN KEY (`kbi_assessment_id`) REFERENCES `kbi_assessments` (`id_kbi_assessment`) ON DELETE CASCADE,
+  ADD CONSTRAINT `kbi_scores_kbi_item_id_foreign` FOREIGN KEY (`kbi_item_id`) REFERENCES `kbi_items` (`id_kbi_item`);
+
+--
+-- Ketidakleluasaan untuk tabel `kontrak`
+--
+ALTER TABLE `kontrak`
+  ADD CONSTRAINT `kontrak_ibfk_1` FOREIGN KEY (`id_karyawan`) REFERENCES `karyawan` (`id_karyawan`);
+
+--
+-- Ketidakleluasaan untuk tabel `kpi_assessments`
+--
+ALTER TABLE `kpi_assessments`
+  ADD CONSTRAINT `kpi_assessments_karyawan_id_foreign` FOREIGN KEY (`karyawan_id`) REFERENCES `karyawan` (`id_karyawan`) ON DELETE CASCADE;
+
+--
+-- Ketidakleluasaan untuk tabel `kpi_items`
+--
+ALTER TABLE `kpi_items`
+  ADD CONSTRAINT `kpi_items_kpi_assessment_id_foreign` FOREIGN KEY (`kpi_assessment_id`) REFERENCES `kpi_assessments` (`id_kpi_assessment`) ON DELETE CASCADE;
+
+--
+-- Ketidakleluasaan untuk tabel `kpi_scores`
+--
+ALTER TABLE `kpi_scores`
+  ADD CONSTRAINT `kpi_scores_kpi_item_id_foreign` FOREIGN KEY (`kpi_item_id`) REFERENCES `kpi_items` (`id_kpi_item`) ON DELETE CASCADE;
+
+--
+-- Ketidakleluasaan untuk tabel `onboarding_karyawan`
+--
+ALTER TABLE `onboarding_karyawan`
+  ADD CONSTRAINT `fk_onboarding_kandidat` FOREIGN KEY (`kandidat_id`) REFERENCES `kandidat` (`id_kandidat`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_onboarding_posisi` FOREIGN KEY (`posisi_id`) REFERENCES `posisi` (`id_posisi`) ON UPDATE CASCADE;
+
+--
+-- Ketidakleluasaan untuk tabel `pekerjaan`
+--
+ALTER TABLE `pekerjaan`
+  ADD CONSTRAINT `pekerjaan_ibfk_1` FOREIGN KEY (`id_karyawan`) REFERENCES `karyawan` (`id_karyawan`);
+
+--
+-- Ketidakleluasaan untuk tabel `pemberkasan`
+--
+ALTER TABLE `pemberkasan`
+  ADD CONSTRAINT `fk_pemberkasan_posisi` FOREIGN KEY (`posisi_id`) REFERENCES `posisi` (`id_posisi`) ON DELETE SET NULL,
+  ADD CONSTRAINT `pemberkasan_ibfk_1` FOREIGN KEY (`kandidat_id`) REFERENCES `kandidat` (`id_kandidat`);
+
+--
+-- Ketidakleluasaan untuk tabel `pendidikan`
+--
+ALTER TABLE `pendidikan`
+  ADD CONSTRAINT `pendidikan_ibfk_1` FOREIGN KEY (`id_karyawan`) REFERENCES `karyawan` (`id_karyawan`);
+
+--
+-- Ketidakleluasaan untuk tabel `perusahaan`
+--
+ALTER TABLE `perusahaan`
+  ADD CONSTRAINT `perusahaan_ibfk_1` FOREIGN KEY (`id_karyawan`) REFERENCES `karyawan` (`id_karyawan`);
+
+--
+-- Ketidakleluasaan untuk tabel `proses_rekrutmen`
+--
+ALTER TABLE `proses_rekrutmen`
+  ADD CONSTRAINT `proses_rekrutmen_ibfk_1` FOREIGN KEY (`kandidat_id`) REFERENCES `kandidat` (`id_kandidat`);
+
+--
+-- Ketidakleluasaan untuk tabel `rekrutmen_daily`
+--
+ALTER TABLE `rekrutmen_daily`
+  ADD CONSTRAINT `rekrutmen_daily_posisi_id_foreign` FOREIGN KEY (`posisi_id`) REFERENCES `posisi` (`id_posisi`) ON DELETE CASCADE;
+
+--
+-- Ketidakleluasaan untuk tabel `role_user`
+--
+ALTER TABLE `role_user`
+  ADD CONSTRAINT `role_user_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `role_user_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Ketidakleluasaan untuk tabel `status_karyawan`
+--
+ALTER TABLE `status_karyawan`
+  ADD CONSTRAINT `status_karyawan_ibfk_1` FOREIGN KEY (`id_karyawan`) REFERENCES `karyawan` (`id_karyawan`);
+
+--
+-- Ketidakleluasaan untuk tabel `tempa_absensi`
+--
+ALTER TABLE `tempa_absensi`
+  ADD CONSTRAINT `tempa_absensi_ibfk_1` FOREIGN KEY (`id_peserta`) REFERENCES `tempa_peserta` (`id_peserta`) ON DELETE CASCADE;
+
+--
+-- Ketidakleluasaan untuk tabel `tempa_kelompok`
+--
+ALTER TABLE `tempa_kelompok`
+  ADD CONSTRAINT `tempa_kelompok_ibfk_1` FOREIGN KEY (`id_tempa`) REFERENCES `tempa` (`id_tempa`) ON DELETE CASCADE,
+  ADD CONSTRAINT `tempa_kelompok_mentor_id_foreign` FOREIGN KEY (`mentor_id`) REFERENCES `users` (`id`);
+
+--
+-- Ketidakleluasaan untuk tabel `tempa_materi`
+--
+ALTER TABLE `tempa_materi`
+  ADD CONSTRAINT `tempa_materi_ibfk_1` FOREIGN KEY (`id_tempa`) REFERENCES `tempa` (`id_tempa`) ON DELETE CASCADE;
+
+--
+-- Ketidakleluasaan untuk tabel `tempa_peserta`
+--
+ALTER TABLE `tempa_peserta`
+  ADD CONSTRAINT `tempa_peserta_ibfk_1` FOREIGN KEY (`id_tempa`) REFERENCES `tempa` (`id_tempa`) ON DELETE CASCADE,
+  ADD CONSTRAINT `tempa_peserta_ibfk_2` FOREIGN KEY (`id_kelompok`) REFERENCES `tempa_kelompok` (`id_kelompok`) ON DELETE CASCADE,
+  ADD CONSTRAINT `tempa_peserta_mentor_id_foreign` FOREIGN KEY (`mentor_id`) REFERENCES `users` (`id`);
+
+--
+-- Ketidakleluasaan untuk tabel `training`
+--
+ALTER TABLE `training`
+  ADD CONSTRAINT `fk_training_kandidat` FOREIGN KEY (`kandidat_id`) REFERENCES `kandidat` (`id_kandidat`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_training_posisi` FOREIGN KEY (`posisi_id`) REFERENCES `posisi` (`id_posisi`) ON DELETE CASCADE;
+
+--
+-- Ketidakleluasaan untuk tabel `wig_rekrutmen`
+--
+ALTER TABLE `wig_rekrutmen`
+  ADD CONSTRAINT `wig_rekrutmen_ibfk_1` FOREIGN KEY (`posisi_id`) REFERENCES `posisi` (`id_posisi`);
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

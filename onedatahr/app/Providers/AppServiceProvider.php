@@ -10,7 +10,7 @@ use App\Models\Posisi;
 use App\Models\InterviewHr;
 use App\Observers\KandidatObserver;
 use App\Observers\PosisiObserver;
-use App\Policies\TempaPolicy;
+use App\Policies\TempaPesertaPolicy;
 use Illuminate\Support\Facades\Gate;
 
 class AppServiceProvider extends ServiceProvider
@@ -39,10 +39,20 @@ class AppServiceProvider extends ServiceProvider
         Paginator::useTailwind();
 
         // Register Gates for TEMPA
-        Gate::define('viewTempaPeserta', [TempaPolicy::class, 'viewTempaPeserta']);
-        Gate::define('createTempaPeserta', [TempaPolicy::class, 'createTempaPeserta']);
-        Gate::define('editTempaPeserta', [TempaPolicy::class, 'editTempaPeserta']);
-        Gate::define('deleteTempaPeserta', [TempaPolicy::class, 'deleteTempaPeserta']);
+        Gate::define('viewTempaPeserta', function($user) {
+            return $user->hasRole(['admin', 'superadmin', 'ketua_tempa']);
+        });
+        Gate::define('createTempaPeserta', function($user) {
+            return $user->hasRole(['admin', 'superadmin', 'ketua_tempa']);
+        });
+        Gate::define('editTempaPeserta', function($user) {
+            return $user->hasRole(['admin', 'superadmin', 'ketua_tempa']);
+        });
+        Gate::define('deleteTempaPeserta', function($user) {
+            return $user->hasRole(['admin', 'superadmin', 'ketua_tempa']);
+        });
+
+        Gate::policy(\App\Models\TempaPeserta::class, TempaPesertaPolicy::class);
 
         Gate::define('viewTempaAbsensi', [TempaPolicy::class, 'viewTempaAbsensi']);
         Gate::define('createTempaAbsensi', [TempaPolicy::class, 'createTempaAbsensi']);

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TempaKelompok extends Model
 {
@@ -16,7 +17,8 @@ class TempaKelompok extends Model
     protected $fillable = [
         'id_tempa',
         'nama_kelompok',
-        'nama_mentor'
+        'nama_mentor',
+        'ketua_tempa_id'
     ];
 
     /* =====================
@@ -28,13 +30,19 @@ class TempaKelompok extends Model
         return $this->belongsTo(Tempa::class, 'id_tempa');
     }
 
-    // public function peserta()
-    // {
-    //     return $this->hasMany(TempaPeserta::class, 'id_kelompok');
-    // }
+    /**
+     * Ketua TEMPA yang mengelola kelompok ini
+     */
+    public function ketuaTempa(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'ketua_tempa_id');
+    }
+
+    /**
+     * Peserta dalam kelompok ini
+     */
     public function pesertas(): HasMany
     {
-        // Adjust 'id_kelompok' to match your actual foreign key in the tempa_peserta table
-        return $this->hasMany(TempaPeserta::class, 'id_kelompok', 'id');
+        return $this->hasMany(TempaPeserta::class, 'id_kelompok', 'id_kelompok');
     }
 }
