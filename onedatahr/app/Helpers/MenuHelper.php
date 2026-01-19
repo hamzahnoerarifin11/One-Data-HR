@@ -78,6 +78,9 @@ class MenuHelper
         // =============================================================
         $tempaSubItems = [];
         if ($user->hasRole(['ketua_tempa', 'admin', 'superadmin'])) {
+            $tempaSubItems[] = ['name' => 'Kelompok TEMPA', 'path' => '/tempa/kelompok'];
+        }
+        if ($user->hasRole(['ketua_tempa', 'admin', 'superadmin'])) {
             $tempaSubItems[] = ['name' => 'Peserta TEMPA', 'path' => '/tempa/peserta'];
         }
         if ($user->hasRole(['ketua_tempa', 'admin', 'superadmin'])) {

@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\TempaPeserta;
 use App\Models\TempaKelompok;
 use App\Models\Tempa;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TempaPesertaController extends Controller
 {
@@ -18,8 +20,13 @@ class TempaPesertaController extends Controller
     {
         $this->authorize('viewTempaPeserta');
 
-        $user = auth()->user();
-        $isKetuaTempa = $user->hasRole('ketua_tempa') && !$user->hasRole(['admin', 'superadmin']);
+        $user = Auth::user();
+        if ($user instanceof User) {
+            $user->loadMissing('roles');
+            $isKetuaTempa = $user->hasRole('ketua_tempa') && !$user->hasRole(['admin', 'superadmin']);
+        } else {
+            $isKetuaTempa = false;
+        }
 
         if ($isKetuaTempa) {
             // Ketua TEMPA hanya melihat peserta dari kelompoknya saja
@@ -35,14 +42,39 @@ class TempaPesertaController extends Controller
         return view('pages.tempa.peserta.index', compact('pesertas'));
     }
 
+    public function show($peserta)
+    {
+        $this->authorize('viewTempaPeserta');
 
+        $user = Auth::user();
+        if ($user instanceof User) {
+            $user->loadMissing('roles');
+            $isKetuaTempa = $user->hasRole('ketua_tempa') && !$user->hasRole(['admin', 'superadmin']);
+        } else {
+            $isKetuaTempa = false;
+        }
+
+        $pesertaModel = TempaPeserta::with(['kelompok.ketuaTempa', 'tempa'])->findOrFail($peserta);
+
+        // Cek akses ketua_tempa
+        if ($isKetuaTempa && $pesertaModel->kelompok->ketua_tempa_id != $user->id) {
+            abort(403, 'Unauthorized');
+        }
+
+        return view('pages.tempa.peserta.show', compact('pesertaModel'));
+    }
 
     public function create()
     {
         $this->authorize('createTempaPeserta');
 
-        $user = auth()->user();
-        $isKetuaTempa = $user->hasRole('ketua_tempa') && !$user->hasRole(['admin', 'superadmin']);
+        $user = Auth::user();
+        if ($user instanceof User) {
+            $user->loadMissing('roles');
+            $isKetuaTempa = $user->hasRole('ketua_tempa') && !$user->hasRole(['admin', 'superadmin']);
+        } else {
+            $isKetuaTempa = false;
+        }
 
         if ($isKetuaTempa) {
             // Ketua TEMPA hanya bisa membuat peserta untuk kelompoknya
@@ -57,36 +89,33 @@ class TempaPesertaController extends Controller
 
     public function store(\App\Http\Requests\TempaPesertaRequest $request)
     {
-        $user = auth()->user();
-        $isKetuaTempa = $user->hasRole('ketua_tempa') && !$user->hasRole(['admin', 'superadmin']);
+        $user = Auth::user();
+        if ($user instanceof User) {
+            $user->loadMissing('roles');
+            $isKetuaTempa = $user->hasRole('ketua_tempa') && !$user->hasRole(['admin', 'superadmin']);
+        } else {
+            $isKetuaTempa = false;
+        }
 
         $validated = $request->validated();
 
         if ($isKetuaTempa) {
-            // Ketua TEMPA buat kelompok baru atau gunakan yang ada
-            $activeTempa = Tempa::latest()->first();
-            if (!$activeTempa) {
-                return back()->withErrors(['tempa' => 'Tidak ada TEMPA aktif'])->withInput();
+            // Ketua TEMPA gunakan kelompok yang dipilih
+            $kelompok = TempaKelompok::where('id_kelompok', $validated['kelompok_id'])
+                ->where('ketua_tempa_id', $user->id)
+                ->first();
+
+            if (!$kelompok) {
+                return back()->withErrors(['kelompok_id' => 'Kelompok tidak ditemukan atau tidak milik Anda'])->withInput();
             }
 
-            // Buat atau cari kelompok dengan kombinasi unik: nama_kelompok + ketua_tempa_id
-            $kelompok = TempaKelompok::firstOrCreate(
-                [
-                    'nama_kelompok' => $validated['nama_kelompok'],
-                    'ketua_tempa_id' => $user->id,
-                    'id_tempa' => $activeTempa->id_tempa
-                ],
-                [
-                    'nama_mentor' => $validated['nama_mentor']
-                ]
-            );
-
             $validated['id_kelompok'] = $kelompok->id_kelompok;
-            $validated['id_tempa'] = $activeTempa->id_tempa;
-            unset($validated['nama_kelompok'], $validated['nama_mentor']);
+            $validated['id_tempa'] = $kelompok->id_tempa;
+            unset($validated['kelompok_id']);
         } else {
             // Admin/Superadmin gunakan kelompok yang dipilih
-            unset($validated['nama_mentor']);
+            $validated['id_kelompok'] = $validated['kelompok_id'];
+            unset($validated['nama_mentor'], $validated['kelompok_id']);
         }
 
         TempaPeserta::create($validated);
@@ -102,9 +131,14 @@ class TempaPesertaController extends Controller
     {
         $this->authorize('editTempaPeserta');
 
-        $user = auth()->user();
+        $user = Auth::user();
+        if ($user instanceof User) {
+            $user->loadMissing('roles');
+            $isKetuaTempa = $user->hasRole('ketua_tempa') && !$user->hasRole(['admin', 'superadmin']);
+        } else {
+            $isKetuaTempa = false;
+        }
         $peserta = TempaPeserta::findOrFail($peserta);
-        $isKetuaTempa = $user->hasRole('ketua_tempa') && !$user->hasRole(['admin', 'superadmin']);
 
         // Cek akses ketua_tempa
         if ($isKetuaTempa && $peserta->kelompok->ketua_tempa_id != $user->id) {
@@ -124,9 +158,13 @@ class TempaPesertaController extends Controller
 
     public function update(\App\Http\Requests\TempaPesertaRequest $request, $peserta)
     {
-        $user = auth()->user();
-        $isKetuaTempa = $user->hasRole('ketua_tempa') && !$user->hasRole(['admin', 'superadmin']);
-
+        $user = Auth::user();
+        if ($user instanceof User) {
+            $user->loadMissing('roles');
+            $isKetuaTempa = $user->hasRole('ketua_tempa') && !$user->hasRole(['admin', 'superadmin']);
+        } else {
+            $isKetuaTempa = false;
+        }
         $pesertaModel = TempaPeserta::findOrFail($peserta);
 
         // Cek akses ketua_tempa
@@ -137,29 +175,22 @@ class TempaPesertaController extends Controller
         $validated = $request->validated();
 
         if ($isKetuaTempa) {
-            // Ketua TEMPA buat atau gunakan kelompok
-            $activeTempa = Tempa::latest()->first();
-            if (!$activeTempa) {
-                return back()->withErrors(['tempa' => 'Tidak ada TEMPA aktif'])->withInput();
+            // Ketua TEMPA gunakan kelompok yang dipilih
+            $kelompok = TempaKelompok::where('id_kelompok', $validated['kelompok_id'])
+                ->where('ketua_tempa_id', $user->id)
+                ->first();
+
+            if (!$kelompok) {
+                return back()->withErrors(['kelompok_id' => 'Kelompok tidak ditemukan atau tidak milik Anda'])->withInput();
             }
 
-            $kelompok = TempaKelompok::firstOrCreate(
-                [
-                    'nama_kelompok' => $validated['nama_kelompok'],
-                    'ketua_tempa_id' => $user->id,
-                    'id_tempa' => $activeTempa->id_tempa
-                ],
-                [
-                    'nama_mentor' => $validated['nama_mentor']
-                ]
-            );
-
             $validated['id_kelompok'] = $kelompok->id_kelompok;
-            $validated['id_tempa'] = $activeTempa->id_tempa;
-            unset($validated['nama_kelompok'], $validated['nama_mentor']);
+            $validated['id_tempa'] = $kelompok->id_tempa;
+            unset($validated['kelompok_id']);
         } else {
             // Admin/Superadmin gunakan kelompok yang dipilih
-            unset($validated['nama_mentor']);
+            $validated['id_kelompok'] = $validated['kelompok_id'];
+            unset($validated['nama_mentor'], $validated['kelompok_id']);
         }
 
         $pesertaModel->update($validated);
@@ -173,11 +204,16 @@ class TempaPesertaController extends Controller
     {
         $this->authorize('deleteTempaPeserta');
 
-        $user = auth()->user();
+        $user = Auth::user();
+        if ($user instanceof User) {
+            $user->loadMissing('roles');
+            $isKetuaTempa = $user->hasRole('ketua_tempa') && !$user->hasRole(['admin', 'superadmin']);
+        } else {
+            $isKetuaTempa = false;
+        }
         $pesertaModel = TempaPeserta::findOrFail($peserta);
 
         // Cek akses ketua_tempa
-        $isKetuaTempa = $user->hasRole('ketua_tempa') && !$user->hasRole(['admin', 'superadmin']);
         if ($isKetuaTempa && $pesertaModel->kelompok->ketua_tempa_id != $user->id) {
             abort(403, 'Unauthorized');
         }

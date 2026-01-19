@@ -18,7 +18,9 @@ class TempaKelompok extends Model
         'id_tempa',
         'nama_kelompok',
         'nama_mentor',
-        'ketua_tempa_id'
+        'ketua_tempa_id',
+        'tempat',
+        'keterangan_cabang'
     ];
 
     /* =====================

@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\TempaAbsensi;
 
 class TempaAbsensiSeeder extends Seeder
 {
@@ -12,135 +13,128 @@ class TempaAbsensiSeeder extends Seeder
      */
     public function run(): void
     {
-        $tahun = 2026;
+        $tahun = 2024;
 
-        // Data absensi berdasarkan pola Excel
+        // Data absensi berdasarkan pola Excel untuk beberapa peserta
         $absensiData = [
-            // Nashrul Ihsan (ID: 1) - 51 kehadiran
-            ['id_peserta' => 1, 'bulan' => 1, 'tahun' => $tahun, 'pertemuan_ke' => 1, 'status_hadir' => 1, 'tanggal' => '2026-01-05'],
-            ['id_peserta' => 1, 'bulan' => 1, 'tahun' => $tahun, 'pertemuan_ke' => 2, 'status_hadir' => 1, 'tanggal' => '2026-01-12'],
-            ['id_peserta' => 1, 'bulan' => 1, 'tahun' => $tahun, 'pertemuan_ke' => 3, 'status_hadir' => 1, 'tanggal' => '2026-01-19'],
-            ['id_peserta' => 1, 'bulan' => 1, 'tahun' => $tahun, 'pertemuan_ke' => 4, 'status_hadir' => 1, 'tanggal' => '2026-01-26'],
-            ['id_peserta' => 1, 'bulan' => 1, 'tahun' => $tahun, 'pertemuan_ke' => 5, 'status_hadir' => 1, 'tanggal' => '2026-01-30'],
+            // John Doe (ID: 1) - 51 kehadiran (85%)
+            [
+                'id_peserta' => 1,
+                'tahun_absensi' => $tahun,
+                'absensi_data' => [
+                    'jan' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'feb' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'mar' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'apr' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'mei' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'jun' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'jul' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'agu' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'sep' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'okt' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'nov' => ['hadir', 'hadir', 'hadir', null, null],
+                    'des' => ['hadir', 'hadir', 'hadir', null, null],
+                ],
+                'total_hadir' => 51,
+                'total_pertemuan' => 60,
+                'persentase' => 85.0,
+            ],
 
-            // Februari - lengkap
-            ['id_peserta' => 1, 'bulan' => 2, 'tahun' => $tahun, 'pertemuan_ke' => 1, 'status_hadir' => 1, 'tanggal' => '2026-02-05'],
-            ['id_peserta' => 1, 'bulan' => 2, 'tahun' => $tahun, 'pertemuan_ke' => 2, 'status_hadir' => 1, 'tanggal' => '2026-02-12'],
-            ['id_peserta' => 1, 'bulan' => 2, 'tahun' => $tahun, 'pertemuan_ke' => 3, 'status_hadir' => 1, 'tanggal' => '2026-02-19'],
-            ['id_peserta' => 1, 'bulan' => 2, 'tahun' => $tahun, 'pertemuan_ke' => 4, 'status_hadir' => 1, 'tanggal' => '2026-02-26'],
-            ['id_peserta' => 1, 'bulan' => 2, 'tahun' => $tahun, 'pertemuan_ke' => 5, 'status_hadir' => 1, 'tanggal' => '2026-02-28'],
+            // Jane Smith (ID: 2) - 45 kehadiran (75%)
+            [
+                'id_peserta' => 2,
+                'tahun_absensi' => $tahun,
+                'absensi_data' => [
+                    'jan' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'feb' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'mar' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'apr' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'mei' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'jun' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'jul' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'agu' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'sep' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'okt' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'nov' => ['hadir', 'hadir', null, null, null],
+                    'des' => ['hadir', 'hadir', null, null, null],
+                ],
+                'total_hadir' => 45,
+                'total_pertemuan' => 60,
+                'persentase' => 75.0,
+            ],
 
-            // Maret - lengkap
-            ['id_peserta' => 1, 'bulan' => 3, 'tahun' => $tahun, 'pertemuan_ke' => 1, 'status_hadir' => 1, 'tanggal' => '2026-03-05'],
-            ['id_peserta' => 1, 'bulan' => 3, 'tahun' => $tahun, 'pertemuan_ke' => 2, 'status_hadir' => 1, 'tanggal' => '2026-03-12'],
-            ['id_peserta' => 1, 'bulan' => 3, 'tahun' => $tahun, 'pertemuan_ke' => 3, 'status_hadir' => 1, 'tanggal' => '2026-03-19'],
-            ['id_peserta' => 1, 'bulan' => 3, 'tahun' => $tahun, 'pertemuan_ke' => 4, 'status_hadir' => 1, 'tanggal' => '2026-03-26'],
-            ['id_peserta' => 1, 'bulan' => 3, 'tahun' => $tahun, 'pertemuan_ke' => 5, 'status_hadir' => 1, 'tanggal' => '2026-03-31'],
+            // Bob Johnson (ID: 3) - 60 kehadiran (100%)
+            [
+                'id_peserta' => 3,
+                'tahun_absensi' => $tahun,
+                'absensi_data' => [
+                    'jan' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'feb' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'mar' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'apr' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'mei' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'jun' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'jul' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'agu' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'sep' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'okt' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'nov' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                    'des' => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+                ],
+                'total_hadir' => 60,
+                'total_pertemuan' => 60,
+                'persentase' => 100.0,
+            ],
 
-            // April - lengkap
-            ['id_peserta' => 1, 'bulan' => 4, 'tahun' => $tahun, 'pertemuan_ke' => 1, 'status_hadir' => 1, 'tanggal' => '2026-04-05'],
-            ['id_peserta' => 1, 'bulan' => 4, 'tahun' => $tahun, 'pertemuan_ke' => 2, 'status_hadir' => 1, 'tanggal' => '2026-04-12'],
-            ['id_peserta' => 1, 'bulan' => 4, 'tahun' => $tahun, 'pertemuan_ke' => 3, 'status_hadir' => 1, 'tanggal' => '2026-04-19'],
-            ['id_peserta' => 1, 'bulan' => 4, 'tahun' => $tahun, 'pertemuan_ke' => 4, 'status_hadir' => 1, 'tanggal' => '2026-04-26'],
-            ['id_peserta' => 1, 'bulan' => 4, 'tahun' => $tahun, 'pertemuan_ke' => 5, 'status_hadir' => 1, 'tanggal' => '2026-04-30'],
+            // Nashrul Ihsan (ID: 5) - 30 kehadiran (50%)
+            [
+                'id_peserta' => 5,
+                'tahun_absensi' => $tahun,
+                'absensi_data' => [
+                    'jan' => ['hadir', 'tidak_hadir', 'hadir', 'tidak_hadir', 'hadir'],
+                    'feb' => ['hadir', 'tidak_hadir', 'hadir', 'tidak_hadir', 'hadir'],
+                    'mar' => ['hadir', 'tidak_hadir', 'hadir', 'tidak_hadir', 'hadir'],
+                    'apr' => ['hadir', 'tidak_hadir', 'hadir', 'tidak_hadir', 'hadir'],
+                    'mei' => ['hadir', 'tidak_hadir', 'hadir', 'tidak_hadir', 'hadir'],
+                    'jun' => ['hadir', 'tidak_hadir', 'hadir', 'tidak_hadir', 'hadir'],
+                    'jul' => ['tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir'],
+                    'agu' => ['tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir'],
+                    'sep' => ['tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir'],
+                    'okt' => ['tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir'],
+                    'nov' => ['tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir'],
+                    'des' => ['tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir'],
+                ],
+                'total_hadir' => 30,
+                'total_pertemuan' => 60,
+                'persentase' => 50.0,
+            ],
 
-            // Mei - lengkap
-            ['id_peserta' => 1, 'bulan' => 5, 'tahun' => $tahun, 'pertemuan_ke' => 1, 'status_hadir' => 1, 'tanggal' => '2026-05-05'],
-            ['id_peserta' => 1, 'bulan' => 5, 'tahun' => $tahun, 'pertemuan_ke' => 2, 'status_hadir' => 1, 'tanggal' => '2026-05-12'],
-            ['id_peserta' => 1, 'bulan' => 5, 'tahun' => $tahun, 'pertemuan_ke' => 3, 'status_hadir' => 1, 'tanggal' => '2026-05-19'],
-            ['id_peserta' => 1, 'bulan' => 5, 'tahun' => $tahun, 'pertemuan_ke' => 4, 'status_hadir' => 1, 'tanggal' => '2026-05-26'],
-            ['id_peserta' => 1, 'bulan' => 5, 'tahun' => $tahun, 'pertemuan_ke' => 5, 'status_hadir' => 1, 'tanggal' => '2026-05-31'],
-
-            // Juni - lengkap
-            ['id_peserta' => 1, 'bulan' => 6, 'tahun' => $tahun, 'pertemuan_ke' => 1, 'status_hadir' => 1, 'tanggal' => '2026-06-05'],
-            ['id_peserta' => 1, 'bulan' => 6, 'tahun' => $tahun, 'pertemuan_ke' => 2, 'status_hadir' => 1, 'tanggal' => '2026-06-12'],
-            ['id_peserta' => 1, 'bulan' => 6, 'tahun' => $tahun, 'pertemuan_ke' => 3, 'status_hadir' => 1, 'tanggal' => '2026-06-19'],
-            ['id_peserta' => 1, 'bulan' => 6, 'tahun' => $tahun, 'pertemuan_ke' => 4, 'status_hadir' => 1, 'tanggal' => '2026-06-26'],
-            ['id_peserta' => 1, 'bulan' => 6, 'tahun' => $tahun, 'pertemuan_ke' => 5, 'status_hadir' => 1, 'tanggal' => '2026-06-30'],
-
-            // Juli - lengkap
-            ['id_peserta' => 1, 'bulan' => 7, 'tahun' => $tahun, 'pertemuan_ke' => 1, 'status_hadir' => 1, 'tanggal' => '2026-07-05'],
-            ['id_peserta' => 1, 'bulan' => 7, 'tahun' => $tahun, 'pertemuan_ke' => 2, 'status_hadir' => 1, 'tanggal' => '2026-07-12'],
-            ['id_peserta' => 1, 'bulan' => 7, 'tahun' => $tahun, 'pertemuan_ke' => 3, 'status_hadir' => 1, 'tanggal' => '2026-07-19'],
-            ['id_peserta' => 1, 'bulan' => 7, 'tahun' => $tahun, 'pertemuan_ke' => 4, 'status_hadir' => 1, 'tanggal' => '2026-07-26'],
-            ['id_peserta' => 1, 'bulan' => 7, 'tahun' => $tahun, 'pertemuan_ke' => 5, 'status_hadir' => 1, 'tanggal' => '2026-07-31'],
-
-            // Agustus - lengkap
-            ['id_peserta' => 1, 'bulan' => 8, 'tahun' => $tahun, 'pertemuan_ke' => 1, 'status_hadir' => 1, 'tanggal' => '2026-08-05'],
-            ['id_peserta' => 1, 'bulan' => 8, 'tahun' => $tahun, 'pertemuan_ke' => 2, 'status_hadir' => 1, 'tanggal' => '2026-08-12'],
-            ['id_peserta' => 1, 'bulan' => 8, 'tahun' => $tahun, 'pertemuan_ke' => 3, 'status_hadir' => 1, 'tanggal' => '2026-08-19'],
-            ['id_peserta' => 1, 'bulan' => 8, 'tahun' => $tahun, 'pertemuan_ke' => 4, 'status_hadir' => 1, 'tanggal' => '2026-08-26'],
-            ['id_peserta' => 1, 'bulan' => 8, 'tahun' => $tahun, 'pertemuan_ke' => 5, 'status_hadir' => 1, 'tanggal' => '2026-08-31'],
-
-            // September - lengkap
-            ['id_peserta' => 1, 'bulan' => 9, 'tahun' => $tahun, 'pertemuan_ke' => 1, 'status_hadir' => 1, 'tanggal' => '2026-09-05'],
-            ['id_peserta' => 1, 'bulan' => 9, 'tahun' => $tahun, 'pertemuan_ke' => 2, 'status_hadir' => 1, 'tanggal' => '2026-09-12'],
-            ['id_peserta' => 1, 'bulan' => 9, 'tahun' => $tahun, 'pertemuan_ke' => 3, 'status_hadir' => 1, 'tanggal' => '2026-09-19'],
-            ['id_peserta' => 1, 'bulan' => 9, 'tahun' => $tahun, 'pertemuan_ke' => 4, 'status_hadir' => 1, 'tanggal' => '2026-09-26'],
-            ['id_peserta' => 1, 'bulan' => 9, 'tahun' => $tahun, 'pertemuan_ke' => 5, 'status_hadir' => 1, 'tanggal' => '2026-09-30'],
-
-            // Oktober - lengkap
-            ['id_peserta' => 1, 'bulan' => 10, 'tahun' => $tahun, 'pertemuan_ke' => 1, 'status_hadir' => 1, 'tanggal' => '2026-10-05'],
-            ['id_peserta' => 1, 'bulan' => 10, 'tahun' => $tahun, 'pertemuan_ke' => 2, 'status_hadir' => 1, 'tanggal' => '2026-10-12'],
-            ['id_peserta' => 1, 'bulan' => 10, 'tahun' => $tahun, 'pertemuan_ke' => 3, 'status_hadir' => 1, 'tanggal' => '2026-10-19'],
-            ['id_peserta' => 1, 'bulan' => 10, 'tahun' => $tahun, 'pertemuan_ke' => 4, 'status_hadir' => 1, 'tanggal' => '2026-10-26'],
-            ['id_peserta' => 1, 'bulan' => 10, 'tahun' => $tahun, 'pertemuan_ke' => 5, 'status_hadir' => 1, 'tanggal' => '2026-10-31'],
-
-            // November - lengkap
-            ['id_peserta' => 1, 'bulan' => 11, 'tahun' => $tahun, 'pertemuan_ke' => 1, 'status_hadir' => 1, 'tanggal' => '2026-11-05'],
-            ['id_peserta' => 1, 'bulan' => 11, 'tahun' => $tahun, 'pertemuan_ke' => 2, 'status_hadir' => 1, 'tanggal' => '2026-11-12'],
-            ['id_peserta' => 1, 'bulan' => 11, 'tahun' => $tahun, 'pertemuan_ke' => 3, 'status_hadir' => 1, 'tanggal' => '2026-11-19'],
-            ['id_peserta' => 1, 'bulan' => 11, 'tahun' => $tahun, 'pertemuan_ke' => 4, 'status_hadir' => 1, 'tanggal' => '2026-11-26'],
-            ['id_peserta' => 1, 'bulan' => 11, 'tahun' => $tahun, 'pertemuan_ke' => 5, 'status_hadir' => 1, 'tanggal' => '2026-11-30'],
-
-            // Desember - 4 kehadiran (tidak lengkap)
-            ['id_peserta' => 1, 'bulan' => 12, 'tahun' => $tahun, 'pertemuan_ke' => 1, 'status_hadir' => 1, 'tanggal' => '2026-12-05'],
-            ['id_peserta' => 1, 'bulan' => 12, 'tahun' => $tahun, 'pertemuan_ke' => 2, 'status_hadir' => 1, 'tanggal' => '2026-12-12'],
-            ['id_peserta' => 1, 'bulan' => 12, 'tahun' => $tahun, 'pertemuan_ke' => 3, 'status_hadir' => 1, 'tanggal' => '2026-12-19'],
-            ['id_peserta' => 1, 'bulan' => 12, 'tahun' => $tahun, 'pertemuan_ke' => 4, 'status_hadir' => 1, 'tanggal' => '2026-12-26'],
-            // Pertemuan 5 Desember tidak hadir
-
-            // Zaenal Marlis (ID: 3) - 22 kehadiran
-            ['id_peserta' => 3, 'bulan' => 1, 'tahun' => $tahun, 'pertemuan_ke' => 1, 'status_hadir' => 1, 'tanggal' => '2026-01-05'],
-            ['id_peserta' => 3, 'bulan' => 1, 'tahun' => $tahun, 'pertemuan_ke' => 2, 'status_hadir' => 1, 'tanggal' => '2026-01-12'],
-            ['id_peserta' => 3, 'bulan' => 1, 'tahun' => $tahun, 'pertemuan_ke' => 3, 'status_hadir' => 1, 'tanggal' => '2026-01-19'],
-            ['id_peserta' => 3, 'bulan' => 1, 'tahun' => $tahun, 'pertemuan_ke' => 4, 'status_hadir' => 1, 'tanggal' => '2026-01-26'],
-            ['id_peserta' => 3, 'bulan' => 1, 'tahun' => $tahun, 'pertemuan_ke' => 5, 'status_hadir' => 1, 'tanggal' => '2026-01-30'],
-
-            // Februari - lengkap
-            ['id_peserta' => 3, 'bulan' => 2, 'tahun' => $tahun, 'pertemuan_ke' => 1, 'status_hadir' => 1, 'tanggal' => '2026-02-05'],
-            ['id_peserta' => 3, 'bulan' => 2, 'tahun' => $tahun, 'pertemuan_ke' => 2, 'status_hadir' => 1, 'tanggal' => '2026-02-12'],
-            ['id_peserta' => 3, 'bulan' => 2, 'tahun' => $tahun, 'pertemuan_ke' => 3, 'status_hadir' => 1, 'tanggal' => '2026-02-19'],
-            ['id_peserta' => 3, 'bulan' => 2, 'tahun' => $tahun, 'pertemuan_ke' => 4, 'status_hadir' => 1, 'tanggal' => '2026-02-26'],
-            ['id_peserta' => 3, 'bulan' => 2, 'tahun' => $tahun, 'pertemuan_ke' => 5, 'status_hadir' => 1, 'tanggal' => '2026-02-28'],
-
-            // Maret - lengkap
-            ['id_peserta' => 3, 'bulan' => 3, 'tahun' => $tahun, 'pertemuan_ke' => 1, 'status_hadir' => 1, 'tanggal' => '2026-03-05'],
-            ['id_peserta' => 3, 'bulan' => 3, 'tahun' => $tahun, 'pertemuan_ke' => 2, 'status_hadir' => 1, 'tanggal' => '2026-03-12'],
-            ['id_peserta' => 3, 'bulan' => 3, 'tahun' => $tahun, 'pertemuan_ke' => 3, 'status_hadir' => 1, 'tanggal' => '2026-03-19'],
-            ['id_peserta' => 3, 'bulan' => 3, 'tahun' => $tahun, 'pertemuan_ke' => 4, 'status_hadir' => 1, 'tanggal' => '2026-03-26'],
-            ['id_peserta' => 3, 'bulan' => 3, 'tahun' => $tahun, 'pertemuan_ke' => 5, 'status_hadir' => 1, 'tanggal' => '2026-03-31'],
-
-            // April - lengkap
-            ['id_peserta' => 3, 'bulan' => 4, 'tahun' => $tahun, 'pertemuan_ke' => 1, 'status_hadir' => 1, 'tanggal' => '2026-04-05'],
-            ['id_peserta' => 3, 'bulan' => 4, 'tahun' => $tahun, 'pertemuan_ke' => 2, 'status_hadir' => 1, 'tanggal' => '2026-04-12'],
-            ['id_peserta' => 3, 'bulan' => 4, 'tahun' => $tahun, 'pertemuan_ke' => 3, 'status_hadir' => 1, 'tanggal' => '2026-04-19'],
-            ['id_peserta' => 3, 'bulan' => 4, 'tahun' => $tahun, 'pertemuan_ke' => 4, 'status_hadir' => 1, 'tanggal' => '2026-04-26'],
-            ['id_peserta' => 3, 'bulan' => 4, 'tahun' => $tahun, 'pertemuan_ke' => 5, 'status_hadir' => 1, 'tanggal' => '2026-04-30'],
-
-            // Bagus Cahyo (ID: 5) - 20 kehadiran (tidak lengkap)
-            ['id_peserta' => 5, 'bulan' => 6, 'tahun' => $tahun, 'pertemuan_ke' => 1, 'status_hadir' => 1, 'tanggal' => '2026-06-05'],
-            ['id_peserta' => 5, 'bulan' => 6, 'tahun' => $tahun, 'pertemuan_ke' => 2, 'status_hadir' => 1, 'tanggal' => '2026-06-12'],
-            ['id_peserta' => 5, 'bulan' => 6, 'tahun' => $tahun, 'pertemuan_ke' => 3, 'status_hadir' => 1, 'tanggal' => '2026-06-19'],
-            ['id_peserta' => 5, 'bulan' => 6, 'tahun' => $tahun, 'pertemuan_ke' => 4, 'status_hadir' => 1, 'tanggal' => '2026-06-26'],
-            ['id_peserta' => 5, 'bulan' => 6, 'tahun' => $tahun, 'pertemuan_ke' => 5, 'status_hadir' => 1, 'tanggal' => '2026-06-30'],
-
-            // M Syaiful Ulum (ID: 5) - 51 kehadiran (sama dengan Nashrul)
-            // Data lengkap untuk semua bulan seperti Nashrul
+            // Nurul Fatah (ID: 8) - 6 kehadiran (10%)
+            [
+                'id_peserta' => 8,
+                'tahun_absensi' => $tahun,
+                'absensi_data' => [
+                    'jan' => ['hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir'],
+                    'feb' => ['tidak_hadir', 'hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir'],
+                    'mar' => ['tidak_hadir', 'tidak_hadir', 'hadir', 'tidak_hadir', 'tidak_hadir'],
+                    'apr' => ['tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'hadir', 'tidak_hadir'],
+                    'mei' => ['tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'hadir'],
+                    'jun' => ['tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir'],
+                    'jul' => ['tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir'],
+                    'agu' => ['tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir'],
+                    'sep' => ['tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir'],
+                    'okt' => ['tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir'],
+                    'nov' => ['tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir'],
+                    'des' => ['tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir', 'tidak_hadir'],
+                ],
+                'total_hadir' => 6,
+                'total_pertemuan' => 60,
+                'persentase' => 10.0,
+            ],
         ];
 
         foreach ($absensiData as $absensi) {
-            \App\Models\TempaAbsensi::create($absensi);
+            TempaAbsensi::create($absensi);
         }
     }
 }

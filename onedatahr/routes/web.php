@@ -233,6 +233,11 @@ Route::middleware(['auth', 'role:admin|superadmin|manager'])->group(function () 
 
 // Routes untuk TEMPA
 Route::middleware(['auth', 'role:admin|superadmin|ketua_tempa'])->prefix('tempa')->name('tempa.')->group(function () {
+    // Kelompok TEMPA
+    Route::resource('kelompok', \App\Http\Controllers\TempaKelompokController::class)->parameters([
+        'kelompok' => 'kelompok'
+    ]);
+
     // Peserta TEMPA
     Route::resource('peserta', \App\Http\Controllers\TempaPesertaController::class)->parameters([
         'peserta' => 'peserta' // This forces the parameter to be {peserta} instead of {pesertum}
