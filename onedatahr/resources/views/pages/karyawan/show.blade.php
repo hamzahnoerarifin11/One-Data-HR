@@ -205,42 +205,42 @@
 
             <div>
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Jabatan</p>
-                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaan->Jabatan ?? '-' }}</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaanTerkini?->Jabatan ?? '-' }}</p>
             </div>
 
             <div>
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Bagian</p>
-                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaan->Bagian ?? '-' }}</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaanTerkini?->Bagian ?? '-' }}</p>
             </div>
 
             <div>
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Departement</p>
-                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaan->Departement ?? '-' }}</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaanTerkini?->Departement ?? '-' }}</p>
             </div>
 
             <div>
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Divisi</p>
-                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaan->Divisi ?? '-' }}</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaanTerkini?->Divisi ?? '-' }}</p>
             </div>
 
             <div>
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Unit</p>
-                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaan->Unit ?? '-' }}</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaanTerkini?->Unit ?? '-' }}</p>
             </div>
 
             <div>
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Jenis Kontrak</p>
-                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaan->Jenis_Kontrak ?? '-' }}</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaanTerkini?->Jenis_Kontrak ?? '-' }}</p>
             </div>
 
             <div>
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Perjanjian Kerja</p>
-                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaan->Perjanjian ?? '-' }}</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaanTerkini?->Perjanjian ?? '-' }}</p>
             </div>
 
             <div>
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Lokasi Kerja</p>
-                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaan->Lokasi_Kerja ?? '-' }}</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaanTerkini?->Lokasi_Kerja ?? '-' }}</p>
             </div>
 
         </div>
@@ -248,11 +248,11 @@
         <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center text-xs text-gray-500">
             <span>
                 Dibuat pada:
-                {{ $karyawan->pekerjaan->created_at?->timezone('Asia/Jakarta')->format('d/m/Y H:i') ?? '-' }}
+                {{ $karyawan->pekerjaanTerkini?->created_at?->timezone('Asia/Jakarta')->format('d/m/Y H:i') ?? '-' }}
             </span>
             <span>
                 Terakhir diperbarui:
-                {{ $karyawan->pekerjaan->updated_at?->timezone('Asia/Jakarta')->format('d/m/Y H:i') ?? '-' }}
+                {{ $karyawan->pekerjaanTerkini?->updated_at?->timezone('Asia/Jakarta')->format('d/m/Y H:i') ?? '-' }}
             </span>
         </div>
     </div>

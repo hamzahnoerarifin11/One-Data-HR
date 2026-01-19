@@ -83,7 +83,7 @@
             @else
                 {{-- 2. Jika MANAGER/STAFF: Kembali ke Dashboard Utama (Supaya tidak Looping) --}}
                 <a href="{{ url('/dashboard') }}" class="px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition flex-1 lg:flex-none text-center text-gray-600 dark:text-gray-300">
-                    <i class="fas fa-home mr-1"></i> Dashboard
+                    <i class="fas fa-arrow-left mr-2"></i><i class="fas fa-home mr-1"></i> Dashboard
                 </a>
             @endif
 

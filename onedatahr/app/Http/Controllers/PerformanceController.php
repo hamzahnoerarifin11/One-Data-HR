@@ -86,11 +86,10 @@ class PerformanceController extends Controller
             $finalScore = ($skorKpi * 0.7) + ($skorKbiAsli * 0.3);
 
             // --- D. Tentukan Grade ---
-            if ($finalScore >= 90) $grade = 'A';
-            elseif ($finalScore >= 80) $grade = 'B';
-            elseif ($finalScore >= 70) $grade = 'C';
-            elseif ($finalScore >= 60) $grade = 'D';
-            else $grade = 'E';
+            if ($finalScore >= 89) $grade = 'A';
+            elseif ($finalScore >= 79) $grade = 'B';
+            elseif ($finalScore >= 69) $grade = 'C';
+            else $grade = 'D';
 
             // Return Object Bersih
             return (object) [

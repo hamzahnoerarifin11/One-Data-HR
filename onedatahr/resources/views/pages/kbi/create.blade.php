@@ -37,27 +37,27 @@
     /* Logika Warna Saat Dipilih (Checked) */
     /* Skor 1: Merah */
     input[type="radio"]:checked + .radio-card.skor-1 {
-        background-color: #fef2f2 !important; /* Red 50 */
+        background-color: #ef4444 !important; /* Red 50 */
         border-color: #ef4444 !important;     /* Red 500 */
-        color: #b91c1c !important;            /* Red 700 */
+        /* color: #b91c1c !important;            Red 700 */
     }
     /* Skor 2: Kuning/Orange */
     input[type="radio"]:checked + .radio-card.skor-2 {
-        background-color: #fff7ed !important; /* Orange 50 */
+        background-color: #f97316 !important; /* Orange 50 */
         border-color: #f97316 !important;     /* Orange 500 */
-        color: #c2410c !important;            /* Orange 700 */
+        /* color: #c2410c !important;            Orange 700 */
     }
     /* Skor 3: Biru */
     input[type="radio"]:checked + .radio-card.skor-3 {
-        background-color: #eff6ff !important; /* Blue 50 */
+        background-color: #3b82f6 !important; /* Blue 50 */
         border-color: #3b82f6 !important;     /* Blue 500 */
-        color: #1d4ed8 !important;            /* Blue 700 */
+        /* color: #1d4ed8 !important;            Blue 700 */
     }
     /* Skor 4: Hijau */
     input[type="radio"]:checked + .radio-card.skor-4 {
-        background-color: #f0fdf4 !important; /* Green 50 */
+        background-color: #22c55e !important; /* Green 50 */
         border-color: #22c55e !important;     /* Green 500 */
-        color: #15803d !important;            /* Green 700 */
+        /* color: #15803d !important;            Green 700 */
     }
 </style>
 

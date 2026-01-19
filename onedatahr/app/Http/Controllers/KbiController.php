@@ -16,7 +16,6 @@ class KbiController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        // Ambil tahun dari request, jika tidak ada gunakan tahun berjalan
         $tahun = $request->input('tahun', date('Y'));
 
         // A. Validasi NIK User Login
@@ -25,24 +24,50 @@ class KbiController extends Controller
         }
 
         // B. Cari Data Karyawan (Diri Sendiri)
-        $karyawan = Karyawan::with('atasan')->where('nik', $user->nik)->first();
+        $karyawan = Karyawan::with(['atasan', 'pekerjaan'])->where('nik', $user->nik)->first();
         if (!$karyawan) {
             return redirect()->back()->with('error', 'Data Karyawan tidak ditemukan.');
         }
 
-        // C. Cek Penilaian Diri Sendiri (Variabel yang tadi Error)
+        // C. Cek Penilaian Diri Sendiri
         $selfAssessment = KbiAssessment::where('karyawan_id', $karyawan->id_karyawan)
             ->where('tipe_penilai', 'DIRI_SENDIRI')
             ->where('tahun', $tahun)
             ->first();
 
-        // D. Logic Daftar Karyawan (Tabel Kanan)
+        // D. Logic Daftar Karyawan (Tabel Kanan / Bawahan)
         $query = Karyawan::query();
 
-        // Filter: Jangan tampilkan diri sendiri di tabel
+        // Filter: Jangan tampilkan diri sendiri
         $query->where('id_karyawan', '!=', $karyawan->id_karyawan);
 
-        // Filter Search
+        // --- [LOGIC BARU: FILTER KHUSUS MANAGER] ---
+        // Cek Jabatan User Login
+        $userJabatan = $karyawan->pekerjaan->first()?->Jabatan;
+        $userDivisi  = $karyawan->pekerjaan->first()?->Divisi;
+
+        // Jika jabatan mengandung kata "Manager" (case insensitive)
+        // Sesuaikan dengan nama jabatan di database Anda
+        $isManager = stripos($userJabatan, 'Manager') !== false;
+
+        if ($isManager) {
+            // Manager hanya melihat karyawan di DIVISI YANG SAMA
+            if ($userDivisi) {
+                $query->whereHas('pekerjaan', function ($q) use ($userDivisi) {
+                    $q->where('Divisi', $userDivisi);
+                    
+                    // Opsional: Jika ingin filter level jabatan di bawahnya secara spesifik
+                    // $q->whereIn('Jabatan', ['Supervisor', 'Staff', 'Officer']); 
+                    // Atau gunakan logika NOT LIKE Manager jika ingin mengecualikan sesama manager
+                    // $q->where('Jabatan', 'NOT LIKE', '%Manager%');
+                });
+            } else {
+                // Jika data divisi manager kosong, mungkin tidak tampilkan apa-apa atau tampilkan semua (safety net)
+                 \Log::warning('Manager tanpa Divisi login: ' . $karyawan->Nama_Lengkap_Sesuai_Ijazah);
+            }
+        }
+
+        // Filter Search (Tetap ada)
         if ($request->has('search') && $request->search != '') {
             $keyword = $request->search;
             $query->where(function ($q) use ($keyword) {
@@ -52,20 +77,20 @@ class KbiController extends Controller
             });
         }
 
-        // Eksekusi Pagination (10 per halaman)
+        // Eksekusi Pagination
         $bawahanList = $query->paginate(10)->onEachSide(1)->appends(['tahun' => $tahun]);
 
-        // Cek Status Penilaian untuk setiap karyawan di list
+        // Cek Status Penilaian (Looping)
         $bawahanList->through(function ($staff) use ($tahun, $user) {
             $staff->sudah_dinilai = KbiAssessment::where('karyawan_id', $staff->id_karyawan)
                 ->where('penilai_id', $user->id)
-                ->where('tipe_penilai', 'ATASAN')
+                ->where('tipe_penilai', 'ATASAN') // Manager menilai Bawahan
                 ->where('tahun', $tahun)
                 ->exists();
             return $staff;
         });
 
-        // E. Ambil Data Atasan (Kotak Kiri Bawah)
+        // E. Ambil Data Atasan (Kotak Kiri Bawah - Tetap Sama)
         $atasan = $karyawan->atasan;
         $sudahMenilaiAtasan = false;
         if ($atasan) {
@@ -75,21 +100,42 @@ class KbiController extends Controller
                 ->where('tahun', $tahun)
                 ->exists();
         }
-        // [BARU] Ambil List Semua Karyawan untuk Dropdown Pilihan Atasan
-        // Kita kecualikan diri sendiri, biar gak milih diri sendiri jadi bos
-        $listCalonAtasan = Karyawan::where('id_karyawan', '!=', $karyawan->id_karyawan)
-            ->orderBy('Nama_Lengkap_Sesuai_Ijazah', 'ASC')
-            ->get();
 
-        // Kirim semua variabel ke View
+        // F. Logic Dropdown Pilih Atasan (Tetap Sama - Saya ringkas di sini agar tidak kepanjangan, 
+        // tapi pastikan Anda copy paste bagian "Logika Baru Ambil List Semua Karyawan..." dari kode lama Anda)
+        // ... (Masukkan kode $jabatanHierarchy dan logic $listCalonAtasan di sini) ...
+        
+        // --- SAYA SALIN ULANG BAGIAN PENTING HIERARKI AGAR ANDA BISA LANGSUNG COPY-PASTE UTUH ---
+        $jabatanHierarchy = [
+            'GM' => 1, 'General Manager' => 1, 'Manager' => 2, 'Supervisor' => 3,
+            'Staff' => 4, 'Officer' => 4, 'Assistant' => 5,
+        ];
+        $userLevel = $jabatanHierarchy[$userJabatan] ?? 99;
+
+        if ($userLevel <= 1 || empty($userDivisi)) {
+            $listCalonAtasan = collect();
+        } else {
+            $higherJabatan = [];
+            foreach ($jabatanHierarchy as $jabatan => $level) {
+                if ($level < $userLevel) $higherJabatan[] = $jabatan;
+            }
+            $listCalonAtasan = Karyawan::where('id_karyawan', '!=', $karyawan->id_karyawan)
+                ->whereHas('pekerjaan', function ($q) use ($userDivisi, $higherJabatan) {
+                    $q->where('Divisi', $userDivisi);
+                    if (!empty($higherJabatan)) {
+                        $q->where(function ($subQ) use ($higherJabatan) {
+                            foreach ($higherJabatan as $jab) $subQ->orWhere('Jabatan', 'LIKE', '%' . $jab . '%');
+                        });
+                    } else {
+                        $q->where('Jabatan', 'NONEXISTENT');
+                    }
+                })->orderBy('Nama_Lengkap_Sesuai_Ijazah', 'ASC')->get();
+        }
+        // -----------------------------------------------------------------------------------------
+
         return view('pages.kbi.index', compact(
-            'karyawan',
-            'selfAssessment',
-            'bawahanList',
-            'atasan',
-            'sudahMenilaiAtasan',
-            'listCalonAtasan',
-            'tahun'
+            'karyawan', 'selfAssessment', 'bawahanList', 'atasan', 
+            'sudahMenilaiAtasan', 'listCalonAtasan', 'tahun'
         ));
     }
 

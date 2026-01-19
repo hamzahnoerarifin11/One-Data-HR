@@ -65,6 +65,14 @@
                             </div>
                             <form method="POST" action="{{ route('signin.post') }}" class="bg-transparent p-0">
                                 @csrf
+
+                                <!-- ERROR ALERT -->
+                                @if(session('error'))
+                                    <div class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-red-800 dark:border-red-900 dark:bg-red-900/20 dark:text-red-400">
+                                        {{ session('error') }}
+                                    </div>
+                                @endif
+
                                 <div class="space-y-5">
                                     <!-- Email -->
                                     <div>

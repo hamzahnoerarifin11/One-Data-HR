@@ -69,7 +69,7 @@
             <table class="w-full min-w-full border-collapse">
                 <thead>
                     <tr class="border-y border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-900">
-                        <th class="px-6 py-3 text-left text-md font-medium text-gray-600 dark:text-gray-400">#</th>
+                        <th class="px-6 py-3 text-left text-md font-medium text-gray-600 dark:text-gray-400">No</th>
                         <th @click="sort('nama')" class="cursor-pointer px-6 py-3 text-left text-md font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600 transition">
                             <div class="flex items-center gap-1">Nama Kandidat <svg class="h-4 w-4" :class="sortCol === 'nama' ? (sortAsc ? '' : 'rotate-180') : 'opacity-20'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></div>
                         </th>
@@ -424,6 +424,9 @@ function kandidatTable() {
             }
             return range;
         },
+
+        get startItem() { return this.filtered.length === 0 ? 0 : (this.page - 1) * this.perPage + 1; },
+        get endItem() { return Math.min(this.page * this.perPage, this.filtered.length); },
 
        openShowModal(row) {
             const formatDate = (dateString) => {

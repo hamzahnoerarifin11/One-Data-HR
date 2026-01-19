@@ -269,6 +269,7 @@
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
+document.addEventListener('DOMContentLoaded', function() {
     // Small helper for export dropdown
     document.addEventListener('click', function (e) {
         const exportToggle = document.getElementById('export-toggle');
@@ -298,14 +299,41 @@
     function fetchSummary(params = {}){
         const urlCv = new URL("{{ route('rekrutmen.metrics.cv') }}", window.location.origin);
         const urlPs = new URL("{{ route('rekrutmen.metrics.psikotes') }}", window.location.origin);
+        const urlKompetensi = new URL("{{ route('rekrutmen.metrics.kompetensi') }}", window.location.origin);
+        const urlInterviewHr = new URL("{{ route('rekrutmen.metrics.hr') }}", window.location.origin);
+        const urlInterviewUser = new URL("{{ route('rekrutmen.metrics.user') }}", window.location.origin);
+        const urlPemberkasan = new URL("{{ route('rekrutmen.metrics.pemberkasan') }}", window.location.origin);
+        
         Object.keys(params).forEach(k => params[k] ? urlCv.searchParams.append(k, params[k]) : null);
         Object.keys(params).forEach(k => params[k] ? urlPs.searchParams.append(k, params[k]) : null);
-        Promise.all([fetch(urlCv).then(r => r.json()), fetch(urlPs).then(r => r.json())])
-        .then(([cv, ps]) => {
+        Object.keys(params).forEach(k => params[k] ? urlKompetensi.searchParams.append(k, params[k]) : null);
+        Object.keys(params).forEach(k => params[k] ? urlInterviewHr.searchParams.append(k, params[k]) : null);
+        Object.keys(params).forEach(k => params[k] ? urlInterviewUser.searchParams.append(k, params[k]) : null);
+        Object.keys(params).forEach(k => params[k] ? urlPemberkasan.searchParams.append(k, params[k]) : null);
+        
+        Promise.all([
+            fetch(urlCv).then(r => r.json()),
+            fetch(urlPs).then(r => r.json()),
+            fetch(urlKompetensi).then(r => r.json()),
+            fetch(urlInterviewHr).then(r => r.json()),
+            fetch(urlInterviewUser).then(r => r.json()),
+            fetch(urlPemberkasan).then(r => r.json())
+        ])
+        .then(([cv, ps, komp, hr, user, pemberkasan]) => {
             const totalCv = (cv || []).reduce((s,i)=> s + (i.total||0),0);
             const totalPs = (ps || []).reduce((s,i)=> s + (i.total||0),0);
+            const totalKomp = (komp || []).reduce((s,i)=> s + (i.total||0),0);
+            const totalHr = (hr || []).reduce((s,i)=> s + (i.total||0),0);
+            const totalUser = (user || []).reduce((s,i)=> s + (i.total||0),0);
+            const totalPemberkasan = (pemberkasan || []).reduce((s,i)=> s + (i.done_recruitment||0),0);
+            
             document.getElementById('total-cv').innerText = totalCv;
             document.getElementById('total-psikotes').innerText = totalPs;
+            document.getElementById('total-kompetensi').innerText = totalKomp;
+            document.getElementById('total-interview-hr').innerText = totalHr;
+            document.getElementById('total-interview-user').innerText = totalUser;
+            document.getElementById('total-pemberkasan').innerText = totalPemberkasan;
+            
             const totalCandidates = window.dataTotalCandidates || '-';
             if(document.getElementById('total-kandidat')) document.getElementById('total-kandidat').innerText = totalCandidates;
         }).catch(()=>{});
@@ -352,9 +380,11 @@
             from: form.from.value ? form.from.value + '-01' : null,
             to: form.to.value ? form.to.value + '-31' : null,
         };
-        fetchCandidates(data).then(renderCandidatesChart);
+        fetchCandidates(data).then(data => {
+            renderCandidatesChart(data);
+            fetchSummary(data); // call after fetchCandidates
+        });
         fetchStages(data).then(renderStages);
-        fetchSummary(data);
         updateExportLink();
     });
 
@@ -364,9 +394,11 @@
         form.posisi_id.value = '';
         form.from.value = '';
         form.to.value = '';
-        fetchCandidates().then(renderCandidatesChart);
+        fetchCandidates().then(data => {
+            renderCandidatesChart(data);
+            fetchSummary(); // call after fetchCandidates
+        });
         fetchStages().then(renderStages);
-        fetchSummary();
         updateExportLink();
     });
 
@@ -413,9 +445,11 @@
     }
 
     // initial load
-    fetchCandidates().then(renderCandidatesChart);
+    fetchCandidates().then(data => {
+        renderCandidatesChart(data);
+        fetchSummary(); // call fetchSummary after fetchCandidates completes
+    });
     fetchStages().then(renderStages);
-    fetchSummary();
 
     // handle add-posisi modal confirmation to create a new posisi and update the select
     window.addEventListener('modal-confirmed', function(e){
@@ -474,5 +508,6 @@
             }
         }).catch((err) => { console.error('posisi create error', err); errEl.innerText = 'Terjadi kesalahan jaringan.'; errEl.classList.remove('hidden'); });
     });
+});
 </script>
 @endsection

@@ -15,10 +15,7 @@ use App\Http\Controllers\PosisiController;
 use App\Http\Controllers\RekrutmenDailyController;
 use App\Http\Controllers\RekrutmenCalendarController;
 // Import Controller yang sebelumnya tertinggal agar tidak error class not found
-use App\Http\Controllers\ScreeningCvController;
-use App\Http\Controllers\TesKompetensiController;
 use App\Http\Controllers\InterviewHrController;
-use App\Http\Controllers\InterviewUserController;
 use App\Http\Controllers\KandidatLanjutUserController;
 use App\Http\Controllers\TrainingController;
 use App\Http\Controllers\UserController;
@@ -75,10 +72,7 @@ Route::middleware(['auth'])->group(function () {
 
 
             // Pelamar & Tahapan
-            Route::get('screening-cv', [ScreeningCvController::class, 'index'])->name('screening-cv');
-            Route::get('tes-kompetensi', [TesKompetensiController::class, 'index'])->name('tes-kompetensi');
             Route::resource('interview_hr', InterviewHrController::class);
-            Route::get('interview-user', [InterviewUserController::class, 'index'])->name('interview-user');
             Route::resource('kandidat_lanjut_user', KandidatLanjutUserController::class);
             Route::resource('pemberkasan', PemberkasanController::class);
 
