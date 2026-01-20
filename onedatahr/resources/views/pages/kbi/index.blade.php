@@ -28,7 +28,7 @@
 </style>
 
 <div class="p-4 sm:p-6">
-    <div class="mb-6 flex flex-col lg:flex-row justify-between items-start lg:items-center p-4 md:p-6 rounded-xl shadow-sm gap-4">
+    <div class="bg-white dark:bg-gray-800 mb-6 flex flex-col lg:flex-row justify-between items-start lg:items-center p-4 md:p-6 rounded-xl shadow-sm gap-4">
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
             PENILAIAN KBI
         </h1>

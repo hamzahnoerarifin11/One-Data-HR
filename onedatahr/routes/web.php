@@ -50,6 +50,8 @@ Route::middleware(['auth'])->group(function () {
     //     Route::delete('/karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
     // });
     Route::middleware(['auth', 'role:admin|superadmin'])->group(function () {
+        Route::get('/rekrutmen/metrics/all-stats', [App\Http\Controllers\RecruitmentDashboardController::class, 'dashboardStats'])
+        ->name('rekrutmen.metrics.all_stats');
         // --- KARYAWAN MANAGEMENT ---
         Route::post('karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
         Route::resource('karyawan', KaryawanController::class);

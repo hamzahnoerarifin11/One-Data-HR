@@ -27,7 +27,15 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('rekrutmen_daily', function (Blueprint $table) {
-            //
+            // Hapus kolom-kolom yang ditambahkan di method up()
+            $table->dropColumn([
+                'lolos_cv',
+                'lolos_psikotes',
+                'lolos_kompetensi',
+                'lolos_hr',
+                'lolos_user',
+                'notes'
+            ]);
         });
     }
 };
