@@ -1,20 +1,13 @@
-# TODO: Update TEMPA Peserta Create Form
+# TEMPA Attendance Data Fixes
 
-## Tasks
-- [ ] Create migration to add keterangan_pindah field to tempa_peserta table
-- [ ] Update TempaPeserta model to include keterangan_pindah in fillable
-- [ ] Update TempaPesertaRequest to include keterangan_pindah validation
-- [ ] Update TempaKelompok model to add mentor relationship (assuming mentor_id field exists or needs to be added)
-- [ ] Update TempaPesertaController create method to differentiate between roles (ketua_tempa vs superadmin/admin)
-- [ ] Update create.blade.php view to:
-  - Show keterangan_pindah field when status is 2 (Pindah)
-  - Show kelompok and mentor as text inputs for ketua_tempa
-  - Show kelompok and mentor as selects for superadmin/admin with auto-fill functionality
-- [ ] Update edit.blade.php view similarly
-- [ ] Add JavaScript for auto-fill mentor when kelompok is selected
-- [ ] Test the functionality
+## Issues Fixed:
+- [x] Fixed incorrect permission check `editmpaAbsensi` → `editTempaAbsensi` in index.blade.php
+- [x] Fixed incorrect permission check `updateTempaAbsensi` → `editTempaAbsensi` in index.blade.php
+- [x] Fixed array indexing mismatch in edit.blade.php (changed from 1-based to 0-based indexing to match database storage)
 
-## Notes
-- For ketua_tempa: kelompok and mentor are manual inputs
-- For superadmin/admin: kelompok and mentor are selects, mentor auto-fills based on kelompok
-- Status 2 (Pindah) shows additional keterangan_pindah field
+## Summary:
+The attendance data form and table display now have consistent input field mappings. The edit button in the actions column should now be visible for users with appropriate permissions (ketua_tempa role).
+
+## Files Modified:
+- `resources/views/pages/tempa/absensi/index.blade.php` - Fixed permission checks
+- `resources/views/pages/tempa/absensi/edit.blade.php` - Fixed array indexing for form inputs

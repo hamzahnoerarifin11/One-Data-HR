@@ -76,8 +76,14 @@
                             Aktif
                         </span>
                     @elseif($absensiModel->peserta->status_peserta == 2)
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
-                            Pindah
+                        <span class="inline-flex flex-col items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
+                            <!-- <span>Pindah</span> -->
+                            @if(!empty($absensiModel->peserta->keterangan_pindah))
+                                <!-- <span class="block text-[11px] font-normal text-yellow-700 dark:text-yellow-200 mt-0.5">{{ $absensiModel->peserta->keterangan_pindah }}</span> -->
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
+                                    Pindah{{ $absensiModel->peserta->keterangan_pindah ? ' - ' .  $absensiModel->peserta->keterangan_pindah : ''  }}
+                                </span>
+                            @endif
                         </span>
                     @else
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
@@ -100,17 +106,22 @@
             <div>
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Lokasi Kelompok</p>
                 <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">
-                    @if($absensiModel->peserta->kelompok->tempat === 'pusat')
+                    @php
+                        $kelompok = $absensiModel->peserta?->kelompok;
+                    @endphp
+
+                    @if($kelompok?->tempat === 'pusat')
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
                             Pusat
                         </span>
-                    @elseif($absensiModel->peserta->kelompok->tempat === 'cabang')
+                    @elseif($kelompok?->tempat === 'cabang')
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-                            Cabang{{ $absensiModel->peserta->kelompok->keterangan_cabang ? ' - ' . $absensiModel->peserta->kelompok->keterangan_cabang : '' }}
+                            Cabang{{ $kelompok?->keterangan_cabang ? ' - ' . $kelompok->keterangan_cabang : '' }}
                         </span>
                     @else
-                        -
+                        <span class="text-gray-400">-</span>
                     @endif
+
                 </p>
             </div>
 

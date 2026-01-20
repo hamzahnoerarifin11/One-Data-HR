@@ -29,9 +29,11 @@
                     <label for="id_peserta" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Pilih Peserta <span class="text-red-500">*</span>
                     </label>
+                    <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
                     <select id="id_peserta" name="id_peserta"
-                            class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
-                            required>
+                             class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
+                                :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true"
+                                required>
                         <option value="">Pilih Peserta</option>
                         @foreach($pesertas as $peserta)
                             <option value="{{ $peserta->id_peserta }}"
@@ -43,6 +45,15 @@
                             </option>
                         @endforeach
                     </select>
+                    <span
+                                class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
+                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </span>
+                    </div>
                     @error('id_peserta')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
@@ -53,13 +64,24 @@
                     <label for="tahun_absensi" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Tahun Absensi <span class="text-red-500">*</span>
                     </label>
+                    <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
                     <select id="tahun_absensi" name="tahun_absensi"
-                            class="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
-                            required>
+                            class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
+                                :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true"
+                                required>
                         @for($year = date('Y') - 1; $year <= date('Y') + 1; $year++)
                             <option value="{{ $year }}" {{ $year == date('Y') ? 'selected' : '' }}>{{ $year }}</option>
                         @endfor
                     </select>
+                    <span
+                                class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
+                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </span>
+                    </div>
                     @error('tahun_absensi')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
@@ -86,232 +108,51 @@
             </div>
         </div>
 
-        <!-- Data Absensi Bulanan -->
-        <div class="rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-800 dark:bg-white/[0.03] p-6">
+       <div class="rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-800 dark:bg-white/[0.03] p-6">
             <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Data Absensi Bulanan</h2>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
                 Pilih status kehadiran untuk setiap minggu (1-5 minggu per bulan). Kosongkan jika tidak ada pertemuan TEMPA.
             </p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Januari -->
-                <div class="space-y-3">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white border-b pb-2">Januari</h3>
-                    @for($i = 1; $i <= 5; $i++)
-                        <div class="flex items-center justify-between">
-                            <label for="absensi_jan_{{ $i }}" class="text-sm text-gray-700 dark:text-gray-300">
-                                Minggu {{ $i }}
-                            </label>
-                            <select id="absensi_jan_{{ $i }}" name="absensi[jan][{{ $i }}]"
-                                    class="ml-2 w-32 text-sm rounded-lg border border-gray-300 px-2 py-1 text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-                                <option value="">Kosong</option>
-                                <option value="hadir">Hadir</option>
-                                <option value="tidak_hadir">Tidak Hadir</option>
-                            </select>
-                        </div>
-                    @endfor
-                </div>
+                @php
+                    $months = [
+                        'jan' => 'Januari', 'feb' => 'Februari', 'mar' => 'Maret',
+                        'apr' => 'April', 'mei' => 'Mei', 'jun' => 'Juni',
+                        'jul' => 'Juli', 'agu' => 'Agustus', 'sep' => 'September',
+                        'okt' => 'Oktober', 'nov' => 'November', 'des' => 'Desember'
+                    ];
+                @endphp
 
-                <!-- Februari -->
+                @foreach($months as $key => $name)
                 <div class="space-y-3">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white border-b pb-2">Februari</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white border-b pb-2">{{ $name }}</h3>
                     @for($i = 1; $i <= 5; $i++)
                         <div class="flex items-center justify-between">
-                            <label for="absensi_feb_{{ $i }}" class="text-sm text-gray-700 dark:text-gray-300">
+                            <label for="absensi_{{ $key }}_{{ $i }}" class="text-sm text-gray-700 dark:text-gray-300">
                                 Minggu {{ $i }}
                             </label>
-                            <select id="absensi_feb_{{ $i }}" name="absensi[feb][{{ $i }}]"
-                                    class="ml-2 w-32 text-sm rounded-lg border border-gray-300 px-2 py-1 text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-                                <option value="">Kosong</option>
-                                <option value="hadir">Hadir</option>
-                                <option value="tidak_hadir">Tidak Hadir</option>
-                            </select>
+                            <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
+                                <select id="absensi_{{ $key }}_{{ $i }}" name="absensi[{{ $key }}][{{ $i }}]"
+                                        class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
+                                        :class="isOptionSelected && 'text-gray-800 dark:text-white/90'"
+                                        @change="isOptionSelected = true">
+                                    <option value="">Kosong</option>
+                                    <option value="hadir">Hadir</option>
+                                    <option value="tidak_hadir">Tidak Hadir</option>
+                                </select>
+                                <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
+                                    <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </span>
+                            </div>
                         </div>
                     @endfor
                 </div>
-
-                <!-- Maret -->
-                <div class="space-y-3">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white border-b pb-2">Maret</h3>
-                    @for($i = 1; $i <= 5; $i++)
-                        <div class="flex items-center justify-between">
-                            <label for="absensi_mar_{{ $i }}" class="text-sm text-gray-700 dark:text-gray-300">
-                                Minggu {{ $i }}
-                            </label>
-                            <select id="absensi_mar_{{ $i }}" name="absensi[mar][{{ $i }}]"
-                                    class="ml-2 w-32 text-sm rounded-lg border border-gray-300 px-2 py-1 text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-                                <option value="">Kosong</option>
-                                <option value="hadir">Hadir</option>
-                                <option value="tidak_hadir">Tidak Hadir</option>
-                            </select>
-                        </div>
-                    @endfor
-                </div>
-
-                <!-- April -->
-                <div class="space-y-3">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white border-b pb-2">April</h3>
-                    @for($i = 1; $i <= 5; $i++)
-                        <div class="flex items-center justify-between">
-                            <label for="absensi_apr_{{ $i }}" class="text-sm text-gray-700 dark:text-gray-300">
-                                Minggu {{ $i }}
-                            </label>
-                            <select id="absensi_apr_{{ $i }}" name="absensi[apr][{{ $i }}]"
-                                    class="ml-2 w-32 text-sm rounded-lg border border-gray-300 px-2 py-1 text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-                                <option value="">Kosong</option>
-                                <option value="hadir">Hadir</option>
-                                <option value="tidak_hadir">Tidak Hadir</option>
-                            </select>
-                        </div>
-                    @endfor
-                </div>
-
-                <!-- Mei -->
-                <div class="space-y-3">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white border-b pb-2">Mei</h3>
-                    @for($i = 1; $i <= 5; $i++)
-                        <div class="flex items-center justify-between">
-                            <label for="absensi_mei_{{ $i }}" class="text-sm text-gray-700 dark:text-gray-300">
-                                Minggu {{ $i }}
-                            </label>
-                            <select id="absensi_mei_{{ $i }}" name="absensi[mei][{{ $i }}]"
-                                    class="ml-2 w-32 text-sm rounded-lg border border-gray-300 px-2 py-1 text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-                                <option value="">Kosong</option>
-                                <option value="hadir">Hadir</option>
-                                <option value="tidak_hadir">Tidak Hadir</option>
-                            </select>
-                        </div>
-                    @endfor
-                </div>
-
-                <!-- Juni -->
-                <div class="space-y-3">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white border-b pb-2">Juni</h3>
-                    @for($i = 1; $i <= 5; $i++)
-                        <div class="flex items-center justify-between">
-                            <label for="absensi_jun_{{ $i }}" class="text-sm text-gray-700 dark:text-gray-300">
-                                Minggu {{ $i }}
-                            </label>
-                            <select id="absensi_jun_{{ $i }}" name="absensi[jun][{{ $i }}]"
-                                    class="ml-2 w-32 text-sm rounded-lg border border-gray-300 px-2 py-1 text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-                                <option value="">Kosong</option>
-                                <option value="hadir">Hadir</option>
-                                <option value="tidak_hadir">Tidak Hadir</option>
-                            </select>
-                        </div>
-                    @endfor
-                </div>
-
-                <!-- Juli -->
-                <div class="space-y-3">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white border-b pb-2">Juli</h3>
-                    @for($i = 1; $i <= 5; $i++)
-                        <div class="flex items-center justify-between">
-                            <label for="absensi_jul_{{ $i }}" class="text-sm text-gray-700 dark:text-gray-300">
-                                Minggu {{ $i }}
-                            </label>
-                            <select id="absensi_jul_{{ $i }}" name="absensi[jul][{{ $i }}]"
-                                    class="ml-2 w-32 text-sm rounded-lg border border-gray-300 px-2 py-1 text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-                                <option value="">Kosong</option>
-                                <option value="hadir">Hadir</option>
-                                <option value="tidak_hadir">Tidak Hadir</option>
-                            </select>
-                        </div>
-                    @endfor
-                </div>
-
-                <!-- Agustus -->
-                <div class="space-y-3">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white border-b pb-2">Agustus</h3>
-                    @for($i = 1; $i <= 5; $i++)
-                        <div class="flex items-center justify-between">
-                            <label for="absensi_agu_{{ $i }}" class="text-sm text-gray-700 dark:text-gray-300">
-                                Minggu {{ $i }}
-                            </label>
-                            <select id="absensi_agu_{{ $i }}" name="absensi[agu][{{ $i }}]"
-                                    class="ml-2 w-32 text-sm rounded-lg border border-gray-300 px-2 py-1 text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-                                <option value="">Kosong</option>
-                                <option value="hadir">Hadir</option>
-                                <option value="tidak_hadir">Tidak Hadir</option>
-                            </select>
-                        </div>
-                    @endfor
-                </div>
-
-                <!-- September -->
-                <div class="space-y-3">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white border-b pb-2">September</h3>
-                    @for($i = 1; $i <= 5; $i++)
-                        <div class="flex items-center justify-between">
-                            <label for="absensi_sep_{{ $i }}" class="text-sm text-gray-700 dark:text-gray-300">
-                                Minggu {{ $i }}
-                            </label>
-                            <select id="absensi_sep_{{ $i }}" name="absensi[sep][{{ $i }}]"
-                                    class="ml-2 w-32 text-sm rounded-lg border border-gray-300 px-2 py-1 text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-                                <option value="">Kosong</option>
-                                <option value="hadir">Hadir</option>
-                                <option value="tidak_hadir">Tidak Hadir</option>
-                            </select>
-                        </div>
-                    @endfor
-                </div>
-
-                <!-- Oktober -->
-                <div class="space-y-3">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white border-b pb-2">Oktober</h3>
-                    @for($i = 1; $i <= 5; $i++)
-                        <div class="flex items-center justify-between">
-                            <label for="absensi_okt_{{ $i }}" class="text-sm text-gray-700 dark:text-gray-300">
-                                Minggu {{ $i }}
-                            </label>
-                            <select id="absensi_okt_{{ $i }}" name="absensi[okt][{{ $i }}]"
-                                    class="ml-2 w-32 text-sm rounded-lg border border-gray-300 px-2 py-1 text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-                                <option value="">Kosong</option>
-                                <option value="hadir">Hadir</option>
-                                <option value="tidak_hadir">Tidak Hadir</option>
-                            </select>
-                        </div>
-                    @endfor
-                </div>
-
-                <!-- November -->
-                <div class="space-y-3">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white border-b pb-2">November</h3>
-                    @for($i = 1; $i <= 5; $i++)
-                        <div class="flex items-center justify-between">
-                            <label for="absensi_nov_{{ $i }}" class="text-sm text-gray-700 dark:text-gray-300">
-                                Minggu {{ $i }}
-                            </label>
-                            <select id="absensi_nov_{{ $i }}" name="absensi[nov][{{ $i }}]"
-                                    class="ml-2 w-32 text-sm rounded-lg border border-gray-300 px-2 py-1 text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-                                <option value="">Kosong</option>
-                                <option value="hadir">Hadir</option>
-                                <option value="tidak_hadir">Tidak Hadir</option>
-                            </select>
-                        </div>
-                    @endfor
-                </div>
-
-                <!-- Desember -->
-                <div class="space-y-3">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white border-b pb-2">Desember</h3>
-                    @for($i = 1; $i <= 5; $i++)
-                        <div class="flex items-center justify-between">
-                            <label for="absensi_des_{{ $i }}" class="text-sm text-gray-700 dark:text-gray-300">
-                                Minggu {{ $i }}
-                            </label>
-                            <select id="absensi_des_{{ $i }}" name="absensi[des][{{ $i }}]"
-                                    class="ml-2 w-32 text-sm rounded-lg border border-gray-300 px-2 py-1 text-gray-900 focus:border-blue-600 focus:ring-1 focus:ring-blue-600 dark:border-gray-700 dark:bg-gray-900 dark:text-white">
-                                <option value="">Kosong</option>
-                                <option value="hadir">Hadir</option>
-                                <option value="tidak_hadir">Tidak Hadir</option>
-                            </select>
-                        </div>
-                    @endfor
-                </div>
+                @endforeach
             </div>
         </div>
-
         <!-- Upload Bukti Foto -->
         <div class="rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-800 dark:bg-white/[0.03] p-6">
             <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Bukti Foto</h2>
@@ -321,7 +162,7 @@
                     Upload Bukti Foto Absensi
                 </label>
                 <input type="file" id="bukti_foto" name="bukti_foto"
-                       class="w-full text-gray-900 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-900 dark:border-gray-700 dark:text-white"
+                       class="focus:border-ring-brand-300 shadow-theme-xs focus:file:ring-brand-300 h-11 w-full overflow-hidden rounded-lg border border-gray-300 bg-transparent text-sm text-gray-500 transition-colors file:mr-5 file:border-collapse file:cursor-pointer file:rounded-l-lg file:border-0 file:border-r file:border-solid file:border-gray-200 file:bg-gray-50 file:py-3 file:pr-3 file:pl-3.5 file:text-sm file:text-gray-700 placeholder:text-gray-400 hover:file:bg-gray-100 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:text-white/90 dark:file:border-gray-800 dark:file:bg-white/[0.03] dark:file:text-gray-400 dark:placeholder:text-gray-400"
                        accept="image/*">
                 <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
                     Upload foto bukti absensi (format: JPG, PNG, maksimal 2MB)

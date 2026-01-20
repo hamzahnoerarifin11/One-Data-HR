@@ -30,23 +30,54 @@ class TempaAbsensiController extends Controller
 
         $tahun = request('tahun', date('Y'));
         $bulan = request('bulan', null); // null = tampilkan semua bulan
+        $search = request('search', null);
+        $kelompok = request('kelompok', null);
+        $status = request('status', null);
+        $lokasi = request('lokasi', null);
+
+        $query = TempaAbsensi::with(['peserta.kelompok.ketuaTempa', 'peserta.tempa'])
+            ->leftJoin('tempa_peserta', 'tempa_absensi.id_peserta', '=', 'tempa_peserta.id_peserta')
+            ->leftJoin('tempa_kelompok', 'tempa_peserta.id_kelompok', '=', 'tempa_kelompok.id_kelompok')
+            ->where('tempa_absensi.tahun_absensi', $tahun);
 
         if ($isKetuaTempa) {
             // Ketua TEMPA hanya melihat absensi peserta dari kelompoknya
-            $absensis = TempaAbsensi::with(['peserta.kelompok.ketuaTempa', 'peserta.tempa'])
-                ->whereHas('peserta.kelompok', function($q) use ($user) {
-                    $q->where('ketua_tempa_id', $user->id);
-                })
-                ->where('tahun_absensi', $tahun)
-                ->get();
-        } else {
-            // Admin/Superadmin melihat semua absensi
-            $absensis = TempaAbsensi::with(['peserta.kelompok.ketuaTempa', 'peserta.tempa'])
-                ->where('tahun_absensi', $tahun)
-                ->get();
+            $query->where('tempa_kelompok.ketua_tempa_id', $user->id);
         }
 
-        return view('pages.tempa.absensi.index', compact('absensis', 'tahun', 'bulan'));
+        // Filter berdasarkan search (nama peserta atau NIK)
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('tempa_peserta.nama_peserta', 'like', '%' . $search . '%')
+                  ->orWhere('tempa_peserta.nik_karyawan', 'like', '%' . $search . '%');
+            });
+        }
+
+        // Filter berdasarkan kelompok
+        if ($kelompok) {
+            $query->where('tempa_peserta.id_kelompok', $kelompok);
+        }
+
+        // Filter berdasarkan status peserta
+        if ($status) {
+            $query->where('tempa_peserta.status_peserta', $status);
+        }
+
+        // Filter berdasarkan lokasi (pusat/cabang)
+        if ($lokasi) {
+            $query->where('tempa_kelompok.tempat', $lokasi);
+        }
+
+        $absensis = $query->select('tempa_absensi.*')->get();
+
+        // Load kelompoks untuk filter dropdown
+        if ($isKetuaTempa) {
+            $kelompoks = TempaKelompok::where('ketua_tempa_id', $user->id)->get();
+        } else {
+            $kelompoks = TempaKelompok::all();
+        }
+
+        return view('pages.tempa.absensi.index', compact('absensis', 'tahun', 'bulan', 'search', 'kelompok', 'status', 'lokasi', 'kelompoks'));
     }
 
     public function create()

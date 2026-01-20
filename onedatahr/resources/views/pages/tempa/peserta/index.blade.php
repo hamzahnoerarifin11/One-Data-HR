@@ -44,6 +44,7 @@
             'nik'            => $row->nik_karyawan,
             'status_val'     => $row->status_peserta, // untuk filter/sort
             'status_label'   => $row->status_peserta == 1 ? 'Aktif' : ($row->status_peserta == 2 ? 'Pindah' : 'Keluar'),
+            'keterangan_pindah' => $row->keterangan_pindah ?? '-',
             'kelompok'       => $row->kelompok->nama_kelompok ?? '-',
             'mentor'         => $row->kelompok->nama_mentor ?? '-',
             'show_url'       => route('tempa.peserta.show', ['peserta' => $row->id_peserta]),
@@ -136,14 +137,26 @@
                             <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white" x-text="row.nama_peserta"></td>
                             <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300" x-text="row.nik"></td>
                             <td class="px-6 py-4 text-sm">
-                                <span class="inline-flex rounded-full px-3 py-1 text-xs font-medium"
-                                    :class="{
-                                        'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400': row.status_val == 1,
-                                        'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400': row.status_val == 2,
-                                        'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400': row.status_val != 1 && row.status_val != 2
-                                    }"
-                                    x-text="row.status_label">
-                                </span>
+                                <div class="flex flex-col gap-1.5">
+                                    <div>
+                                        <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold tracking-wide uppercase"
+                                            :class="{
+                                                'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400': row.status_val == 1,
+                                                'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400': row.status_val == 2,
+                                                'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400': row.status_val != 1 && row.status_val != 2
+                                            }"
+                                            x-text="row.status_label">
+                                        </span>
+                                    </div>
+                                    <template x-if="row.status_val == 2 && row.keterangan_pindah && row.keterangan_pindah !== '-'">
+                                        <div class="flex items-start gap-1 text-gray-500 dark:text-gray-400">
+                                            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            <span class="text-[11px] leading-tight italic" x-text="row.keterangan_pindah"></span>
+                                        </div>
+                                    </template>
+                                </div>
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300" x-text="row.kelompok"></td>
                             <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300" x-text="row.mentor"></td>
