@@ -62,6 +62,7 @@ class AppServiceProvider extends ServiceProvider
 
         Gate::define('viewTempaMonitoring', [TempaPolicy::class, 'viewTempaMonitoring']);
         Gate::define('createTempaMateri', [TempaPolicy::class, 'createTempaMateri']);
+        Gate::define('viewTempaMateri', [TempaPolicy::class, 'viewTempaMateri']);
 
         // Gates for TEMPA KELOMPOK
         Gate::define('viewTempaKelompok', function($user) {

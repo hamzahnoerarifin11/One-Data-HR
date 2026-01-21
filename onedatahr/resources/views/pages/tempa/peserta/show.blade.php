@@ -109,10 +109,10 @@
                 </p>
             </div>
 
-            <div>
+            <!-- <div>
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">TEMPA</p>
                 <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $pesertaModel->tempa->nama_tempa ?? '-' }}</p>
-            </div>
+            </div> -->
         </div>
 
         <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center text-xs text-gray-500">

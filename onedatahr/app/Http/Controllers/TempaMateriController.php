@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Tempa;
 use App\Models\TempaMateri;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -16,7 +17,7 @@ class TempaMateriController extends Controller
 
     public function index()
     {
-        $this->authorize('createTempaMateri'); // Admin/Superadmin only
+        $this->authorize('viewTempaMateri'); // Admin/Superadmin/Ketua TEMPA can view
 
         $materis = TempaMateri::with('uploader')->get();
         return view('pages.tempa.materi.index', compact('materis'));
@@ -26,16 +27,16 @@ class TempaMateriController extends Controller
     {
         $this->authorize('createTempaMateri');
 
-        return view('pages.tempa.materi.create');
+        $tempas = \App\Models\Tempa::all();
+        return view('pages.tempa.materi.create', compact('tempas'));
     }
 
     public function store(Request $request)
     {
-        if (!Gate::allows('create-tempa-materi')) {
-            abort(403);
-        }
+        $this->authorize('createTempaMateri');
 
         $request->validate([
+            'id_tempa' => 'required|exists:tempa,id_tempa',
             'judul' => 'required|string|max:255',
             'file_materi' => 'required|file|mimes:pdf,doc,docx,ppt,pptx|max:10240',
         ]);
@@ -43,8 +44,9 @@ class TempaMateriController extends Controller
         $path = $request->file('file_materi')->store('tempa/materi', 'public');
 
         TempaMateri::create([
-            'judul' => $request->judul,
-            'file_path' => $path,
+            'id_tempa' => $request->id_tempa,
+            'judul_materi' => $request->judul,
+            'file_materi' => $path,
             'uploaded_by' => auth()->id(),
         ]);
 
@@ -53,7 +55,9 @@ class TempaMateriController extends Controller
 
     public function download($id)
     {
+        $this->authorize('viewTempaMateri'); // Admin/Superadmin/Ketua TEMPA can download
+
         $materi = TempaMateri::findOrFail($id);
-        return Storage::disk('public')->download($materi->file_path);
+        return Storage::disk('public')->download($materi->file_materi);
     }
 }

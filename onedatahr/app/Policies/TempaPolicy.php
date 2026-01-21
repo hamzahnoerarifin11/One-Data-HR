@@ -66,6 +66,11 @@ class TempaPolicy
 
     public function createTempaMateri(User $user)
     {
-        return $user->hasRole(['admin']);
+        return $user->hasRole(['admin', 'superadmin']);
+    }
+
+    public function viewTempaMateri(User $user)
+    {
+        return $user->hasRole(['admin', 'superadmin', 'ketua_tempa']);
     }
 }

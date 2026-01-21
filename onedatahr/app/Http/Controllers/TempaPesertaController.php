@@ -114,7 +114,13 @@ class TempaPesertaController extends Controller
             unset($validated['kelompok_id']);
         } else {
             // Admin/Superadmin gunakan kelompok yang dipilih
+            $kelompok = TempaKelompok::find($validated['kelompok_id']);
+            if (!$kelompok) {
+                return back()->withErrors(['kelompok_id' => 'Kelompok tidak ditemukan'])->withInput();
+            }
+
             $validated['id_kelompok'] = $validated['kelompok_id'];
+            $validated['id_tempa'] = $kelompok->id_tempa;
             unset($validated['nama_mentor'], $validated['kelompok_id']);
         }
 

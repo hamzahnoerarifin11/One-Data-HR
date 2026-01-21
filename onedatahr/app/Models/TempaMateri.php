@@ -14,8 +14,8 @@ class TempaMateri extends Model
 
     protected $fillable = [
         'id_tempa',
-        'judul',
-        'file_path',
+        'judul_materi',
+        'file_materi',
         'uploaded_by'
     ];
 
