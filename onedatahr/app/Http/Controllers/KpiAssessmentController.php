@@ -516,8 +516,33 @@ class KpiAssessmentController extends Controller
 
         $filename = "KPI_{$karyawan->NIK}_{$tahun}.pdf";
 
-        $pdf = Pdf::loadView('pages.kpi.pdf', compact('karyawan', 'kpi', 'items', 'tahun'));
+        $pdf = Pdf::loadView('pages.kpi.pdf', compact('karyawan', 'kpi', 'items', 'tahun'))->setPaper('a4', 'landscape');
 
         return $pdf->download($filename);
+    }
+
+    // =================================================================
+    // DESTROY: Hapus KPI Assessment
+    // =================================================================
+    public function destroy($id)
+    {
+        try {
+            $kpi = KpiAssessment::findOrFail($id);
+
+            // Hapus scores terkait
+            KpiScore::whereHas('item', function ($query) use ($kpi) {
+                $query->where('kpi_assessment_id', $kpi->id_kpi_assessment);
+            })->delete();
+
+            // Hapus items terkait
+            KpiItem::where('kpi_assessment_id', $kpi->id_kpi_assessment)->delete();
+
+            // Hapus assessment utama
+            $kpi->delete();
+
+            return redirect()->back()->with('success', 'Data KPI berhasil dihapus.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal menghapus data KPI: ' . $e->getMessage());
+        }
     }
 }

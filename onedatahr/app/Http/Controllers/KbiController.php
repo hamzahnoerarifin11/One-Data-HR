@@ -55,7 +55,7 @@ class KbiController extends Controller
             if ($userDivisi) {
                 $query->whereHas('pekerjaan', function ($q) use ($userDivisi) {
                     $q->where('Divisi', $userDivisi);
-                    
+
                     // Opsional: Jika ingin filter level jabatan di bawahnya secara spesifik
                     // $q->whereIn('Jabatan', ['Supervisor', 'Staff', 'Officer']); 
                     // Atau gunakan logika NOT LIKE Manager jika ingin mengecualikan sesama manager
@@ -63,7 +63,7 @@ class KbiController extends Controller
                 });
             } else {
                 // Jika data divisi manager kosong, mungkin tidak tampilkan apa-apa atau tampilkan semua (safety net)
-                 \Log::warning('Manager tanpa Divisi login: ' . $karyawan->Nama_Lengkap_Sesuai_Ijazah);
+                \Log::warning('Manager tanpa Divisi login: ' . $karyawan->Nama_Lengkap_Sesuai_Ijazah);
             }
         }
 
@@ -104,11 +104,16 @@ class KbiController extends Controller
         // F. Logic Dropdown Pilih Atasan (Tetap Sama - Saya ringkas di sini agar tidak kepanjangan, 
         // tapi pastikan Anda copy paste bagian "Logika Baru Ambil List Semua Karyawan..." dari kode lama Anda)
         // ... (Masukkan kode $jabatanHierarchy dan logic $listCalonAtasan di sini) ...
-        
+
         // --- SAYA SALIN ULANG BAGIAN PENTING HIERARKI AGAR ANDA BISA LANGSUNG COPY-PASTE UTUH ---
         $jabatanHierarchy = [
-            'GM' => 1, 'General Manager' => 1, 'Manager' => 2, 'Supervisor' => 3,
-            'Staff' => 4, 'Officer' => 4, 'Assistant' => 5,
+            'GM' => 1,
+            'General Manager' => 1,
+            'Manager' => 2,
+            'Supervisor' => 3,
+            'Staff' => 4,
+            'Officer' => 4,
+            'Assistant' => 5,
         ];
         $userLevel = $jabatanHierarchy[$userJabatan] ?? 99;
 
@@ -134,8 +139,13 @@ class KbiController extends Controller
         // -----------------------------------------------------------------------------------------
 
         return view('pages.kbi.index', compact(
-            'karyawan', 'selfAssessment', 'bawahanList', 'atasan', 
-            'sudahMenilaiAtasan', 'listCalonAtasan', 'tahun'
+            'karyawan',
+            'selfAssessment',
+            'bawahanList',
+            'atasan',
+            'sudahMenilaiAtasan',
+            'listCalonAtasan',
+            'tahun'
         ));
     }
 
@@ -331,7 +341,34 @@ class KbiController extends Controller
         // 1. Query Dasar
         $query = Karyawan::with(['pekerjaan', 'atasan']);
 
-        // 2. Filter Search
+        // Filter berdasarkan hierarki user login
+        $user = auth()->user();
+        if ($user) {
+            // Jika admin atau superadmin, tampilkan semua
+            if ($user->hasRole(['admin', 'superadmin'])) {
+                // No filter, show all
+            } else {
+                $karyawanUser = Karyawan::where('NIK', $user->nik)->first();
+                if ($karyawanUser) {
+                    $jabatanUser = $karyawanUser->pekerjaan->first()?->Jabatan ?? '';
+                    $jabatanLower = strtolower($jabatanUser);
+
+                    // Jika GM atau General Manager, tampilkan semua karyawan di divisi yang sama
+                    if (strpos($jabatanLower, 'general manager') !== false || strpos($jabatanLower, 'gm') !== false) {
+                        $divisiUser = $karyawanUser->pekerjaan->first()?->Divisi ?? '';
+                        $query->whereHas('pekerjaan', function ($q) use ($divisiUser) {
+                            $q->where('Divisi', $divisiUser);
+                        });
+                    } elseif (strpos($jabatanLower, 'manager') !== false) {
+                        // Jika manager (tapi bukan general manager), tampilkan bawahan langsung
+                        $query->where('atasan_id', $karyawanUser->id_karyawan);
+                    } else {
+                        // Untuk jabatan lain dengan role manager, mungkin tampilkan bawahan
+                        $query->where('atasan_id', $karyawanUser->id_karyawan);
+                    }
+                }
+            }
+        }
         if ($request->has('search') && $request->search != '') {
             $keyword = $request->search;
             $query->where(function ($q) use ($keyword) {

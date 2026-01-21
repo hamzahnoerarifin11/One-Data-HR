@@ -357,7 +357,7 @@
     </div>
 </div>
 
-<div id="modalEditKPI" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden z-50 flex justify-center items-center p-4">
+<div id="modalEditKPI" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden z-50 justify-center items-center p-4">
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl p-4 md:p-6 relative max-h-[90vh] overflow-y-auto">
         <h2 class="text-lg md:text-xl font-bold mb-4 text-gray-800 dark:text-white">Edit Indikator Kinerja</h2>
         <form id="formEditKPI" method="POST">
@@ -372,14 +372,38 @@
                 <input type="text" id="edit_target" name="target" class="w-full border rounded p-2 text-sm" required>
             </div>
             <div class="mt-6 flex justify-end gap-3">
-                <button type="button" onclick="document.getElementById('modalEditKPI').classList.add('hidden')" class="px-4 py-2 border rounded text-gray-600 hover:bg-gray-100 text-sm">Batal</button>
+                <button type="button" onclick="closeEditModal()" class="px-4 py-2 border rounded text-gray-600 hover:bg-gray-100 text-sm">Batal</button>
                 <button type="submit" class="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 text-sm">Update KPI</button>
             </div>
         </form>
     </div>
 </div>
+<div id="unsavedModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); backdrop-filter: blur(8px); z-index:9999; display:flex; align-items:center; justify-content:center;">
+    <div style="background:#fff; width:450px; margin:auto; padding:24px; border-radius:12px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); animation: modalFadeIn 0.3s ease-out;">
+        <div style="display:flex; align-items:center; margin-bottom:16px;">
+            <i class="fas fa-exclamation-triangle" style="color:#f59e0b; font-size:24px; margin-right:12px;"></i>
+            <div>
+                <h3 style="font-size:18px; font-weight:bold; color:#1f2937; margin:0;">Perubahan Belum Disimpan</h3>
+                <p style="font-size:14px; color:#6b7280; margin:0;">Konfirmasi sebelum meninggalkan halaman</p>
+            </div>
+        </div>
+        <p style="color:#374151; margin-bottom:20px; line-height:1.5;">
+            Anda memiliki perubahan yang belum disimpan pada form KPI. Jika Anda meninggalkan halaman sekarang, perubahan tersebut akan hilang.
+        </p>
+        <div style="display:flex; justify-content:flex-end; gap:12px;">
+            <button id="stayBtn" style="padding:8px 16px; background:#e5e7eb; color:#374151; border:none; border-radius:6px; cursor:pointer; transition:all 0.2s; font-weight:500; ">
+                <i class="fas fa-arrow-left" style="margin-right:6px;">
 
+                </i>Tetap Disini
+            </button>
+            <button id="leaveBtn" style="padding:8px 16px; background:#dc2626; color:white; border:none; border-radius:6px; cursor:pointer; transition:all 0.2s; font-weight:500;">
+                <i class="fas fa-sign-out-alt" style="margin-right:6px;"></i>Tinggalkan
+            </button>
+        </div>
+    </div>
+</div>
 <form id="globalDeleteForm" method="POST" class="hidden">@csrf @method('DELETE')</form>
+
 
 {{-- SCRIPT --}}
 <script>
@@ -451,7 +475,9 @@
         document.getElementById('edit_polaritas').value = data.polaritas;
         document.getElementById('edit_bobot').value = data.bobot;
         document.getElementById('edit_target').value = data.target || data.target_tahunan;
-        document.getElementById('modalEditKPI').classList.remove('hidden');
+        const modal = document.getElementById('modalEditKPI');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
     }
 
     function confirmDelete(deleteUrl) {
@@ -635,9 +661,9 @@
             const alertBox = document.getElementById('total-bobot-alert');
             if (alertBox) {
                 if (totalBobot != 100) {
-                    alertBox.innerHTML = `<span class="text-red-600 bg-red-100 px-2 py-1 rounded border border-red-200"><i class="fas fa-exclamation-triangle"></i> Total Bobot: ${totalBobot}% (Harus 100%)</span>`;
+                    alertBox.innerHTML = `<span class="text-white bg-red-600 px-2 py-1 rounded border border-red-200"><i class="fas fa-exclamation-triangle"></i> Total Bobot: ${totalBobot}% (Harus 100%)</span>`;
                 } else {
-                    alertBox.innerHTML = `<span class="text-green-600 bg-green-100 px-2 py-1 rounded border border-green-200"><i class="fas fa-check-circle"></i> Total Bobot: 100% (OK)</span>`;
+                    alertBox.innerHTML = `<span class="text-white bg-green-600 px-2 py-1 rounded border border-green-200"><i class="fas fa-check-circle"></i> Total Bobot: 100% (OK)</span>`;
                 }
             }
         }
@@ -650,6 +676,83 @@
 
         calculateAll();
     });
+
+    let isDirty = false;
+    let targetUrl = null;
+
+    const kpiFormInputs = document.querySelectorAll('#kpiForm input, #kpiForm textarea, #kpiForm select');
+    
+    kpiFormInputs.forEach(el => {
+        el.addEventListener('change', function() {
+            // Opsional: Cek jika input ini readonly, jangan dianggap dirty
+            if (!this.readOnly) {
+                isDirty = true;
+            }
+        });
+    });
+
+    // Reset jika submit (Form disubmit secara sah)
+    const formKpi = document.getElementById('kpiForm');
+    if (formKpi) {
+        formKpi.addEventListener('submit', () => isDirty = false);
+    }
+    // Intercept semua link navigasi
+    document.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            
+            // 1. Abaikan jika link kosong/javascript
+            if (!href || href.startsWith('#') || href.startsWith('javascript')) return;
+
+            // 2. Abaikan jika ini link EXPORT (Excel/PDF)
+            //    Biasanya export membuka tab baru atau download file, jadi tidak perlu warning
+            if (href.includes('export') || href.includes('download')) return;
+
+            // 3. Abaikan jika target="_blank" (Tab baru)
+            if (this.target === '_blank') return;
+            
+            if (isDirty) {
+                e.preventDefault();
+                targetUrl = this.href;
+                
+                const modal = document.getElementById('unsavedModal');
+                modal.style.display = 'flex'; 
+                modal.firstElementChild.classList.add('modal-animate');
+            }
+        });
+    });
+
+    // Tombol modal
+    document.getElementById('stayBtn').addEventListener('click', function(e) {
+        e.stopPropagation();
+        document.getElementById('unsavedModal').style.display = 'none';
+        targetUrl = null;
+        isDirty = true; // Tetap dirty sampai simpan
+    });
+
+    document.getElementById('leaveBtn').addEventListener('click', function(e) {
+        e.stopPropagation();
+        isDirty = false;
+        if (targetUrl) {
+            window.location.href = targetUrl;
+        } else {
+            // Jika tidak ada targetUrl, mungkin refresh atau back
+            window.history.back();
+        }
+    });
 </script>
+
+
+
+<style>
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+#unsavedModal > div {
+    animation: modalFadeIn 0.3s ease-out;
+}
+</style>
+
 </body>
 </html>
