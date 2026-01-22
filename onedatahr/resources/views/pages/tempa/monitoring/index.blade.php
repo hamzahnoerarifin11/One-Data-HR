@@ -35,8 +35,8 @@
                     <p class="text-sm text-gray-500 dark:text-gray-400">Persentase Nasional</p>
                     <h3 class="text-2xl font-bold"
                         :class="{
-                            'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400': {{ $persentaseNasional }} >= 80,
-                            'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400': {{ $persentaseNasional }} >= 60 && {{ $persentaseNasional }} < 80,
+                            'text-green-700 dark:text-green-400': {{ $persentaseNasional }} >= 80,
+                            'text-yellow-700 dark:text-yellow-400': {{ $persentaseNasional }} >= 60 && {{ $persentaseNasional }} < 80,
                             'text-red-700 dark:text-red-400': {{ $persentaseNasional }} < 60
                         }">
                         {{ number_format($persentaseNasional, 1) }}%
@@ -107,66 +107,117 @@
             </div>
         </div>
     </div>
+    @php
+        $rekapKelompokJs = collect($rekapKelompok)->values();
+    @endphp
 
     {{-- Rekap Kelompok --}}
     @if(!empty($rekapKelompok))
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Rekapitulasi per Kelompok</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            @foreach($rekapKelompok as $rekap)
+<div
+    x-data="rekapKelompokPagination()"
+    class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-6"
+>
+    <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+            Rekapitulasi per Kelompok
+        </h3>
+    </div>
+
+    <!-- GRID REKAP -->
+    <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <template x-for="rekap in paginated" :key="rekap.nama_kelompok">
             <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                 <div class="flex justify-between items-start mb-2">
-                    <h4 class="font-medium text-gray-900 dark:text-white">{{ $rekap['nama_kelompok'] }}</h4>
-                    <span class="text-xs">
-                        @if($rekap['lokasi'] && $rekap['lokasi'] !== '-')
-                            @php $lokasiLow = strtolower($rekap['lokasi']); @endphp
+                    <h4 class="font-medium text-gray-900 dark:text-white" x-text="rekap.nama_kelompok"></h4>
 
-                            @if($lokasiLow === 'pusat')
-                                <span class="inline-flex items-center px-2 py-0.5 rounded font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-                                    Pusat
-                                </span>
-                            @elseif($lokasiLow === 'cabang')
-                                <span class="inline-flex items-center px-2 py-0.5 rounded font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-                                    Cabang @if(!empty($rekap['keterangan_cabang'])) - {{ $rekap['keterangan_cabang'] }} @endif
-                                </span>
-                            @else
-                                <span class="text-gray-500">{{ $rekap['lokasi'] }}</span>
-                            @endif
-                        @else
-                            <span class="text-gray-500">-</span>
-                        @endif
+                    <span class="text-xs">
+                        <template x-if="rekap.lokasi === 'pusat'">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                Pusat
+                            </span>
+                        </template>
+
+                        <template x-if="rekap.lokasi === 'cabang'">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                                Cabang
+                                <template x-if="rekap.keterangan_cabang">
+                                    <span class="ml-1" x-text="'- ' + rekap.keterangan_cabang"></span>
+                                </template>
+                            </span>
+                        </template>
                     </span>
                 </div>
+
                 <div class="space-y-1 text-sm">
                     <div class="flex justify-between">
                         <span class="text-gray-600 dark:text-gray-300">Mentor:</span>
-                        <span class="font-medium text-gray-900 dark:text-white">{{ $rekap['nama_mentor'] }}</span>
+                        <span class="font-medium text-gray-900 dark:text-white" x-text="rekap.nama_mentor"></span>
                     </div>
+
                     <div class="flex justify-between">
                         <span class="text-gray-600 dark:text-gray-300">Peserta Aktif:</span>
-                        <span class="font-medium text-gray-900 dark:text-white">{{ $rekap['jumlah_peserta_aktif'] }}/{{ $rekap['total_peserta'] }}</span>
+                        <span class="font-medium text-gray-900 dark:text-white"
+                              x-text="rekap.jumlah_peserta_aktif + '/' + rekap.total_peserta">
+                        </span>
                     </div>
+
                     <div class="flex justify-between">
                         <span class="text-gray-600 dark:text-gray-300">Persentase:</span>
-                        <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                        <span
+                            class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold"
                             :class="{
-                                'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400': {{ $rekap['persentase'] }} >= 80,
-                                'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400': {{ $rekap['persentase'] }} >= 60 && {{ $rekap['persentase'] }} < 80,
-                                'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400': {{ $rekap['persentase'] }} < 60
-                            }">
-                            {{ number_format($rekap['persentase'], 1) }}%
+                                'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400': rekap.persentase >= 80,
+                                'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400': rekap.persentase >= 60 && rekap.persentase < 80,
+                                'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400': rekap.persentase < 60
+                            }"
+                            x-text="rekap.persentase.toFixed(1) + '%'">
                         </span>
                     </div>
                 </div>
             </div>
-            @endforeach
+        </template>
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="flex items-center justify-between px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+        <div class="text-sm text-gray-600 dark:text-gray-400">
+            Showing <span x-text="startItem"></span>
+            to <span x-text="endItem"></span>
+            of <span x-text="data.length"></span> entries
+        </div>
+
+        <div class="flex items-center gap-2">
+            <button @click="prevPage"
+                    :disabled="page === 1"
+                    class="rounded-lg border px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white disabled:opacity-50">
+                Prev
+            </button>
+
+            <template x-for="p in displayedPages" :key="p">
+                <button x-show="p !== '...'"
+                        @click="goToPage(p)"
+                        :class="page === p ? 'bg-blue-500 text-white' : 'text-gray-700 hover:bg-blue-500/[0.08] hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-500'"
+                        class="flex h-8 w-8 items-center justify-center rounded-lg text-theme-sm font-medium"
+                        x-text="p">
+                </button>
+                <span x-show="p === '...'" class="flex h-8 w-8 items-center justify-center text-gray-500">...</span>
+            </template>
+
+            <button @click="nextPage"
+                    :disabled="page === totalPages"
+                    class="rounded-lg border px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white disabled:opacity-50">
+                Next
+            </button>
         </div>
     </div>
-    @endif
+</div>
+@endif
+
+
 
     {{-- Filter Form --}}
     <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
-        <form method="GET" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
+        <form method="GET" x-data="filterLokasiKelompok()" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tahun</label>
                 <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
@@ -184,30 +235,13 @@
                 </div>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Kelompok</label>
-                <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
-
-                <select name="kelompok" class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
-                           :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true" required>
-                        <option value="">Semua</option>
-                    @foreach($listKelompok ?? [] as $kel)
-                        <option value="{{ $kel->id_kelompok }}" {{ request('kelompok') == $kel->id_kelompok ? 'selected' : '' }}>{{ $kel->nama_kelompok }}</option>
-                    @endforeach
-                </select>
-                <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
-                            <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                        </span>
-                </div>
-            </div>
-            <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Lokasi</label>
                 <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
 
-                <select name="lokasi" class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
-                           :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true" required>
-                        <option value="">Semua</option>
+                <select name="lokasi" x-model="lokasi"
+                        @change="filterKelompok()" class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
+                           :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true" >
+                        <option value="">Semua Lokasi</option>
                     @foreach($listLokasi ?? [] as $lok)
                         <option value="{{ $lok }}" {{ request('lokasi') == $lok ? 'selected' : '' }}>{{ $lok }}</option>
                     @endforeach
@@ -220,12 +254,36 @@
                 </div>
             </div>
             <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Kelompok</label>
+                <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
+
+                <select name="kelompok" class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
+                           :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true">
+                        <option value="">Semua Kelompok</option>
+                        <template x-for="kel in filteredKelompok" :key="kel.id_kelompok">
+                            <option :value="kel.id_kelompok"
+                                    x-text="kel.nama_kelompok"
+                                    :selected="kel.id_kelompok == '{{ request('kelompok') }}'">
+                            </option>
+                        </template>
+                    <!-- @foreach($listKelompok ?? [] as $kel)
+                        <option value="{{ $kel->id_kelompok }}" {{ request('kelompok') == $kel->id_kelompok ? 'selected' : '' }}>{{ $kel->nama_kelompok }}</option>
+                    @endforeach -->
+                </select>
+                <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
+                            <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </span>
+                </div>
+            </div>
+            <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
                 <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
                 <select name="status" class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
-                           :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true" required>
+                           :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true" >
 
-                    <option value="">Semua</option>
+                    <option value="">Semua Status</option>
                     <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Aktif</option>
                     <option value="2" {{ request('status') == '2' ? 'selected' : '' }}>Pindah</option>
                     <option value="3" {{ request('status') == '3' ? 'selected' : '' }}>Keluar</option>
@@ -363,21 +421,34 @@
                             </td>
                             <td class="px-6 py-4 text-sm">
                                 <div class="flex flex-col gap-1.5">
-                                    <div>
-                                        <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold tracking-wide uppercase"
-                                            :class="{
-                                                'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400': row.status_val == 1,
-                                                'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400': row.status_val == 2,
-                                                'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400': row.status_val != 1 && row.status_val != 2
-                                            }"
-                                            x-text="row.status_label">
-                                        </span>
-                                    </div>
-                                    <template x-if="row.status_val == 2 && row.keterangan_pindah !== '-'">
-                                        <div class="text-[10px] text-yellow-700 dark:text-yellow-400" x-text="row.keterangan_pindah"></div>
+
+                                    <!-- BADGE STATUS -->
+                                    <span
+                                        class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold tracking-wide uppercase"
+                                        :class="{
+                                            'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400': row.status_val == 1,
+                                            'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400': row.status_val == 2,
+                                            'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400': row.status_val != 1 && row.status_val != 2
+                                        }"
+                                        x-text="row.status_label">
+                                    </span>
+
+                                    <!-- KETERANGAN PINDAH -->
+                                    <template x-if="row.status_val == 2 && row.keterangan_pindah && row.keterangan_pindah !== '-'">
+                                        <div class="flex items-start gap-1 text-gray-500 dark:text-gray-400">
+                                            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                            <span class="text-[11px] leading-tight italic"
+                                                x-text="row.keterangan_pindah">
+                                            </span>
+                                        </div>
                                     </template>
+
                                 </div>
                             </td>
+
                             <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300" x-text="row.kelompok"></td>
                             <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300" x-text="row.mentor"></td>
                             <!-- <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300" x-text="row.lokasi"></td> -->
@@ -440,6 +511,34 @@
         </div>
     </div>
 </div>
+
+<script>
+function filterLokasiKelompok() {
+    return {
+        lokasi: '{{ request('lokasi') }}',
+
+        kelompokAll: @json($listKelompok),
+
+        filteredKelompok: [],
+
+        init() {
+            this.filterKelompok();
+        },
+
+        filterKelompok() {
+            if (!this.lokasi) {
+                // Jika lokasi kosong / semua → tampilkan semua kelompok
+                this.filteredKelompok = this.kelompokAll;
+            } else {
+                // Jika pilih pusat / cabang → filter berdasarkan lokasi
+                this.filteredKelompok = this.kelompokAll.filter(kel =>
+                    kel.tempat && kel.tempat.toLowerCase() === this.lokasi.toLowerCase()
+                );
+            }
+        }
+    }
+}
+</script>
 
 <script>
 function monitoringTable() {
@@ -564,4 +663,62 @@ function monitoringTable() {
     }
 }
 </script>
+<script>
+function rekapKelompokPagination() {
+    return {
+        data: @json($rekapKelompokJs),
+        page: 1,
+        perPage: 6,
+
+        get totalPages() {
+            return Math.ceil(this.data.length / this.perPage);
+        },
+
+        get paginated() {
+            const start = (this.page - 1) * this.perPage;
+            return this.data.slice(start, start + this.perPage);
+        },
+
+        get startItem() {
+            return (this.page - 1) * this.perPage + 1;
+        },
+
+        get endItem() {
+            return Math.min(this.page * this.perPage, this.data.length);
+        },
+
+        get displayedPages() {
+            const pages = [];
+            const total = this.totalPages;
+            const current = this.page;
+
+            if (total <= 7) {
+                for (let i = 1; i <= total; i++) pages.push(i);
+            } else if (current <= 4) {
+                pages.push(1,2,3,4,5,'...',total);
+            } else if (current >= total - 3) {
+                pages.push(1,'...',total-4,total-3,total-2,total-1,total);
+            } else {
+                pages.push(1,'...',current-1,current,current+1,'...',total);
+            }
+
+            return pages;
+        },
+
+        prevPage() {
+            if (this.page > 1) this.page--;
+        },
+
+        nextPage() {
+            if (this.page < this.totalPages) this.page++;
+        },
+
+        goToPage(p) {
+            if (p >= 1 && p <= this.totalPages) this.page = p;
+        }
+    }
+}
+</script>
+
+
 @endsection

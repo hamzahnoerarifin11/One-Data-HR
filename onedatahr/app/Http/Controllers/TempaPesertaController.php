@@ -54,7 +54,7 @@ class TempaPesertaController extends Controller
             $isKetuaTempa = false;
         }
 
-        $pesertaModel = TempaPeserta::with(['kelompok.ketuaTempa', 'tempa'])->findOrFail($peserta);
+        $pesertaModel = TempaPeserta::with(['kelompok.ketuaTempa'])->findOrFail($peserta);
 
         // Cek akses ketua_tempa
         if ($isKetuaTempa && $pesertaModel->kelompok->ketua_tempa_id != $user->id) {

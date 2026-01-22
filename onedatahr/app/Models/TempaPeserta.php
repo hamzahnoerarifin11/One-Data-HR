@@ -20,7 +20,9 @@ class TempaPeserta extends Model
         'status_peserta',
         'keterangan_pindah',
         'id_kelompok',
-        'id_tempa'
+        'mentor_id',
+        'tempat',
+        'keterangan_cabang'
     ];
 
     public function kelompok()
@@ -32,9 +34,9 @@ class TempaPeserta extends Model
         );
     }
 
-    public function tempa()
+    public function mentor()
     {
-        return $this->belongsTo(Tempa::class, 'id_tempa', 'id_tempa');
+        return $this->belongsTo(User::class, 'mentor_id');
     }
 
     public function absensi()

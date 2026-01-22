@@ -35,7 +35,7 @@ class TempaAbsensiController extends Controller
         $status = request('status', null);
         $lokasi = request('lokasi', null);
 
-        $query = TempaAbsensi::with(['peserta.kelompok.ketuaTempa', 'peserta.tempa'])
+        $query = TempaAbsensi::with(['peserta.kelompok.ketuaTempa', 'peserta'])
             ->leftJoin('tempa_peserta', 'tempa_absensi.id_peserta', '=', 'tempa_peserta.id_peserta')
             ->leftJoin('tempa_kelompok', 'tempa_peserta.id_kelompok', '=', 'tempa_kelompok.id_kelompok')
             ->where('tempa_absensi.tahun_absensi', $tahun);
@@ -181,7 +181,7 @@ class TempaAbsensiController extends Controller
             $isKetuaTempa = false;
         }
 
-        $absensiModel = TempaAbsensi::with(['peserta.kelompok.ketuaTempa', 'peserta.tempa'])->findOrFail($absensi);
+        $absensiModel = TempaAbsensi::with(['peserta.kelompok.ketuaTempa', 'peserta'])->findOrFail($absensi);
 
         // Cek akses ketua_tempa
         if ($isKetuaTempa && $absensiModel->peserta->kelompok->ketua_tempa_id != $user->id) {
@@ -203,7 +203,7 @@ class TempaAbsensiController extends Controller
             $isKetuaTempa = false;
         }
 
-        $absensiModel = TempaAbsensi::with(['peserta.kelompok.ketuaTempa', 'peserta.tempa'])->findOrFail($absensi);
+        $absensiModel = TempaAbsensi::with(['peserta.kelompok.ketuaTempa', 'peserta'])->findOrFail($absensi);
 
         // Cek akses ketua_tempa
         if ($isKetuaTempa && $absensiModel->peserta->kelompok->ketua_tempa_id != $user->id) {

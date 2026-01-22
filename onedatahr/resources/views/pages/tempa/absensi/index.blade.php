@@ -120,6 +120,29 @@
                     </div>
                 </div>
             </div>
+            <!-- Filter Lokasi -->
+            <div>
+                <label for="lokasiFilter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Lokasi
+                </label>
+                <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
+                <select id="lokasiFilter" name="lokasi" onchange="changeFilter()"
+                        class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
+                                :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true">
+                    <option value="">Semua Lokasi</option>
+                    <option value="pusat" {{ request('lokasi') == 'pusat' ? 'selected' : '' }}>Pusat</option>
+                    <option value="cabang" {{ request('lokasi') == 'cabang' ? 'selected' : '' }}>Cabang</option>
+                </select>
+                <span
+                                class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
+                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </span>
+                </div>
+            </div>
 
             <!-- Filter Kelompok -->
             <div>
@@ -148,7 +171,7 @@
                 </div>
             </div>
 
-            <!-- Filter Status -->
+             <!-- Filter Status -->
             <div>
                 <label for="statusFilter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Status Peserta
@@ -161,30 +184,6 @@
                     <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Aktif</option>
                     <option value="2" {{ request('status') == '2' ? 'selected' : '' }}>Pindah</option>
                     <option value="3" {{ request('status') == '3' ? 'selected' : '' }}>Keluar</option>
-                </select>
-                <span
-                                class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
-                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5"
-                                        stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                            </span>
-                </div>
-            </div>
-
-            <!-- Filter Lokasi -->
-            <div>
-                <label for="lokasiFilter" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Lokasi
-                </label>
-                <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
-                <select id="lokasiFilter" name="lokasi" onchange="changeFilter()"
-                        class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
-                                :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true">
-                    <option value="">Semua Lokasi</option>
-                    <option value="pusat" {{ request('lokasi') == 'pusat' ? 'selected' : '' }}>Pusat</option>
-                    <option value="cabang" {{ request('lokasi') == 'cabang' ? 'selected' : '' }}>Cabang</option>
                 </select>
                 <span
                                 class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
@@ -521,17 +520,45 @@
                         </td>
 
                         <!-- Status Peserta -->
-                        <td class="px-2 py-4 whitespace-nowrap text-center text-sm text-gray-900 dark:text-white">
-                            <span x-show="absensi.status_peserta == 1" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-                                Aktif
-                            </span>
-                            <span x-show="absensi.status_peserta == 2" class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
-                                Pindah<span x-show="absensi.keterangan_pindah"> - </span><span x-text="absensi.keterangan_pindah"></span>
-                            </span>
-                            <span x-show="absensi.status_peserta != 1 && absensi.status_peserta != 2" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
-                                Keluar
-                            </span>
+                        <td class="px-6 py-4 text-sm">
+                            <div class="flex flex-col items-center gap-1.5">
+
+                                <!-- STATUS AKTIF -->
+                                <span x-show="absensi.status_peserta == 1"
+                                    class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold tracking-wide uppercase
+                                            bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                                    Aktif
+                                </span>
+
+                                <!-- STATUS PINDAH -->
+                                <span x-show="absensi.status_peserta == 2"
+                                    class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold tracking-wide uppercase
+                                            bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">
+                                    Pindah
+                                </span>
+
+                                <!-- KETERANGAN PINDAH -->
+                                <template x-if="absensi.status_peserta == 2 && absensi.keterangan_pindah && absensi.keterangan_pindah !== '-'">
+                                    <div class="flex items-start gap-1 text-gray-500 dark:text-gray-400">
+                                        <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        <span class="text-[11px] leading-tight italic"
+                                            x-text="absensi.keterangan_pindah"></span>
+                                    </div>
+                                </template>
+
+                                <!-- STATUS KELUAR -->
+                                <span x-show="absensi.status_peserta != 1 && absensi.status_peserta != 2"
+                                    class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold tracking-wide uppercase
+                                            bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                                    Keluar
+                                </span>
+
+                            </div>
                         </td>
+
 <!-- <template x-if="absensi.keterangan_pindah">
                                     <span class="block text-[11px] font-normal text-yellow-700 dark:text-yellow-200 mt-0.5" x-text="absensi.keterangan_pindah"></span>
                                 </template> -->

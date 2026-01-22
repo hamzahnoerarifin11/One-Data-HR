@@ -132,7 +132,7 @@
                         @endphp
                         <div class="flex items-center justify-between">
                             <label for="absensi_{{ $key }}_{{ $i }}" class="text-sm text-gray-700 dark:text-gray-300">
-                                Minggu {{ $i + 1 }}
+                                Minggu {{ $i }}
                             </label>
                             <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
                             <select id="absensi_{{ $key }}_{{ $i }}" name="absensi[{{ $key }}][{{ $i }}]"

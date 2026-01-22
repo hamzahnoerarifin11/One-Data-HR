@@ -13,7 +13,6 @@ class TempaMateri extends Model
     protected $primaryKey = 'id_materi';
 
     protected $fillable = [
-        'id_tempa',
         'judul_materi',
         'file_materi',
         'uploaded_by'
@@ -22,11 +21,6 @@ class TempaMateri extends Model
     /* =====================
      | RELATIONSHIP
      ===================== */
-
-    public function tempa()
-    {
-        return $this->belongsTo(Tempa::class, 'id_tempa');
-    }
 
     public function uploader()
     {

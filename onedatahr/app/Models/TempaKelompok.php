@@ -15,22 +15,18 @@ class TempaKelompok extends Model
     protected $primaryKey = 'id_kelompok';
 
     protected $fillable = [
-        'id_tempa',
         'nama_kelompok',
         'nama_mentor',
         'ketua_tempa_id',
+        'mentor_id',
         'tempat',
-        'keterangan_cabang'
+        'keterangan_cabang',
+        'created_by_tempa'
     ];
 
     /* =====================
      | RELATIONSHIP
      ===================== */
-
-    public function tempa()
-    {
-        return $this->belongsTo(Tempa::class, 'id_tempa');
-    }
 
     /**
      * Ketua TEMPA yang mengelola kelompok ini
@@ -38,6 +34,14 @@ class TempaKelompok extends Model
     public function ketuaTempa(): BelongsTo
     {
         return $this->belongsTo(User::class, 'ketua_tempa_id');
+    }
+
+    /**
+     * Mentor
+     */
+    public function mentor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'mentor_id');
     }
 
     /**

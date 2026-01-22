@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\TempaKelompokRequest;
 use App\Models\TempaKelompok;
-use App\Models\Tempa;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 
@@ -29,12 +28,12 @@ class TempaKelompokController extends Controller
 
         if ($isKetuaTempa) {
             // Ketua TEMPA hanya melihat kelompoknya sendiri
-            $kelompoks = TempaKelompok::with(['ketuaTempa', 'tempa'])
+            $kelompoks = TempaKelompok::with(['ketuaTempa'])
                 ->where('ketua_tempa_id', $user->id)
                 ->get();
         } else {
             // Admin/Superadmin melihat semua kelompok
-            $kelompoks = TempaKelompok::with(['ketuaTempa', 'tempa'])->get();
+            $kelompoks = TempaKelompok::with(['ketuaTempa'])->get();
         }
 
         return view('pages.tempa.kelompok.index', compact('kelompoks'));
@@ -73,19 +72,12 @@ class TempaKelompokController extends Controller
 
         $validated = $request->validated();
 
-        $activeTempa = Tempa::latest()->first();
-        if (!$activeTempa) {
-            return back()->withErrors(['tempa' => 'Tidak ada TEMPA aktif'])->withInput();
-        }
-
         if ($isKetuaTempa) {
             $validated['ketua_tempa_id'] = $user->id;
         } else {
             // Untuk admin, bisa set ketua_tempa_id jika diperlukan, tapi untuk sekarang biarkan null atau set default
             $validated['ketua_tempa_id'] = $request->input('ketua_tempa_id', $user->id); // atau sesuaikan
         }
-
-        $validated['id_tempa'] = $activeTempa->id_tempa;
 
         TempaKelompok::create($validated);
 
@@ -127,7 +119,7 @@ class TempaKelompokController extends Controller
             $isKetuaTempa = false;
         }
 
-        $kelompok = TempaKelompok::with(['ketuaTempa', 'tempa', 'pesertas'])->findOrFail($kelompok);
+        $kelompok = TempaKelompok::with(['ketuaTempa', 'pesertas'])->findOrFail($kelompok);
 
         // Cek akses ketua_tempa
         if ($isKetuaTempa && $kelompok->ketua_tempa_id != $user->id) {

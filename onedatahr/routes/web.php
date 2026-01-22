@@ -250,6 +250,15 @@ Route::middleware(['auth', 'role:admin|superadmin|ketua_tempa'])->prefix('tempa'
     Route::get('monitoring', [\App\Http\Controllers\TempaMonitoringController::class, 'index'])->name('monitoring.index');
 
     // Materi TEMPA
-    Route::resource('materi', \App\Http\Controllers\TempaMateriController::class)->except(['edit', 'update', 'destroy', 'show']);
+    Route::resource('materi', \App\Http\Controllers\TempaMateriController::class)->except(['show']);
     Route::get('materi/download/{id}', [\App\Http\Controllers\TempaMateriController::class, 'download'])->name('materi.download');
+});
+
+// Routes untuk Struktur Pekerjaan
+Route::middleware(['auth', 'role:admin|superadmin'])->group(function () {
+    Route::resource('company', \App\Http\Controllers\CompanyController::class);
+    Route::resource('division', \App\Http\Controllers\DivisionController::class);
+    Route::resource('department', \App\Http\Controllers\DepartmentController::class);
+    Route::resource('unit', \App\Http\Controllers\UnitController::class);
+    Route::resource('position', \App\Http\Controllers\PositionController::class);
 });

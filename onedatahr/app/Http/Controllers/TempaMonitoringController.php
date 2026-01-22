@@ -68,7 +68,14 @@ class TempaMonitoringController extends Controller
         $rekapKelompok = $this->getStatistikKelompokFiltered($pesertas);
 
         // List kelompok untuk filter dropdown
-        $listKelompok = TempaKelompok::orderBy('nama_kelompok')->get();
+        // $listKelompok = TempaKelompok::orderBy('nama_kelompok')->get();
+        $listKelompok = \App\Models\TempaKelompok::select(
+            'id_kelompok',
+            'nama_kelompok',
+            'tempat'
+        )
+        ->orderBy('nama_kelompok')
+        ->get();
 
         // List lokasi untuk filter dropdown
         $listLokasi = TempaKelompok::select('tempat')->distinct()->whereNotNull('tempat')->pluck('tempat')->toArray();

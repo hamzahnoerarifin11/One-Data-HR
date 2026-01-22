@@ -33,25 +33,13 @@
         @csrf
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div class="md:col-span-2">
-                <label class="mb-2.5 block text-sm font-medium text-gray-900 dark:text-white">Pilih Program TEMPA</label>
-                <select name="id_tempa" class="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-blue-500 focus:outline-hidden focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" required>
-                    <option value="">-- Pilih Program TEMPA --</option>
-                    @foreach($tempas as $tempa)
-                        <option value="{{ $tempa->id_tempa }}" {{ old('id_tempa') == $tempa->id_tempa ? 'selected' : '' }}>
-                            {{ $tempa->nama_tempa }} ({{ $tempa->cabang }} - {{ $tempa->periode }})
-                        </option>
-                    @endforeach
-                </select>
-                @error('id_tempa') <p class="text-red-500 text-xs">{{ $message }}</p> @enderror
-            </div>
-            <div class="md:col-span-2">
                 <label class="mb-2.5 block text-sm font-medium text-gray-900 dark:text-white">Judul Materi</label>
                 <input type="text" name="judul" value="{{ old('judul') }}" class="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-blue-500 focus:outline-hidden focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" placeholder="Contoh: Modul Pelatihan Leadership" required>
                 @error('judul') <p class="text-red-500 text-xs">{{ $message }}</p> @enderror
             </div>
             <div class="md:col-span-2">
                 <label class="mb-2.5 block text-sm font-medium text-gray-900 dark:text-white">File Materi</label>
-                <input type="file" name="file_materi" accept=".pdf,.doc,.docx,.ppt,.pptx" class="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-blue-500 focus:outline-hidden focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 file:mr-4 file:py-2 file:px-4 file:rounded-l-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-300" required>
+                <input type="file" name="file_materi" accept=".pdf,.doc,.docx,.ppt,.pptx" class="focus:border-ring-brand-300 shadow-theme-xs focus:file:ring-brand-300 h-11 w-full overflow-hidden rounded-lg border border-gray-300 bg-transparent text-sm text-gray-500 transition-colors file:mr-5 file:border-collapse file:cursor-pointer file:rounded-l-lg file:border-0 file:border-r file:border-solid file:border-gray-200 file:bg-gray-50 file:py-3 file:pr-3 file:pl-3.5 file:text-sm file:text-gray-700 placeholder:text-gray-400 hover:file:bg-gray-100 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:text-white/90 dark:file:border-gray-800 dark:file:bg-white/[0.03] dark:file:text-gray-400 dark:placeholder:text-gray-400" required>
                 @error('file_materi') <p class="text-red-500 text-xs">{{ $message }}</p> @enderror
                 <p class="text-xs text-gray-500 mt-1 dark:text-gray-400">Format yang didukung: PDF, DOC, DOCX, PPT, PPTX. Maksimal 10MB.</p>
             </div>

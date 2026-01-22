@@ -101,13 +101,19 @@ class MenuHelper
         }
 
         // =============================================================
-        // 4. MENU KHUSUS SUPERADMIN
+        // 5. MENU STRUKTUR PEKERJAAN (Untuk admin, superadmin)
         // =============================================================
-        if ($user->hasRole('superadmin')) {
+        if ($user->hasRole(['admin', 'superadmin'])) {
             $menu[] = [
-                'icon' => 'authentication',
-                'name' => 'Manajemen User',
-                'path' => '/users',
+                'icon' => 'forms',
+                'name' => 'Struktur Pekerjaan',
+                'subItems' => [
+                    ['name' => 'Perusahaan', 'path' => '/company'],
+                    ['name' => 'Divisi', 'path' => '/division'],
+                    ['name' => 'Departemen', 'path' => '/department'],
+                    ['name' => 'Unit', 'path' => '/unit'],
+                    ['name' => 'Jabatan', 'path' => '/position'],
+                ],
             ];
         }
         // KPI Karyawan (Punya Staff Sendiri)
