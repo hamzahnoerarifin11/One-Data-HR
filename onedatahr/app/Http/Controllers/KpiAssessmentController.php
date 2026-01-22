@@ -231,7 +231,12 @@ class KpiAssessmentController extends Controller
         $assessment = KpiAssessment::with('karyawan')->findOrFail($id_kpi_assessment);
         $inputs = $request->input('kpi'); // Array dari form
 
-        if (!$inputs) return redirect()->back()->with('error', 'Tidak ada data dikirim.');
+        if (!$inputs) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Tidak ada data dikirim.']);
+            }
+            return redirect()->back()->with('error', 'Tidak ada data dikirim.');
+        }
 
         DB::beginTransaction();
         try {
@@ -362,9 +367,16 @@ class KpiAssessmentController extends Controller
             // Pesan Feedback Disesuaikan
             $pesan = ($statusBaru == 'FINAL') ? 'Data disetujui & difinalisasi.' : 'Data berhasil dikirim ke Atasan.';
 
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => $pesan . ' Skor Akhir: ' . number_format($grandTotal, 2)]);
+            }
+
             return redirect()->back()->with('success', $pesan . ' Skor Akhir: ' . number_format($grandTotal, 2));
         } catch (\Exception $e) {
             DB::rollback();
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Gagal menyimpan: ' . $e->getMessage()]);
+            }
             return redirect()->back()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
         }
     }

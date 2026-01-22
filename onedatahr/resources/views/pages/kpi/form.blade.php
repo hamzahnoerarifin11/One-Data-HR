@@ -119,8 +119,8 @@
                 }
             @endphp
             {{-- 3. Tombol Simpan --}}
-            <button id="btnSimpan" type="button" onclick="submitKpiForm()" 
-                class="px-3 py-2 {{ $isManager ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700' }} text-white rounded-lg text-sm transition shadow-lg flex items-center justify-center gap-2 flex-1 lg:flex-none">
+            <button id="btnSimpan" type="button" onclick="submitKpiForm()" disabled
+                class="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm transition shadow-lg flex items-center justify-center gap-2 flex-1 lg:flex-none opacity-50 cursor-not-allowed">
                 
                 @if($isManager)
                     <i class="fas fa-check-double"></i> <span class="hidden sm:inline">Simpan & Approve</span>
@@ -128,6 +128,11 @@
                     <i class="fas fa-save"></i> <span class="hidden sm:inline">Simpan</span>
                 @endif
             </button>
+            {{-- BADGE PERINGATAN (Hanya muncul jika ada perubahan) --}}
+            <div id="unsaved-badge" class="hidden flex items-center gap-2 px-3 py-1.5 bg-yellow-100 text-yellow-700 text-xs font-bold rounded-lg border border-yellow-300 shadow-sm animate-pulse transition-all">
+                <i class="fas fa-pen-nib"></i>
+                <span>Ada perubahan belum disimpan</span>
+            </div>
         </div>
     </div>
 
@@ -165,8 +170,9 @@
 
     @php
     // Cek apakah user yang login berhak melakukan adjustment?
-    // Staff TIDAK BOLEH (False), Manager/Admin BOLEH (True)
+    // Staff TIDAK BOLEH (False), Manager TIDAK BOLEH kecuali GM (superadmin)
     $isStaff = auth()->user()->hasRole(['staff']);
+    $canAdjust = auth()->user()->hasRole(['superadmin']); // Hanya GM yang bisa adjust
     
     // Class CSS untuk input yang dikunci (Abu-abu & tidak bisa diklik)
     $readonlyClass = $isStaff ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-transparent text-orange-700 font-bold border-b border-orange-300';
@@ -181,8 +187,10 @@
                 <table class="w-full text-sm text-left border-collapse min-w-[3000px] md:min-w-[4500px]"> 
                     <thead class="text-xs text-gray-700 uppercase bg-gray-100 sticky top-0 z-20 shadow-sm">
                         <tr>
-                            <th rowspan="2" class="sticky left-0 bg-gray-200 z-30 p-2 md:p-3 w-10 md:w-12 text-center border border-gray-300">No</th>
-                            <th rowspan="2" class="md:sticky left-10 md:left-12 bg-gray-200 z-30 p-2 md:p-3 w-60 md:w-72 border border-gray-300">Key Performance Indicator</th>
+                            <th rowspan="2" class="sticky left-0 z-40 bg-gray-200 p-2 w-14 text-center border">No</th>
+                            <th rowspan="2" class="sticky left-20 bg-gray-200 z-30 p-2 w-40 border border-gray-300">KRA</th>
+                            {{-- <th rowspan="2" class="md:sticky left-10 md:left-12 bg-gray-200 z-30 p-2 md:p-3 w-60 md:w-72 border border-gray-300">Key Performance Indicator</th> --}}
+                            <th rowspan="2" class="p-2 md:p-3 w-28 border border-gray-300 bg-gray-50">KPI</th>
                             <th rowspan="2" class="p-2 md:p-3 w-28 border border-gray-300 bg-gray-50">Perspektif</th>
                             <th rowspan="2" class="p-2 md:p-3 w-16 text-center border border-gray-300 bg-gray-50">Bobot</th>
                             <th rowspan="2" class="p-2 md:p-3 w-16 text-center border border-gray-300 bg-gray-50">Target</th>
@@ -207,18 +215,23 @@
                         <tr class="row-kpi hover:bg-gray-50 dark:hover:bg-gray-600 transition group text-xs md:text-sm">
                             {{-- IDENTITAS --}}
                             <td class="sticky left-0 bg-white z-10 p-2 md:p-3 text-center border-r font-medium">{{ $items->firstItem() + $index }}</td>
-                            <td class="md:sticky left-10 md:left-12 bg-white z-10 p-2 md:p-3 border-r align-top shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+                            <td class="sticky left-20 bg-white z-10 p-2 md:p-3 border-r align-top shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                                 <div class="flex flex-col sm:flex-row justify-between items-start gap-2">
-                                    <div class="font-semibold text-gray-900 leading-snug">{{ $item->key_performance_indicator ?? $item->indikator }}</div>
+                                    <div class="font-semibold text-gray-900 leading-snug">{{ $item->key_result_area ?? $item->indikator }}</div>
+                                    {{-- <div class="font-semibold text-gray-900 leading-snug"></div> --}}
+
                                     <div class="flex gap-1 shrink-0">
                                         <button type="button" onclick="openEditModal({{ json_encode($item) }}, '{{ route('kpi.update-item', $item->id_kpi_item) }}')" class="text-gray-400 hover:text-yellow-600 p-1"><i class="fas fa-pencil-alt text-[10px]"></i></button>
                                         <button type="button" onclick="confirmDelete('{{ route('kpi.delete-item', $item->id_kpi_item) }}')" class="text-gray-400 hover:text-red-600 p-1"><i class="fas fa-trash-alt text-[10px]"></i></button>
                                     </div>
                                 </div>
+                                
+                                {{-- <div class="text-[15px] text-gray-500 mt-1">{{ $item->key_performance_indicator ?? $item->indikator }}</div> --}}
                                 <div class="text-[15px] text-gray-500 mt-1">{{ $item->units ?? $item->satuan }} | {{ $item->polaritas }}</div>
                                 <input type="hidden" class="input-bobot" value="{{ $item->bobot }}">
                                 <input type="hidden" class="input-polaritas" value="{{ $item->polaritas }}">
                             </td>
+                            <td class="p-2 md:p-3 border-r align-top">{{ $item->key_performance_indicator ?? $item->indikator }}</td>
                             <td class="p-2 md:p-3 border-r align-top">{{ $item->perspektif }}</td>
                             <td class="p-2 md:p-3 text-center border-r align-top font-bold text-blue-600 bg-blue-50/10">{{ $item->bobot }}%</td>
                             <td class="p-2 md:p-3 text-center border-r align-top font-bold text-gray-700">
@@ -230,31 +243,31 @@
                             {{-- SEMESTER 1 --}}
                             @php $bln = 'smt1'; @endphp
                             <td class="p-1 border-r align-center">
-                                <input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][real_{{ $bln }}]" value="{{ $score->{'real_'.$bln} ?? 0 }}" class="input-real-smt1 w-full h-8 px-1 border rounded text-center"></td>
+                                <input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][real_{{ $bln }}]" value="{{ $score->{'real_'.$bln} }}" class="input-real-smt1 w-full h-8 px-1 border rounded text-center" placeholder="0"></td>
                             <td class="p-1 border-r align-center text-center bg-gray-50">
-                                <div class="py-1.5 font-medium text-gray-600"><span class="span-skor-smt1">0</span>%</div>
+                                <div class="py-1.5 font-medium text-gray-600"><span class="span-skor-smt1"></span>%</div>
                             </td>
                             <td class="p-1 border-r-2 align-center text-center bg-blue-50/20">
-                                <div class="py-1.5 font-bold text-blue-700"><span class="span-nilai-smt1">0</span>%</div>
+                                <div class="py-1.5 font-bold text-blue-700"><span class="span-nilai-smt1"></span>%</div>
                             </td>
 
                             {{-- BULANAN --}}
                             @foreach(['jul','aug','sep','okt','nov','des'] as $bln)
-                                <td class="p-1 border-r align center"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][target_{{ $bln }}]" value="{{ $score->{'target_'.$bln} ?? 0 }}" class="input-target-{{ $bln }} w-full h-8 px-1 border rounded text-center"></td>
-                                <td class="p-1 border-r align center"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][real_{{ $bln }}]" value="{{ $score->{'real_'.$bln} ?? 0 }}" class="input-real-{{ $bln }} w-full h-8 px-1 border rounded text-center"></td>
-                                <td class="p-1 border-r align center text-center bg-gray-50"><div class="py-1.5 font-medium text-gray-600"><span class="span-skor-{{ $bln }}">0</span>%</div></td>
-                                <td class="p-1 border-r-2 align center text-center bg-blue-50/20"><div class="py-1.5 font-bold text-blue-700"><span class="span-nilai-{{ $bln }}">0</span>%</div></td>
+                                <td class="p-1 border-r align center"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][target_{{ $bln }}]" value="{{ $score->{'target_'.$bln} }}" class="input-target-{{ $bln }} w-full h-8 px-1 border rounded text-center" placeholder="0"></td>
+                                <td class="p-1 border-r align center"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][real_{{ $bln }}]" value="{{ $score->{'real_'.$bln} }}" class="input-real-{{ $bln }} w-full h-8 px-1 border rounded text-center" placeholder="0"></td>
+                                <td class="p-1 border-r align center text-center bg-gray-50"><div class="py-1.5 font-medium text-gray-600"><span class="span-skor-{{ $bln }}"></span>%</div></td>
+                                <td class="p-1 border-r-2 align center text-center bg-blue-50/20"><div class="py-1.5 font-bold text-blue-700"><span class="span-nilai-{{ $bln }}"></span>%</div></td>
                             @endforeach
 
                             {{-- TOTAL SEMESTER 2 --}}
                             <td class="p-1 text-center border-r bg-gray-50 align-center">
-                                <input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][total_target_smt2]" value="{{ old('kpi.'.$item->id_kpi_item.'.total_target_smt2', $score->total_target_smt2 ?? 0) }}" class="input-total-target-smt2 w-full h-8 px-1 bg-white border rounded text-center focus:border-blue-500 outline-none placeholder-gray-400" placeholder="0">
+                                <input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][total_target_smt2]" value="{{ old('kpi.'.$item->id_kpi_item.'.total_target_smt2', $score->total_target_smt2) }}" class="input-total-target-smt2 w-full h-8 px-1 bg-white border rounded text-center focus:border-blue-500 outline-none placeholder-gray-400" placeholder="0">
                             </td>
                             <td class="p-1 text-center  border-r bg-gray-50 align-center">
-                                <input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][total_real_smt2]" value="{{ old('kpi.'.$item->id_kpi_item.'.total_real_smt2', $score->total_real_smt2 ?? 0) }}" class="input-total-real-smt2 w-full h-8 px-1 bg-white border rounded text-center focus:border-green-500 outline-none placeholder-gray-400" placeholder="0">
+                                <input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][total_real_smt2]" value="{{ old('kpi.'.$item->id_kpi_item.'.total_real_smt2', $score->total_real_smt2) }}" class="input-total-real-smt2 w-full h-8 px-1 bg-white border rounded text-center focus:border-green-500 outline-none placeholder-gray-400" placeholder="0">
                             </td>
-                            <td class="p-2 text-center border-r bg-gray-50 text-gray-500"><span class="span-total-skor-smt2">0</span>%</td>
-                            <td class="p-2 text-center border-r bg-gray-100 font-bold text-gray-700"><span class="span-total-nilai-smt2">0</span>%</td>
+                            <td class="p-2 text-center border-r bg-gray-50 text-gray-500"><span class="span-total-skor-smt2"></span>%</td>
+                            <td class="p-2 text-center border-r bg-gray-100 font-bold text-gray-700"><span class="span-total-nilai-smt2"></span>%</td>
 
                             {{-- ADJ S-I --}}
                             <td class="p-1 text-center border-r bg-orange-50/30 align-center">
@@ -262,10 +275,10 @@
                                 type="number" 
                                 name="kpi[{{ $item->id_kpi_item }}][adjustment_real_smt1]" 
                                 value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_real_smt1', $score->adjustment_real_smt1 ?? '') }}"
-                                {{ $isStaff ? 'readonly' : '' }} 
+                                {{ !$canAdjust ? 'readonly' : '' }} 
                                 step="0.01" class="input-adj-real-smt1 w-full h-8 px-1 bg-transparent text-center border-b border-orange-200 outline-none" placeholder="Real"></td>
                             <td class="p-1 border-r bg-orange-50/30 align-center text-center pt-2">
-                                <span class="span-adj-skor-smt1 font-bold text-orange-600">0</span>%</td>
+                                <span class="span-adj-skor-smt1 font-bold text-orange-600"></span>%</td>
                             <td class="p-1 text-center border-r bg-orange-50/30 align-center">
                                 <input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][adjustment_smt1]" value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_smt1', $score->adjustment_smt1 ?? '') }}" class="input-adj-nilai-smt1 w-full h-8 px-1 bg-transparent text-center font-bold text-orange-600 border-b border-orange-200 outline-none" placeholder="Nilai" readonly></td>
 
@@ -274,19 +287,19 @@
                                 <input type="number" 
                                 name="kpi[{{ $item->id_kpi_item }}][adjustment_target_smt2]" 
                                 value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_target_smt2', $score->adjustment_target_smt2 ?? '') }}"
-                                {{ $isStaff ? 'readonly' : '' }}
+                                {{ !$canAdjust ? 'readonly' : '' }}
                                 step="0.01" class="input-adj-target-smt2 w-full h-8 px-1 bg-transparent text-center border-b border-orange-200 outline-none" placeholder="Tgt"></td>
                             <td class="p-1 border-r bg-orange-50/30 align-center">
                                 <input type="number" 
                                 name="kpi[{{ $item->id_kpi_item }}][adjustment_real_smt2]" 
                                 value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_real_smt2', $score->adjustment_real_smt2 ?? '') }}"
-                                {{ $isStaff ? 'readonly' : '' }} 
+                                {{ !$canAdjust ? 'readonly' : '' }} 
                                 step="0.01" class="input-adj-real-smt2 w-full h-8 px-1 bg-transparent text-center border-b border-orange-200 outline-none" placeholder="Real"></td>
-                            <td class="p-1 border-r bg-orange-50/30 align-center text-center pt-2"><span class="span-adj-skor-smt2 font-bold text-orange-600">0</span>%</td>
+                            <td class="p-1 border-r bg-orange-50/30 align-center text-center pt-2"><span class="span-adj-skor-smt2 font-bold text-orange-600"></span>%</td>
                             <td class="p-1 border-r bg-orange-50/30 align-center"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][adjustment_smt2]" value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_smt2', $score->adjustment_smt2 ?? '') }}" class="input-adj-nilai-smt2 w-full h-8 px-1 bg-transparent text-center font-bold text-orange-600 border-b border-orange-200 outline-none" placeholder="Nilai" readonly></td>
 
                             {{-- FINAL --}}
-                            <td class="p-2 md:p-3 text-center border-r bg-gray-100 font-bold text-blue-800"><span class="span-final-score">0</span>%</td>
+                            <td class="p-2 md:p-3 text-center border-r bg-gray-100 font-bold text-blue-800"><span class="span-final-score"></span>%</td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -294,12 +307,12 @@
                         <tr class="bg-gray-50 border-b border-gray-200">
                             <td colspan="2" class="sticky left-0 bg-gray-100 p-2 font-bold uppercase border-r">Total Skor Akhir :</td>
                             <td colspan="3" class="border-r bg-gray-50"></td>
-                            <td colspan="2" class="border-r"></td><td class="p-2 text-center font-bold text-blue-800 border-r-2"><span id="footer-total-smt1">0</span>%</td>
-                            @foreach(['jul','aug','sep','okt','nov','des'] as $bln) <td colspan="3" class="border-r"></td><td class="p-2 text-center font-bold text-blue-800 border-r-2"><span id="footer-total-{{ $bln }}">0</span>%</td> @endforeach
-                            <td colspan="3" class="border-r"></td><td class="p-2 text-center font-bold text-gray-700 border-r"><span id="footer-total-sem">0</span>%</td>
-                            <td colspan="2" class="border-r bg-orange-50"></td><td class="p-2 border-r bg-orange-50 font-bold text-orange-800 text-center"><span id="footer-adj-smt1">0</span>%</td>
-                            <td colspan="3" class="border-r bg-orange-50"></td><td class="p-2 border-r bg-orange-50 font-bold text-orange-800 text-center"><span id="footer-adj-smt2">0</span>%</td>
-                            <td class="p-2 text-center font-extrabold text-blue-900 bg-gray-200"><span id="footer-grand-total">0</span>%</td>
+                            <td colspan="2" class="border-r"></td><td class="p-2 text-center font-bold text-blue-800 border-r-2"><span id="footer-total-smt1"></span>%</td>
+                            @foreach(['jul','aug','sep','okt','nov','des'] as $bln) <td colspan="3" class="border-r"></td><td class="p-2 text-center font-bold text-blue-800 border-r-2"><span id="footer-total-{{ $bln }}"></span>%</td> @endforeach
+                            <td colspan="3" class="border-r"></td><td class="p-2 text-center font-bold text-gray-700 border-r"><span id="footer-total-sem"></span>%</td>
+                            <td colspan="2" class="border-r bg-orange-50"></td><td class="p-2 border-r bg-orange-50 font-bold text-orange-800 text-center"><span id="footer-adj-smt1"></span>%</td>
+                            <td colspan="3" class="border-r bg-orange-50"></td><td class="p-2 border-r bg-orange-50 font-bold text-orange-800 text-center"><span id="footer-adj-smt2"></span>%</td>
+                            <td class="p-2 text-center font-extrabold text-blue-900 bg-gray-200"><span id="footer-grand-total"></span>%</td>
                         </tr>
                     </tfoot>
                 </table>
@@ -310,44 +323,20 @@
 </div>
 
 {{-- MODALS --}}
+{{-- 1. MODAL TAMBAH --}}
 <div id="modalTambahKPI" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden z-50 flex justify-center items-center p-4">
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl p-6 relative max-h-[90vh] overflow-y-auto">
         <h2 class="text-xl font-bold mb-4 dark:text-white">Tambah KPI</h2>
         <form action="{{ route('kpi.store-item') }}" method="POST">
             @csrf <input type="hidden" name="kpi_assessment_id" value="{{ $kpi->id_kpi_assessment }}">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label for="key_performance_indicator" class="block text-sm font-medium text-gray-700">KPI</label>
-                    <input type="text" name="key_performance_indicator" class="border p-2 w-full rounded text-sm" placeholder="KPI" required>
-                </div>
-                <div>
-                    <label for="bobot" class="block text-sm font-medium text-gray-700">Bobot (%)</label>
-                    <input type="number" step="0.01" name="bobot" class="border p-2 w-full rounded text-sm" placeholder="Bobot" required>
-                </div>
-                <div>
-                    <label for="target" class="block text-sm font-medium text-gray-700">Target</label>
-                    <input type="text" name="target" class="border p-2 w-full rounded text-sm" placeholder="Target (misal: 100)" required>
-                </div>
-                <div>
-                    <label for="perspektif" class="block text-sm font-medium text-gray-700">Perspektif</label>
-                    <select name="perspektif" class="border p-2 w-full rounded text-sm">
-                        <option value="Financial">Financial</option><option value="Customer">Customer</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="key_result_area" class="block text-sm font-medium text-gray-700">KRA</label>
-                    <input type="text" name="key_result_area" class="border p-2 w-full rounded text-sm" placeholder="KRA" required>
-                </div>
-                <div>
-                    <label for="units" class="block text-sm font-medium text-gray-700">Units</label>
-                    <input type="text" name="units" class="border p-2 w-full rounded text-sm" placeholder="Satuan" required>
-                </div>
-                <div>
-                    <label for="polaritas" class="block text-sm font-medium text-gray-700">Polaritas</label>
-                    <select name="polaritas" class="border p-2 w-full rounded text-sm">
-                        <option value="Maximize">Positif</option><option value="Minimize">Negatif</option>
-                    </select>
-                </div>
+                <div><label class="block text-sm font-medium text-gray-700">KPI</label><input type="text" name="key_performance_indicator" class="border p-2 w-full rounded text-sm" required></div>
+                <div><label class="block text-sm font-medium text-gray-700">Bobot (%)</label><input type="number" step="0.01" name="bobot" class="border p-2 w-full rounded text-sm" required></div>
+                <div><label class="block text-sm font-medium text-gray-700">Target</label><input type="text" name="target" class="border p-2 w-full rounded text-sm" required></div>
+                <div><label class="block text-sm font-medium text-gray-700">Perspektif</label><select name="perspektif" class="border p-2 w-full rounded text-sm"><option value="Financial">Financial</option><option value="Customer">Customer</option></select></div>
+                <div><label class="block text-sm font-medium text-gray-700">KRA</label><input type="text" name="key_result_area" class="border p-2 w-full rounded text-sm" required></div>
+                <div><label class="block text-sm font-medium text-gray-700">Units</label><input type="text" name="units" class="border p-2 w-full rounded text-sm" required></div>
+                <div><label class="block text-sm font-medium text-gray-700">Polaritas</label><select name="polaritas" class="border p-2 w-full rounded text-sm"><option value="Maximize">Positif</option><option value="Minimize">Negatif</option></select></div>
             </div>
             <div class="mt-6 flex justify-end gap-2">
                 <button type="button" onclick="document.getElementById('modalTambahKPI').classList.add('hidden')" class="px-4 py-2 border rounded">Batal</button>
@@ -357,19 +346,41 @@
     </div>
 </div>
 
+{{-- 2. MODAL EDIT --}}
 <div id="modalEditKPI" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden z-50 justify-center items-center p-4">
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl p-4 md:p-6 relative max-h-[90vh] overflow-y-auto">
         <h2 class="text-lg md:text-xl font-bold mb-4 text-gray-800 dark:text-white">Edit Indikator Kinerja</h2>
         <form id="formEditKPI" method="POST">
             @csrf @method('PUT')
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-                <select id="edit_perspektif" name="perspektif" class="w-full border rounded p-2 text-sm"><option value="Financial">Financial</option><option value="Customer">Customer</option></select>
-                <input type="text" id="edit_kra" name="key_result_area" class="w-full border rounded p-2 text-sm" required>
-                <textarea id="edit_kpi" name="key_performance_indicator" class="w-full border rounded p-2 text-sm md:col-span-2" rows="2" required></textarea>
-                <input type="text" id="edit_units" name="units" class="w-full border rounded p-2 text-sm" required>
-                <select id="edit_polaritas" name="polaritas" class="w-full border rounded p-2 text-sm"><option value="Maximize">Positif</option><option value="Minimize">Negatif</option></select>
-                <input type="number" step="0.01" id="edit_bobot" name="bobot" class="w-full border rounded p-2 text-sm" required>
-                <input type="text" id="edit_target" name="target" class="w-full border rounded p-2 text-sm" required>
+                <div>
+                    <label for="edit_perspektif" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Perspektif</label>
+                    <select id="edit_perspektif" name="perspektif" class="w-full border rounded p-2 text-sm"><option value="Financial">Financial</option><option value="Customer">Customer</option></select>
+                </div>
+                <div>
+                    <label for="edit_kra" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">KRA</label>
+                    <input type="text" id="edit_kra" name="key_result_area" class="w-full border rounded p-2 text-sm" required>
+                </div>
+                <div class="md:col-span-2">
+                    <label for="edit_kpi" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Key Performance Indicator</label>
+                    <textarea id="edit_kpi" name="key_performance_indicator" class="w-full border rounded p-2 text-sm" rows="2" required></textarea>
+                </div>
+                <div>
+                    <label for="edit_units" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Units</label>
+                    <input type="text" id="edit_units" name="units" class="w-full border rounded p-2 text-sm" required>
+                </div>
+                <div>
+                    <label for="edit_polaritas" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Polaritas</label>
+                    <select id="edit_polaritas" name="polaritas" class="w-full border rounded p-2 text-sm"><option value="Maximize">Positif</option><option value="Minimize">Negatif</option></select>
+                </div>
+                <div>
+                    <label for="edit_bobot" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bobot (%)</label>
+                    <input type="number" step="0.01" id="edit_bobot" name="bobot" class="w-full border rounded p-2 text-sm" required>
+                </div>
+                <div>
+                    <label for="edit_target" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Target</label>
+                    <input type="text" id="edit_target" name="target" class="w-full border rounded p-2 text-sm" required>
+                </div>
             </div>
             <div class="mt-6 flex justify-end gap-3">
                 <button type="button" onclick="closeEditModal()" class="px-4 py-2 border rounded text-gray-600 hover:bg-gray-100 text-sm">Batal</button>
@@ -378,94 +389,353 @@
         </form>
     </div>
 </div>
-<div id="unsavedModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); backdrop-filter: blur(8px); z-index:9999; display:flex; align-items:center; justify-content:center;">
-    <div style="background:#fff; width:450px; margin:auto; padding:24px; border-radius:12px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); animation: modalFadeIn 0.3s ease-out;">
+
+{{-- 3. MODAL UNSAVED CHANGES (DIPERBAIKI DENGAN LOGIKA DISCARD) --}}
+<div id="unsavedModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); backdrop-filter: blur(4px); z-index:9999; display:flex; align-items:center; justify-content:center;">
+    <div style="background:#fff; width:450px; margin:auto; padding:24px; border-radius:12px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); animation: modalFadeIn 0.3s ease-out;">
         <div style="display:flex; align-items:center; margin-bottom:16px;">
-            <i class="fas fa-exclamation-triangle" style="color:#f59e0b; font-size:24px; margin-right:12px;"></i>
+            <i class="fas fa-exclamation-circle" style="color:#f59e0b; font-size:24px; margin-right:12px;"></i>
             <div>
                 <h3 style="font-size:18px; font-weight:bold; color:#1f2937; margin:0;">Perubahan Belum Disimpan</h3>
-                <p style="font-size:14px; color:#6b7280; margin:0;">Konfirmasi sebelum meninggalkan halaman</p>
+                <p style="font-size:14px; color:#6b7280; margin:0;">Konfirmasi Navigasi</p>
             </div>
         </div>
-        <p style="color:#374151; margin-bottom:20px; line-height:1.5;">
-            Anda memiliki perubahan yang belum disimpan pada form KPI. Jika Anda meninggalkan halaman sekarang, perubahan tersebut akan hilang.
+        <p style="color:#374151; margin-bottom:24px; line-height:1.5;">
+            Anda telah mengubah data. Jika Anda keluar sekarang, perubahan tersebut akan hilang. Apa yang ingin Anda lakukan?
         </p>
         <div style="display:flex; justify-content:flex-end; gap:12px;">
-            <button id="stayBtn" style="padding:8px 16px; background:#e5e7eb; color:#374151; border:none; border-radius:6px; cursor:pointer; transition:all 0.2s; font-weight:500; ">
-                <i class="fas fa-arrow-left" style="margin-right:6px;">
-
-                </i>Tetap Disini
+            {{-- Tombol Batal --}}
+            <button id="stayBtn" type="button" style="padding:8px 16px; background:#f3f4f6; color:#374151; border:1px solid #d1d5db; border-radius:6px; cursor:pointer; font-weight:600; font-size:14px;">
+                Batal (Tetap Disini)
             </button>
-            <button id="leaveBtn" style="padding:8px 16px; background:#dc2626; color:white; border:none; border-radius:6px; cursor:pointer; transition:all 0.2s; font-weight:500;">
-                <i class="fas fa-sign-out-alt" style="margin-right:6px;"></i>Tinggalkan
+            {{-- Tombol Discard --}}
+            <button id="discardBtn" type="button" style="padding:8px 16px; background:#dc2626; color:white; border:none; border-radius:6px; cursor:pointer; font-weight:600; font-size:14px; display:flex; align-items:center;">
+                <i class="fas fa-sign-out-alt" style="margin-right:6px;"></i> Tinggalkan Halaman
             </button>
         </div>
     </div>
 </div>
+{{-- MODAL SUKSES (Muncul otomatis jika Session Success ada) --}}
+@if(session('success'))
+<div id="successModal" class="fixed inset-0 bg-gray-900 bg-opacity-60 z-[100] flex justify-center items-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 text-center transform scale-100 transition-all">
+        <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+            <i class="fas fa-check"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 mb-2">Berhasil Disimpan!</h3>
+        <p class="text-gray-600 mb-6">{{ session('success') }}</p>
+        <button onclick="document.getElementById('successModal').remove()" class="bg-green-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-700 transition w-full">
+            Tutup
+        </button>
+    </div>
+</div>
+@endif
+
+{{-- FORM DELETE GLOBAL --}}
+
 <form id="globalDeleteForm" method="POST" class="hidden">@csrf @method('DELETE')</form>
 
-
-{{-- SCRIPT --}}
+{{-- SCRIPT--}}
 <script>
-    // Fungsi Filter KPI Berdasarkan Tahun
-    function changeKpiYear(selectedYear) {
-        console.log('Mengubah tahun ke:', selectedYear);
-        
-        // Validasi input
-        if (!selectedYear || selectedYear === '') {
-            alert('Pilih tahun terlebih dahulu!');
-            return;
-        }
+    // --- KONFIGURASI & VARIABEL ---
+    let initialFormState = null;   
+    let targetUrl = null;
+    let isSubmitting = false;      
+    let isMonitoring = false;      
 
-        // Update display di halaman sebelum redirect
-        const currentYearDisplay = document.getElementById('currentYearDisplay');
-        if (currentYearDisplay) {
-            currentYearDisplay.textContent = selectedYear;
-        }
-
-        // Buat URL dengan template dan placeholder
-        let rawUrl = "{{ route('kpi.show', ['karyawan_id' => $karyawan->id_karyawan, 'tahun' => '8888']) }}";
-        console.log('Raw URL template:', rawUrl);
-        
-        // Ganti placeholder tahun dengan tahun yang dipilih
-        let finalUrl = rawUrl.replace('8888', selectedYear);
-        console.log('Final URL:', finalUrl);
-        
-        // Loading indicator
-        const selectElement = document.querySelector('select[onchange="changeKpiYear(this.value)"]');
-        if (selectElement) {
-            selectElement.disabled = true;
-        }
-        
-        // Redirect dengan delay minimal untuk memastikan visual update
-        setTimeout(function() {
-            window.location.href = finalUrl;
-        }, 100);
+    // --- HELPER DATA FORM ---
+    function getFormDataString() {
+        const form = document.getElementById('kpiForm');
+        if (!form) return "";
+        return new URLSearchParams(new FormData(form)).toString();
     }
 
-    // Fungsi Submit Manual
-    function submitKpiForm() {
-        const form = document.getElementById('kpiForm');
-        const btn = document.getElementById('btnSimpan');
+    // --- LOGIC UTAMA (LOAD) ---
+    document.addEventListener('DOMContentLoaded', function() {
         
-        // Cek Total Bobot
+        // 1. Matikan Tombol Simpan saat awal load
+        toggleSaveButton(false); 
+
+        // 2. Jalankan Matematika
+        calculateAll();
+
+        // 3. AMBIL SNAPSHOT & AKTIFKAN MONITORING
+        setTimeout(() => {
+            initialFormState = getFormDataString(); 
+            isMonitoring = true; 
+            
+            // Pastikan status tombol sesuai kondisi awal (seharusnya mati/disabled)
+            updateSystemState();
+            
+            console.log("System Ready: Button Logic Active.");
+        }, 800);
+
+        // 4. PASANG EVENT LISTENER
+        const inputs = document.querySelectorAll('#kpiForm input, #kpiForm select, #kpiForm textarea');
+        inputs.forEach(el => {
+            // Kalkulasi Matematika
+            if(el.tagName === 'INPUT') {
+                el.addEventListener('input', calculateAll);
+            }
+
+            // Deteksi Perubahan untuk Tombol & Warning
+            ['input', 'change'].forEach(evt => {
+                el.addEventListener(evt, function() {
+                    if (!isMonitoring) return;
+                    if (isSubmitting) return;
+
+                    // Cek status setiap kali user mengetik
+                    updateSystemState();
+                });
+            });
+        });
+    });
+
+    // --- FUNGSI PUSAT KONTROL STATUS ---
+    function updateSystemState() {
+        const isChanged = hasUnsavedChanges();
+        
+        // 1. Update Badge Kuning
+        const badge = document.getElementById('unsaved-badge');
+        if(badge) {
+            if (isChanged) badge.classList.remove('hidden');
+            else badge.classList.add('hidden');
+        }
+
+        // 2. Update Tombol Simpan (Enable/Disable)
+        toggleSaveButton(isChanged);
+    }
+
+    function hasUnsavedChanges() {
+        if (!initialFormState) return false;
+        const currentFormState = getFormDataString();
+        return currentFormState !== initialFormState;
+    }
+
+    // --- LOGIC TOMBOL SIMPAN (ENABLE/DISABLE) ---
+    function toggleSaveButton(enable) {
+        const btn = document.getElementById('btnSimpan');
+        if (!btn) return;
+
+        if (enable) {
+            // AKTIFKAN TOMBOL (User melakukan perubahan)
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            btn.classList.add('hover:bg-blue-700', 'shadow-lg'); // Efek hover aktif
+        } else {
+            // MATIKAN TOMBOL (Tidak ada perubahan / Baru disimpan)
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            btn.classList.remove('hover:bg-blue-700', 'shadow-lg');
+        }
+    }
+
+    // --- TOMBOL SIMPAN (SUBMIT ACTION) ---
+    function submitKpiForm() {
+        const btn = document.getElementById('btnSimpan');
+
+        // Cek Bobot
         const alertBobot = document.getElementById('total-bobot-alert');
         if(alertBobot && alertBobot.innerText.includes('Harus 100%')) {
-            alert('Total Bobot belum 100%. Silakan perbaiki sebelum menyimpan.');
+            alert('Gagal: Total Bobot belum 100%.');
             return;
         }
-        
-        if(!form) { alert('Error: Form tidak ditemukan!'); return; }
-        
+
+        // KUNCI: Set flag submitting
+        isSubmitting = true; 
+        isMonitoring = false; 
+
+        // UI Loading (Tetap disable tombol agar tidak double click)
         if(btn) { 
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...'; 
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Menyimpan...'; 
             btn.disabled = true; 
-            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            btn.classList.add('opacity-75', 'cursor-wait'); 
         }
-        form.submit();
+
+        document.getElementById('kpiForm').submit();
     }
 
-    // Fungsi Modal & Delete
+    // --- CEK SAAT REFRESH/CLOSE TAB ---
+    window.addEventListener('beforeunload', function (e) {
+        if (isSubmitting) return; 
+        if (!isMonitoring) return; 
+        if (document.getElementById('successModal')) return; 
+
+        if (hasUnsavedChanges()) {
+            e.preventDefault();
+            e.returnValue = ''; 
+        }
+    });
+
+    // --- CEK SAAT PINDAH HALAMAN (LINK) ---
+    document.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            if (!href || href.startsWith('#') || href.startsWith('javascript') || this.target === '_blank' || href.includes('export') || href.includes('download')) return;
+
+            if (isSubmitting) return;
+            if (document.getElementById('successModal')) return; 
+
+            if (hasUnsavedChanges()) {
+                e.preventDefault(); 
+                targetUrl = href;   
+                document.getElementById('unsavedModal').style.display = 'flex'; 
+            }
+        });
+    });
+
+    // --- TOMBOL MODAL ALERT ---
+    document.getElementById('stayBtn').addEventListener('click', () => {
+        document.getElementById('unsavedModal').style.display = 'none';
+        targetUrl = null;
+    });
+
+    document.getElementById('discardBtn').addEventListener('click', () => {
+        document.getElementById('unsavedModal').style.display = 'none';
+        if (targetUrl) window.location.href = targetUrl;
+    });
+
+    // --- FILTER TAHUN ---
+    function changeKpiYear(selectedYear) {
+        if (!selectedYear) { alert('Pilih tahun!'); return; }
+        
+        if (hasUnsavedChanges() && !document.getElementById('successModal')) {
+            targetUrl = "{{ route('kpi.show', ['karyawan_id' => $karyawan->id_karyawan, 'tahun' => '8888']) }}".replace('8888', selectedYear);
+            document.getElementById('unsavedModal').style.display = 'flex';
+            return;
+        }
+        window.location.href = "{{ route('kpi.show', ['karyawan_id' => $karyawan->id_karyawan, 'tahun' => '8888']) }}".replace('8888', selectedYear);
+    }
+
+    // --- MATEMATIKA KPI (TETAP SAMA) ---
+    const rows = document.querySelectorAll('.row-kpi');
+    const monthsSmt2 = ['jul', 'aug', 'sep', 'okt', 'nov', 'des'];
+
+    function parseNumber(val) { if (!val || val === '') return 0; return parseFloat(val.toString().replace(',', '.')) || 0; }
+    function formatNumber(num) { return num.toFixed(2).replace(/\.00$/, ''); }
+    
+    function calculateSingleScore(target, real, polaritas) {
+        if (target === 0) return 0;
+        let score = 0;
+        const p = polaritas ? polaritas.toLowerCase() : '';
+        if (p.includes('positif') || p.includes('maximize')) score = (real / target) * 100;
+        else if (p.includes('negatif') || p.includes('minimize')) score = (real === 0) ? 100 : (target / real) * 100;
+        else if (p.includes('yes') || p.includes('no')) score = (real >= target) ? 100 : 0;
+        return Math.max(0, score); 
+    }
+
+    function calculateAll() {
+        let footerSmt1 = 0; let footerSmt2 = 0; let footerGrandTotal = 0;
+        let footerAdjSmt1 = 0; let footerAdjSmt2 = 0;
+        let footerMonthly = { jul:0, aug:0, sep:0, okt:0, nov:0, des:0 };
+
+        rows.forEach(row => {
+            const bobotInput = row.querySelector('.input-bobot');
+            const polaritasInput = row.querySelector('.input-polaritas');
+            if (!bobotInput || !polaritasInput) return;
+
+            const bobot = parseNumber(bobotInput.value);
+            const polaritas = polaritasInput.value;
+            const targetTahunan = parseNumber(row.querySelector('.input-target-smt1').value);
+
+            // SMT 1
+            const rSmt1 = parseNumber(row.querySelector('.input-real-smt1').value);
+            let skorSmt1 = calculateSingleScore(targetTahunan, rSmt1, polaritas);
+            let nilaiSmt1 = (skorSmt1 * bobot) / 100;
+            row.querySelector('.span-skor-smt1').textContent = formatNumber(skorSmt1);
+            row.querySelector('.span-nilai-smt1').textContent = formatNumber(nilaiSmt1);
+
+            // BULANAN
+            monthsSmt2.forEach(bln => {
+                const inputTgt = row.querySelector(`.input-target-${bln}`);
+                const inputReal = row.querySelector(`.input-real-${bln}`);
+                if(inputTgt && inputReal) {
+                    const t = parseNumber(inputTgt.value);
+                    const r = parseNumber(inputReal.value);
+                    let skor = (t !== 0) ? calculateSingleScore(t, r, polaritas) : 0;
+                    let nilai = (skor * bobot) / 100;
+                    const spanSkor = row.querySelector(`.span-skor-${bln}`);
+                    const spanNilai = row.querySelector(`.span-nilai-${bln}`);
+                    if(spanSkor) spanSkor.textContent = formatNumber(skor);
+                    if(spanNilai) spanNilai.textContent = formatNumber(nilai);
+                    footerMonthly[bln] += nilai;
+                }
+            });
+
+            // SMT 2
+            const inputTotalTgt2 = row.querySelector('.input-total-target-smt2');
+            const inputTotalReal2 = row.querySelector('.input-total-real-smt2');
+            const tSmt2 = parseNumber(inputTotalTgt2.value);
+            const rSmt2 = parseNumber(inputTotalReal2.value);
+            let skorTotalSmt2 = calculateSingleScore(tSmt2, rSmt2, polaritas);
+            let nilaiTotalSmt2 = (skorTotalSmt2 * bobot) / 100;
+            row.querySelector('.span-total-skor-smt2').textContent = formatNumber(skorTotalSmt2);
+            row.querySelector('.span-total-nilai-smt2').textContent = formatNumber(nilaiTotalSmt2);
+
+            // ADJ SMT 1
+            const adjReal1Input = row.querySelector('.input-adj-real-smt1');
+            const adjNilaiInput1 = row.querySelector('.input-adj-nilai-smt1');
+            let finalSmt1 = nilaiSmt1; 
+            if (adjReal1Input && adjReal1Input.value !== "") {
+                let adjSkor1 = calculateSingleScore(targetTahunan, parseNumber(adjReal1Input.value), polaritas);
+                let adjNilai1 = (adjSkor1 * bobot) / 100;
+                row.querySelector('.span-adj-skor-smt1').textContent = formatNumber(adjSkor1);
+                adjNilaiInput1.value = formatNumber(adjNilai1);
+                finalSmt1 = adjNilai1;
+            } else {
+                row.querySelector('.span-adj-skor-smt1').textContent = '0';
+                adjNilaiInput1.value = '';
+            }
+
+            // ADJ SMT 2
+            const adjTarget2Input = row.querySelector('.input-adj-target-smt2');
+            const adjReal2Input = row.querySelector('.input-adj-real-smt2');
+            const adjNilaiInput2 = row.querySelector('.input-adj-nilai-smt2');
+            let finalSmt2 = nilaiTotalSmt2;
+            if (adjTarget2Input && adjReal2Input && adjTarget2Input.value !== "" && adjReal2Input.value !== "") {
+                let adjSkor2 = calculateSingleScore(parseNumber(adjTarget2Input.value), parseNumber(adjReal2Input.value), polaritas);
+                let adjNilai2 = (adjSkor2 * bobot) / 100;
+                row.querySelector('.span-adj-skor-smt2').textContent = formatNumber(adjSkor2);
+                adjNilaiInput2.value = formatNumber(adjNilai2);
+                finalSmt2 = adjNilai2;
+            } else {
+                row.querySelector('.span-adj-skor-smt2').textContent = '0';
+                adjNilaiInput2.value = '';
+            }
+
+            // TOTALS
+            footerSmt1 += nilaiSmt1;
+            footerSmt2 += nilaiTotalSmt2;
+            footerAdjSmt1 += (adjReal1Input && adjReal1Input.value !== "") ? finalSmt1 : nilaiSmt1;
+            footerAdjSmt2 += (adjTarget2Input && adjReal2Input.value !== "") ? finalSmt2 : nilaiTotalSmt2;
+            let grandFinal = (finalSmt1 + finalSmt2) / 2; 
+            row.querySelector('.span-final-score').textContent = formatNumber(grandFinal);
+            footerGrandTotal += grandFinal;
+        });
+
+        const setFooterText = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = formatNumber(val); };
+        setFooterText('footer-total-smt1', footerSmt1);
+        setFooterText('footer-total-sem', footerSmt2);
+        setFooterText('footer-grand-total', footerGrandTotal);
+        monthsSmt2.forEach(bln => setFooterText(`footer-total-${bln}`, footerMonthly[bln]));
+        if(document.getElementById('footer-adj-smt1')) document.getElementById('footer-adj-smt1').textContent = formatNumber(footerAdjSmt1);
+        if(document.getElementById('footer-adj-smt2')) document.getElementById('footer-adj-smt2').textContent = formatNumber(footerAdjSmt2);
+        checkBobot();
+    }
+
+    function checkBobot() {
+        let totalBobot = 0;
+        document.querySelectorAll('.input-bobot').forEach(el => totalBobot += parseNumber(el.value));
+        totalBobot = Math.round(totalBobot * 100) / 100;
+        const alertBox = document.getElementById('total-bobot-alert');
+        if (alertBox) {
+            alertBox.innerHTML = totalBobot != 100 
+                ? `<span class="text-white bg-red-600 px-2 py-1 rounded border border-red-200"><i class="fas fa-exclamation-triangle"></i> Total Bobot: ${totalBobot}% (Harus 100%)</span>`
+                : `<span class="text-white bg-green-600 px-2 py-1 rounded border border-green-200"><i class="fas fa-check-circle"></i> Total Bobot: 100% (OK)</span>`;
+        }
+    }
+
+    // Modal Helper
     function openEditModal(data, updateUrl) {
         document.getElementById('formEditKPI').action = updateUrl;
         document.getElementById('edit_perspektif').value = data.perspektif;
@@ -476,283 +746,25 @@
         document.getElementById('edit_bobot').value = data.bobot;
         document.getElementById('edit_target').value = data.target || data.target_tahunan;
         const modal = document.getElementById('modalEditKPI');
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
+        modal.classList.remove('hidden'); modal.classList.add('flex');
     }
-
+    function closeEditModal() {
+        const modal = document.getElementById('modalEditKPI');
+        modal.classList.add('hidden'); modal.classList.remove('flex');
+    }
     function confirmDelete(deleteUrl) {
         if (confirm('Yakin ingin menghapus KPI ini?')) {
             const form = document.getElementById('globalDeleteForm');
-            form.action = deleteUrl; 
-            form.submit();
+            form.action = deleteUrl; form.submit();
         }
     }
-
-    // --- LOGIKA PERHITUNGAN (FULL MANUAL SEMESTER 2) ---
-    document.addEventListener('DOMContentLoaded', function() {
-        const rows = document.querySelectorAll('.row-kpi');
-        const monthsSmt2 = ['jul', 'aug', 'sep', 'okt', 'nov', 'des'];
-
-        function parseNumber(val) { 
-            if (!val || val === '') return 0; 
-            return parseFloat(val.toString().replace(',', '.')) || 0; 
-        }
-
-        function formatNumber(num) { 
-            return num.toFixed(2).replace(/\.00$/, ''); 
-        }
-
-        function calculateSingleScore(target, real, polaritas) {
-            if (target === 0) return 0;
-            let score = 0;
-            const p = polaritas.toLowerCase();
-            
-            if (p.includes('positif') || p.includes('maximize')) {
-                score = (real / target) * 100;
-            } else if (p.includes('negatif') || p.includes('minimize')) {
-                score = (real === 0) ? 100 : (target / real) * 100;
-            } else if (p.includes('yes') || p.includes('no')) {
-                score = (real >= target) ? 100 : 0;
-            }
-            return Math.max(0, score); 
-        }
-
-        function calculateAll() {
-            let footerSmt1 = 0; 
-            let footerSmt2 = 0; 
-            let footerGrandTotal = 0;
-            let footerAdjSmt1 = 0; 
-            let footerAdjSmt2 = 0;
-            let footerMonthly = { jul:0, aug:0, sep:0, okt:0, nov:0, des:0 };
-
-            rows.forEach(row => {
-                const bobotInput = row.querySelector('.input-bobot');
-                const polaritasInput = row.querySelector('.input-polaritas');
-                
-                if (!bobotInput || !polaritasInput) return;
-
-                const bobot = parseNumber(bobotInput.value);
-                const polaritas = polaritasInput.value;
-                const targetTahunan = parseNumber(row.querySelector('.input-target-smt1').value);
-
-                // --- 1. HITUNG SEMESTER 1 ---
-                const rSmt1 = parseNumber(row.querySelector('.input-real-smt1').value);
-                let skorSmt1 = calculateSingleScore(targetTahunan, rSmt1, polaritas);
-                let nilaiSmt1 = (skorSmt1 * bobot) / 100;
-                
-                row.querySelector('.span-skor-smt1').textContent = formatNumber(skorSmt1);
-                row.querySelector('.span-nilai-smt1').textContent = formatNumber(nilaiSmt1);
-
-                // --- 2. HITUNG BULANAN (Hanya untuk Footer & Tampilan Bulan) ---
-                // Tidak ada lagi logika penjumlahan ke Semester 2 disini
-                monthsSmt2.forEach(bln => {
-                    const inputTgt = row.querySelector(`.input-target-${bln}`);
-                    const inputReal = row.querySelector(`.input-real-${bln}`);
-                    
-                    if(inputTgt && inputReal) {
-                        const t = parseNumber(inputTgt.value);
-                        const r = parseNumber(inputReal.value);
-                        
-                        let skor = (t !== 0) ? calculateSingleScore(t, r, polaritas) : 0;
-                        let nilai = (skor * bobot) / 100;
-                        
-                        const spanSkor = row.querySelector(`.span-skor-${bln}`);
-                        const spanNilai = row.querySelector(`.span-nilai-${bln}`);
-                        if(spanSkor) spanSkor.textContent = formatNumber(skor);
-                        if(spanNilai) spanNilai.textContent = formatNumber(nilai);
-                        
-                        footerMonthly[bln] += nilai;
-                    }
-                });
-
-                // --- 3. TOTAL SEMESTER 2 (MURNI MANUAL) ---
-                // Kita HAPUS semua logika otomatisasi disini.
-                // Sistem hanya membaca apa yang Anda ketik.
-                const inputTotalTgt2 = row.querySelector('.input-total-target-smt2');
-                const inputTotalReal2 = row.querySelector('.input-total-real-smt2');
-
-                const tSmt2 = parseNumber(inputTotalTgt2.value); // Baca Input Manual Target
-                const rSmt2 = parseNumber(inputTotalReal2.value); // Baca Input Manual Realisasi
-
-                // Hitung Skor berdasarkan input manual tersebut
-                let skorTotalSmt2 = calculateSingleScore(tSmt2, rSmt2, polaritas);
-                let nilaiTotalSmt2 = (skorTotalSmt2 * bobot) / 100;
-                
-                row.querySelector('.span-total-skor-smt2').textContent = formatNumber(skorTotalSmt2);
-                row.querySelector('.span-total-nilai-smt2').textContent = formatNumber(nilaiTotalSmt2);
-
-                // --- 4. ADJUSTMENT SMT 1 ---
-                const adjReal1Input = row.querySelector('.input-adj-real-smt1');
-                const adjNilaiInput1 = row.querySelector('.input-adj-nilai-smt1');
-                let finalSmt1 = nilaiSmt1; 
-
-                if (adjReal1Input && adjReal1Input.value !== "") {
-                    let adjSkor1 = calculateSingleScore(targetTahunan, parseNumber(adjReal1Input.value), polaritas);
-                    let adjNilai1 = (adjSkor1 * bobot) / 100;
-                    row.querySelector('.span-adj-skor-smt1').textContent = formatNumber(adjSkor1);
-                    adjNilaiInput1.value = formatNumber(adjNilai1);
-                    finalSmt1 = adjNilai1;
-                } else {
-                    row.querySelector('.span-adj-skor-smt1').textContent = '0';
-                    adjNilaiInput1.value = '';
-                }
-
-                // --- 5. ADJUSTMENT SMT 2 ---
-                const adjTarget2Input = row.querySelector('.input-adj-target-smt2');
-                const adjReal2Input = row.querySelector('.input-adj-real-smt2');
-                const adjNilaiInput2 = row.querySelector('.input-adj-nilai-smt2');
-                let finalSmt2 = nilaiTotalSmt2;
-
-                if (adjTarget2Input && adjReal2Input && adjTarget2Input.value !== "" && adjReal2Input.value !== "") {
-                    let adjSkor2 = calculateSingleScore(parseNumber(adjTarget2Input.value), parseNumber(adjReal2Input.value), polaritas);
-                    let adjNilai2 = (adjSkor2 * bobot) / 100;
-                    row.querySelector('.span-adj-skor-smt2').textContent = formatNumber(adjSkor2);
-                    adjNilaiInput2.value = formatNumber(adjNilai2);
-                    finalSmt2 = adjNilai2;
-                } else {
-                    row.querySelector('.span-adj-skor-smt2').textContent = '0';
-                    adjNilaiInput2.value = '';
-                }
-
-                // --- 6. AKUMULASI FOOTER ---
-                footerSmt1 += nilaiSmt1;
-                footerSmt2 += nilaiTotalSmt2;
-                
-                if(adjReal1Input && adjReal1Input.value !== "") footerAdjSmt1 += finalSmt1;
-                else footerAdjSmt1 += nilaiSmt1;
-
-                if(adjTarget2Input && adjReal2Input.value !== "") footerAdjSmt2 += finalSmt2;
-                else footerAdjSmt2 += nilaiTotalSmt2;
-                
-                let grandFinal = (finalSmt1 + finalSmt2) / 2; 
-                row.querySelector('.span-final-score').textContent = formatNumber(grandFinal);
-                footerGrandTotal += grandFinal;
-            });
-
-            // Update Footer UI
-            const setFooterText = (id, val) => {
-                const el = document.getElementById(id);
-                if(el) el.textContent = formatNumber(val);
-            };
-
-            setFooterText('footer-total-smt1', footerSmt1);
-            setFooterText('footer-total-sem', footerSmt2);
-            setFooterText('footer-grand-total', footerGrandTotal);
-            
-            monthsSmt2.forEach(bln => {
-                setFooterText(`footer-total-${bln}`, footerMonthly[bln]);
-            });
-
-            if(document.getElementById('footer-adj-smt1')) {
-                document.getElementById('footer-adj-smt1').textContent = formatNumber(footerAdjSmt1);
-            }
-            if(document.getElementById('footer-adj-smt2')) {
-                document.getElementById('footer-adj-smt2').textContent = formatNumber(footerAdjSmt2);
-            }
-            
-            checkBobot();
-        }
-
-        function checkBobot() {
-            let totalBobot = 0;
-            document.querySelectorAll('.input-bobot').forEach(el => totalBobot += parseNumber(el.value));
-            totalBobot = Math.round(totalBobot * 100) / 100;
-            
-            const alertBox = document.getElementById('total-bobot-alert');
-            if (alertBox) {
-                if (totalBobot != 100) {
-                    alertBox.innerHTML = `<span class="text-white bg-red-600 px-2 py-1 rounded border border-red-200"><i class="fas fa-exclamation-triangle"></i> Total Bobot: ${totalBobot}% (Harus 100%)</span>`;
-                } else {
-                    alertBox.innerHTML = `<span class="text-white bg-green-600 px-2 py-1 rounded border border-green-200"><i class="fas fa-check-circle"></i> Total Bobot: 100% (OK)</span>`;
-                }
-            }
-        }
-
-        const inputs = document.querySelectorAll('input');
-        inputs.forEach(input => {
-            input.addEventListener('input', calculateAll);
-            input.addEventListener('change', calculateAll);
-        });
-
-        calculateAll();
-    });
-
-    let isDirty = false;
-    let targetUrl = null;
-
-    const kpiFormInputs = document.querySelectorAll('#kpiForm input, #kpiForm textarea, #kpiForm select');
-    
-    kpiFormInputs.forEach(el => {
-        el.addEventListener('change', function() {
-            // Opsional: Cek jika input ini readonly, jangan dianggap dirty
-            if (!this.readOnly) {
-                isDirty = true;
-            }
-        });
-    });
-
-    // Reset jika submit (Form disubmit secara sah)
-    const formKpi = document.getElementById('kpiForm');
-    if (formKpi) {
-        formKpi.addEventListener('submit', () => isDirty = false);
-    }
-    // Intercept semua link navigasi
-    document.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', function (e) {
-            const href = this.getAttribute('href');
-            
-            // 1. Abaikan jika link kosong/javascript
-            if (!href || href.startsWith('#') || href.startsWith('javascript')) return;
-
-            // 2. Abaikan jika ini link EXPORT (Excel/PDF)
-            //    Biasanya export membuka tab baru atau download file, jadi tidak perlu warning
-            if (href.includes('export') || href.includes('download')) return;
-
-            // 3. Abaikan jika target="_blank" (Tab baru)
-            if (this.target === '_blank') return;
-            
-            if (isDirty) {
-                e.preventDefault();
-                targetUrl = this.href;
-                
-                const modal = document.getElementById('unsavedModal');
-                modal.style.display = 'flex'; 
-                modal.firstElementChild.classList.add('modal-animate');
-            }
-        });
-    });
-
-    // Tombol modal
-    document.getElementById('stayBtn').addEventListener('click', function(e) {
-        e.stopPropagation();
-        document.getElementById('unsavedModal').style.display = 'none';
-        targetUrl = null;
-        isDirty = true; // Tetap dirty sampai simpan
-    });
-
-    document.getElementById('leaveBtn').addEventListener('click', function(e) {
-        e.stopPropagation();
-        isDirty = false;
-        if (targetUrl) {
-            window.location.href = targetUrl;
-        } else {
-            // Jika tidak ada targetUrl, mungkin refresh atau back
-            window.history.back();
-        }
-    });
 </script>
-
-
 
 <style>
 @keyframes modalFadeIn {
     from { opacity: 0; transform: scale(0.95); }
     to { opacity: 1; transform: scale(1); }
 }
-#unsavedModal > div {
-    animation: modalFadeIn 0.3s ease-out;
-}
 </style>
-
 </body>
 </html>
