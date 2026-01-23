@@ -4,7 +4,7 @@
 <div class="p-4 sm:p-8 max-w-5xl mx-auto space-y-6">
 
     {{-- Welcome Banner --}}
-    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg dark:from-blue-500 dark:to-indigo-500">
+    <div class="bg-linear-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-black dark:text-white shadow-lg dark:from-blue-500 dark:to-indigo-500">
         <h1 class="text-2xl font-bold">Halo, {{ $karyawan->Nama_Lengkap_Sesuai_Ijazah }}! 👋</h1>
         <p class="opacity-90 mt-1">Selamat datang di Dashboard Kinerja. Berikut adalah status penilaian Anda untuk tahun <strong>{{ $tahun }}</strong>.</p>
     </div>

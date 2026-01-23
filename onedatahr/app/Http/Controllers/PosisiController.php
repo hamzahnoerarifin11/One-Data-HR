@@ -56,7 +56,8 @@ class PosisiController extends Controller
         try {
             $pos = Posisi::create([
                 'nama_posisi' => $request->nama_posisi,
-                'status'      => $request->status
+                'status'      => $request->status,
+                'activated_at' => $request->status === 'Aktif' ? now() : null
             ]);
 
             return response()->json([
@@ -80,10 +81,18 @@ class PosisiController extends Controller
 
         try {
             $pos = Posisi::findOrFail($id);
+            $oldStatus = $pos->status;
             $pos->update([
                 'nama_posisi' => $request->nama_posisi,
                 'status'      => $request->status
             ]);
+
+            // Update activated_at based on status change
+            if ($request->status === 'Aktif' && $oldStatus !== 'Aktif') {
+                $pos->update(['activated_at' => now()]);
+            } elseif ($request->status === 'Nonaktif') {
+                $pos->update(['activated_at' => null]);
+            }
 
             return response()->json([
                 'success' => true,

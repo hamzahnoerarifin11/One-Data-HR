@@ -73,10 +73,14 @@ Route::middleware(['auth'])->group(function () {
             Route::delete('posisi/{id}', [PosisiController::class, 'destroy'])->name('posisi.destroy');
 
 
-            // Pelamar & Tahapan
-            Route::resource('interview_hr', InterviewHrController::class);
-            Route::resource('kandidat_lanjut_user', KandidatLanjutUserController::class);
-            Route::resource('pemberkasan', PemberkasanController::class);
+        // Pelamar & Tahapan
+        // Route::resource('pelamar', PelamarHarianController::class)->only(['index', 'store']);
+        // Route::get('screening-cv', [ScreeningCvController::class, 'index'])->name('screening-cv');
+        // Route::get('tes-kompetensi', [TesKompetensiController::class, 'index'])->name('tes-kompetensi');
+        Route::resource('interview_hr', InterviewHrController::class);
+        // Route::get('interview-user', [InterviewUserController::class, 'index'])->name('interview-user');
+        Route::resource('kandidat_lanjut_user', KandidatLanjutUserController::class);
+        Route::resource('pemberkasan', PemberkasanController::class);
 
             // Kandidat CRUD & Exports
             Route::get('kandidat/list', [KandidatController::class, 'list'])->name('kandidat.list');
@@ -227,4 +231,36 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/kpi/items/{id}', [KpiAssessmentController::class, 'destroyItem'])->name('kpi.delete-item');
     // Route untuk Update Item KPI
     Route::put('/kpi/items/{id}', [KpiAssessmentController::class, 'updateItem'])->name('kpi.update-item');
+});
+
+// Routes untuk TEMPA
+Route::middleware(['auth', 'role:admin|superadmin|ketua_tempa'])->prefix('tempa')->name('tempa.')->group(function () {
+    // Kelompok TEMPA
+    Route::resource('kelompok', \App\Http\Controllers\TempaKelompokController::class)->parameters([
+        'kelompok' => 'kelompok'
+    ]);
+
+    // Peserta TEMPA
+    Route::resource('peserta', \App\Http\Controllers\TempaPesertaController::class)->parameters([
+        'peserta' => 'peserta' // This forces the parameter to be {peserta} instead of {pesertum}
+    ]);
+
+    // Absensi TEMPA
+    Route::resource('absensi', \App\Http\Controllers\TempaAbsensiController::class);
+
+    // Monitoring TEMPA
+    Route::get('monitoring', [\App\Http\Controllers\TempaMonitoringController::class, 'index'])->name('monitoring.index');
+
+    // Materi TEMPA
+    Route::resource('materi', \App\Http\Controllers\TempaMateriController::class)->except(['show']);
+    Route::get('materi/download/{id}', [\App\Http\Controllers\TempaMateriController::class, 'download'])->name('materi.download');
+});
+
+// Routes untuk Struktur Pekerjaan
+Route::middleware(['auth', 'role:admin|superadmin'])->group(function () {
+    Route::resource('company', \App\Http\Controllers\CompanyController::class);
+    Route::resource('division', \App\Http\Controllers\DivisionController::class);
+    Route::resource('department', \App\Http\Controllers\DepartmentController::class);
+    Route::resource('unit', \App\Http\Controllers\UnitController::class);
+    Route::resource('position', \App\Http\Controllers\PositionController::class);
 });

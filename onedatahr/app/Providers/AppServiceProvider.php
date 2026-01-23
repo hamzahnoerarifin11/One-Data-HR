@@ -10,6 +10,9 @@ use App\Models\Posisi;
 use App\Models\InterviewHr;
 use App\Observers\KandidatObserver;
 use App\Observers\PosisiObserver;
+use App\Policies\TempaPesertaPolicy;
+use App\Policies\TempaPolicy;
+use Illuminate\Support\Facades\Gate;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -35,5 +38,45 @@ class AppServiceProvider extends ServiceProvider
         Kandidat::observe(KandidatObserver::class);
         Posisi::observe(PosisiObserver::class);
         Paginator::useTailwind();
+
+        // Register Gates for TEMPA
+        Gate::define('viewTempaPeserta', function($user) {
+            return $user->hasRole(['admin', 'superadmin', 'ketua_tempa']);
+        });
+        Gate::define('createTempaPeserta', function($user) {
+            return $user->hasRole(['admin', 'superadmin', 'ketua_tempa']);
+        });
+        Gate::define('editTempaPeserta', function($user) {
+            return $user->hasRole(['admin', 'superadmin', 'ketua_tempa']);
+        });
+        Gate::define('deleteTempaPeserta', function($user) {
+            return $user->hasRole(['admin', 'superadmin', 'ketua_tempa']);
+        });
+
+        Gate::policy(\App\Models\TempaPeserta::class, TempaPesertaPolicy::class);
+
+        Gate::define('viewTempaAbsensi', [TempaPolicy::class, 'viewTempaAbsensi']);
+        Gate::define('createTempaAbsensi', [TempaPolicy::class, 'createTempaAbsensi']);
+        Gate::define('editTempaAbsensi', [TempaPolicy::class, 'updateTempaAbsensi']);
+        Gate::define('deleteTempaAbsensi', [TempaPolicy::class, 'deleteTempaAbsensi']);
+
+        Gate::define('viewTempaMonitoring', [TempaPolicy::class, 'viewTempaMonitoring']);
+        Gate::define('createTempaMateri', [TempaPolicy::class, 'createTempaMateri']);
+        Gate::define('viewTempaMateri', [TempaPolicy::class, 'viewTempaMateri']);
+
+        // Gates for TEMPA KELOMPOK
+        Gate::define('viewTempaKelompok', function($user) {
+            return $user->hasRole(['admin', 'superadmin', 'ketua_tempa']);
+        });
+        Gate::define('createTempaKelompok', function($user) {
+            return $user->hasRole(['admin', 'superadmin', 'ketua_tempa']);
+        });
+        Gate::define('editTempaKelompok', function($user) {
+            return $user->hasRole(['admin', 'superadmin', 'ketua_tempa']);
+        });
+        Gate::define('deleteTempaKelompok', function($user) {
+            return $user->hasRole(['admin', 'superadmin', 'ketua_tempa']);
+        });
+        Gate::policy(\App\Models\TempaKelompok::class, \App\Policies\TempaKelompokPolicy::class);
     }
 }

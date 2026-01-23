@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 10 Jan 2026 pada 05.11
+-- Waktu pembuatan: 15 Jan 2026 pada 07.32
 -- Versi server: 10.4.27-MariaDB
 -- Versi PHP: 8.2.0
 
@@ -141,8 +141,8 @@ CREATE TABLE `interview_hr` (
 --
 
 INSERT INTO `interview_hr` (`id_interview_hr`, `kandidat_id`, `posisi_id`, `hari_tanggal`, `nama_interviewer`, `model_wawancara`, `skor_profesional`, `catatan_profesional`, `skor_spiritual`, `catatan_spiritual`, `skor_learning`, `catatan_learning`, `skor_initiative`, `catatan_initiative`, `skor_komunikasi`, `catatan_komunikasi`, `skor_problem_solving`, `catatan_problem_solving`, `skor_teamwork`, `catatan_teamwork`, `catatan_tambahan`, `keputusan`, `total`, `hasil_akhir`, `created_at`, `updated_at`) VALUES
-(14, 11, 7, '2025-12-29', 'Rafif', 'Online', 4, 'q', 4, 'q', 4, 'q', 4, 'q', 4, 'q', 4, 'q', 4, 'q', 'Lanjut User', 'DITERIMA', 28, 'Lolos Tes Interview', '2025-12-31 08:06:01', '2025-12-31 08:06:01'),
-(16, 17, 7, '2025-12-31', 'Luki', 'Online', 4, 's', 4, 's', 4, 's', 4, 's', 4, 's', 4, 'e', 4, 's', 'Lnjt user', 'DITOLAK', 28, 'Lolos Tes Interview HR', '2026-01-02 02:10:06', '2026-01-02 03:59:01');
+(14, 11, 7, '2025-12-29', 'Rafif', 'Online', 4, 'Lorem ipsum, atau ringkasnya lipsum, adalah teks standar yang ditempatkan untuk mendemostrasikan elemen grafis atau presentasi visual seperti font, tipografi, dan tata letak.', 4, 'q', 4, 'q', 4, 'q', 4, 'q', 4, 'q', 4, 'q', 'Lanjut User', 'DITERIMA', 28, 'Lolos Tes Interview', '2025-12-31 08:06:01', '2026-01-13 06:40:46'),
+(16, 17, 7, '2025-12-31', 'Luki', 'Online', 4, 's', 4, 's', 4, 's', 4, 's', 4, 's', 4, 'e', 4, 's', 'Lnjt user', 'DITERIMA', 28, 'Lolos Tes Interview HR', '2026-01-02 02:10:06', '2026-01-14 07:46:16');
 
 -- --------------------------------------------------------
 
@@ -177,15 +177,15 @@ INSERT INTO `kandidat` (`id_kandidat`, `nama`, `posisi_id`, `tanggal_melamar`, `
 (4, 'Isyana', 5, NULL, NULL, NULL, NULL, 'Psikotes Lolos', '2025-12-17 00:45:54', '2026-01-02 02:05:56', NULL, NULL, NULL, NULL, NULL),
 (7, 'Rudi', 13, '2025-12-22', 'Glints', NULL, NULL, 'Tes Kompetensi Lolos', '2025-12-21 23:15:27', '2026-01-02 02:05:56', NULL, NULL, '2025-12-22', NULL, NULL),
 (9, 'Mardi', 2, '2025-12-22', 'Glints', NULL, NULL, 'CV Lolos', '2025-12-21 23:45:36', '2026-01-02 02:05:56', '2025-12-22', NULL, NULL, NULL, NULL),
-(11, 'Raditya', 7, '2025-12-30', 'glints', NULL, NULL, 'Diterima', '2025-12-30 02:31:19', '2026-01-09 07:57:35', NULL, NULL, NULL, '2026-01-02', '2025-12-30'),
+(11, 'Raditya', 7, '2025-12-30', 'glints', NULL, NULL, 'Diterima', '2025-12-30 02:31:19', '2026-01-14 07:48:55', NULL, NULL, NULL, '2026-01-02', '2025-12-30'),
 (12, 'in', 3, '2025-12-03', 'glints', NULL, NULL, 'Psikotes Lolos', '2025-12-30 02:34:15', '2026-01-02 02:05:56', NULL, '2025-12-03', NULL, NULL, NULL),
 (13, 'Wiwi', 4, '2025-12-31', 'Glints', NULL, NULL, 'CV Lolos', '2025-12-31 01:40:39', '2026-01-02 02:05:56', '2025-12-31', NULL, NULL, NULL, NULL),
 (15, 'Adit', 12, '2025-12-29', 'Glints', NULL, NULL, 'CV Lolos', '2025-12-31 06:09:46', '2026-01-05 02:04:26', '2026-01-05', '2026-01-02', NULL, NULL, NULL),
 (16, 'Mane', 7, '2025-12-22', 'Glints', NULL, NULL, 'CV Lolos', '2025-12-31 07:59:33', '2026-01-02 02:05:56', '2025-12-22', NULL, NULL, NULL, NULL),
-(17, 'Uus', 7, '2025-12-22', 'Glints', NULL, NULL, 'Tidak Lolos', '2025-12-31 08:02:11', '2026-01-02 03:59:01', '2026-01-02', '2026-01-02', NULL, '2026-01-02', NULL),
+(17, 'Uus', 7, '2025-12-22', 'Glints', NULL, NULL, 'Diterima', '2025-12-31 08:02:11', '2026-01-14 07:48:41', '2026-01-02', '2026-01-02', NULL, '2026-01-02', '2026-01-14'),
 (18, 'Andika', 7, '2025-12-23', 'Glints', 'https://drive.google.com/file/d/1tIVqS7Gz_KS_72TtOjzqhqlBHIybCfe4/view?usp=sharing', NULL, 'CV Lolos', '2025-12-31 08:02:58', '2026-01-02 06:18:00', '2025-12-23', NULL, NULL, NULL, NULL),
-(20, 'Hamzah', 4, '2025-12-22', 'glints', 'https://drive.google.com/file/d/1M5Hp0wDGm4pzBU-3W7cd8g1AZ-rgClTf/view?usp=sharing', NULL, 'CV Lolos', '2026-01-02 07:25:12', '2026-01-02 07:25:12', NULL, NULL, NULL, NULL, NULL),
-(22, 'A', 1, '2025-12-29', 'glints', 'https://drive.google.com/file/d/1M5Hp0wDGm4pzBU-3W7cd8g1AZ-rgClTf/view?usp=sharing', '1767929663_ALAT_INTERPRETASI.pdf', 'CV Lolos', '2026-01-03 04:33:39', '2026-01-09 03:34:23', '2026-01-05', NULL, NULL, '2026-01-05', NULL),
+(20, 'Hamzah', 4, '2025-12-22', 'glints', 'https://drive.google.com/file/d/1M5Hp0wDGm4pzBU-3W7cd8g1AZ-rgClTf/view?usp=sharing', NULL, 'CV Lolos', '2026-01-02 07:25:12', '2026-01-14 07:46:03', '2026-01-14', NULL, NULL, '2026-01-14', NULL),
+(22, 'Aa', 1, '2025-12-29', 'glints', 'https://drive.google.com/file/d/1M5Hp0wDGm4pzBU-3W7cd8g1AZ-rgClTf/view?usp=sharing', '1767929663_ALAT_INTERPRETASI.pdf', 'CV Lolos', '2026-01-03 04:33:39', '2026-01-14 08:16:43', '2026-01-05', NULL, NULL, '2026-01-05', NULL),
 (25, 'BE', 11, '2026-01-05', 'glints', 'https://drive.google.com/file/d/1M5Hp0wDGm4pzBU-3W7cd8g1AZ-rgClTf/view?usp=sharing', '1767929785_ALAT_INTERPRETASI.pdf', 'CV Lolos', '2026-01-09 03:35:31', '2026-01-09 03:36:25', NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
@@ -211,7 +211,8 @@ CREATE TABLE `kandidat_lanjut_user` (
 --
 
 INSERT INTO `kandidat_lanjut_user` (`id_kandidat_lanjut_user`, `kandidat_id`, `posisi_id`, `tanggal_interview_hr`, `tanggal_penyerahan`, `detail_interview`, `catatan`, `created_at`, `updated_at`) VALUES
-(12, 11, NULL, '2025-12-29', '2025-12-30', '[{\"nama_user\":\"Pak Eko\",\"tanggal\":\"2025-12-30\",\"hasil\":\"Lolos\"}]', 'Lanjut', '2026-01-09 07:56:35', '2026-01-09 07:56:35');
+(12, 11, NULL, '2025-12-29', '2025-12-30', '[{\"nama_user\":\"Pak Eko\",\"tanggal\":\"2025-12-30\",\"hasil\":\"Lolos\"},{\"nama_user\":\"Pak Abdul\",\"tanggal\":\"2026-01-14\",\"hasil\":\"Lolos\"}]', 'Lanjut', '2026-01-09 07:56:35', '2026-01-14 07:47:28'),
+(13, 17, NULL, '2025-12-31', '2026-01-05', '[{\"nama_user\":\"Pak Eko\",\"tanggal\":\"2026-01-06\",\"hasil\":\"Lolos\"}]', 'qweqwe', '2026-01-14 07:47:16', '2026-01-14 07:47:16');
 
 -- --------------------------------------------------------
 
@@ -1417,7 +1418,13 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (6, '2025_12_30_040824_add_total_smt2_to_kpi_scores_table', 6),
 (7, '2025_12_30_042614_add_adjustment_columns_to_kpi_scores', 7),
 (8, '2025_12_30_102541_add_real_adjustment_to_kpi_scores', 8),
-(9, '2025_12_31_060700_create_kbi_tables', 9);
+(9, '2025_12_31_060700_create_kbi_tables', 9),
+(10, '2026_01_14_084756_create_roles_table', 10),
+(11, '2026_01_14_084900_create_role_user_table', 11),
+(12, '2026_01_14_091032_drop_role_from_users_table', 12),
+(13, '2026_01_15_091924_add_activated_at_to_posisi_table', 13),
+(14, '2026_01_15_105032_add_mentor_id_to_tempa_peserta_table', 14),
+(15, '2026_01_15_105135_add_tahun_to_tempa_absensi_table', 15);
 
 -- --------------------------------------------------------
 
@@ -1435,6 +1442,9 @@ CREATE TABLE `onboarding_karyawan` (
   `nomor_wa` varchar(20) DEFAULT NULL,
   `jadwal_ttd_kontrak` date DEFAULT NULL,
   `tanggal_resign` date DEFAULT NULL,
+  `masa_kerja_hari` int(11) DEFAULT NULL,
+  `status_turnover` enum('turnover','lolos','belum') DEFAULT 'belum',
+  `tanggal_lolos_probation` date DEFAULT NULL,
   `alasan_resign` text DEFAULT NULL,
   `id_card_status` enum('proses','jadi','diambil') DEFAULT 'proses',
   `id_card_proses` date DEFAULT NULL,
@@ -1460,6 +1470,26 @@ CREATE TABLE `onboarding_karyawan` (
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `onboarding_karyawan`
+--
+
+INSERT INTO `onboarding_karyawan` (`id_onboarding`, `kandidat_id`, `posisi_id`, `pendidikan_terakhir`, `nama_sekolah`, `alamat_domisili`, `nomor_wa`, `jadwal_ttd_kontrak`, `tanggal_resign`, `masa_kerja_hari`, `status_turnover`, `tanggal_lolos_probation`, `alasan_resign`, `id_card_status`, `id_card_proses`, `id_card_jadi`, `id_card_diambil`, `no_rekening`, `fingerprint_status`, `fingerprint_sudah`, `link_data_dikirim_hr`, `link_data_dilengkapi_karyawan`, `ijazah_diterima_hr`, `kontrak_ttd_pusat`, `visi_misi`, `wadja_philosophy`, `sejarah_perusahaan`, `kondisi_perizinan`, `tata_tertib`, `bpjs`, `k3`, `tanggal_induction`, `evaluasi`, `status_onboarding`, `created_at`, `updated_at`) VALUES
+(1, 3, 1, 'S1', 'Universitas Gadjah Mada', 'Jl. Contoh No. 118', '084342924392', '2025-09-11', NULL, NULL, 'lolos', '2025-12-03', NULL, 'jadi', '2025-12-20', '2025-12-31', NULL, NULL, 'sudah', '2025-12-30', NULL, NULL, '2025-12-17', '2025-12-30', 1, 0, 0, 0, 1, 0, 0, '2026-01-01', NULL, 'selesai', '2026-01-12 06:27:55', '2026-01-14 07:54:15'),
+(2, 22, 1, 'S1', 'SMA Negeri 1 Jakarta', 'Jl. Contoh No. 220', '083125326297', '2025-11-17', '2025-12-22', NULL, 'lolos', '2026-02-08', 'Masalah Keluarga', 'proses', NULL, NULL, NULL, NULL, 'belum', NULL, '2025-12-10', NULL, '2025-11-17', '2025-11-17', 1, 0, 0, 0, 1, 1, 1, '2025-11-18', NULL, 'selesai', '2026-01-12 06:27:55', '2026-01-13 06:14:01'),
+(3, 9, 2, 'S1', 'Universitas Gadjah Mada', 'Jl. Contoh No. 213', '089542837759', '2025-05-22', '2025-06-14', 30, 'turnover', NULL, 'Masalah keluarga', 'jadi', '2025-12-14', '2025-12-30', NULL, NULL, 'sudah', '2026-01-09', '2025-12-23', NULL, '2026-01-01', '2025-12-26', 1, 0, 0, 1, 0, 0, 0, '2025-11-30', 'Onboarding berjalan sesuai SOP dan kebutuhan unit kerja.', 'selesai', '2026-01-12 06:27:55', '2026-01-12 06:27:55'),
+(4, 12, 3, 'SMA', 'SMA Negeri 1 Jakarta', 'Jl. Contoh No. 75', '082390772198', '2026-01-18', '2026-02-09', NULL, 'lolos', '2026-02-08', 'Masalah Keluarga', 'proses', NULL, NULL, NULL, NULL, 'sudah', '2026-01-26', '2026-01-18', NULL, '2026-01-18', '2026-01-18', 0, 1, 1, 1, 1, 0, 0, '2026-01-11', 'Onboarding berjalan sesuai SOP dan kebutuhan unit kerja.', 'selesai', '2026-01-12 06:27:55', '2026-01-13 06:16:39'),
+(5, 13, 4, 'S1', 'Politeknik Negeri Jakarta', 'Jl. Contoh No. 67', '082106666439', '2025-06-25', NULL, NULL, 'lolos', '2025-09-16', NULL, 'jadi', '2025-12-27', '2025-12-29', NULL, NULL, 'sudah', '2026-01-08', NULL, NULL, NULL, NULL, 0, 1, 0, 1, 1, 1, 0, NULL, 'Onboarding berjalan sesuai SOP dan kebutuhan unit kerja.', 'selesai', '2026-01-12 06:27:55', '2026-01-12 06:27:55'),
+(6, 20, 4, 'S1', 'Politeknik Negeri Jakarta', 'Jl. Contoh No. 170', '086277137021', '2025-04-04', NULL, NULL, 'lolos', '2025-06-26', NULL, 'jadi', '2025-12-14', '2026-01-02', NULL, NULL, 'belum', NULL, NULL, '2025-12-30', NULL, '2026-01-03', 1, 1, 1, 1, 0, 1, 0, NULL, NULL, 'selesai', '2026-01-12 06:27:55', '2026-01-12 06:27:55'),
+(7, 4, 5, 'S2', 'Politeknik Negeri Jakarta', 'Jl. Contoh No. 87', '083951433910', '2025-07-12', NULL, NULL, 'lolos', '2025-10-03', NULL, 'proses', NULL, NULL, NULL, NULL, 'belum', NULL, '2025-11-30', '2025-12-18', NULL, NULL, 0, 0, 0, 0, 1, 0, 0, NULL, 'Onboarding berjalan sesuai SOP dan kebutuhan unit kerja.', 'progress', '2026-01-12 06:27:55', '2026-01-12 06:27:55'),
+(8, 11, 7, 'SMA', 'SMA Negeri 1 Jakarta', 'Jl. Contoh No. 198', '087028760869', '2025-02-01', NULL, NULL, 'lolos', '2025-04-25', NULL, 'jadi', '2026-01-02', '2025-12-28', NULL, NULL, 'belum', NULL, NULL, '2025-12-14', NULL, '2026-01-01', 1, 1, 1, 1, 1, 1, 0, '2025-12-20', 'Onboarding berjalan sesuai SOP dan kebutuhan unit kerja.', 'progress', '2026-01-12 06:27:55', '2026-01-12 06:27:55'),
+(9, 16, 7, 'D3', 'Institut Teknologi Bandung', 'Jl. Contoh No. 37', '081020315181', '2025-05-12', NULL, NULL, 'lolos', '2025-08-03', NULL, 'proses', NULL, NULL, NULL, NULL, 'belum', NULL, NULL, '2025-12-29', NULL, NULL, 0, 0, 0, 1, 0, 0, 1, NULL, 'Onboarding berjalan sesuai SOP dan kebutuhan unit kerja.', 'selesai', '2026-01-12 06:27:55', '2026-01-12 06:27:55'),
+(10, 17, 7, 'S1', 'Institut Teknologi Bandung', 'Jl. Contoh No. 45', '085281604892', '2025-07-08', NULL, NULL, 'lolos', '2025-09-29', NULL, 'jadi', '2025-12-13', '2026-01-04', NULL, NULL, 'sudah', '2026-01-08', NULL, '2025-12-21', NULL, '2025-12-30', 1, 0, 0, 1, 0, 1, 0, '2025-11-28', NULL, 'progress', '2026-01-12 06:27:56', '2026-01-12 06:27:56'),
+(11, 18, 7, 'S1', 'Universitas Indonesia', 'Jl. Contoh No. 63', '086895414315', '2025-06-21', NULL, NULL, 'lolos', '2025-09-12', NULL, 'jadi', '2026-01-01', '2025-12-28', NULL, NULL, 'sudah', '2026-01-11', NULL, '2025-12-30', '2025-12-09', NULL, 1, 0, 0, 1, 1, 0, 1, '2025-11-26', NULL, 'selesai', '2026-01-12 06:27:56', '2026-01-12 06:27:56'),
+(12, 25, 11, 'D3', 'Universitas Gadjah Mada', 'Jl. Contoh No. 77', '089777251040', '2025-10-17', NULL, NULL, 'lolos', '2026-01-08', NULL, 'diambil', '2025-12-29', '2025-12-29', '2026-01-08', NULL, 'sudah', '2025-12-31', NULL, '2025-12-28', '2025-12-29', NULL, 1, 0, 0, 0, 0, 0, 0, '2025-12-12', NULL, 'selesai', '2026-01-12 06:27:56', '2026-01-12 06:27:56'),
+(13, 15, 12, 'D3', 'Politeknik Negeri Jakarta', 'Jl. Contoh No. 234', '083982122648', '2025-04-11', '2025-12-06', 246, 'turnover', NULL, 'Masalah keluarga', 'proses', NULL, NULL, NULL, NULL, 'belum', NULL, '2025-12-23', NULL, NULL, NULL, 0, 1, 0, 0, 0, 1, 0, NULL, 'Onboarding berjalan sesuai SOP dan kebutuhan unit kerja.', 'selesai', '2026-01-12 06:27:56', '2026-01-12 06:27:56'),
+(14, 7, 13, 'S2', 'SMA Negeri 1 Jakarta', 'Jl. Contoh No. 159', '086594949608', '2025-07-13', NULL, NULL, 'lolos', '2025-10-04', NULL, 'jadi', '2025-12-18', '2026-01-04', NULL, NULL, 'belum', NULL, '2025-12-17', '2026-01-06', '2025-12-30', '2025-12-26', 1, 0, 0, 0, 0, 1, 1, NULL, 'Onboarding berjalan sesuai SOP dan kebutuhan unit kerja.', 'selesai', '2026-01-12 06:27:56', '2026-01-12 06:27:56');
 
 -- --------------------------------------------------------
 
@@ -1524,7 +1554,8 @@ CREATE TABLE `pemberkasan` (
 --
 
 INSERT INTO `pemberkasan` (`id_pemberkasan`, `kandidat_id`, `posisi_id`, `follow_up`, `kandidat_kirim_berkas`, `selesai_recruitment`, `selesai_skgk_finance`, `selesai_ttd_manager_hrd`, `selesai_ttd_user`, `selesai_ttd_direktur`, `jadwal_ttd_kontrak`, `background_checking`, `created_at`, `updated_at`) VALUES
-(15, 11, NULL, '2025-12-31', '2026-01-05', '2026-01-06', '2026-01-07', '2026-01-08', '2026-01-08', '2026-01-08', '2026-01-12', 'Clear', '2026-01-09 07:57:35', '2026-01-09 07:57:35');
+(15, 11, NULL, '2025-12-31', '2026-01-05', '2026-01-06', '2026-01-07', '2026-01-08', '2026-01-08', '2026-01-08', '2026-01-12', 'Clear weqweqwe', '2026-01-09 07:57:35', '2026-01-14 07:48:55'),
+(16, 17, NULL, '2026-01-07', '2026-01-07', '2026-01-07', '2026-01-07', '2026-01-07', '2026-01-07', '2026-01-07', '2026-01-07', 'Clear', '2026-01-14 07:48:41', '2026-01-14 07:48:41');
 
 -- --------------------------------------------------------
 
@@ -1597,26 +1628,28 @@ CREATE TABLE `posisi` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `progress_rekrutmen` varchar(50) DEFAULT 'Menerima Kandidat',
-  `total_pelamar` int(11) DEFAULT 0
+  `total_pelamar` int(11) DEFAULT 0,
+  `activated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data untuk tabel `posisi`
 --
 
-INSERT INTO `posisi` (`id_posisi`, `nama_posisi`, `status`, `created_at`, `updated_at`, `progress_rekrutmen`, `total_pelamar`) VALUES
-(1, 'Software Engineer', 'Aktif', '2025-12-16 21:53:11', '2026-01-05 13:09:08', 'Interview HR', 2),
-(2, 'Quality Assurance', 'Aktif', '2025-12-16 21:53:11', '2026-01-02 04:19:19', 'Interview HR', 1),
-(3, 'Product Manager', 'Aktif', '2025-12-16 21:53:11', '2025-12-31 01:41:57', 'Pre Interview', 1),
-(4, 'UI/UX Designer', 'Aktif', '2025-12-16 21:53:11', '2026-01-02 07:25:12', 'Interview HR', 2),
-(5, 'Sales Tangerang', 'Aktif', '2025-12-16 21:53:11', '2025-12-31 01:42:28', 'Pre Interview', 1),
-(6, 'Smoke Test Position', 'Aktif', '2025-12-16 23:26:27', '2025-12-31 03:27:12', 'Menerima Kandidat', 0),
-(7, 'Sales Pati', 'Aktif', '2025-12-16 23:26:27', '2026-01-09 07:57:35', 'Rekrutmen Selesai', 3),
-(11, 'Sales Bali', 'Aktif', '2025-12-16 23:33:58', '2026-01-09 03:35:31', 'Interview HR', 1),
-(12, 'Sales Bandung', 'Aktif', '2025-12-17 19:03:24', '2026-01-05 02:04:27', 'Interview HR', 1),
-(13, 'Sales Jakarta', 'Aktif', '2025-12-18 20:09:45', '2026-01-09 03:34:09', 'Pre Interview', 1),
-(15, 'Sales Lampung', 'Aktif', '2025-12-21 20:06:55', '2025-12-21 20:06:55', 'Menerima Kandidat', 0),
-(21, 'Sales Makassar', 'Nonaktif', '2025-12-21 21:03:08', '2025-12-31 03:26:08', 'Tidak Menerima Kandidat', 0);
+INSERT INTO `posisi` (`id_posisi`, `nama_posisi`, `status`, `created_at`, `updated_at`, `progress_rekrutmen`, `total_pelamar`, `activated_at`) VALUES
+(1, 'Software Engineer', 'Aktif', '2025-12-16 21:53:11', '2026-01-15 02:27:40', 'Interview HR', 2, '2025-12-16 21:53:11'),
+(2, 'Quality Assurance', 'Aktif', '2025-12-16 21:53:11', '2026-01-15 02:27:40', 'Interview HR', 1, '2025-12-16 21:53:11'),
+(3, 'Product Manager', 'Aktif', '2025-12-16 21:53:11', '2026-01-15 02:27:40', 'Pre Interview', 1, '2025-12-16 21:53:11'),
+(4, 'UI/UX Designer', 'Aktif', '2025-12-16 21:53:11', '2026-01-15 02:27:40', 'Interview HR', 2, '2025-12-16 21:53:11'),
+(5, 'Sales Tangerang', 'Aktif', '2025-12-16 21:53:11', '2026-01-15 02:27:40', 'Pre Interview', 1, '2025-12-16 21:53:11'),
+(6, 'Smoke Test Position', 'Aktif', '2025-12-16 23:26:27', '2026-01-15 02:27:40', 'Menerima Kandidat', 0, '2025-12-16 23:26:27'),
+(7, 'Sales Pati', 'Aktif', '2025-12-16 23:26:27', '2026-01-15 02:27:40', 'Rekrutmen Selesai', 4, '2025-12-16 23:26:27'),
+(11, 'Sales Bali', 'Aktif', '2025-12-16 23:33:58', '2026-01-15 02:27:40', 'Interview HR', 1, '2025-12-16 23:33:58'),
+(12, 'Sales Bandung', 'Aktif', '2025-12-17 19:03:24', '2026-01-15 02:27:40', 'Interview HR', 1, '2025-12-17 19:03:24'),
+(13, 'Sales Jakarta', 'Aktif', '2025-12-18 20:09:45', '2026-01-15 02:27:40', 'Pre Interview', 1, '2025-12-18 20:09:45'),
+(15, 'Sales Lampung', 'Aktif', '2025-12-21 20:06:55', '2026-01-15 02:27:40', 'Menerima Kandidat', 0, '2025-12-21 20:06:55'),
+(21, 'Sales Makassar', 'Nonaktif', '2025-12-21 21:03:08', '2025-12-31 03:26:08', 'Tidak Menerima Kandidat', 0, NULL),
+(38, 'R', 'Aktif', '2026-01-15 01:53:07', '2026-01-15 02:27:40', 'Menerima Kandidat', 0, '2026-01-15 01:53:07');
 
 -- --------------------------------------------------------
 
@@ -1683,7 +1716,59 @@ INSERT INTO `rekrutmen_daily` (`id`, `posisi_id`, `date`, `total_pelamar`, `lolo
 (12, 7, '2026-01-02', 0, 1, 1, 0, 2, 0, NULL, NULL, '2026-01-02 01:57:56', '2026-01-02 03:52:24'),
 (13, 12, '2026-01-05', 0, 1, 0, 0, 0, 0, NULL, NULL, '2026-01-05 02:04:27', '2026-01-05 02:04:27'),
 (14, 1, '2026-01-05', 0, 1, 0, 0, 1, 0, NULL, NULL, '2026-01-05 13:08:16', '2026-01-05 13:09:08'),
-(15, 2, '2026-01-02', 4, 0, 0, 0, 0, 0, NULL, 3, '2026-01-06 03:41:25', '2026-01-06 03:41:25');
+(15, 2, '2026-01-02', 3, 0, 0, 0, 0, 0, NULL, 16, '2026-01-06 03:41:25', '2026-01-14 07:44:30'),
+(16, 1, '2026-01-14', 0, 0, 0, 0, 0, 0, NULL, NULL, '2026-01-14 07:41:53', '2026-01-14 07:42:10'),
+(17, 2, '2026-01-03', 4, 0, 0, 0, 0, 0, NULL, 16, '2026-01-14 07:44:35', '2026-01-14 07:44:35'),
+(18, 4, '2026-01-14', 0, 1, 0, 0, 1, 0, NULL, NULL, '2026-01-14 07:45:43', '2026-01-14 07:46:03'),
+(19, 7, '2026-01-14', 0, 0, 0, 0, 0, 1, NULL, NULL, '2026-01-14 07:47:16', '2026-01-14 07:47:16');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `roles`
+--
+
+CREATE TABLE `roles` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data untuk tabel `roles`
+--
+
+INSERT INTO `roles` (`id`, `name`, `created_at`, `updated_at`) VALUES
+(1, 'superadmin', '2026-01-14 01:57:12', '2026-01-14 01:57:12'),
+(2, 'admin', '2026-01-14 01:57:13', '2026-01-14 01:57:13'),
+(3, 'manager', '2026-01-14 01:57:13', '2026-01-14 01:57:13'),
+(4, 'staff', '2026-01-14 01:57:13', '2026-01-14 01:57:13'),
+(5, 'ketua_tempa', '2026-01-14 01:57:13', '2026-01-14 01:57:13');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `role_user`
+--
+
+CREATE TABLE `role_user` (
+  `user_id` bigint(20) UNSIGNED NOT NULL,
+  `role_id` bigint(20) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data untuk tabel `role_user`
+--
+
+INSERT INTO `role_user` (`user_id`, `role_id`) VALUES
+(3, 1),
+(15, 4),
+(16, 1),
+(17, 3),
+(18, 3),
+(19, 4),
+(19, 5);
 
 -- --------------------------------------------------------
 
@@ -1705,7 +1790,10 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('LY3OXOMYPu9awNTmFoVOdYujBGUZDimDcsVotkOW', 16, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiRmNTRDhmbmdlU3BUSFN2dDBjTEQwdURPTktBejlvVnNkZUs4N1pIMiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6Mzk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9vbmJvYXJkaW5nL2NyZWF0ZSI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fXM6NTA6ImxvZ2luX3dlYl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjE2O30=', 1768018153);
+('aKa1CaGArhG6wc16yWDDewWZ90SueTpUYDKSXd5x', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.108.0 Chrome/142.0.7444.235 Electron/39.2.7 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiZng2QW53aDF2Mlg3NW1LYWVPWG43N1cwdnZVV0NHa2hUNkdhNzlnQyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MTAxOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvc2lnbmluP2lkPTQwYjhlNTZlLTE3MTgtNGJkZC04MThhLTQ1NWZlNDcyNzRmNyZ2c2NvZGVCcm93c2VyUmVxSWQ9MTc2ODQ1NjkxOTQxOSI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1768456922),
+('P2O8NpsH8l19LJOs4F4jeSl6o7cxXKq2LRODJHKj', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.108.0 Chrome/142.0.7444.235 Electron/39.2.7 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoiVkxyU0RPckFxMEhtNVlHSzRXcnU3TjNybnh0S256VjZTSDFwd29iTyI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MTAxOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvc2lnbmluP2lkPTQwYjhlNTZlLTE3MTgtNGJkZC04MThhLTQ1NWZlNDcyNzRmNyZ2c2NvZGVCcm93c2VyUmVxSWQ9MTc2ODQ1Njk1NzQ3OCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1768456958),
+('Sd73AtzHmw1soOCdUWcvCddd75Ogvl5ZFOEnqcS0', 19, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiaXhRS3RCTmFWaGhhWU12UVhIMnNBQnFnVmQycEpVWmF2YWduSG81ayI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzU6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC90ZW1wYS9hYnNlbnNpIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTk7fQ==', 1768458348),
+('YBAgUC8oq72znCuBmu0EsjqFaS9WxKKAIyXJeXFM', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.108.0 Chrome/142.0.7444.235 Electron/39.2.7 Safari/537.36', 'YToyOntzOjY6Il90b2tlbiI7czo0MDoicWlvTzVKWlp6RExwNFV5emFFYTFIbmV1aURldHJMZWNkR0NmZUt0cSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1768456953);
 
 -- --------------------------------------------------------
 
@@ -1739,6 +1827,132 @@ INSERT INTO `status_karyawan` (`id_status`, `id_karyawan`, `Tanggal_Non_Aktif`, 
 -- --------------------------------------------------------
 
 --
+-- Struktur dari tabel `tempa`
+--
+
+CREATE TABLE `tempa` (
+  `id_tempa` int(11) NOT NULL,
+  `jenis_tempa` enum('pusat','cabang') NOT NULL,
+  `cabang` varchar(100) DEFAULT NULL COMMENT 'Diisi jika TEMPA Cabang',
+  `nama_tempa` varchar(150) NOT NULL,
+  `periode` varchar(50) NOT NULL,
+  `jumlah_pertemuan` int(11) NOT NULL,
+  `created_by` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `tempa`
+--
+
+INSERT INTO `tempa` (`id_tempa`, `jenis_tempa`, `cabang`, `nama_tempa`, `periode`, `jumlah_pertemuan`, `created_by`, `created_at`, `updated_at`) VALUES
+(1, 'cabang', 'Jakarta', 'Program Pengembangan Talenta 2026', 'Januari - Juni 2026', 12, 3, '2026-01-15 03:52:42', '2026-01-15 03:52:42');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `tempa_absensi`
+--
+
+CREATE TABLE `tempa_absensi` (
+  `id_absensi` int(11) NOT NULL,
+  `id_peserta` int(11) NOT NULL,
+  `bulan` tinyint(4) NOT NULL COMMENT '1-12',
+  `tahun` year(4) NOT NULL,
+  `pertemuan_ke` tinyint(4) NOT NULL COMMENT '1-5',
+  `status_hadir` tinyint(4) NOT NULL COMMENT '1=Hadir,0=Tidak Hadir',
+  `bukti_foto` varchar(255) DEFAULT NULL,
+  `created_by` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `tempa_absensi`
+--
+
+INSERT INTO `tempa_absensi` (`id_absensi`, `id_peserta`, `bulan`, `tahun`, `pertemuan_ke`, `status_hadir`, `bukti_foto`, `created_by`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 2026, 1, 0, NULL, 3, '2026-01-15 03:52:42', '2026-01-15 03:52:42'),
+(2, 2, 1, 2026, 2, 1, NULL, 3, '2026-01-15 03:52:42', '2026-01-15 03:52:42'),
+(3, 3, 1, 2026, 3, 0, NULL, 3, '2026-01-15 03:52:42', '2026-01-15 03:52:42');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `tempa_kelompok`
+--
+
+CREATE TABLE `tempa_kelompok` (
+  `id_kelompok` int(11) NOT NULL,
+  `id_tempa` int(11) NOT NULL,
+  `nama_kelompok` varchar(100) NOT NULL,
+  `nama_mentor` varchar(100) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `tempa_kelompok`
+--
+
+INSERT INTO `tempa_kelompok` (`id_kelompok`, `id_tempa`, `nama_kelompok`, `nama_mentor`, `created_at`, `updated_at`) VALUES
+(1, 1, 'Kelompok Alpha', 'Manager Alpha', '2026-01-15 03:52:42', '2026-01-15 03:52:42'),
+(2, 1, 'Kelompok Beta', 'Manager Beta', '2026-01-15 03:52:42', '2026-01-15 03:52:42');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `tempa_materi`
+--
+
+CREATE TABLE `tempa_materi` (
+  `id_materi` int(11) NOT NULL,
+  `id_tempa` int(11) NOT NULL,
+  `judul_materi` varchar(150) NOT NULL,
+  `file_materi` varchar(255) NOT NULL,
+  `uploaded_by` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `tempa_materi`
+--
+
+INSERT INTO `tempa_materi` (`id_materi`, `id_tempa`, `judul_materi`, `file_materi`, `uploaded_by`, `created_at`, `updated_at`) VALUES
+(1, 1, 'Materi Pengenalan TEMPA', 'tempa/materi/sample.pdf', 3, '2026-01-15 03:52:42', '2026-01-15 03:52:42');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `tempa_peserta`
+--
+
+CREATE TABLE `tempa_peserta` (
+  `id_peserta` int(11) NOT NULL,
+  `id_tempa` int(11) NOT NULL,
+  `id_kelompok` int(11) NOT NULL,
+  `status_peserta` tinyint(4) NOT NULL COMMENT '1=Aktif,2=Pindah,0=Keluar',
+  `nama_peserta` varchar(150) NOT NULL,
+  `nik_karyawan` varchar(50) NOT NULL,
+  `mentor_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `tempa_peserta`
+--
+
+INSERT INTO `tempa_peserta` (`id_peserta`, `id_tempa`, `id_kelompok`, `status_peserta`, `nama_peserta`, `nik_karyawan`, `mentor_id`, `created_at`, `updated_at`) VALUES
+(1, 1, 1, 1, 'John Doe', '1234567890', 17, '2026-01-15 03:52:42', '2026-01-15 03:52:42'),
+(2, 1, 1, 1, 'Jane Smith', '1234567891', 17, '2026-01-15 03:52:42', '2026-01-15 03:52:42'),
+(3, 1, 2, 1, 'Bob Johnson', '1234567892', 18, '2026-01-15 03:52:42', '2026-01-15 03:52:42');
+
+-- --------------------------------------------------------
+
+--
 -- Struktur dari tabel `training`
 --
 
@@ -1760,7 +1974,7 @@ CREATE TABLE `training` (
 --
 
 INSERT INTO `training` (`id_training`, `kandidat_id`, `posisi_id`, `tanggal_mulai`, `tanggal_selesai`, `jadwal_ttd_kontrak`, `hasil_evaluasi`, `keterangan_tambahan`, `created_at`, `updated_at`) VALUES
-(2, 11, 7, '2026-01-05', '2026-01-10', '2025-12-29', 'LULUS TRAINING', 'Lulus', '2026-01-02 02:36:37', '2026-01-02 02:46:59');
+(2, 11, 7, '2026-01-05', '2026-01-10', '2026-01-05', 'LULUS TRAINING', 'Lulus', '2026-01-02 02:36:37', '2026-01-14 07:53:41');
 
 -- --------------------------------------------------------
 
@@ -1774,7 +1988,6 @@ CREATE TABLE `users` (
   `email` varchar(255) DEFAULT NULL,
   `nik` varchar(50) DEFAULT NULL,
   `jabatan` varchar(200) DEFAULT NULL,
-  `role` enum('superadmin','admin','manager','staff') DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
@@ -1784,19 +1997,21 @@ CREATE TABLE `users` (
 -- Dumping data untuk tabel `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `email`, `nik`, `jabatan`, `role`, `password`, `created_at`, `updated_at`) VALUES
-(3, 'Admin One', 'admin@example.com', '1111111111', 'HR Manager', 'superadmin', '$2y$12$W9P9cpNxjAjDjuw/NsfZSuEUroH6NJfnBpmPF65x4qsBK52lJM3VS', '2025-12-07 23:46:38', '2026-01-06 04:03:00'),
-(4, 'Felicia Lind MD', 'fahey.cordia@example.net', NULL, '', NULL, '$2y$12$DwOeRYdbLK03bKLl0IZKDuL2a4.BX.QTHXepenOU3RabSO12/hLXm', '2025-12-07 23:46:38', '2025-12-07 23:46:38'),
-(5, 'Liam Brown', 'bogisich.zander@example.com', NULL, '', NULL, '$2y$12$DwOeRYdbLK03bKLl0IZKDuL2a4.BX.QTHXepenOU3RabSO12/hLXm', '2025-12-07 23:46:38', '2025-12-07 23:46:38'),
-(6, 'Prof. Catalina Goldner II', 'madyson47@example.org', NULL, '', NULL, '$2y$12$DwOeRYdbLK03bKLl0IZKDuL2a4.BX.QTHXepenOU3RabSO12/hLXm', '2025-12-07 23:46:38', '2025-12-07 23:46:38'),
-(7, 'Dr. Julius Hessel MD', 'ceasar07@example.org', NULL, '', NULL, '$2y$12$DwOeRYdbLK03bKLl0IZKDuL2a4.BX.QTHXepenOU3RabSO12/hLXm', '2025-12-07 23:46:38', '2025-12-07 23:46:38'),
-(8, 'Ms. Mona Mayert', 'mariana91@example.net', NULL, '', NULL, '$2y$12$DwOeRYdbLK03bKLl0IZKDuL2a4.BX.QTHXepenOU3RabSO12/hLXm', '2025-12-07 23:46:38', '2025-12-07 23:46:38'),
-(10, 'Zita Rempel', 'zroob@example.org', NULL, '', NULL, '$2y$12$DwOeRYdbLK03bKLl0IZKDuL2a4.BX.QTHXepenOU3RabSO12/hLXm', '2025-12-07 23:46:39', '2025-12-07 23:46:39'),
-(11, 'Dr. Jayda Kris DVM', 'connor.eichmann@example.net', NULL, '', NULL, '$2y$12$DwOeRYdbLK03bKLl0IZKDuL2a4.BX.QTHXepenOU3RabSO12/hLXm', '2025-12-07 23:46:39', '2025-12-07 23:46:39'),
-(14, 'Test User', 'test@example.com', NULL, NULL, NULL, '$2y$12$nZFZk6/LA1aL8TgRC58MOuBUzRYSDgK9kYlpOrHWTtkF9GjQe8dtG', '2025-12-09 07:20:01', '2025-12-09 07:20:01'),
-(15, 'tes', 'tes@gmail.com', '1234567889', 'Staff', 'staff', '$2y$12$54VOu5U9qXBDVaYLWk4TAuWEd5yF0/ry4ayWJx5gZx8Yj.5xZf.5W', '2026-01-05 08:50:07', '2026-01-05 08:50:07'),
-(16, 'Marcell Bass', 'marcell@gmail.com', '21670004', 'Staff Akuntan', 'superadmin', '$2y$12$z/G3mUs7TVuTw0actShM7.uDabObHLlkdYz0xzt5k/1C.MaIGEdu2', '2026-01-05 12:17:47', '2026-01-10 03:09:00'),
-(17, 'manager', 'manager@gmail.com', '111111111', 'Manager HR', 'manager', '$2y$12$26XOVmjjkMFBigarTbGcNu2MpxK.XwA4Jb/qNp4GsjvgIA/WYvW4S', '2026-01-09 08:03:57', '2026-01-09 08:03:57');
+INSERT INTO `users` (`id`, `name`, `email`, `nik`, `jabatan`, `password`, `created_at`, `updated_at`) VALUES
+(3, 'Admin One', 'admin@example.com', '1111111111', 'HR Manager', '$2y$12$W9P9cpNxjAjDjuw/NsfZSuEUroH6NJfnBpmPF65x4qsBK52lJM3VS', '2025-12-07 23:46:38', '2026-01-06 04:03:00'),
+(4, 'Felicia Lind MD', 'fahey.cordia@example.net', NULL, '', '$2y$12$DwOeRYdbLK03bKLl0IZKDuL2a4.BX.QTHXepenOU3RabSO12/hLXm', '2025-12-07 23:46:38', '2025-12-07 23:46:38'),
+(5, 'Liam Brown', 'bogisich.zander@example.com', NULL, '', '$2y$12$DwOeRYdbLK03bKLl0IZKDuL2a4.BX.QTHXepenOU3RabSO12/hLXm', '2025-12-07 23:46:38', '2025-12-07 23:46:38'),
+(6, 'Prof. Catalina Goldner II', 'madyson47@example.org', NULL, '', '$2y$12$DwOeRYdbLK03bKLl0IZKDuL2a4.BX.QTHXepenOU3RabSO12/hLXm', '2025-12-07 23:46:38', '2025-12-07 23:46:38'),
+(7, 'Dr. Julius Hessel MD', 'ceasar07@example.org', NULL, '', '$2y$12$DwOeRYdbLK03bKLl0IZKDuL2a4.BX.QTHXepenOU3RabSO12/hLXm', '2025-12-07 23:46:38', '2025-12-07 23:46:38'),
+(8, 'Ms. Mona Mayert', 'mariana91@example.net', NULL, '', '$2y$12$DwOeRYdbLK03bKLl0IZKDuL2a4.BX.QTHXepenOU3RabSO12/hLXm', '2025-12-07 23:46:38', '2025-12-07 23:46:38'),
+(10, 'Zita Rempel', 'zroob@example.org', NULL, '', '$2y$12$DwOeRYdbLK03bKLl0IZKDuL2a4.BX.QTHXepenOU3RabSO12/hLXm', '2025-12-07 23:46:39', '2025-12-07 23:46:39'),
+(11, 'Dr. Jayda Kris DVM', 'connor.eichmann@example.net', NULL, '', '$2y$12$DwOeRYdbLK03bKLl0IZKDuL2a4.BX.QTHXepenOU3RabSO12/hLXm', '2025-12-07 23:46:39', '2025-12-07 23:46:39'),
+(14, 'Test User', 'test@example.com', NULL, NULL, '$2y$12$nZFZk6/LA1aL8TgRC58MOuBUzRYSDgK9kYlpOrHWTtkF9GjQe8dtG', '2025-12-09 07:20:01', '2025-12-09 07:20:01'),
+(15, 'tes', 'tes@gmail.com', '1234567889', 'Staff', '$2y$12$Oe5dxWOHz1baJT4tOjM3CexswGT3V15WqUa.HTuQmLdlBu30Dsov.', '2026-01-05 08:50:07', '2026-01-14 08:36:41'),
+(16, 'Marcell Bass', 'marcell@gmail.com', '21670004', 'Staff Akuntan', '$2y$12$z/G3mUs7TVuTw0actShM7.uDabObHLlkdYz0xzt5k/1C.MaIGEdu2', '2026-01-05 12:17:47', '2026-01-10 03:09:00'),
+(17, 'manager', 'manager@gmail.com', '111111111', 'Manager HR', '$2y$12$26XOVmjjkMFBigarTbGcNu2MpxK.XwA4Jb/qNp4GsjvgIA/WYvW4S', '2026-01-09 08:03:57', '2026-01-09 08:03:57'),
+(18, 'Mirai', 'mirai@gmail.com', '1111', 'Manager', '$2y$12$YGTUARZOVZ4FT5ojJOXYbegpbR099r9AzhtP.rbeSX7h48LO8CQuW', '2026-01-14 06:21:51', '2026-01-14 06:21:51'),
+(19, 'Tokio', 'tokio@gmail.com', '12345', 'staff', '$2y$12$zZ/BlrKtuALe3nItMiDCrON84hZYZh.bjNxcqtcaFD0TRvIbL3FP6', '2026-01-14 08:31:17', '2026-01-15 06:01:40');
 
 -- --------------------------------------------------------
 
@@ -2024,6 +2239,20 @@ ALTER TABLE `rekrutmen_daily`
   ADD UNIQUE KEY `posisi_date_unique` (`posisi_id`,`date`);
 
 --
+-- Indeks untuk tabel `roles`
+--
+ALTER TABLE `roles`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `roles_name_unique` (`name`);
+
+--
+-- Indeks untuk tabel `role_user`
+--
+ALTER TABLE `role_user`
+  ADD PRIMARY KEY (`user_id`,`role_id`),
+  ADD KEY `role_user_role_id_foreign` (`role_id`);
+
+--
 -- Indeks untuk tabel `sessions`
 --
 ALTER TABLE `sessions`
@@ -2037,6 +2266,42 @@ ALTER TABLE `sessions`
 ALTER TABLE `status_karyawan`
   ADD PRIMARY KEY (`id_status`),
   ADD KEY `id_karyawan` (`id_karyawan`);
+
+--
+-- Indeks untuk tabel `tempa`
+--
+ALTER TABLE `tempa`
+  ADD PRIMARY KEY (`id_tempa`);
+
+--
+-- Indeks untuk tabel `tempa_absensi`
+--
+ALTER TABLE `tempa_absensi`
+  ADD PRIMARY KEY (`id_absensi`),
+  ADD UNIQUE KEY `unik_absensi` (`id_peserta`,`bulan`,`pertemuan_ke`);
+
+--
+-- Indeks untuk tabel `tempa_kelompok`
+--
+ALTER TABLE `tempa_kelompok`
+  ADD PRIMARY KEY (`id_kelompok`),
+  ADD KEY `id_tempa` (`id_tempa`);
+
+--
+-- Indeks untuk tabel `tempa_materi`
+--
+ALTER TABLE `tempa_materi`
+  ADD PRIMARY KEY (`id_materi`),
+  ADD KEY `id_tempa` (`id_tempa`);
+
+--
+-- Indeks untuk tabel `tempa_peserta`
+--
+ALTER TABLE `tempa_peserta`
+  ADD PRIMARY KEY (`id_peserta`),
+  ADD KEY `id_tempa` (`id_tempa`),
+  ADD KEY `id_kelompok` (`id_kelompok`),
+  ADD KEY `tempa_peserta_mentor_id_foreign` (`mentor_id`);
 
 --
 -- Indeks untuk tabel `training`
@@ -2086,19 +2351,19 @@ ALTER TABLE `data_keluarga`
 -- AUTO_INCREMENT untuk tabel `interview_hr`
 --
 ALTER TABLE `interview_hr`
-  MODIFY `id_interview_hr` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id_interview_hr` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT untuk tabel `kandidat`
 --
 ALTER TABLE `kandidat`
-  MODIFY `id_kandidat` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id_kandidat` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT untuk tabel `kandidat_lanjut_user`
 --
 ALTER TABLE `kandidat_lanjut_user`
-  MODIFY `id_kandidat_lanjut_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id_kandidat_lanjut_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT untuk tabel `karyawan`
@@ -2152,13 +2417,13 @@ ALTER TABLE `kpi_scores`
 -- AUTO_INCREMENT untuk tabel `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT untuk tabel `onboarding_karyawan`
 --
 ALTER TABLE `onboarding_karyawan`
-  MODIFY `id_onboarding` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_onboarding` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT untuk tabel `pekerjaan`
@@ -2170,7 +2435,7 @@ ALTER TABLE `pekerjaan`
 -- AUTO_INCREMENT untuk tabel `pemberkasan`
 --
 ALTER TABLE `pemberkasan`
-  MODIFY `id_pemberkasan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id_pemberkasan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT untuk tabel `pendidikan`
@@ -2188,7 +2453,7 @@ ALTER TABLE `perusahaan`
 -- AUTO_INCREMENT untuk tabel `posisi`
 --
 ALTER TABLE `posisi`
-  MODIFY `id_posisi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id_posisi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT untuk tabel `proses_rekrutmen`
@@ -2200,13 +2465,49 @@ ALTER TABLE `proses_rekrutmen`
 -- AUTO_INCREMENT untuk tabel `rekrutmen_daily`
 --
 ALTER TABLE `rekrutmen_daily`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+
+--
+-- AUTO_INCREMENT untuk tabel `roles`
+--
+ALTER TABLE `roles`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT untuk tabel `status_karyawan`
 --
 ALTER TABLE `status_karyawan`
   MODIFY `id_status` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT untuk tabel `tempa`
+--
+ALTER TABLE `tempa`
+  MODIFY `id_tempa` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT untuk tabel `tempa_absensi`
+--
+ALTER TABLE `tempa_absensi`
+  MODIFY `id_absensi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT untuk tabel `tempa_kelompok`
+--
+ALTER TABLE `tempa_kelompok`
+  MODIFY `id_kelompok` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT untuk tabel `tempa_materi`
+--
+ALTER TABLE `tempa_materi`
+  MODIFY `id_materi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT untuk tabel `tempa_peserta`
+--
+ALTER TABLE `tempa_peserta`
+  MODIFY `id_peserta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT untuk tabel `training`
@@ -2218,7 +2519,7 @@ ALTER TABLE `training`
 -- AUTO_INCREMENT untuk tabel `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT untuk tabel `wig_rekrutmen`
@@ -2339,10 +2640,43 @@ ALTER TABLE `rekrutmen_daily`
   ADD CONSTRAINT `rekrutmen_daily_posisi_id_foreign` FOREIGN KEY (`posisi_id`) REFERENCES `posisi` (`id_posisi`) ON DELETE CASCADE;
 
 --
+-- Ketidakleluasaan untuk tabel `role_user`
+--
+ALTER TABLE `role_user`
+  ADD CONSTRAINT `role_user_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `role_user_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
 -- Ketidakleluasaan untuk tabel `status_karyawan`
 --
 ALTER TABLE `status_karyawan`
   ADD CONSTRAINT `status_karyawan_ibfk_1` FOREIGN KEY (`id_karyawan`) REFERENCES `karyawan` (`id_karyawan`);
+
+--
+-- Ketidakleluasaan untuk tabel `tempa_absensi`
+--
+ALTER TABLE `tempa_absensi`
+  ADD CONSTRAINT `tempa_absensi_ibfk_1` FOREIGN KEY (`id_peserta`) REFERENCES `tempa_peserta` (`id_peserta`) ON DELETE CASCADE;
+
+--
+-- Ketidakleluasaan untuk tabel `tempa_kelompok`
+--
+ALTER TABLE `tempa_kelompok`
+  ADD CONSTRAINT `tempa_kelompok_ibfk_1` FOREIGN KEY (`id_tempa`) REFERENCES `tempa` (`id_tempa`) ON DELETE CASCADE;
+
+--
+-- Ketidakleluasaan untuk tabel `tempa_materi`
+--
+ALTER TABLE `tempa_materi`
+  ADD CONSTRAINT `tempa_materi_ibfk_1` FOREIGN KEY (`id_tempa`) REFERENCES `tempa` (`id_tempa`) ON DELETE CASCADE;
+
+--
+-- Ketidakleluasaan untuk tabel `tempa_peserta`
+--
+ALTER TABLE `tempa_peserta`
+  ADD CONSTRAINT `tempa_peserta_ibfk_1` FOREIGN KEY (`id_tempa`) REFERENCES `tempa` (`id_tempa`) ON DELETE CASCADE,
+  ADD CONSTRAINT `tempa_peserta_ibfk_2` FOREIGN KEY (`id_kelompok`) REFERENCES `tempa_kelompok` (`id_kelompok`) ON DELETE CASCADE,
+  ADD CONSTRAINT `tempa_peserta_mentor_id_foreign` FOREIGN KEY (`mentor_id`) REFERENCES `users` (`id`);
 
 --
 -- Ketidakleluasaan untuk tabel `training`

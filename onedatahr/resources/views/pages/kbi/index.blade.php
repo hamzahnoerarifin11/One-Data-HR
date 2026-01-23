@@ -195,7 +195,7 @@
                     @if(auth()->user()->hasRole('manager'))
                         Daftar Tim Saya ({{ $bawahanList->total() }})
                     @else
-                        Daftar Karyawan ({{ $bawahanList->total() }})
+                        belum memiliki bawahan yang terdaftar
                     @endif
                 </h3>
             </div>

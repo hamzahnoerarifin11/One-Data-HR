@@ -47,10 +47,21 @@
         </div>
     @endif
 
+    @php
+        $isManager = false;
+        $loggedInKaryawan = \App\Models\Karyawan::where('nik', auth()->user()->nik)->first();
+        if($loggedInKaryawan && $karyawan->atasan_id == $loggedInKaryawan->id_karyawan) {
+            $isManager = true;
+        }
+    @endphp
+
     {{-- HEADER --}}
-    <div class="mb-6 flex flex-col lg:flex-row justify-between items-start lg:items-center bg-white dark:bg-gray-800 p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 gap-4">
-        <div>
+    <div class="mb-6 flex flex-col lg:flex justify-between items-start lg:items-center bg-white dark:bg-gray-800 p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 gap-4">
+        <div class="text-center">
             <h1 class="text-2xl font-bold text-gray-800">Form Penilaian KPI</h1>
+            @if($isManager)
+                <p class="text-gray-600 dark:text-gray-400">Karyawan: <strong class="text-blue-600">{{ $karyawan->Nama_Lengkap_Sesuai_Ijazah }}</strong> ({{ $karyawan->NIK }})</p>
+            @endif
             <p class="text-gray-500">Periode Penilaian: {{ $tahun }}</p>
         </div>
 
@@ -110,14 +121,6 @@
                     </a>
                 </div>
             </div>
-            @php
-                $isManager = false;
-                // Asumsi user sudah terhubung ke data karyawan lewat auth
-                $loggedInKaryawan = \App\Models\Karyawan::where('nik', auth()->user()->nik)->first();
-                if($loggedInKaryawan && $karyawan->atasan_id == $loggedInKaryawan->id_karyawan) {
-                    $isManager = true;
-                }
-            @endphp
             {{-- 3. Tombol Simpan --}}
             <button id="btnSimpan" type="button" onclick="submitKpiForm()" disabled
                 class="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm transition shadow-lg flex items-center justify-center gap-2 flex-1 lg:flex-none opacity-50 cursor-not-allowed">
@@ -128,11 +131,11 @@
                     <i class="fas fa-save"></i> <span class="hidden sm:inline">Simpan</span>
                 @endif
             </button>
-            {{-- BADGE PERINGATAN (Hanya muncul jika ada perubahan) --}}
-            <div id="unsaved-badge" class="hidden flex items-center gap-2 px-3 py-1.5 bg-yellow-100 text-yellow-700 text-xs font-bold rounded-lg border border-yellow-300 shadow-sm animate-pulse transition-all">
-                <i class="fas fa-pen-nib"></i>
-                <span>Ada perubahan belum disimpan</span>
-            </div>
+        </div>
+        {{-- BADGE PERINGATAN (Hanya muncul jika ada perubahan) --}}
+        <div id="unsaved-badge" class="hidden flex items-center gap-2 px-3 py-1.5 bg-yellow-100 text-yellow-700 text-md font-bold rounded-lg border border-yellow-300 shadow-sm animate-pulse transition-all">
+            <i class="fas fa-pen-nib"></i>
+            <span>Ada perubahan belum disimpan</span>
         </div>
     </div>
 
@@ -184,12 +187,14 @@
         @if(!$items->isEmpty())
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700 relative">
             <div class="w-full overflow-x-auto custom-scrollbar">
-                <table class="w-full text-sm text-left border-collapse min-w-[3000px] md:min-w-[4500px]"> 
+                <table 
+                    class="w-full text-sm text-left min-w-[3000px] md:min-w-[4500px] border-collapse"
+                    style="--col-no:48px; --col-kra:220px;"
+                    > 
                     <thead class="text-xs text-gray-700 uppercase bg-gray-100 sticky top-0 z-20 shadow-sm">
                         <tr>
-                            <th rowspan="2" class="sticky left-0 z-40 bg-gray-200 p-2 w-14 text-center border">No</th>
-                            <th rowspan="2" class="sticky left-20 bg-gray-200 z-30 p-2 w-40 border border-gray-300">KRA</th>
-                            {{-- <th rowspan="2" class="md:sticky left-10 md:left-12 bg-gray-200 z-30 p-2 md:p-3 w-60 md:w-72 border border-gray-300">Key Performance Indicator</th> --}}
+                            <th rowspan="2" class="sticky left-0 z-40 bg-gray-200 p-2 w-10 text-center border border-gray-300 shadow-sm">No</th>
+                            <th rowspan="2" class="sticky left-[48px] ml-4 bg-gray-200 z-40 p-2 w-40 border border-gray-300 shadow-sm">KRA</th>
                             <th rowspan="2" class="p-2 md:p-3 w-28 border border-gray-300 bg-gray-50">KPI</th>
                             <th rowspan="2" class="p-2 md:p-3 w-28 border border-gray-300 bg-gray-50">Perspektif</th>
                             <th rowspan="2" class="p-2 md:p-3 w-16 text-center border border-gray-300 bg-gray-50">Bobot</th>
@@ -215,9 +220,9 @@
                         <tr class="row-kpi hover:bg-gray-50 dark:hover:bg-gray-600 transition group text-xs md:text-sm">
                             {{-- IDENTITAS --}}
                             <td class="sticky left-0 bg-white z-10 p-2 md:p-3 text-center border-r font-medium">{{ $items->firstItem() + $index }}</td>
-                            <td class="sticky left-20 bg-white z-10 p-2 md:p-3 border-r align-top shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+                            <td class="sticky left-10 bg-white z-10 p-2 md:p-3 border-r align-top shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                                 <div class="flex flex-col sm:flex-row justify-between items-start gap-2">
-                                    <div class="font-semibold text-gray-900 leading-snug">{{ $item->key_result_area ?? $item->indikator }}</div>
+                                    <div class="font-semibold text-gray-900 leading-snug group-hover:text-blue-600">{{ $item->key_result_area ?? $item->indikator }}</div>
                                     {{-- <div class="font-semibold text-gray-900 leading-snug"></div> --}}
 
                                     <div class="flex gap-1 shrink-0">
@@ -306,7 +311,7 @@
                     <tfoot class="bg-white border-t-4 border-gray-300 sticky bottom-0 z-40 text-xs md:text-sm">
                         <tr class="bg-gray-50 border-b border-gray-200">
                             <td colspan="2" class="sticky left-0 bg-gray-100 p-2 font-bold uppercase border-r">Total Skor Akhir :</td>
-                            <td colspan="3" class="border-r bg-gray-50"></td>
+                            <td colspan="4" class="border-r bg-gray-50"></td>
                             <td colspan="2" class="border-r"></td><td class="p-2 text-center font-bold text-blue-800 border-r-2"><span id="footer-total-smt1"></span>%</td>
                             @foreach(['jul','aug','sep','okt','nov','des'] as $bln) <td colspan="3" class="border-r"></td><td class="p-2 text-center font-bold text-blue-800 border-r-2"><span id="footer-total-{{ $bln }}"></span>%</td> @endforeach
                             <td colspan="3" class="border-r"></td><td class="p-2 text-center font-bold text-gray-700 border-r"><span id="footer-total-sem"></span>%</td>
@@ -390,31 +395,6 @@
     </div>
 </div>
 
-{{-- 3. MODAL UNSAVED CHANGES (DIPERBAIKI DENGAN LOGIKA DISCARD) --}}
-<div id="unsavedModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); backdrop-filter: blur(4px); z-index:9999; display:flex; align-items:center; justify-content:center;">
-    <div style="background:#fff; width:450px; margin:auto; padding:24px; border-radius:12px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); animation: modalFadeIn 0.3s ease-out;">
-        <div style="display:flex; align-items:center; margin-bottom:16px;">
-            <i class="fas fa-exclamation-circle" style="color:#f59e0b; font-size:24px; margin-right:12px;"></i>
-            <div>
-                <h3 style="font-size:18px; font-weight:bold; color:#1f2937; margin:0;">Perubahan Belum Disimpan</h3>
-                <p style="font-size:14px; color:#6b7280; margin:0;">Konfirmasi Navigasi</p>
-            </div>
-        </div>
-        <p style="color:#374151; margin-bottom:24px; line-height:1.5;">
-            Anda telah mengubah data. Jika Anda keluar sekarang, perubahan tersebut akan hilang. Apa yang ingin Anda lakukan?
-        </p>
-        <div style="display:flex; justify-content:flex-end; gap:12px;">
-            {{-- Tombol Batal --}}
-            <button id="stayBtn" type="button" style="padding:8px 16px; background:#f3f4f6; color:#374151; border:1px solid #d1d5db; border-radius:6px; cursor:pointer; font-weight:600; font-size:14px;">
-                Batal (Tetap Disini)
-            </button>
-            {{-- Tombol Discard --}}
-            <button id="discardBtn" type="button" style="padding:8px 16px; background:#dc2626; color:white; border:none; border-radius:6px; cursor:pointer; font-weight:600; font-size:14px; display:flex; align-items:center;">
-                <i class="fas fa-sign-out-alt" style="margin-right:6px;"></i> Tinggalkan Halaman
-            </button>
-        </div>
-    </div>
-</div>
 {{-- MODAL SUKSES (Muncul otomatis jika Session Success ada) --}}
 @if(session('success'))
 <div id="successModal" class="fixed inset-0 bg-gray-900 bg-opacity-60 z-[100] flex justify-center items-center p-4 backdrop-blur-sm">
@@ -556,6 +536,8 @@
     }
 
     // --- CEK SAAT REFRESH/CLOSE TAB ---
+    // Dinonaktifkan: Peringatan saat refresh/close tab dihilangkan
+    /*
     window.addEventListener('beforeunload', function (e) {
         if (isSubmitting) return; 
         if (!isMonitoring) return; 
@@ -566,8 +548,11 @@
             e.returnValue = ''; 
         }
     });
+    */
 
     // --- CEK SAAT PINDAH HALAMAN (LINK) ---
+    // Dinonaktifkan: Popup alert perubahan belum disimpan dihilangkan
+    /*
     document.querySelectorAll('a').forEach(link => {
         link.addEventListener('click', function (e) {
             const href = this.getAttribute('href');
@@ -583,8 +568,11 @@
             }
         });
     });
+    */
 
     // --- TOMBOL MODAL ALERT ---
+    // Dinonaktifkan: Modal tidak digunakan lagi
+    /*
     document.getElementById('stayBtn').addEventListener('click', () => {
         document.getElementById('unsavedModal').style.display = 'none';
         targetUrl = null;
@@ -594,6 +582,7 @@
         document.getElementById('unsavedModal').style.display = 'none';
         if (targetUrl) window.location.href = targetUrl;
     });
+    */
 
     // --- FILTER TAHUN ---
     function changeKpiYear(selectedYear) {

@@ -89,6 +89,9 @@
                             </div>
                         </th>
                         <th class="px-6 py-3 text-left text-md font-medium text-gray-600 dark:text-gray-400">
+                            Hari Aktif
+                        </th>
+                        <th class="px-6 py-3 text-left text-md font-medium text-gray-600 dark:text-gray-400">
                             Progress Rekrutmen
                         </th>
                         <th class="px-6 py-3 text-right text-md font-medium text-gray-600 dark:text-gray-400">Aksi</th>
@@ -108,6 +111,7 @@
                                       x-text="row.status">
                                 </span>
                             </td>
+                            <td class="px-6 py-4 text-md text-gray-600 dark:text-gray-300" x-text="Math.floor(row.hari_aktif) + ' Hari'"></td>
                             <td class="px-6 py-4 text-md">
                                 <div class="flex flex-col">
                                     <span x-text="row.progress_rekrutmen"
@@ -136,7 +140,7 @@
                         </tr>
                     </template>
                     <tr x-show="paginated.length === 0">
-                        <td colspan="5" class="py-12 text-center text-gray-500">Data tidak ditemukan</td>
+                        <td colspan="6" class="py-12 text-center text-gray-500">Data tidak ditemukan</td>
                     </tr>
                 </tbody>
             </table>

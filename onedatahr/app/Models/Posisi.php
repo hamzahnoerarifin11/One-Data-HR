@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
+
 
 class Posisi extends Model
 {
@@ -19,8 +21,12 @@ class Posisi extends Model
     'nama_posisi',
     'status',
     'progress_rekrutmen',
-    'total_pelamar'
+    'total_pelamar',
+    'activated_at'
     ];
+
+    // Kolom yang selalu disertakan saat serialize
+    protected $appends = ['hari_aktif'];
 
     /* ===================== RELATIONSHIPS ===================== */
 
@@ -44,5 +50,18 @@ class Posisi extends Model
     public function scopeAktif($query)
     {
         return $query->where('status', 'Aktif');
+    }
+
+    /* ===================== ACCESSORS ===================== */
+
+    public function getHariAktifAttribute()
+    {
+        if (!$this->activated_at) {
+            return 0;
+        }
+
+        return Carbon::parse($this->activated_at)
+            ->startOfDay()
+            ->diffInDays(now()->startOfDay());
     }
 }
