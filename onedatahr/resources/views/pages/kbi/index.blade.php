@@ -193,9 +193,13 @@
                     {{-- Ganti Judul Agar Lebih Relevan untuk Manager --}}
                     <i class="fas fa-users"></i>
                     @if(auth()->user()->hasRole('manager'))
-                        Daftar Tim Saya ({{ $bawahanList->total() }})
+                        @if($bawahanList->total() > 0)
+                            Daftar Tim Saya ({{ $bawahanList->total() }})
+                        @else
+                            Anda belum memiliki bawahan yang terdaftar
+                        @endif
                     @else
-                        belum memiliki bawahan yang terdaftar
+                        Anda belum memiliki bawahan yang terdaftar
                     @endif
                 </h3>
             </div>

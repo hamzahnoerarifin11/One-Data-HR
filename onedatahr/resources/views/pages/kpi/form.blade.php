@@ -57,10 +57,10 @@
 
     {{-- HEADER --}}
     <div class="mb-6 flex flex-col lg:flex justify-between items-start lg:items-center bg-white dark:bg-gray-800 p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 gap-4">
-        <div class="text-center">
+        <div>
             <h1 class="text-2xl font-bold text-gray-800">Form Penilaian KPI</h1>
             @if($isManager)
-                <p class="text-gray-600 dark:text-gray-400">Karyawan: <strong class="text-blue-600">{{ $karyawan->Nama_Lengkap_Sesuai_Ijazah }}</strong> ({{ $karyawan->NIK }})</p>
+                <p class="text-gray-600 dark:text-gray-400">Karyawan: <strong class="text-blue-600">{{ $karyawan->nama_karyawan }}</strong> ({{ $karyawan->nik }})</p>
             @endif
             <p class="text-gray-500">Periode Penilaian: {{ $tahun }}</p>
         </div>

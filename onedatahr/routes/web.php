@@ -55,6 +55,11 @@ Route::middleware(['auth'])->group(function () {
         // --- KARYAWAN MANAGEMENT ---
         Route::post('karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
         Route::resource('karyawan', KaryawanController::class);
+        Route::middleware(['auth', 'role:superadmin'])->group(function () {
+    // User management resource
+    Route::resource('users', UserController::class);
+    Route::delete('/users/batch-delete', [UserController::class, 'batchDelete'])->name('users.batchDelete');
+    });
 
         // --- REKRUTMEN MODULE ---
         Route::prefix('rekrutmen')->name('rekrutmen.')->group(function () {
