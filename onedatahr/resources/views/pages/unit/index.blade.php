@@ -133,7 +133,8 @@
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                     <template x-for="(row, index) in filtered.slice((page - 1) * perPage, page * perPage)" :key="row.id">
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-900/50">
-                            <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white" x-text="row.id"></td>
+                            <!-- <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white" x-text="row.id"></td> -->
+                            <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400" x-text="(page - 1) * perPage + index + 1"></td>
                             <td class="px-6 py-4 text-sm text-gray-900 dark:text-white" x-text="row.name"></td>
                             <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400" x-text="row.department_name"></td>
                             <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400" x-text="row.division_name"></td>
@@ -195,14 +196,7 @@
 <script>
 function unitTable() {
     return {
-        data: @json($units->map(fn($u) => [
-            'id' => $u->id,
-            'name' => $u->name,
-            'department_name' => $u->department->name ?? '-',
-            'division_name' => $u->department?->division?->name ?? '-',
-            'company_name' => $u->department?->division?->company?->name ?? '-',
-            'created_at' => $u->created_at->format('d/m/Y')
-        ])),
+        data: @json($units),
         search: '',
         sortField: 'name',
         sortDirection: 'asc',

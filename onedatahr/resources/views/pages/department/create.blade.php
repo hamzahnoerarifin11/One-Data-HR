@@ -50,7 +50,7 @@
     @endif
 
     <!-- FORM -->
-    <div class="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-6">
+    <div x-data="departmentForm()" class="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-6">
         <form action="{{ route('department.store') }}" method="POST" class="space-y-6">
             @csrf
 

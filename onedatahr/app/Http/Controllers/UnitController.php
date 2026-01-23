@@ -12,9 +12,20 @@ class UnitController extends Controller
 {
     public function index()
     {
-        $units = Unit::with(['company', 'division', 'department'])->get();
+        $units = Unit::with(['department.division.company'])->get()->map(function ($u) {
+            return [
+                'id' => $u->id,
+                'name' => $u->name,
+                'department_name' => $u->department->name ?? '-',
+                'division_name' => $u->department?->division?->name ?? '-',
+                'company_name' => $u->department?->division?->company?->name ?? '-',
+                'created_at' => $u->created_at->format('d/m/Y'),
+            ];
+        });
+
         return view('pages.unit.index', compact('units'));
     }
+
 
     public function create()
     {

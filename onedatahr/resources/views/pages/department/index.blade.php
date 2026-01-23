@@ -128,7 +128,8 @@
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                     <template x-for="(row, index) in filtered.slice((page - 1) * perPage, page * perPage)" :key="row.id">
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-900/50">
-                            <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white" x-text="row.id"></td>
+                            <!-- <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white" x-text="row.id"></td> -->
+                            <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400" x-text="(page - 1) * perPage + index + 1"></td>
                             <td class="px-6 py-4 text-sm text-gray-900 dark:text-white" x-text="row.name"></td>
                             <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400" x-text="row.division_name"></td>
                             <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400" x-text="row.company_name"></td>
@@ -194,7 +195,7 @@ function departmentTable() {
         sortField: 'name',
         sortDirection: 'asc',
         page: 1,
-        perPage: 10
+        perPage: 10,
 
         get filtered() {
             let filtered = this.data.filter(item => {
