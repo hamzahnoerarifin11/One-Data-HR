@@ -49,6 +49,14 @@ Route::middleware(['auth'])->group(function () {
     //     Route::resource('karyawan', KaryawanController::class);
     //     Route::delete('/karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
     // });
+});
+
+// API routes for hierarchical dropdowns (no auth required for AJAX calls)
+Route::get('karyawan/divisions/{companyId}', [KaryawanController::class, 'getDivisions'])->name('karyawan.divisions');
+Route::get('karyawan/departments/{divisionId}', [KaryawanController::class, 'getDepartments'])->name('karyawan.departments');
+Route::get('karyawan/units/{departmentId}', [KaryawanController::class, 'getUnits'])->name('karyawan.units');
+Route::get('karyawan/positions/{unitId}', [KaryawanController::class, 'getPositions'])->name('karyawan.positions');
+
 Route::middleware(['auth', 'role:admin|superadmin'])->group(function () {
         // --- KARYAWAN MANAGEMENT ---
     Route::post('karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
@@ -142,15 +150,15 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     // User management resource
     Route::resource('users', UserController::class);
     Route::delete('/users/batch-delete', [UserController::class, 'batchDelete'])->name('users.batchDelete');
-    });
+});
+
 Route::middleware(['auth', 'role:admin|superadmin|manager'])->group(function () {
     // User management resource
     // 7. monitoring
     Route::get('/kbi/monitoring', [App\Http\Controllers\KbiController::class, 'monitoring'])->name('kbi.monitoring');
-  // --- rekap PERFORMANCE ROUTES ---
+    // --- rekap PERFORMANCE ROUTES ---
     Route::get('/performance/rekap', [App\Http\Controllers\PerformanceController::class, 'index'])->name('performance.rekap');
 
-    });
     // Route::resource('wig-rekrutmen', WigRekrutmenController::class);
 
     // Recruitment / Kandidat resources and metrics

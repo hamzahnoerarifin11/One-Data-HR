@@ -19,16 +19,27 @@ class DivisionSeeder extends Seeder
             return; // Skip if no companies exist
         }
 
-        $divisions = [
-            ['name' => 'Divisi Teknologi Informasi', 'company_id' => $companies->first()->id],
-            ['name' => 'Divisi Keuangan', 'company_id' => $companies->first()->id],
-            ['name' => 'Divisi Sumber Daya Manusia', 'company_id' => $companies->first()->id],
-            ['name' => 'Divisi Pemasaran', 'company_id' => $companies->skip(1)->first()?->id ?? $companies->first()->id],
-            ['name' => 'Divisi Operasional', 'company_id' => $companies->skip(1)->first()?->id ?? $companies->first()->id],
+        $divisionNames = [
+            'Divisi Teknologi Informasi',
+            'Divisi Keuangan',
+            'Divisi Sumber Daya Manusia',
+            'Divisi Pemasaran',
+            'Divisi Operasional',
+            'Divisi Produksi',
+            'Divisi Logistik',
         ];
 
-        foreach ($divisions as $division) {
-            Division::firstOrCreate($division);
+        foreach ($companies as $company) {
+            // Create 2-3 divisions per company
+            $numDivisions = rand(2, 3);
+            $selectedNames = array_slice($divisionNames, 0, $numDivisions);
+
+            foreach ($selectedNames as $name) {
+                Division::firstOrCreate([
+                    'company_id' => $company->id,
+                    'name' => $name,
+                ]);
+            }
         }
     }
 }
