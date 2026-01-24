@@ -65,12 +65,12 @@
                     <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
                         <i class="fas fa-user text-blue-600 dark:text-blue-400"></i>
                     </div>
-                    <h3 class="font-bold text-base text-blue-800 dark:text-blue-400">
+                    <h3 class="font-bold text-xl text-blue-800 dark:text-blue-400">
                         Penilaian Diri
                     </h3>
                 </div>
 
-                <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                <p class="text-md text-gray-500 dark:text-gray-400 mb-4">
                     Wajib tiap semester
                 </p>
 
@@ -127,7 +127,7 @@
                         
                         {{-- Info Nama & Jabatan --}}
                         <div class="flex-1 min-w-0">
-                            <h4 class="font-bold text-gray-800 dark:text-white text-sm truncate">
+                            <h4 class="font-bold text-gray-800 dark:text-white text-md truncate">
                                 {{ $atasan->Nama_Lengkap_Sesuai_Ijazah ?? $atasan->Nama_Sesuai_KTP }}
                             </h4>
                             <p class="text-xs text-gray-500 dark:text-gray-400 truncate">

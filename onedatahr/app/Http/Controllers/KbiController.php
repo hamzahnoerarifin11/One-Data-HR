@@ -371,8 +371,11 @@ class KbiController extends Controller
         // 1. Query Dasar
         $query = Karyawan::with(['pekerjaan', 'atasan']);
 
-        // Filter berdasarkan hierarki user login
+        // Kecualikan user yang sedang login dari list monitoring
         $user = auth()->user();
+        if ($user && $user->nik) {
+            $query->where('NIK', '!=', $user->nik);
+        }
         if ($user) {
             // Jika admin atau superadmin, tampilkan semua
             if ($user->hasRole(['admin', 'superadmin'])) {
