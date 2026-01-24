@@ -48,7 +48,8 @@ class KbiController extends Controller
 
         // Jika jabatan mengandung kata "Manager" (case insensitive)
         // Sesuaikan dengan nama jabatan di database Anda
-        $isManager = stripos($userJabatan, 'Manager') !== false;
+        // Check apakah user adalah Manager level (Manager, GM, atau General Manager)
+        $isManager = stripos($userJabatan, 'Manager') !== false || stripos($userJabatan, 'GM') !== false;
 
         if ($isManager) {
             // Manager hanya melihat karyawan di DIVISI YANG SAMA
@@ -107,15 +108,24 @@ class KbiController extends Controller
 
         // --- SAYA SALIN ULANG BAGIAN PENTING HIERARKI AGAR ANDA BISA LANGSUNG COPY-PASTE UTUH ---
         $jabatanHierarchy = [
-            'GM' => 1,
-            'General Manager' => 1,
-            'Manager' => 2,
-            'Supervisor' => 3,
-            'Staff' => 4,
-            'Officer' => 4,
-            'Assistant' => 5,
+            'Direktur' => 1,
+            'General Manager' => 2,
+            'GM' => 2,
+            'Manager' => 3,
+            'Supervisor' => 4,
+            'Staff' => 5,
+            'Officer' => 6,
+            'Assistant' => 7,
         ];
-        $userLevel = $jabatanHierarchy[$userJabatan] ?? 99;
+        $userLevel = 99;
+
+        foreach ($jabatanHierarchy as $key => $level) {
+            if (stripos($userJabatan, $key) !== false) {
+                if ($level < $userLevel) {
+                    $userLevel = $level;
+                }
+            }
+        }
 
         if ($userLevel <= 1 || empty($userDivisi)) {
             $listCalonAtasan = collect();
@@ -124,12 +134,32 @@ class KbiController extends Controller
             foreach ($jabatanHierarchy as $jabatan => $level) {
                 if ($level < $userLevel) $higherJabatan[] = $jabatan;
             }
+
+            // Untuk GM (level 2), hanya tampilkan jabatan level 1 (Direktur Utama)
+            if ($userLevel == 2) {
+                $higherJabatan = array_filter($higherJabatan, function ($jabatan) use ($jabatanHierarchy) {
+                    return ($jabatanHierarchy[$jabatan] ?? 99) == 1;
+                });
+            }
+            // Ambil calon atasan dengan 2 kondisi:
+            // 1. Jika level 1-2 (Direktur/GM): Bisa dari divisi manapun
+            // 2. Jika level > 2 (Manager+): Utamakan divisi yang sama, tapi bisa juga dari level yang lebih tinggi
             $listCalonAtasan = Karyawan::where('id_karyawan', '!=', $karyawan->id_karyawan)
-                ->whereHas('pekerjaan', function ($q) use ($userDivisi, $higherJabatan) {
-                    $q->where('Divisi', $userDivisi);
+                ->whereHas('pekerjaan', function ($q) use ($userDivisi, $higherJabatan, $userLevel) {
                     if (!empty($higherJabatan)) {
-                        $q->where(function ($subQ) use ($higherJabatan) {
-                            foreach ($higherJabatan as $jab) $subQ->orWhere('Jabatan', 'LIKE', '%' . $jab . '%');
+                        $q->where(function ($subQ) use ($higherJabatan, $userDivisi, $userLevel) {
+                            // Direktur/GM (level 1-2): Bisa dari divisi apapun
+                            foreach ($higherJabatan as $jab) {
+                                if (stripos($jab, 'Direktur') !== false || stripos($jab, 'GM') !== false) {
+                                    $subQ->orWhere('Jabatan', 'LIKE', '%' . $jab . '%');
+                                } else {
+                                    // Jabatan lain: hanya dari divisi yang sama
+                                    $subQ->orWhere(function ($sq) use ($jab, $userDivisi) {
+                                        $sq->where('Jabatan', 'LIKE', '%' . $jab . '%')
+                                            ->where('Divisi', $userDivisi);
+                                    });
+                                }
+                            }
                         });
                     } else {
                         $q->where('Jabatan', 'NONEXISTENT');
@@ -354,7 +384,7 @@ class KbiController extends Controller
                     $jabatanLower = strtolower($jabatanUser);
 
                     // Jika GM atau General Manager, tampilkan semua karyawan di divisi yang sama
-                    if (strpos($jabatanLower, 'general manager') !== false || strpos($jabatanLower, 'gm') !== false) {
+                    if (strpos($jabatanLower, 'general manager') !== false || strpos($jabatanLower, 'GM') !== false) {
                         $divisiUser = $karyawanUser->pekerjaan->first()?->Divisi ?? '';
                         $query->whereHas('pekerjaan', function ($q) use ($divisiUser) {
                             $q->where('Divisi', $divisiUser);

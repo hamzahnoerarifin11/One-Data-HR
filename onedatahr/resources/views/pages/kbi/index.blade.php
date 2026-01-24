@@ -185,14 +185,14 @@
 
         {{-- KONTEN UTAMA: DAFTAR KARYAWAN --}}
         {{-- Tampilkan table hanya jika role bukan staff --}}
-        @if(auth()->user() && auth()->user()->hasRole(['admin', 'manager', 'superadmin']))
+        @if(auth()->user() && auth()->user()->hasRole(['admin', 'manager', 'gm', 'superadmin']))
         <div class="bg-white dark:bg-gray-800 p-5 sm:p-6 rounded-xl shadow border border-green-100 dark:border-gray-700">
 
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
                 <h3 class="font-bold text-lg text-green-800 dark:text-green-400 flex items-center gap-2">
                     {{-- Ganti Judul Agar Lebih Relevan untuk Manager --}}
                     <i class="fas fa-users"></i>
-                    @if(auth()->user()->hasRole('manager'))
+                    @if(auth()->user()->hasRole(['manager', 'gm']))
                         @if($bawahanList->total() > 0)
                             Daftar Tim Saya ({{ $bawahanList->total() }})
                         @else
@@ -267,7 +267,7 @@
                             <td colspan="4" class="p-8 text-center text-gray-400 dark:text-gray-500">
                                 <i class="fas fa-inbox text-3xl mb-3 opacity-50"></i>
                                 <p>
-                                    @if(auth()->user()->hasRole('manager'))
+                                    @if(auth()->user()->hasRole(['manager', 'gm']))
                                         Belum ada anggota tim di divisi Anda.
                                     @else
                                         Data tidak ditemukan

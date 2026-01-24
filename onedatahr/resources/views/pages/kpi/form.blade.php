@@ -175,7 +175,7 @@
     // Cek apakah user yang login berhak melakukan adjustment?
     // Staff TIDAK BOLEH (False), Manager TIDAK BOLEH kecuali GM (superadmin)
     $isStaff = auth()->user()->hasRole(['staff']);
-    $canAdjust = auth()->user()->hasRole(['superadmin']); // Hanya GM yang bisa adjust
+    $canAdjust = auth()->user()->hasRole(['superadmin', 'gm']); // GM dan superadmin yang bisa adjust
     
     // Class CSS untuk input yang dikunci (Abu-abu & tidak bisa diklik)
     $readonlyClass = $isStaff ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-transparent text-orange-700 font-bold border-b border-orange-300';

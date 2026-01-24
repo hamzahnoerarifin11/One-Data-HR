@@ -132,6 +132,7 @@
                         <option value="superadmin">Super Admin</option>
                         <option value="admin">Admin</option>
                         <option value="manager">Manager</option>
+                        <option value="gm">General Manager</option>
                         <option value="staff">Staff</option>
                         <option value="ketua_tempa">Ketua Tempa</option>
                     </select>

@@ -19,7 +19,7 @@ class MenuHelper
             'name' => 'Dashboard',
             'path' => '/dashboard',
         ];
-        
+
 
         // =============================================================
         // 5. MENU STRUKTUR PEKERJAAN (Untuk admin, superadmin)
@@ -82,7 +82,6 @@ class MenuHelper
                 'name' => 'Data Turnover',
                 'path' => '/turnover',
             ];
-
         }
 
         // =============================================================
@@ -124,20 +123,20 @@ class MenuHelper
         ];
 
         // Monitoring KBI (Khusus HRD memantau Staff)
-        if ($user->hasRole(['admin', 'superadmin', 'manager'])) {
+        if ($user->hasRole(['admin', 'superadmin', 'manager', 'gm'])) {
             // Tambahkan ke subItems Penilaian Karyawan
             $menu[count($menu) - 1]['subItems'][] = ['name' => 'Monitoring KBI', 'path' => '/kbi/monitoring'];
             $menu[count($menu) - 1]['subItems'][] = ['name' => 'Rekap Performance', 'path' => '/performance/rekap'];
         }
         // Manajemen User
         if ($user->hasRole('superadmin')) {
-                $menu[] = [
-                    'icon' => 'authentication',
-                    'name' => 'Manajemen User',
-                    'path' => '/users',
-                ];
-            }
-        
+            $menu[] = [
+                'icon' => 'authentication',
+                'name' => 'Manajemen User',
+                'path' => '/users',
+            ];
+        }
+
 
         return $menu;
     }
