@@ -255,10 +255,20 @@ Route::middleware(['auth', 'role:admin|superadmin|ketua_tempa'])->prefix('tempa'
 });
 
 // Routes untuk Struktur Pekerjaan
-Route::middleware(['auth', 'role:admin|superadmin'])->group(function () {
-    Route::resource('company', \App\Http\Controllers\CompanyController::class);
-    Route::resource('division', \App\Http\Controllers\DivisionController::class);
-    Route::resource('department', \App\Http\Controllers\DepartmentController::class);
-    Route::resource('unit', \App\Http\Controllers\UnitController::class);
-    Route::resource('position', \App\Http\Controllers\PositionController::class);
+Route::middleware(['auth', 'role:admin|superadmin'])->prefix('organization')->name('organization.')->group(function () {
+    Route::resource('company', \App\Http\Controllers\CompanyController::class)->parameters([
+        'company' => 'company'
+    ]);
+    Route::resource('division', \App\Http\Controllers\DivisionController::class)->parameters([
+        'division' => 'division'
+    ]);
+    Route::resource('department', \App\Http\Controllers\DepartmentController::class)->parameters([
+        'department' => 'department'
+    ]);
+    Route::resource('unit', \App\Http\Controllers\UnitController::class)->parameters([
+        'unit' => 'unit'
+    ]);
+    Route::resource('position', \App\Http\Controllers\PositionController::class)->parameters([
+        'position' => 'position'
+    ]);
 });

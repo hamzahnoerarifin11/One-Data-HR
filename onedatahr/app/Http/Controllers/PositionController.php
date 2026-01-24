@@ -26,7 +26,7 @@ class PositionController extends Controller
             ];
         });
 
-        return view('pages.position.index', compact('positions'));
+        return view('pages.organization.position.index', compact('positions'));
     }
 
     public function create()
@@ -35,7 +35,7 @@ class PositionController extends Controller
         $divisions = Division::all();
         $departments = Department::all();
         $units = Unit::all();
-        return view('pages.position.create', compact('companies', 'divisions', 'departments', 'units'));
+        return view('pages.organization.position.create', compact('companies', 'divisions', 'departments', 'units'));
     }
 
     public function store(Request $request)
@@ -48,12 +48,12 @@ class PositionController extends Controller
             'name' => 'required|string|max:255'
         ]);
         Position::create($request->only(['company_id', 'division_id', 'department_id', 'unit_id', 'name']));
-        return redirect()->route('position.index')->with('success', 'Position created successfully.');
+        return redirect()->route('organization.position.index')->with('success', 'Position created successfully.');
     }
 
     public function show(Position $position)
     {
-        return view('pages.position.show', compact('position'));
+        return view('pages.organization.position.show', compact('position'));
     }
 
     public function edit(Position $position)
@@ -62,7 +62,7 @@ class PositionController extends Controller
         $divisions = Division::all();
         $departments = Department::all();
         $units = Unit::all();
-        return view('pages.position.edit', compact('position', 'companies', 'divisions', 'departments', 'units'));
+        return view('pages.organization.position.edit', compact('position', 'companies', 'divisions', 'departments', 'units'));
     }
 
     public function update(Request $request, Position $position)
@@ -75,12 +75,12 @@ class PositionController extends Controller
             'name' => 'required|string|max:255'
         ]);
         $position->update($request->only(['company_id', 'division_id', 'department_id', 'unit_id', 'name']));
-        return redirect()->route('position.index')->with('success', 'Position updated successfully.');
+        return redirect()->route('organization.position.index')->with('success', 'Position updated successfully.');
     }
 
     public function destroy(Position $position)
     {
         $position->delete();
-        return redirect()->route('position.index')->with('success', 'Position deleted successfully.');
+        return redirect()->route('organization.position.index')->with('success', 'Position deleted successfully.');
     }
 }

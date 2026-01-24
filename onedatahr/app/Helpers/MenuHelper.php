@@ -26,16 +26,16 @@ class MenuHelper
         // =============================================================
         // 5. MENU STRUKTUR PEKERJAAN (Untuk admin, superadmin)
         // =============================================================
-        if ($user->hasRole(['admin', 'superadmin'])) {
+        if ($user && $user->hasRole(['admin', 'superadmin'])) {
             $menu[] = [
                 'icon' => 'ai-building',
                 'name' => 'Struktur Pekerjaan',
                 'subItems' => [
-                    ['name' => 'Perusahaan', 'path' => '/company'],
-                    ['name' => 'Divisi', 'path' => '/division'],
-                    ['name' => 'Departement', 'path' => '/department'],
-                    ['name' => 'Unit', 'path' => '/unit'],
-                    ['name' => 'Jabatan', 'path' => '/position'],
+                    ['name' => 'Perusahaan', 'path' => '/organization/company'],
+                    ['name' => 'Divisi', 'path' => '/organization/division'],
+                    ['name' => 'Departement', 'path' => '/organization/department'],
+                    ['name' => 'Unit', 'path' => '/organization/unit'],
+                    ['name' => 'Jabatan', 'path' => '/organization/position'],
                 ],
             ];
         }
@@ -44,7 +44,7 @@ class MenuHelper
         // 2. MENU KHUSUS (Hanya Admin, HRD, Manager)
         // =============================================================
         // Logika: "Jika User ADA dan User BUKAN Staff"
-        if ($user->hasRole(['admin', 'superadmin'])) {
+        if ($user && $user->hasRole(['admin', 'superadmin'])) {
 
             // Data Karyawan
             $menu[] = [
@@ -87,6 +87,11 @@ class MenuHelper
                 'name' => 'Data Turnover',
                 'path' => '/turnover',
             ];
+            $menu[] = [
+                'icon' => 'user-shield',
+                'name' => 'Manajemen User',
+                'path' => '/users',
+            ];
 
         }
 
@@ -94,19 +99,19 @@ class MenuHelper
         // 3. MENU TEMPA (Untuk ketua_tempa, admin, superadmin)
         // =============================================================
         $tempaSubItems = [];
-        if ($user->hasRole(['ketua_tempa', 'admin', 'superadmin'])) {
+        if ($user && $user->hasRole(['ketua_tempa', 'admin', 'superadmin'])) {
             $tempaSubItems[] = ['name' => 'Kelompok TEMPA', 'path' => '/tempa/kelompok'];
         }
-        if ($user->hasRole(['ketua_tempa', 'admin', 'superadmin'])) {
+        if ($user && $user->hasRole(['ketua_tempa', 'admin', 'superadmin'])) {
             $tempaSubItems[] = ['name' => 'Peserta TEMPA', 'path' => '/tempa/peserta'];
         }
-        if ($user->hasRole(['ketua_tempa', 'admin', 'superadmin'])) {
+        if ($user && $user->hasRole(['ketua_tempa', 'admin', 'superadmin'])) {
             $tempaSubItems[] = ['name' => 'Absensi TEMPA', 'path' => '/tempa/absensi'];
         }
-        if ($user->hasRole(['admin', 'superadmin'])) {
+        if ($user && $user->hasRole(['admin', 'superadmin'])) {
             $tempaSubItems[] = ['name' => 'Monitoring TEMPA', 'path' => '/tempa/monitoring'];
         }
-        if ($user->hasRole(['ketua_tempa', 'admin', 'superadmin'])) {
+        if ($user && $user->hasRole(['ketua_tempa', 'admin', 'superadmin'])) {
             $tempaSubItems[] = ['name' => 'Materi TEMPA', 'path' => '/tempa/materi'];
         }
         if (!empty($tempaSubItems)) {
@@ -132,7 +137,7 @@ class MenuHelper
             'path' => '/kbi/dashboard',
         ];
         // Monitoring KBI (Khusus HRD memantau Staff)
-        if ($user->hasRole(['admin', 'superadmin', 'manager'])) {
+        if ($user && $user->hasRole(['admin', 'superadmin', 'manager'])) {
             $menu[] = [
                     'icon' => 'desktop',
                     'name' => 'Monitoring KBI',

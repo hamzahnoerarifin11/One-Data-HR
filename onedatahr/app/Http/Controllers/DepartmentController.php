@@ -21,7 +21,7 @@ class DepartmentController extends Controller
             ];
         });
 
-        return view('pages.department.index', compact('departments'));
+        return view('pages.organization.department.index', compact('departments'));
     }
 
 
@@ -29,7 +29,7 @@ class DepartmentController extends Controller
     {
         $companies = Company::all();
         $divisions = Division::all();
-        return view('pages.department.create', compact('companies', 'divisions'));
+        return view('pages.organization.department.create', compact('companies', 'divisions'));
     }
 
     public function store(Request $request)
@@ -40,19 +40,19 @@ class DepartmentController extends Controller
             'name' => 'required|string|max:255'
         ]);
         Department::create($request->only(['company_id', 'division_id', 'name']));
-        return redirect()->route('department.index')->with('success', 'Department created successfully.');
+        return redirect()->route('organization.department.index')->with('success', 'Department created successfully.');
     }
 
     public function show(Department $department)
     {
-        return view('pages.department.show', compact('department'));
+        return view('pages.organization.department.show', compact('department'));
     }
 
     public function edit(Department $department)
     {
         $companies = Company::all();
         $divisions = Division::all();
-        return view('pages.department.edit', compact('department', 'companies', 'divisions'));
+        return view('pages.organization.department.edit', compact('department', 'companies', 'divisions'));
     }
 
     public function update(Request $request, Department $department)
@@ -63,12 +63,12 @@ class DepartmentController extends Controller
             'name' => 'required|string|max:255'
         ]);
         $department->update($request->only(['company_id', 'division_id', 'name']));
-        return redirect()->route('department.index')->with('success', 'Department updated successfully.');
+        return redirect()->route('organization.department.index')->with('success', 'Department updated successfully.');
     }
 
     public function destroy(Department $department)
     {
         $department->delete();
-        return redirect()->route('department.index')->with('success', 'Department deleted successfully.');
+        return redirect()->route('organization.department.index')->with('success', 'Department deleted successfully.');
     }
 }
