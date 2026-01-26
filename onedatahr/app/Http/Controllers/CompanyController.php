@@ -9,42 +9,50 @@ class CompanyController extends Controller
 {
     public function index()
     {
-        $companies = Company::all();
-        return view('pages.company.index', compact('companies'));
+        $companies = Company::all()->map(function ($c) {
+            return [
+                'id' => $c->id,
+                'name' => $c->name,
+                'created_at' => $c->created_at->format('d/m/Y'),
+            ];
+        });
+
+        return view('pages.organization.company.index', compact('companies'));
     }
+
 
     public function create()
     {
-        return view('pages.company.create');
+        return view('pages.organization.company.create');
     }
 
     public function store(Request $request)
     {
         $request->validate(['name' => 'required|string|max:255']);
         Company::create($request->only('name'));
-        return redirect()->route('company.index')->with('success', 'Company created successfully.');
+        return redirect()->route('organization.company.index')->with('success', 'Company created successfully.');
     }
 
     public function show(Company $company)
     {
-        return view('pages.company.show', compact('company'));
+        return view('pages.organization.company.show', compact('company'));
     }
 
     public function edit(Company $company)
     {
-        return view('pages.company.edit', compact('company'));
+        return view('pages.organization.company.edit', compact('company'));
     }
 
     public function update(Request $request, Company $company)
     {
         $request->validate(['name' => 'required|string|max:255']);
         $company->update($request->only('name'));
-        return redirect()->route('company.index')->with('success', 'Company updated successfully.');
+        return redirect()->route('organization.company.index')->with('success', 'Company updated successfully.');
     }
 
     public function destroy(Company $company)
     {
         $company->delete();
-        return redirect()->route('company.index')->with('success', 'Company deleted successfully.');
+        return redirect()->route('organization.company.index')->with('success', 'Company deleted successfully.');
     }
 }

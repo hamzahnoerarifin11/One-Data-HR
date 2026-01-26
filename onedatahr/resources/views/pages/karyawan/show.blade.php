@@ -192,40 +192,39 @@
     <div class="mb-6 rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-800 dark:bg-white/[0.03] p-6">
         <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Informasi Pekerjaan</h2>
 
-        @if($karyawan->perusahaan)
+        @if($karyawan->pekerjaan->company)
         <div class="mb-4 p-4 rounded-lg border border-gray-100 dark:border-gray-700">
             <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Perusahaan</p>
             <p class="text-base font-semibold text-gray-900 dark:text-white mt-1">
-                {{ $karyawan->perusahaan->Perusahaan ?? '-' }}
+                {{ $karyawan->pekerjaan->company->name ?? '-' }}
             </p>
         </div>
         @endif
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+            <div>
+                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Divisi</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaan->division->name ?? '-' }}</p>
+            </div>
+
+            <div>
+                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Departement</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaan->department->name ?? '-' }}</p>
+            </div>
+
+            <div>
+                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Unit</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaan->unit->name ?? '-' }}</p>
+            </div>
 
             <div>
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Jabatan</p>
-                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaanTerkini?->Jabatan ?? '-' }}</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaan->position->name ?? '-' }}</p>
             </div>
 
             <div>
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Bagian</p>
                 <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaanTerkini?->Bagian ?? '-' }}</p>
-            </div>
-
-            <div>
-                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Departement</p>
-                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaanTerkini?->Departement ?? '-' }}</p>
-            </div>
-
-            <div>
-                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Divisi</p>
-                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaanTerkini?->Divisi ?? '-' }}</p>
-            </div>
-
-            <div>
-                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Unit</p>
-                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaanTerkini?->Unit ?? '-' }}</p>
             </div>
 
             <div>

@@ -27,7 +27,7 @@ class KaryawanController extends Controller
 
     public function index()
     {
-        $karyawans = Karyawan::with(['pekerjaanTerkini', 'pendidikan', 'kontrak', 'keluarga', 'bpjs', 'perusahaan', 'status', 'pekerjaan'])
+        $karyawans = Karyawan::with(['pekerjaan.company', 'pekerjaan.division', 'pekerjaan.department', 'pekerjaan.unit', 'pekerjaan.position', 'pendidikan', 'kontrak', 'keluarga', 'bpjs', 'perusahaan', 'status'])
             ->orderBy('id_karyawan', 'desc')
             ->get();
 
@@ -43,11 +43,9 @@ class KaryawanController extends Controller
 
     public function create()
     {
+        $companies = \App\Models\Company::all();
         return view('pages.karyawan.create', [
-            'jabatanOptions' => getjabatan('pekerjaan', 'Jabatan'),
-            'departementOptions' => getdepartement('pekerjaan', 'Departement'),
-            'divisiOptions' => getdivisi('pekerjaan', 'Divisi'),
-            'unitOptions' => getunit('pekerjaan', 'Unit'),
+            'companies' => $companies,
             'lokasikerjaOptions' => getlokasikerja('pekerjaan', 'Lokasi_Kerja'),
             'perusahaanOptions' => getperusahaan('perusahaan', 'Perusahaan'),
             'pendidikanOptions' => getpendidikan('pendidikan', 'Pendidikan_Terakhir'),
@@ -90,7 +88,7 @@ class KaryawanController extends Controller
             DataKeluarga::create($keluargaData);
 
             // Pekerjaan
-            $pekerjaanData = $request->only(['Jabatan', 'Bagian', 'Departement', 'Divisi', 'Unit', 'Jenis_Kontrak', 'Perjanjian', 'Lokasi_Kerja']);
+            $pekerjaanData = $request->only(['position_id', 'Bagian', 'department_id', 'division_id', 'unit_id', 'company_id', 'Jenis_Kontrak', 'Perjanjian', 'Lokasi_Kerja']);
             $pekerjaanData['id_karyawan'] = $karyawan->id_karyawan;
             Pekerjaan::create($pekerjaanData);
 
@@ -163,18 +161,15 @@ class KaryawanController extends Controller
 
     public function show($id)
     {
-        $karyawan = Karyawan::with(['pekerjaan', 'pendidikan', 'kontrak', 'keluarga', 'bpjs', 'perusahaan', 'status'])->findOrFail($id);
+        $karyawan = Karyawan::with(['pekerjaan.company', 'pekerjaan.division', 'pekerjaan.department', 'pekerjaan.unit', 'pekerjaan.position', 'pendidikan', 'kontrak', 'keluarga', 'bpjs', 'perusahaan', 'status'])->findOrFail($id);
         return view('pages.karyawan.show', compact('karyawan'));
     }
 
     public function edit($id)
     {
-        $karyawan = Karyawan::with(['pekerjaan', 'pendidikan', 'kontrak', 'keluarga', 'bpjs', 'perusahaan', 'status'])->findOrFail($id);
-        return view('pages.karyawan.edit', array_merge(compact('karyawan'), [
-            'jabatanOptions' => getjabatan('pekerjaan', 'Jabatan'),
-            'departementOptions' => getdepartement('pekerjaan', 'Departement'),
-            'divisiOptions' => getdivisi('pekerjaan', 'Divisi'),
-            'unitOptions' => getunit('pekerjaan', 'Unit'),
+        $karyawan = Karyawan::with(['pekerjaan.company', 'pekerjaan.division', 'pekerjaan.department', 'pekerjaan.unit', 'pekerjaan.position', 'pendidikan', 'kontrak', 'keluarga', 'bpjs', 'perusahaan', 'status'])->findOrFail($id);
+        $companies = \App\Models\Company::all();
+        return view('pages.karyawan.edit', array_merge(compact('karyawan', 'companies'), [
             'lokasikerjaOptions' => getlokasikerja('pekerjaan', 'Lokasi_Kerja'),
             'perusahaanOptions' => getperusahaan('perusahaan', 'Perusahaan'),
             'pendidikanOptions' => getpendidikan('pendidikan', 'Pendidikan_Terakhir'),
@@ -251,7 +246,7 @@ class KaryawanController extends Controller
             $karyawan->kontrak ? $karyawan->kontrak->update($dataKontrak) : Kontrak::create(array_merge(['id_karyawan' => $id], $dataKontrak));
 
             // 8. Update Pekerjaan
-            $dataKerja = $request->only(['Jabatan', 'Bagian', 'Departement', 'Divisi', 'Unit', 'Jenis_Kontrak', 'Perjanjian', 'Lokasi_Kerja']);
+            $dataKerja = $request->only(['position_id', 'Bagian', 'department_id', 'division_id', 'unit_id', 'company_id', 'Jenis_Kontrak', 'Perjanjian', 'Lokasi_Kerja']);
             $karyawan->pekerjaan()->exists() ? $karyawan->pekerjaan()->first()->update($dataKerja) : Pekerjaan::create(array_merge(['id_karyawan' => $id], $dataKerja));
 
             DB::commit();
@@ -276,5 +271,29 @@ class KaryawanController extends Controller
             $karyawan->delete();
         });
         return redirect()->route('karyawan.index')->with('success', 'Karyawan berhasil dihapus');
+    }
+
+    public function getDivisions($companyId)
+    {
+        $divisions = \App\Models\Division::where('company_id', $companyId)->get();
+        return response()->json($divisions);
+    }
+
+    public function getDepartments($divisionId)
+    {
+        $departments = \App\Models\Department::where('division_id', $divisionId)->get();
+        return response()->json($departments);
+    }
+
+    public function getUnits($departmentId)
+    {
+        $units = \App\Models\Unit::where('department_id', $departmentId)->get();
+        return response()->json($units);
+    }
+
+    public function getPositions($unitId)
+    {
+        $positions = \App\Models\Position::where('unit_id', $unitId)->get();
+        return response()->json($positions);
     }
 }

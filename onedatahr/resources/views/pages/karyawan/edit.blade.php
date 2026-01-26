@@ -795,6 +795,140 @@
             <div x-show="currentStep===2" x-transition class="space-y-6">
                 <div class="grid grid-cols-2 gap-4">
 
+                    <!-- PERUSAHAAN -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            Perusahaan
+                        </label>
+
+                        <div class="relative z-20">
+                            <select id="company" name="company_id"
+                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 px-4 pr-11 text-sm
+                                    shadow-theme-xs bg-transparent
+                                    focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
+                                    dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+
+                                <option value="">-- Pilih Perusahaan --</option>
+
+                                @foreach ($companies as $company)
+                                    <option value="{{ $company->id }}"
+                                        {{ old('company_id', optional($karyawan->pekerjaan)->company_id) == $company->id ? 'selected' : '' }}>
+                                        {{ $company->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+
+                            <!-- Arrow -->
+                            <span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-gray-500">
+                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <path d="M4.8 7.4L10 12.6L15.2 7.4"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"/>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- DIVISI -->
+                     <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            Divisi
+                        </label>
+
+                        <div class="relative z-20">
+                            <select id="division" name="division_id"
+                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 px-4 pr-11 text-sm
+                                    shadow-theme-xs bg-transparent
+                                    focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
+                                    dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+
+                                <option value="">-- Pilih Divisi --</option>
+                                @if(optional($karyawan->pekerjaan)->division)
+                                    <option value="{{ optional($karyawan->pekerjaan)->division->id }}" selected>
+                                        {{ optional($karyawan->pekerjaan)->division->name }}
+                                    </option>
+                                @endif
+                            </select>
+
+                            <!-- Arrow -->
+                            <span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-gray-500">
+                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <path d="M4.8 7.4L10 12.6L15.2 7.4"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"/>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- DEPARTEMENT -->
+                     <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            Departement
+                        </label>
+
+                        <div class="relative z-20">
+                            <select id="department" name="department_id"
+                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 px-4 pr-11 text-sm
+                                    shadow-theme-xs bg-transparent
+                                    focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
+                                    dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+
+                                <option value="">-- Pilih Departement --</option>
+                                @if(optional($karyawan->pekerjaan)->department)
+                                    <option value="{{ optional($karyawan->pekerjaan)->department->id }}" selected>
+                                        {{ optional($karyawan->pekerjaan)->department->name }}
+                                    </option>
+                                @endif
+                            </select>
+
+                            <!-- Arrow -->
+                            <span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-gray-500">
+                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <path d="M4.8 7.4L10 12.6L15.2 7.4"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"/>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- UNIT -->
+                     <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            Unit
+                        </label>
+
+                        <div class="relative z-20">
+                            <select id="unit" name="unit_id"
+                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 px-4 pr-11 text-sm
+                                    shadow-theme-xs bg-transparent
+                                    focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
+                                    dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+
+                                <option value="">-- Pilih Unit --</option>
+                                @if(optional($karyawan->pekerjaan)->unit)
+                                    <option value="{{ optional($karyawan->pekerjaan)->unit->id }}" selected>
+                                        {{ optional($karyawan->pekerjaan)->unit->name }}
+                                    </option>
+                                @endif
+                            </select>
+
+                            <!-- Arrow -->
+                            <span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-gray-500">
+                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <path d="M4.8 7.4L10 12.6L15.2 7.4"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"/>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+
                     <!-- JABATAN -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
@@ -802,20 +936,18 @@
                         </label>
 
                         <div class="relative z-20">
-                            <select name="Jabatan"
+                            <select id="position" name="position_id"
                                 class="h-11 w-full appearance-none rounded-lg border border-gray-300 px-4 pr-11 text-sm
                                     shadow-theme-xs bg-transparent
                                     focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
                                     dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
 
                                 <option value="">-- Pilih Jabatan --</option>
-
-                                @foreach ($jabatanOptions as $jabatan)
-                                    <option value="{{ $jabatan }}"
-                                        {{ old('Jabatan', optional($karyawan->pekerjaanTerkini)->Jabatan) === $jabatan ? 'selected' : '' }}>
-                                        {{ $jabatan }}
+                                @if(optional($karyawan->pekerjaan)->position)
+                                    <option value="{{ optional($karyawan->pekerjaan)->position->id }}" selected>
+                                        {{ optional($karyawan->pekerjaan)->position->name }}
                                     </option>
-                                @endforeach
+                                @endif
                             </select>
 
                             <!-- Arrow -->
@@ -1093,6 +1225,9 @@
                                     <option value="{{ $perusahaan }}"
                                         {{ old('Perusahaan', optional($karyawan->perusahaan)->Perusahaan) === $perusahaan ? 'selected' : '' }}>
                                         {{ $perusahaan }}
+                                    </option>
+                                        {{ old('Lokasi_Kerja', optional($karyawan->pekerjaan)->Lokasi_Kerja) === $lokasikerja ? 'selected' : '' }}>
+                                        {{ $lokasikerja }}
                                     </option>
                                 @endforeach
                             </select>
@@ -2016,4 +2151,151 @@ function kontrakForm() {
   };
 }
 </script> -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const companySelect = document.getElementById('company');
+    const divisionSelect = document.getElementById('division');
+    const departmentSelect = document.getElementById('department');
+    const unitSelect = document.getElementById('unit');
+    const positionSelect = document.getElementById('position');
+
+    // Function to populate select options
+    function populateSelect(selectElement, data, placeholder) {
+        console.log('Populating', selectElement.id, 'with data:', data);
+        selectElement.innerHTML = `<option value="">${placeholder}</option>`;
+        data.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.id;
+            option.textContent = item.name;
+            selectElement.appendChild(option);
+        });
+    }
+
+    // Company change event
+    companySelect.addEventListener('change', function() {
+        const companyId = this.value;
+        console.log('Company changed to:', companyId);
+        if (companyId) {
+            console.log('Fetching divisions for company:', companyId);
+            fetch(`/karyawan/divisions/${companyId}`)
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Fetched divisions data:', data);
+                    populateSelect(divisionSelect, data, '-- Pilih Divisi --');
+                    // Reset dependent selects
+                    departmentSelect.innerHTML = '<option value="">-- Pilih Departement --</option>';
+                    unitSelect.innerHTML = '<option value="">-- Pilih Unit --</option>';
+                    positionSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+                })
+                .catch(error => console.error('Error fetching divisions:', error));
+        } else {
+            divisionSelect.innerHTML = '<option value="">-- Pilih Divisi --</option>';
+            departmentSelect.innerHTML = '<option value="">-- Pilih Departement --</option>';
+            unitSelect.innerHTML = '<option value="">-- Pilih Unit --</option>';
+            positionSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+        }
+    });
+
+    // Division change event
+    divisionSelect.addEventListener('change', function() {
+        const divisionId = this.value;
+        if (divisionId) {
+            fetch(`/karyawan/departments/${divisionId}`)
+                .then(response => response.json())
+                .then(data => {
+                    populateSelect(departmentSelect, data, '-- Pilih Departement --');
+                    // Reset dependent selects
+                    unitSelect.innerHTML = '<option value="">-- Pilih Unit --</option>';
+                    positionSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+                });
+        } else {
+            departmentSelect.innerHTML = '<option value="">-- Pilih Departement --</option>';
+            unitSelect.innerHTML = '<option value="">-- Pilih Unit --</option>';
+            positionSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+        }
+    });
+
+    // Department change event
+    departmentSelect.addEventListener('change', function() {
+        const departmentId = this.value;
+        if (departmentId) {
+            fetch(`/karyawan/units/${departmentId}`)
+                .then(response => response.json())
+                .then(data => {
+                    populateSelect(unitSelect, data, '-- Pilih Unit --');
+                    // Reset dependent select
+                    positionSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+                });
+        } else {
+            unitSelect.innerHTML = '<option value="">-- Pilih Unit --</option>';
+            positionSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+        }
+    });
+
+    // Unit change event
+    unitSelect.addEventListener('change', function() {
+        const unitId = this.value;
+        if (unitId) {
+            fetch(`/karyawan/positions/${unitId}`)
+                .then(response => response.json())
+                .then(data => {
+                    populateSelect(positionSelect, data, '-- Pilih Jabatan --');
+                });
+        } else {
+            positionSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+        }
+    });
+
+    // Load initial data on page load
+    const initialCompanyId = companySelect.value;
+    if (initialCompanyId) {
+        fetch(`/karyawan/divisions/${initialCompanyId}`)
+            .then(response => response.json())
+            .then(data => {
+                populateSelect(divisionSelect, data, '-- Pilih Divisi --');
+                // Set selected division
+                const selectedDivisionId = divisionSelect.querySelector('option[selected]')?.value;
+                if (selectedDivisionId) {
+                    divisionSelect.value = selectedDivisionId;
+
+                    // Load departments for selected division
+                    fetch(`/karyawan/departments/${selectedDivisionId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            populateSelect(departmentSelect, data, '-- Pilih Departement --');
+                            const selectedDepartmentId = departmentSelect.querySelector('option[selected]')?.value;
+                            if (selectedDepartmentId) {
+                                departmentSelect.value = selectedDepartmentId;
+
+                                // Load units for selected department
+                                fetch(`/karyawan/units/${selectedDepartmentId}`)
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        populateSelect(unitSelect, data, '-- Pilih Unit --');
+                                        const selectedUnitId = unitSelect.querySelector('option[selected]')?.value;
+                                        if (selectedUnitId) {
+                                            unitSelect.value = selectedUnitId;
+
+                                            // Load positions for selected unit
+                                            fetch(`/karyawan/positions/${selectedUnitId}`)
+                                                .then(response => response.json())
+                                                .then(data => {
+                                                    populateSelect(positionSelect, data, '-- Pilih Jabatan --');
+                                                    const selectedPositionId = positionSelect.querySelector('option[selected]')?.value;
+                                                    if (selectedPositionId) {
+                                                        positionSelect.value = selectedPositionId;
+                                                    }
+                                                });
+                                        }
+                                    });
+                            }
+                        });
+                }
+            });
+    }
+});
+</script>
 @endpush

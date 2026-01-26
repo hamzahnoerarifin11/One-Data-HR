@@ -23,7 +23,7 @@ class UnitController extends Controller
             ];
         });
 
-        return view('pages.unit.index', compact('units'));
+        return view('pages.organization.unit.index', compact('units'));
     }
 
 
@@ -32,7 +32,7 @@ class UnitController extends Controller
         $companies = Company::all();
         $divisions = Division::all();
         $departments = Department::all();
-        return view('pages.unit.create', compact('companies', 'divisions', 'departments'));
+        return view('pages.organization.unit.create', compact('companies', 'divisions', 'departments'));
     }
 
     public function store(Request $request)
@@ -44,12 +44,12 @@ class UnitController extends Controller
             'name' => 'required|string|max:255'
         ]);
         Unit::create($request->only(['company_id', 'division_id', 'department_id', 'name']));
-        return redirect()->route('unit.index')->with('success', 'Unit created successfully.');
+        return redirect()->route('organization.unit.index')->with('success', 'Unit created successfully.');
     }
 
     public function show(Unit $unit)
     {
-        return view('pages.unit.show', compact('unit'));
+        return view('pages.organization.unit.show', compact('unit'));
     }
 
     public function edit(Unit $unit)
@@ -57,7 +57,7 @@ class UnitController extends Controller
         $companies = Company::all();
         $divisions = Division::all();
         $departments = Department::all();
-        return view('pages.unit.edit', compact('unit', 'companies', 'divisions', 'departments'));
+        return view('pages.organization.unit.edit', compact('unit', 'companies', 'divisions', 'departments'));
     }
 
     public function update(Request $request, Unit $unit)
@@ -69,12 +69,12 @@ class UnitController extends Controller
             'name' => 'required|string|max:255'
         ]);
         $unit->update($request->only(['company_id', 'division_id', 'department_id', 'name']));
-        return redirect()->route('unit.index')->with('success', 'Unit updated successfully.');
+        return redirect()->route('organization.unit.index')->with('success', 'Unit updated successfully.');
     }
 
     public function destroy(Unit $unit)
     {
         $unit->delete();
-        return redirect()->route('unit.index')->with('success', 'Unit deleted successfully.');
+        return redirect()->route('organization.unit.index')->with('success', 'Unit deleted successfully.');
     }
 }

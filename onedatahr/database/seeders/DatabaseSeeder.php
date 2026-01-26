@@ -60,6 +60,9 @@ class DatabaseSeeder extends Seeder
         $this->call(\Database\Seeders\UnitSeeder::class);
         $this->call(\Database\Seeders\PositionSeeder::class);
 
+        // Seed karyawan with hierarchical structure
+        $this->call(\Database\Seeders\KaryawanHierarchicalSeeder::class);
+
         // Seed TEMPA data
         $this->call([
             TempaPesertaSeeder::class,

@@ -19,14 +19,14 @@ class DivisionController extends Controller
             ];
         });
 
-        return view('pages.division.index', compact('divisions'));
+        return view('pages.organization.division.index', compact('divisions'));
     }
 
 
     public function create()
     {
         $companies = Company::all();
-        return view('pages.division.create', compact('companies'));
+        return view('pages.organization.division.create', compact('companies'));
     }
 
     public function store(Request $request)
@@ -36,18 +36,18 @@ class DivisionController extends Controller
             'name' => 'required|string|max:255'
         ]);
         Division::create($request->only(['company_id', 'name']));
-        return redirect()->route('division.index')->with('success', 'Division created successfully.');
+        return redirect()->route('organization.division.index')->with('success', 'Division created successfully.');
     }
 
     public function show(Division $division)
     {
-        return view('pages.division.show', compact('division'));
+        return view('pages.organization.division.show', compact('division'));
     }
 
     public function edit(Division $division)
     {
         $companies = Company::all();
-        return view('pages.division.edit', compact('division', 'companies'));
+        return view('pages.organization.division.edit', compact('division', 'companies'));
     }
 
     public function update(Request $request, Division $division)
@@ -57,12 +57,12 @@ class DivisionController extends Controller
             'name' => 'required|string|max:255'
         ]);
         $division->update($request->only(['company_id', 'name']));
-        return redirect()->route('division.index')->with('success', 'Division updated successfully.');
+        return redirect()->route('organization.division.index')->with('success', 'Division updated successfully.');
     }
 
     public function destroy(Division $division)
     {
         $division->delete();
-        return redirect()->route('division.index')->with('success', 'Division deleted successfully.');
+        return redirect()->route('organization.division.index')->with('success', 'Division deleted successfully.');
     }
 }

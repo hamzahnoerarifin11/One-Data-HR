@@ -764,6 +764,125 @@
             <div x-show="currentStep===2" x-transition class="space-y-6">
                 <div class="grid grid-cols-2 gap-4">
 
+                    <!-- PERUSAHAAN -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            Perusahaan
+                        </label>
+
+                        <div class="relative z-20">
+                            <select id="company" name="company_id"
+                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 px-4 pr-11 text-sm
+                                    shadow-theme-xs bg-transparent
+                                    focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
+                                    dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+
+                                <option value="">-- Pilih Perusahaan --</option>
+
+                                @foreach ($companies as $company)
+                                    <option value="{{ $company->id }}"
+                                        {{ old('company_id') == $company->id ? 'selected' : '' }}>
+                                        {{ $company->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+
+                            <!-- Arrow -->
+                            <span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-gray-500">
+                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <path d="M4.8 7.4L10 12.6L15.2 7.4"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"/>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- DIVISI -->
+                     <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            Divisi
+                        </label>
+
+                        <div class="relative z-20">
+                            <select id="division" name="division_id"
+                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 px-4 pr-11 text-sm
+                                    shadow-theme-xs bg-transparent
+                                    focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
+                                    dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+
+                                <option value="">-- Pilih Divisi --</option>
+                            </select>
+
+                            <!-- Arrow -->
+                            <span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-gray-500">
+                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <path d="M4.8 7.4L10 12.6L15.2 7.4"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"/>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- DEPARTEMENT -->
+                     <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            Departement
+                        </label>
+
+                        <div class="relative z-20">
+                            <select id="department" name="department_id"
+                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 px-4 pr-11 text-sm
+                                    shadow-theme-xs bg-transparent
+                                    focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
+                                    dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+
+                                <option value="">-- Pilih Departement --</option>
+                            </select>
+
+                            <!-- Arrow -->
+                            <span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-gray-500">
+                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <path d="M4.8 7.4L10 12.6L15.2 7.4"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"/>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- UNIT -->
+                     <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
+                            Unit
+                        </label>
+
+                        <div class="relative z-20">
+                            <select id="unit" name="unit_id"
+                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 px-4 pr-11 text-sm
+                                    shadow-theme-xs bg-transparent
+                                    focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
+                                    dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+
+                                <option value="">-- Pilih Unit --</option>
+                            </select>
+
+                            <!-- Arrow -->
+                            <span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-gray-500">
+                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <path d="M4.8 7.4L10 12.6L15.2 7.4"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"/>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+
                     <!-- JABATAN -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
@@ -771,20 +890,13 @@
                         </label>
 
                         <div class="relative z-20">
-                            <select name="Jabatan"
+                            <select id="position" name="position_id"
                                 class="h-11 w-full appearance-none rounded-lg border border-gray-300 px-4 pr-11 text-sm
                                     shadow-theme-xs bg-transparent
                                     focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
                                     dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
 
                                 <option value="">-- Pilih Jabatan --</option>
-
-                                @foreach ($jabatanOptions as $jabatan)
-                                    <option value="{{ $jabatan }}"
-                                        {{ old('Jabatan') === $jabatan ? 'selected' : '' }}>
-                                        {{ $jabatan }}
-                                    </option>
-                                @endforeach
                             </select>
 
                             <!-- Arrow -->
@@ -810,120 +922,6 @@
                             dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent
                             px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden
                             dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30" />
-                    </div>
-
-                    <!-- DEPARTEMENT (ENUM) -->
-                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Departement
-                        </label>
-
-                        <div class="relative z-20">
-                            <select name="Departement"
-                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 px-4 pr-11 text-sm
-                                    shadow-theme-xs bg-transparent
-                                    focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
-                                    dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-
-                                <option value="">-- Pilih Departement --</option>
-
-                                @foreach ($departementOptions as $departement)
-                                    <option value="{{ $departement }}"
-                                        {{ old('Departement') === $departement ? 'selected' : '' }}>
-                                        {{ $departement }}
-                                    </option>
-                                        {{ old('Departement') === $departement ? 'selected' : '' }}>
-                                        {{ $departement }}
-                                    </option>
-                                @endforeach
-                            </select>
-
-                            <!-- Arrow -->
-                            <span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-gray-500">
-                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                    <path d="M4.8 7.4L10 12.6L15.2 7.4"
-                                        stroke-width="1.5"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"/>
-                                </svg>
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- DIVISI -->
-                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Divisi
-                        </label>
-
-                        <div class="relative z-20">
-                            <select name="Divisi"
-                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 px-4 pr-11 text-sm
-                                    shadow-theme-xs bg-transparent
-                                    focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
-                                    dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-
-                                <option value="">-- Pilih Divisi --</option>
-
-                                @foreach ($divisiOptions as $divisi)
-                                    <option value="{{ $divisi }}"
-                                        {{ old('Divisi') === $divisi ? 'selected' : '' }}>
-                                        {{ $divisi }}
-                                    </option>
-                                        {{ old('Divisi') === $divisi ? 'selected' : '' }}>
-                                        {{ $divisi }}
-                                    </option>
-                                @endforeach
-                            </select>
-
-                            <!-- Arrow -->
-                            <span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-gray-500">
-                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                    <path d="M4.8 7.4L10 12.6L15.2 7.4"
-                                        stroke-width="1.5"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"/>
-                                </svg>
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- UNIT -->
-                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Unit
-                        </label>
-
-                        <div class="relative z-20">
-                            <select name="Unit"
-                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 px-4 pr-11 text-sm
-                                    shadow-theme-xs bg-transparent
-                                    focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
-                                    dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-
-                                <option value="">-- Pilih Unit --</option>
-
-                                @foreach ($unitOptions as $unit)
-                                    <option value="{{ $unit }}"
-                                        {{ old('Unit') === $unit ? 'selected' : '' }}>
-                                        {{ $unit }}
-                                    </option>
-                                        {{ old('Unit') === $unit ? 'selected' : '' }}>
-                                        {{ $unit }}
-                                    </option>
-                                @endforeach
-                            </select>
-
-                            <!-- Arrow -->
-                            <span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-gray-500">
-                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                    <path d="M4.8 7.4L10 12.6L15.2 7.4"
-                                        stroke-width="1.5"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"/>
-                                </svg>
-                            </span>
-                        </div>
                     </div>
 
                     <!-- JENIS KONTRAK & PERJANJIAN (DEPENDENT DROPDOWN) -->
@@ -1028,42 +1026,6 @@
                                     </option>
                                         {{ old('Lokasi_Kerja') === $lokasikerja ? 'selected' : '' }}>
                                         {{ $lokasikerja }}
-                                    </option>
-                                @endforeach
-                            </select>
-
-                            <!-- Arrow -->
-                            <span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-gray-500">
-                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                    <path d="M4.8 7.4L10 12.6L15.2 7.4"
-                                        stroke-width="1.5"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"/>
-                                </svg>
-                            </span>
-                        </div>
-                    </div>
-
-
-                    <!-- PERUSAHAAN -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Perusahaan
-                        </label>
-
-                        <div class="relative z-20">
-                            <select name="Perusahaan"
-                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 px-4 pr-11 text-sm
-                                    shadow-theme-xs bg-transparent
-                                    focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
-                                    dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-
-                                <option value="">-- Pilih Perusahaan --</option>
-
-                                @foreach ($perusahaanOptions as $perusahaan)
-                                    <option value="{{ $perusahaan }}"
-                                        {{ old('Perusahaan') === $perusahaan ? 'selected' : '' }}>
-                                        {{ $perusahaan }}
                                     </option>
                                 @endforeach
                             </select>
@@ -1909,92 +1871,104 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 </script>
-<!-- <script>
-function kontrakForm() {
-  return {
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const companySelect = document.getElementById('company');
+    const divisionSelect = document.getElementById('division');
+    const departmentSelect = document.getElementById('department');
+    const unitSelect = document.getElementById('unit');
+    const positionSelect = document.getElementById('position');
 
-    kontrak: [],
-
-    existingKontrak: window.existingKontrak ? window.existingKontrak : null,
-
-    init() {
-      if (Array.isArray(this.existingKontrak) && this.existingKontrak.length > 0) {
-        this.kontrak = JSON.parse(JSON.stringify(this.existingKontrak));
-      } else {
-        this.kontrak = [ this.emptyKontrak() ];
-      }
-
-      // hitung semua masa kerja setelah load
-      for (let i = 0; i < this.kontrak.length; i++) {
-        this.calculateMasaKerja(i);
-      }
-    },
-
-    emptyKontrak() {
-      return {
-        Tanggal_Mulai_Tugas: "",
-        PKWT_berakhir: "",
-        NO_PKWT_PERTAMA: "",
-        Tanggal_Diangkat_Menjadi_Karyawan_Tetap: "",
-        Riwayat_Penempatan: "",
-        Tanggal_Riwayat_Penempatan: "",
-        Mutasi_Promosi_Demosi: "",
-        Tanggal_Mutasi_Promosi_Demosi: "",
-        Masa_Kerja: "",
-        NO_SK_PERTAMA: ""
-      };
-    },
-
-    addKontrak() {
-      this.kontrak.push(this.emptyKontrak());
-    },
-
-    removeKontrak(index) {
-      this.kontrak.splice(index, 1);
-    },
-
-    validDate(str) {
-      if (!str || str === "0000-00-00") return false;
-      var d = new Date(str);
-      return d instanceof Date && !isNaN(d);
-    },
-
-    calculateMasaKerja(idx) {
-      var startStr = this.kontrak[idx].Tanggal_Mulai_Tugas;
-
-      if (!this.validDate(startStr)) {
-        this.kontrak[idx].Masa_Kerja = "";
-        return;
-      }
-
-      var start = new Date(startStr);
-      var end = new Date();
-
-      if (start > end) {
-        this.kontrak[idx].Masa_Kerja = "";
-        return;
-      }
-
-      var years = end.getFullYear() - start.getFullYear();
-      var months = end.getMonth() - start.getMonth();
-      var days = end.getDate() - start.getDate();
-
-      if (days < 0) {
-        months -= 1;
-        days += new Date(end.getFullYear(), end.getMonth(), 0).getDate();
-      }
-
-      if (months < 0) {
-        years -= 1;
-        months += 12;
-      }
-
-      this.kontrak[idx].Masa_Kerja =
-        years + " Tahun " + months + " Bulan " + days + " Hari";
+    // Function to populate select options
+    function populateSelect(selectElement, data, placeholder) {
+        console.log('Populating', selectElement.id, 'with data:', data);
+        selectElement.innerHTML = `<option value="">${placeholder}</option>`;
+        data.forEach(item => {
+            const option = document.createElement('option');
+            option.value = item.id;
+            option.textContent = item.name;
+            selectElement.appendChild(option);
+        });
     }
 
-  };
-}
-</script> -->
+    // Company change event
+    companySelect.addEventListener('change', function() {
+        const companyId = this.value;
+        console.log('Company changed to:', companyId);
+        if (companyId) {
+            console.log('Fetching divisions for company:', companyId);
+            fetch(`/karyawan/divisions/${companyId}`)
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Fetched divisions data:', data);
+                    populateSelect(divisionSelect, data, '-- Pilih Divisi --');
+                    // Reset dependent selects
+                    departmentSelect.innerHTML = '<option value="">-- Pilih Departement --</option>';
+                    unitSelect.innerHTML = '<option value="">-- Pilih Unit --</option>';
+                    positionSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+                })
+                .catch(error => console.error('Error fetching divisions:', error));
+        } else {
+            divisionSelect.innerHTML = '<option value="">-- Pilih Divisi --</option>';
+            departmentSelect.innerHTML = '<option value="">-- Pilih Departement --</option>';
+            unitSelect.innerHTML = '<option value="">-- Pilih Unit --</option>';
+            positionSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+        }
+    });
+
+    // Division change event
+    divisionSelect.addEventListener('change', function() {
+        const divisionId = this.value;
+        if (divisionId) {
+            fetch(`/karyawan/departments/${divisionId}`)
+                .then(response => response.json())
+                .then(data => {
+                    populateSelect(departmentSelect, data, '-- Pilih Departement --');
+                    // Reset dependent selects
+                    unitSelect.innerHTML = '<option value="">-- Pilih Unit --</option>';
+                    positionSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+                });
+        } else {
+            departmentSelect.innerHTML = '<option value="">-- Pilih Departement --</option>';
+            unitSelect.innerHTML = '<option value="">-- Pilih Unit --</option>';
+            positionSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+        }
+    });
+
+    // Department change event
+    departmentSelect.addEventListener('change', function() {
+        const departmentId = this.value;
+        if (departmentId) {
+            fetch(`/karyawan/units/${departmentId}`)
+                .then(response => response.json())
+                .then(data => {
+                    populateSelect(unitSelect, data, '-- Pilih Unit --');
+                    // Reset dependent select
+                    positionSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+                });
+        } else {
+            unitSelect.innerHTML = '<option value="">-- Pilih Unit --</option>';
+            positionSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+        }
+    });
+
+    // Unit change event
+    unitSelect.addEventListener('change', function() {
+        const unitId = this.value;
+        if (unitId) {
+            fetch(`/karyawan/positions/${unitId}`)
+                .then(response => response.json())
+                .then(data => {
+                    populateSelect(positionSelect, data, '-- Pilih Jabatan --');
+                });
+        } else {
+            positionSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+        }
+    });
+});
+</script>
 
 @endsection
