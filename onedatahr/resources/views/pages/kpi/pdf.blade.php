@@ -80,7 +80,7 @@
         </tr>
         <tr>
             <td><strong>Jabatan</strong></td>
-            <td>: {{ $karyawan->pekerjaan->first()?->jabatan ?? '-' }}</td>
+            <td>: {{ $karyawan->pekerjaan->first()?->position?->name ?? '-' }}</td>
             <td><strong>Status KPI</strong></td>
             <td>: {{ strtoupper($kpi->status) }}</td>
         </tr>

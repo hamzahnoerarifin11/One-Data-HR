@@ -190,21 +190,13 @@
 
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
                 <h3 class="font-bold text-lg text-green-800 dark:text-green-400 flex items-center gap-2">
-                    {{-- Ganti Judul Agar Lebih Relevan untuk Manager/GM --}}
+                    {{-- Ganti Judul Agar Lebih Relevan untuk Manager --}}
                     <i class="fas fa-users"></i>
                     @if(auth()->user()->hasRole(['manager', 'gm']))
                         @if($bawahanList->total() > 0)
-                            @if(isset($isGM) && $isGM)
-                                Daftar Karyawan Divisi Saya ({{ $bawahanList->total() }})
-                            @else
-                                Daftar Tim Saya ({{ $bawahanList->total() }})
-                            @endif
+                            Daftar Tim Saya ({{ $bawahanList->total() }})
                         @else
-                            @if(isset($isGM) && $isGM)
-                                Belum ada karyawan di divisi Anda
-                            @else
-                                Anda belum memiliki bawahan yang terdaftar
-                            @endif
+                            Anda belum memiliki bawahan yang terdaftar
                         @endif
                     @else
                         Anda belum memiliki bawahan yang terdaftar
@@ -212,24 +204,36 @@
                 </h3>
             </div>
 
-            {{-- INFO KHUSUS GM TENTANG ATURAN PENILAIAN --}}
+            {{-- INFO BOX ATURAN PENILAIAN --}}
             @if(isset($isGM) && $isGM)
-                <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-5">
+                <div class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-5">
                     <div class="flex items-start gap-3">
-                        <div class="flex-shrink-0 w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center mt-0.5">
-                            <i class="fas fa-info-circle text-blue-600 dark:text-blue-400 text-xs"></i>
-                        </div>
+                        <i class="fas fa-info-circle text-blue-600 dark:text-blue-400 mt-0.5"></i>
                         <div class="flex-1">
-                            <h4 class="font-semibold text-blue-800 dark:text-blue-400 text-sm mb-1">
-                                Aturan Penilaian GM
-                            </h4>
-                            <p class="text-blue-700 dark:text-blue-300 text-sm">
-                                Sebagai General Manager, Anda dapat menilai semua karyawan di divisi ini. Namun, sesuai dengan struktur organisasi, Anda hanya diperbolehkan menilai karyawan dengan jabatan Manager. Staff dengan jabatan Supervisor, Staff, Officer, atau Assistant akan ditampilkan untuk referensi namun tidak dapat dinilai langsung oleh Anda.
+                            <h4 class="font-semibold text-blue-800 dark:text-blue-300 text-sm mb-1">Aturan Penilaian GM</h4>
+                            <p class="text-blue-700 dark:text-blue-400 text-sm">
+                                Sebagai General Manager, Anda dapat melihat dan menilai <strong>semua staff</strong> yang berada di <strong>divisi yang sama</strong> dengan Anda.
+                                Pastikan penilaian dilakukan secara objektif dan sesuai dengan kompetensi masing-masing karyawan.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            @elseif(isset($isManager) && $isManager)
+                <div class="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-5">
+                    <div class="flex items-start gap-3">
+                        <i class="fas fa-info-circle text-green-600 dark:text-green-400 mt-0.5"></i>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-green-800 dark:text-green-300 text-sm mb-1">Aturan Penilaian Manager</h4>
+                            <p class="text-green-700 dark:text-green-400 text-sm">
+                                Sebagai Manager, Anda dapat melihat dan menilai <strong>staff di bawah level Anda</strong> (Supervisor, Staff, Officer, Assistant)
+                                yang berada di <strong>divisi yang sama</strong> dengan Anda. Staff yang dapat dinilai ditandai dengan status "Dapat dinilai".
                             </p>
                         </div>
                     </div>
                 </div>
             @endif
+
+            {{-- SEARCH --}}
             <form action="{{ route('kbi.index') }}" method="GET" class="mb-5">
                 <div class="flex flex-col sm:flex-row gap-2">
                     <input type="text"
@@ -260,8 +264,8 @@
                             <th class="p-4 text-left">Nama</th>
                             <th class="p-4 text-center">NIK</th>
                             <th class="p-4 text-center hidden sm:table-cell">Jabatan</th>
-                            @if(isset($isGM) && $isGM)
-                                <th class="p-4 text-center hidden md:table-cell">Keterangan</th>
+                            @if((isset($isGM) && $isGM) || (isset($isManager) && $isManager))
+                                <th class="p-4 text-center">Keterangan</th>
                             @endif
                             <th class="p-4 text-center">Aksi</th>
                         </tr>
@@ -276,23 +280,46 @@
                             <td class="p-4 text-gray-600 dark:text-gray-400 text-center hidden sm:table-cell">
                                 {{ $staff->pekerjaan->first()?->Jabatan ?? '-' }}
                             </td>
-                            @if(isset($isGM) && $isGM)
-                                <td class="p-4 text-gray-600 dark:text-gray-400 text-center hidden md:table-cell">
-                                    @php
-                                        $staffJabatan = $staff->pekerjaan->first()?->Jabatan ?? '';
-                                        $isStaffLevel = stripos($staffJabatan, 'Supervisor') !== false ||
-                                                        stripos($staffJabatan, 'Staff') !== false ||
-                                                        stripos($staffJabatan, 'Officer') !== false ||
-                                                        stripos($staffJabatan, 'Assistant') !== false;
-                                    @endphp
-                                    @if($isStaffLevel)
-                                        <span class="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400 text-xs">
-                                            <i class="fas fa-info-circle"></i>Dinilai oleh Manager
+                            @if((isset($isGM) && $isGM) || (isset($isManager) && $isManager))
+                                <td class="p-4 text-center">
+                                    @if(isset($isGM) && $isGM)
+                                        {{-- GM dapat menilai semua staff di divisi yang sama --}}
+                                        <span class="inline-flex items-center gap-1 text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded text-xs font-medium">
+                                            <i class="fas fa-check"></i> Dapat dinilai
                                         </span>
-                                    @else
-                                        <span class="inline-flex items-center gap-1 text-green-600 dark:text-green-400 text-xs">
-                                            <i class="fas fa-check-circle"></i>Dapat dinilai
-                                        </span>
+                                    @elseif(isset($isManager) && $isManager)
+                                        {{-- Manager hanya dapat menilai staff di bawah levelnya --}}
+                                        @php
+                                            $staffJabatan = $staff->pekerjaan->first()?->position?->name;
+                                            $staffLevel = 99;
+                                            $jabatanHierarchy = [
+                                                'Direktur' => 1,
+                                                'General Manager' => 2,
+                                                'GM' => 2,
+                                                'Manager' => 3,
+                                                'Supervisor' => 4,
+                                                'Staff' => 5,
+                                                'Officer' => 6,
+                                                'Assistant' => 7,
+                                            ];
+                                            foreach ($jabatanHierarchy as $key => $level) {
+                                                if (stripos($staffJabatan, $key) !== false) {
+                                                    if ($level < $staffLevel) {
+                                                        $staffLevel = $level;
+                                                    }
+                                                }
+                                            }
+                                            $canEvaluate = $staffLevel > 3; // Manager hanya bisa menilai level > 3
+                                        @endphp
+                                        @if($canEvaluate)
+                                            <span class="inline-flex items-center gap-1 text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded text-xs font-medium">
+                                                <i class="fas fa-check"></i> Dapat dinilai
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1 text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-xs font-medium">
+                                                <i class="fas fa-lock"></i> Tidak dapat dinilai
+                                            </span>
+                                        @endif
                                     @endif
                                 </td>
                             @endif
@@ -302,42 +329,21 @@
                                         <i class="fas fa-check-circle"></i> Selesai
                                     </span>
                                 @else
-                                    {{-- CEK APAKAH GM BOLEH MENILAI STAFF --}}
-                                    @php
-                                        $staffJabatan = $staff->pekerjaan->first()?->Jabatan ?? '';
-                                        $isStaffLevel = stripos($staffJabatan, 'Supervisor') !== false ||
-                                                        stripos($staffJabatan, 'Staff') !== false ||
-                                                        stripos($staffJabatan, 'Officer') !== false ||
-                                                        stripos($staffJabatan, 'Assistant') !== false;
-                                        $canEvaluate = !$isGM || !$isStaffLevel; // GM tidak boleh nilai staff
-                                    @endphp
-
-                                    @if($canEvaluate)
-                                        {{-- TOMBOL NILAI --}}
-                                        <a href="{{ route('kbi.create', ['karyawan_id' => $staff->id_karyawan, 'tipe' => 'ATASAN']) }}"
-                                           class="inline-flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 hover:shadow-md">
-                                            <i class="fas fa-pen-to-square"></i>Nilai
-                                        </a>
-                                    @else
-                                        {{-- TOMBOL DISABLED UNTUK GM MENILAI STAFF --}}
-                                        <span class="inline-flex items-center gap-1 bg-gray-400 text-gray-600 px-3 py-1.5 rounded-lg text-xs font-semibold cursor-not-allowed opacity-60" title="GM hanya dapat menilai Manager - Staff dinilai oleh Manager masing-masing">
-                                            <i class="fas fa-lock"></i>Hanya untuk Manager
-                                        </span>
-                                    @endif
+                                    {{-- TOMBOL NILAI --}}
+                                    <a href="{{ route('kbi.create', ['karyawan_id' => $staff->id_karyawan, 'tipe' => 'ATASAN']) }}"
+                                       class="inline-flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 hover:shadow-md">
+                                        <i class="fas fa-pen-to-square"></i>Nilai
+                                    </a>
                                 @endif
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="{{ isset($isGM) && $isGM ? '5' : '4' }}" class="p-8 text-center text-gray-400 dark:text-gray-500">
+                            <td colspan="{{ (isset($isGM) && $isGM) || (isset($isManager) && $isManager) ? '5' : '4' }}" class="p-8 text-center text-gray-400 dark:text-gray-500">
                                 <i class="fas fa-inbox text-3xl mb-3 opacity-50"></i>
                                 <p>
                                     @if(auth()->user()->hasRole(['manager', 'gm']))
-                                        @if(isset($isGM) && $isGM)
-                                            Belum ada karyawan di divisi Anda.
-                                        @else
-                                            Belum ada anggota tim di divisi Anda.
-                                        @endif
+                                        Belum ada anggota tim di divisi Anda.
                                     @else
                                         Data tidak ditemukan
                                     @endif

@@ -71,7 +71,7 @@ class DashboardController extends Controller
         // (Kode query sama persis seperti sebelumnya)
         $genderData = Karyawan::select(DB::raw("CASE WHEN Jenis_Kelamin_Karyawan = 'L' THEN 'Laki-laki' WHEN Jenis_Kelamin_Karyawan = 'P' THEN 'Perempuan' ELSE 'Tidak Diketahui' END as gender"), DB::raw('count(*) as total'))->groupBy('gender')->pluck('total', 'gender')->toArray();
 
-        $jabatanData = Pekerjaan::whereNotNull('Jabatan')->groupBy('Jabatan')->select('Jabatan', DB::raw('count(*) as total'))->pluck('total', 'Jabatan')->toArray();
+        $jabatanData = Pekerjaan::with('position')->whereHas('position')->groupBy('position_id')->select('position_id', DB::raw('count(*) as total'))->get()->pluck('total', 'position.name')->toArray();
 
         $divisiData = Pekerjaan::whereNotNull('Divisi')->groupBy('Divisi')->select('Divisi', DB::raw('count(*) as total'))->pluck('total', 'Divisi')->toArray();
 
