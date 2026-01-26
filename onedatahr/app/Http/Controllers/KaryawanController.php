@@ -25,11 +25,48 @@ class KaryawanController extends Controller
     //     // $this->middleware('role:admin|superadmin');
     // }
 
-    public function index()
+    public function index(Request $request)
     {
-        $karyawans = Karyawan::with(['pekerjaan.company', 'pekerjaan.division', 'pekerjaan.department', 'pekerjaan.unit', 'pekerjaan.position', 'pendidikan', 'kontrak', 'keluarga', 'bpjs', 'perusahaan', 'status'])
-            ->orderBy('id_karyawan', 'desc')
-            ->get();
+        $query = Karyawan::with(['pekerjaan.company', 'pekerjaan.division', 'pekerjaan.department', 'pekerjaan.unit', 'pekerjaan.position', 'pendidikan', 'kontrak', 'keluarga', 'bpjs', 'perusahaan', 'status']);
+
+        // Apply filters
+        if ($request->filled('nama')) {
+            $query->where('Nama_Sesuai_KTP', 'like', '%' . $request->nama . '%');
+        }
+
+        if ($request->filled('nik')) {
+            $query->where('NIK', 'like', '%' . $request->nik . '%');
+        }
+
+        if ($request->filled('jabatan')) {
+            $query->whereHas('pekerjaan.position', function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->jabatan . '%');
+            });
+        }
+
+        if ($request->filled('lokasi_kerja')) {
+            $query->whereHas('pekerjaan', function($q) use ($request) {
+                $q->where('Lokasi_Kerja', 'like', '%' . $request->lokasi_kerja . '%');
+            });
+        }
+
+        if ($request->filled('divisi')) {
+            $query->whereHas('pekerjaan.division', function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->divisi . '%');
+            });
+        }
+
+        if ($request->filled('perusahaan')) {
+            $query->whereHas('pekerjaan.company', function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->perusahaan . '%');
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('Kode', $request->status);
+        }
+
+        $karyawans = $query->orderBy('id_karyawan', 'desc')->paginate(10);
 
         return view('pages.karyawan.index', compact('karyawans'));
     }
