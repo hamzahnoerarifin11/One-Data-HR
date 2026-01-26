@@ -151,19 +151,18 @@ Route::middleware(['auth', 'role:admin|superadmin'])->group(function () {
 
     // Route::resource('karyawan', KaryawanController::class);
 
-Route::middleware(['auth', 'role:superadmin'])->group(function () {
-    // User management resource
-    Route::resource('users', UserController::class);
-    Route::delete('/users/batch-delete', [UserController::class, 'batchDelete'])->name('users.batchDelete');
-});
-
-Route::middleware(['auth', 'role:admin|superadmin|manager'])->group(function () {
-    // User management resource
-    // 7. monitoring
-    Route::get('/kbi/monitoring', [App\Http\Controllers\KbiController::class, 'monitoring'])->name('kbi.monitoring');
-    // --- rekap PERFORMANCE ROUTES ---
-    Route::get('/performance/rekap', [App\Http\Controllers\PerformanceController::class, 'index'])->name('performance.rekap');
-
+    Route::middleware(['auth', 'role:superadmin'])->group(function () {
+        // User management resource
+        Route::resource('users', UserController::class);
+        Route::delete('/users/batch-delete', [UserController::class, 'batchDelete'])->name('users.batchDelete');
+    });
+    Route::middleware(['auth', 'role:admin|superadmin|manager|GM'])->group(function () {
+        // User management resource
+        // 7. monitoring
+        Route::get('/kbi/monitoring', [App\Http\Controllers\KbiController::class, 'monitoring'])->name('kbi.monitoring');
+        // --- rekap PERFORMANCE ROUTES ---
+        Route::get('/performance/rekap', [App\Http\Controllers\PerformanceController::class, 'index'])->name('performance.rekap');
+    });
     // Route::resource('wig-rekrutmen', WigRekrutmenController::class);
 
     // Recruitment / Kandidat resources and metrics
@@ -243,7 +242,7 @@ Route::middleware(['auth', 'role:admin|superadmin|manager'])->group(function () 
     Route::delete('/kpi/items/{id}', [KpiAssessmentController::class, 'destroyItem'])->name('kpi.delete-item');
     // Route untuk Update Item KPI
     Route::put('/kpi/items/{id}', [KpiAssessmentController::class, 'updateItem'])->name('kpi.update-item');
-});
+
 
 // Routes untuk TEMPA
 Route::middleware(['auth', 'role:admin|superadmin|ketua_tempa'])->prefix('tempa')->name('tempa.')->group(function () {

@@ -41,30 +41,54 @@ class KbiController extends Controller
         // Filter: Jangan tampilkan diri sendiri
         $query->where('id_karyawan', '!=', $karyawan->id_karyawan);
 
-        // --- [LOGIC BARU: FILTER KHUSUS MANAGER] ---
+        // --- [LOGIC BARU: FILTER KHUSUS MANAGER/GM] ---
         // Cek Jabatan User Login
         $userJabatan = $karyawan->pekerjaan->first()?->Jabatan;
-        $userDivisi  = $karyawan->pekerjaan->first()?->Divisi;
+        $userDivisionId = $karyawan->pekerjaan->first()?->division_id;
 
-        // Jika jabatan mengandung kata "Manager" (case insensitive)
-        // Sesuaikan dengan nama jabatan di database Anda
-        // Check apakah user adalah Manager level (Manager, GM, atau General Manager)
-        $isManager = stripos($userJabatan, 'Manager') !== false || stripos($userJabatan, 'GM') !== false;
+        // Tentukan level jabatan user
+        $jabatanHierarchy = [
+            'Direktur' => 1,
+            'General Manager' => 2,
+            'GM' => 2,
+            'Manager' => 3,
+            'Supervisor' => 4,
+            'Staff' => 5,
+            'Officer' => 6,
+            'Assistant' => 7,
+        ];
+        $userLevel = 99;
+        foreach ($jabatanHierarchy as $key => $level) {
+            if (stripos($userJabatan, $key) !== false) {
+                if ($level < $userLevel) {
+                    $userLevel = $level;
+                }
+            }
+        }
 
-        if ($isManager) {
-            // Manager hanya melihat karyawan di DIVISI YANG SAMA
-            if ($userDivisi) {
-                $query->whereHas('pekerjaan', function ($q) use ($userDivisi) {
-                    $q->where('Divisi', $userDivisi);
+        $isGM = $userLevel == 2; // GM level 2
+        $isManager = $userLevel == 3; // Manager level 3
 
-                    // Opsional: Jika ingin filter level jabatan di bawahnya secara spesifik
-                    // $q->whereIn('Jabatan', ['Supervisor', 'Staff', 'Officer']); 
-                    // Atau gunakan logika NOT LIKE Manager jika ingin mengecualikan sesama manager
-                    // $q->where('Jabatan', 'NOT LIKE', '%Manager%');
+        if ($isGM) {
+            // GM melihat semua karyawan di divisi yang sama
+            if ($userDivisionId) {
+                $query->whereHas('pekerjaan', function ($q) use ($userDivisionId) {
+                    $q->where('division_id', $userDivisionId);
                 });
-            } else {
-                // Jika data divisi manager kosong, mungkin tidak tampilkan apa-apa atau tampilkan semua (safety net)
-                \Log::warning('Manager tanpa Divisi login: ' . $karyawan->Nama_Lengkap_Sesuai_Ijazah);
+            }
+        } elseif ($isManager) {
+            // Manager hanya melihat staff di bawahnya (bukan Manager/GM)
+            if ($userDivisionId) {
+                $query->whereHas('pekerjaan', function ($q) use ($userDivisionId) {
+                    $q->where('division_id', $userDivisionId)
+                        ->where(function ($sq) {
+                            // Jabatan di bawah Manager: Supervisor, Staff, Officer, Assistant
+                            $sq->where('Jabatan', 'LIKE', '%Supervisor%')
+                                ->orWhere('Jabatan', 'LIKE', '%Staff%')
+                                ->orWhere('Jabatan', 'LIKE', '%Officer%')
+                                ->orWhere('Jabatan', 'LIKE', '%Assistant%');
+                        });
+                });
             }
         }
 
@@ -127,7 +151,7 @@ class KbiController extends Controller
             }
         }
 
-        if ($userLevel <= 1 || empty($userDivisi)) {
+        if ($userLevel <= 1 || empty($userDivisionId)) {
             $listCalonAtasan = collect();
         } else {
             $higherJabatan = [];
@@ -143,22 +167,24 @@ class KbiController extends Controller
             }
             // Ambil calon atasan dengan 2 kondisi:
             // 1. Jika level 1-2 (Direktur/GM): Bisa dari divisi manapun
-            // 2. Jika level > 2 (Manager+): Utamakan divisi yang sama, tapi bisa juga dari level yang lebih tinggi
+            // 2. Jika level > 2 (Manager+): Hanya dari divisi yang sama
             $listCalonAtasan = Karyawan::where('id_karyawan', '!=', $karyawan->id_karyawan)
-                ->whereHas('pekerjaan', function ($q) use ($userDivisi, $higherJabatan, $userLevel) {
+                ->whereHas('pekerjaan', function ($q) use ($userDivisionId, $higherJabatan, $userLevel) {
                     if (!empty($higherJabatan)) {
-                        $q->where(function ($subQ) use ($higherJabatan, $userDivisi, $userLevel) {
-                            // Direktur/GM (level 1-2): Bisa dari divisi apapun
-                            foreach ($higherJabatan as $jab) {
-                                if (stripos($jab, 'Direktur') !== false || stripos($jab, 'GM') !== false) {
+                        $q->where(function ($subQ) use ($higherJabatan, $userDivisionId, $userLevel) {
+                            // Jika level 1-2 (Direktur/GM): Bisa dari divisi apapun
+                            if ($userLevel <= 2) {
+                                foreach ($higherJabatan as $jab) {
                                     $subQ->orWhere('Jabatan', 'LIKE', '%' . $jab . '%');
-                                } else {
-                                    // Jabatan lain: hanya dari divisi yang sama
-                                    $subQ->orWhere(function ($sq) use ($jab, $userDivisi) {
-                                        $sq->where('Jabatan', 'LIKE', '%' . $jab . '%')
-                                            ->where('Divisi', $userDivisi);
-                                    });
                                 }
+                            } else {
+                                // Jika level > 2 (Manager+): Hanya dari divisi yang sama
+                                $subQ->where('division_id', $userDivisionId)
+                                    ->where(function ($sq) use ($higherJabatan) {
+                                        foreach ($higherJabatan as $jab) {
+                                            $sq->orWhere('Jabatan', 'LIKE', '%' . $jab . '%');
+                                        }
+                                    });
                             }
                         });
                     } else {
@@ -175,7 +201,8 @@ class KbiController extends Controller
             'atasan',
             'sudahMenilaiAtasan',
             'listCalonAtasan',
-            'tahun'
+            'tahun',
+            'isGM'
         ));
     }
 

@@ -121,8 +121,12 @@ class DashboardController extends Controller
     // =========================================================================
     private function managerDashboard($request, $manager, $tahun)
     {
-        // 1. Ambil ID Tim (Bawahan Langsung)
-        $listBawahanIds = Karyawan::where('atasan_id', $manager->id_karyawan)->pluck('id_karyawan');
+        // 1. Ambil ID Tim (Bawahan Langsung yang di divisi sama)
+        $listBawahanIds = Karyawan::where('atasan_id', $manager->id_karyawan)
+            ->whereHas('pekerjaan', function ($q) use ($manager) {
+                $q->where('division_id', $manager->pekerjaan->first()->division_id ?? null);
+            })
+            ->pluck('id_karyawan');
         $totalTim       = $listBawahanIds->count();
 
         // 2. KPI: Butuh Approval (Status: SUBMITTED)
@@ -142,6 +146,9 @@ class DashboardController extends Controller
 
         // 4. Tabel Monitoring (Pagination)
         $teamMonitoring = Karyawan::where('atasan_id', $manager->id_karyawan)
+            ->whereHas('pekerjaan', function ($q) use ($manager) {
+                $q->where('division_id', $manager->pekerjaan->first()->division_id ?? null);
+            })
             ->with([
                 'pekerjaan',
                 'kpiAssessment' => function ($q) use ($tahun) {

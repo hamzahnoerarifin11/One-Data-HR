@@ -844,11 +844,6 @@
                                     dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
 
                                 <option value="">-- Pilih Divisi --</option>
-                                @if(optional($karyawan->pekerjaan->first())->division)
-                                    <option value="{{ optional($karyawan->pekerjaan->first())->division->id }}" selected>
-                                        {{ optional($karyawan->pekerjaan->first())->division->name }}
-                                    </option>
-                                @endif
                             </select>
 
                             <!-- Arrow -->
@@ -877,11 +872,6 @@
                                     dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
 
                                 <option value="">-- Pilih Departement --</option>
-                                @if(optional($karyawan->pekerjaan->first())->department)
-                                    <option value="{{ optional($karyawan->pekerjaan->first())->department->id }}" selected>
-                                        {{ optional($karyawan->pekerjaan->first())->department->name }}
-                                    </option>
-                                @endif
                             </select>
 
                             <!-- Arrow -->
@@ -910,11 +900,6 @@
                                     dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
 
                                 <option value="">-- Pilih Unit --</option>
-                                @if(optional($karyawan->pekerjaan->first())->unit)
-                                    <option value="{{ optional($karyawan->pekerjaan->first())->unit->id }}" selected>
-                                        {{ optional($karyawan->pekerjaan->first())->unit->name }}
-                                    </option>
-                                @endif
                             </select>
 
                             <!-- Arrow -->
@@ -943,11 +928,6 @@
                                     dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
 
                                 <option value="">-- Pilih Jabatan --</option>
-                                @if(optional($karyawan->pekerjaan->first())->position)
-                                    <option value="{{ optional($karyawan->pekerjaan->first())->position->id }}" selected>
-                                        {{ optional($karyawan->pekerjaan->first())->position->name }}
-                                    </option>
-                                @endif
                             </select>
 
                             <!-- Arrow -->
@@ -975,7 +955,7 @@
                             dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30" />
                     </div>
 
-                    <!-- DEPARTEMENT (ENUM) -->
+                    {{-- <!-- DEPARTEMENT (ENUM) -->
                      <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
                             Departement
@@ -1012,83 +992,9 @@
                                 </svg>
                             </span>
                         </div>
-                    </div>
+                    </div> --}}
 
-                    <!-- DIVISI -->
-                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Divisi
-                        </label>
-
-                        <div class="relative z-20">
-                            <select name="Divisi"
-                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 px-4 pr-11 text-sm
-                                    shadow-theme-xs bg-transparent
-                                    focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
-                                    dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-
-                                <option value="">-- Pilih Divisi --</option>
-
-                                @foreach ($divisiOptions as $divisi)
-                                    <option value="{{ $divisi }}"
-                                        {{ old('Divisi', optional($karyawan->pekerjaan->first())->Divisi) === $divisi ? 'selected' : '' }}>
-                                        {{ $divisi }}
-                                    </option>
-                                        {{ old('Divisi', optional($karyawan->pekerjaan->first())->Divisi) === $divisi ? 'selected' : '' }}>
-                                        {{ $divisi }}
-                                    </option>
-                                @endforeach
-                            </select>
-
-                            <!-- Arrow -->
-                            <span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-gray-500">
-                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                    <path d="M4.8 7.4L10 12.6L15.2 7.4"
-                                        stroke-width="1.5"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"/>
-                                </svg>
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- UNIT -->
-                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Unit
-                        </label>
-
-                        <div class="relative z-20">
-                            <select name="Unit"
-                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 px-4 pr-11 text-sm
-                                    shadow-theme-xs bg-transparent
-                                    focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
-                                    dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-
-                                <option value="">-- Pilih Unit --</option>
-
-                                @foreach ($unitOptions as $unit)
-                                    <option value="{{ $unit }}"
-                                        {{ old('Unit', optional($karyawan->pekerjaan->first())->Unit) === $unit ? 'selected' : '' }}>
-                                        {{ $unit }}
-                                    </option>
-                                        {{ old('Unit', optional($karyawan->pekerjaan->first())->Unit) === $unit ? 'selected' : '' }}>
-                                        {{ $unit }}
-                                    </option>
-                                @endforeach
-                            </select>
-
-                            <!-- Arrow -->
-                            <span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-gray-500">
-                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                    <path d="M4.8 7.4L10 12.6L15.2 7.4"
-                                        stroke-width="1.5"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"/>
-                                </svg>
-                            </span>
-                        </div>
-                    </div>
+                    
 
                     <!-- JENIS KONTRAK & PERJANJIAN (DEPENDENT DROPDOWN) -->
                     <div class="grid grid-cols-2 gap-4">
@@ -1187,45 +1093,6 @@
 
                                 @foreach ($lokasikerjaOptions as $lokasikerja)
                                     <option value="{{ $lokasikerja }}"
-                                        {{ old('Lokasi_Kerja', optional($karyawan->pekerjaan->first())->Lokasi_Kerja) === $lokasikerja ? 'selected' : '' }}>
-                                        {{ $lokasikerja }}
-                                    </option>
-                                @endforeach
-                            </select>
-
-                            <!-- Arrow -->
-                            <span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-gray-500">
-                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                    <path d="M4.8 7.4L10 12.6L15.2 7.4"
-                                        stroke-width="1.5"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"/>
-                                </svg>
-                            </span>
-                        </div>
-                    </div>
-
-
-                    <!-- PERUSAHAAN -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Perusahaan
-                        </label>
-
-                        <div class="relative z-20">
-                            <select name="Perusahaan"
-                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 px-4 pr-11 text-sm
-                                    shadow-theme-xs bg-transparent
-                                    focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
-                                    dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-
-                                <option value="">-- Pilih Perusahaan --</option>
-
-                                @foreach ($perusahaanOptions as $perusahaan)
-                                    <option value="{{ $perusahaan }}"
-                                        {{ old('Perusahaan', optional($karyawan->perusahaan)->Perusahaan) === $perusahaan ? 'selected' : '' }}>
-                                        {{ $perusahaan }}
-                                    </option>
                                         {{ old('Lokasi_Kerja', optional($karyawan->pekerjaan->first())->Lokasi_Kerja) === $lokasikerja ? 'selected' : '' }}>
                                         {{ $lokasikerja }}
                                     </option>
@@ -2251,42 +2118,43 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Load initial data on page load
     const initialCompanyId = companySelect.value;
+    const initialDivisionId = '{{ optional($karyawan->pekerjaan->first())->division_id }}';
+    const initialDepartmentId = '{{ optional($karyawan->pekerjaan->first())->department_id }}';
+    const initialUnitId = '{{ optional($karyawan->pekerjaan->first())->unit_id }}';
+    const initialPositionId = '{{ optional($karyawan->pekerjaan->first())->position_id }}';
+
     if (initialCompanyId) {
         fetch(`/karyawan/divisions/${initialCompanyId}`)
             .then(response => response.json())
             .then(data => {
                 populateSelect(divisionSelect, data, '-- Pilih Divisi --');
                 // Set selected division
-                const selectedDivisionId = divisionSelect.querySelector('option[selected]')?.value;
-                if (selectedDivisionId) {
-                    divisionSelect.value = selectedDivisionId;
+                if (initialDivisionId) {
+                    divisionSelect.value = initialDivisionId;
 
                     // Load departments for selected division
-                    fetch(`/karyawan/departments/${selectedDivisionId}`)
+                    fetch(`/karyawan/departments/${initialDivisionId}`)
                         .then(response => response.json())
                         .then(data => {
                             populateSelect(departmentSelect, data, '-- Pilih Departement --');
-                            const selectedDepartmentId = departmentSelect.querySelector('option[selected]')?.value;
-                            if (selectedDepartmentId) {
-                                departmentSelect.value = selectedDepartmentId;
+                            if (initialDepartmentId) {
+                                departmentSelect.value = initialDepartmentId;
 
                                 // Load units for selected department
-                                fetch(`/karyawan/units/${selectedDepartmentId}`)
+                                fetch(`/karyawan/units/${initialDepartmentId}`)
                                     .then(response => response.json())
                                     .then(data => {
                                         populateSelect(unitSelect, data, '-- Pilih Unit --');
-                                        const selectedUnitId = unitSelect.querySelector('option[selected]')?.value;
-                                        if (selectedUnitId) {
-                                            unitSelect.value = selectedUnitId;
+                                        if (initialUnitId) {
+                                            unitSelect.value = initialUnitId;
 
                                             // Load positions for selected unit
-                                            fetch(`/karyawan/positions/${selectedUnitId}`)
+                                            fetch(`/karyawan/positions/${initialUnitId}`)
                                                 .then(response => response.json())
                                                 .then(data => {
                                                     populateSelect(positionSelect, data, '-- Pilih Jabatan --');
-                                                    const selectedPositionId = positionSelect.querySelector('option[selected]')?.value;
-                                                    if (selectedPositionId) {
-                                                        positionSelect.value = selectedPositionId;
+                                                    if (initialPositionId) {
+                                                        positionSelect.value = initialPositionId;
                                                     }
                                                 });
                                         }
