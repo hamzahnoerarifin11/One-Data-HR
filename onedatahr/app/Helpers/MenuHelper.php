@@ -82,15 +82,6 @@ class MenuHelper
                 'name' => 'Data Turnover',
                 'path' => '/turnover',
             ];
-<<<<<<< HEAD
-=======
-            $menu[] = [
-                'icon' => 'user-shield',
-                'name' => 'Manajemen User',
-                'path' => '/users',
-            ];
-
->>>>>>> 392245eac2358d0dd6b6c1e905ee8caf576f0f18
         }
 
         // =============================================================

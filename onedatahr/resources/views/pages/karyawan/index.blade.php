@@ -47,10 +47,10 @@
             'nama'       => $k->Nama_Sesuai_KTP,
             'nik'        => $k->NIK,
             'phone'      => $k->Nomor_Telepon_Aktif_Karyawan,
-            'jabatan'    => $k->pekerjaan->position->name ?? '-',
-            'lokasi'     => $k->pekerjaan->Lokasi_Kerja ?? '-',
-            'divisi'     => $k->pekerjaan->division->name ?? '-',
-            'perusahaan' => $k->pekerjaan->company->name ?? '-',
+            'jabatan'    => $k->pekerjaan->first()->position->name ?? '-',
+            'lokasi'     => $k->pekerjaan->first()->Lokasi_Kerja ?? '-',
+            'divisi'     => $k->pekerjaan->first()->division->name ?? '-',
+            'perusahaan' => $k->pekerjaan->first()->company->name ?? '-',
         ])->values();
     @endphp
 
