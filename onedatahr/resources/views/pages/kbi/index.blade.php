@@ -131,7 +131,7 @@
                                 {{ $atasan->Nama_Lengkap_Sesuai_Ijazah ?? $atasan->Nama_Sesuai_KTP }}
                             </h4>
                             <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
-                                {{ $atasan->pekerjaan->first()?->Jabatan ?? 'Atasan Langsung' }}
+                                {{ $atasan->pekerjaan->first()?->Jabatan ?? $atasan->pekerjaan->first()?->position?->name ?? 'Atasan Langsung' }}
                             </p>
                         </div>
                     </div>
@@ -167,7 +167,7 @@
                                 @foreach($listCalonAtasan as $calon)
                                     <option value="{{ $calon->id_karyawan }}">
                                         {{ $calon->Nama_Lengkap_Sesuai_Ijazah }} 
-                                        ({{ $calon->pekerjaan->first()?->Jabatan ?? '-' }})
+                                        ({{ $calon->pekerjaan->first()?->Jabatan ?? $calon->pekerjaan->first()?->position?->name ?? '-' }})
                                     </option>
                                 @endforeach
                             </select>
@@ -233,26 +233,44 @@
                 </div>
             @endif
 
-            {{-- SEARCH --}}
+            {{-- SEARCH & FILTER --}}
             <form action="{{ route('kbi.index') }}" method="GET" class="mb-5">
-                <div class="flex flex-col sm:flex-row gap-2">
-                    <input type="text"
-                        name="search"
-                        value="{{ request('search') }}"
-                        placeholder="Cari Nama / NIK..."
-                        class="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200 dark:focus:ring-green-800 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition"
-                    >
-                    {{-- TOMBOL CARI --}}
-                    <button class="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-lg font-semibold text-sm transition-all duration-200 hover:shadow-md whitespace-nowrap">
-                        <i class="fas fa-search mr-1"></i>Cari
-                    </button>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {{-- SEARCH --}}
+                    <div>
+                        <input type="text"
+                            name="search"
+                            value="{{ request('search') }}"
+                            placeholder="Cari Nama / NIK..."
+                            class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200 dark:focus:ring-green-800 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition"
+                        >
+                    </div>
 
-                    @if(request('search'))
-                        <a href="{{ route('kbi.index') }}"
-                           class="bg-gray-400 hover:bg-gray-500 text-white px-6 py-2.5 rounded-lg font-semibold text-sm text-center transition-all duration-200 hover:shadow-md whitespace-nowrap">
-                            <i class="fas fa-redo mr-1"></i>Reset
-                        </a>
-                    @endif
+                    {{-- FILTER COMPANIES --}}
+                    <div>
+                        <select name="filter_company" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200 dark:focus:ring-green-800 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            <option value="">Semua Perusahaan</option>
+                            @foreach($listCompanies as $company)
+                                <option value="{{ $company }}" {{ request('filter_company') == $company ? 'selected' : '' }}>
+                                    {{ $company }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    {{-- TOMBOL ACTION --}}
+                    <div class="flex gap-2">
+                        <button class="flex-1 bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-lg font-semibold text-sm transition-all duration-200 hover:shadow-md">
+                            <i class="fas fa-search mr-1"></i>Terapkan
+                        </button>
+
+                        @if(request('search') || request('filter_company'))
+                            <a href="{{ route('kbi.index') }}"
+                               class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2.5 rounded-lg font-semibold text-sm text-center transition-all duration-200 hover:shadow-md">
+                                <i class="fas fa-redo mr-1"></i>Reset
+                            </a>
+                        @endif
+                    </div>
                 </div>
             </form>
 
@@ -264,6 +282,7 @@
                             <th class="p-4 text-left">Nama</th>
                             <th class="p-4 text-center">NIK</th>
                             <th class="p-4 text-center hidden sm:table-cell">Jabatan</th>
+                            <th class="p-4 text-center hidden md:table-cell">Perusahaan</th>
                             @if((isset($isGM) && $isGM) || (isset($isManager) && $isManager))
                                 <th class="p-4 text-center">Keterangan</th>
                             @endif
@@ -271,126 +290,145 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
-    @forelse($bawahanList as $staff)
-        {{-- === LOGIKA PENILAIAN DIHITUNG DI SINI AGAR BISA DIPAKAI DI KOLOM KETERANGAN & AKSI === --}}
-        @php
-            // 1. DEFINISI HIERARKI
-            $jabatanHierarchy = [
-                'Direktur' => 1,
-                'General Manajer' => 2, 'GM' => 2,
-                'Manajer' => 3,
-                'Supervisor' => 4,
-                'Staff' => 5,
-                'Officer' => 6,
-                'Assistant' => 7,
-            ];
+                        @forelse($bawahanList as $staff)
+                            {{-- === LOGIKA PENILAIAN DIHITUNG DI SINI AGAR BISA DIPAKAI DI KOLOM KETERANGAN & AKSI === --}}
+                            @php
+    // ===== 1. HIERARKI JABATAN =====
+    $jabatanHierarchy = [
+        'direktur' => 1,
+        'general manager' => 2,
+        'gm' => 2,
+        'manager' => 3,
+        'manajer' => 3,
+        'supervisor' => 4,
+        'staff' => 5,
+        'officer' => 6,
+        'assistant' => 7,
+    ];
 
-            // 2. AMBIL DATA JABATAN & DIVISI
-            $staffJabatan = $staff->pekerjaan->first()?->Jabatan;
-            $staffLevel   = $jabatanHierarchy[$staffJabatan] ?? 99; // 99 jika jabatan tidak dikenal
-            $staffDivisi  = $staff->pekerjaan->first()?->divisi?->name;
-            
-            $canAssess = false; // Default: Tidak bisa menilai
-            $reason    = '';    // Alasan kenapa tidak bisa
+    // helper normalisasi
+    $normalize = fn($v) => strtolower(trim($v ?? ''));
 
-            // 3. LOGIKA UNTUK GM (General Manager)
-            // Rules: GM (Lvl 2) HANYA bisa menilai Manager (Lvl 3)
-            if(isset($isGM) && $isGM) {
-                if($staffLevel === 3) { 
-                    $canAssess = true; 
-                } else {
-                    $canAssess = false;
-                    $reason = ($staffLevel < 3) ? 'Level diatas/setara' : 'Hanya menilai Manager';
-                }
-            }
-            // 4. LOGIKA UNTUK MANAGER
-            // Rules: Satu Divisi & Level Staff > Level Manager
-            elseif(isset($isManager) && $isManager) {
-                $managerJabatan = $karyawan->pekerjaan->first()?->Jabatan;
-                $managerDivisi  = $karyawan->pekerjaan->first()?->divisi?->name;
-                $managerLevel   = $jabatanHierarchy[$managerJabatan] ?? 99;
+    // ===== 2. DATA STAFF =====
+    $staffJob = $staff->pekerjaan->first();
+    $staffJabatan = $normalize($staffJob?->Jabatan ?? $staffJob?->position?->name);
+    $staffDivisi  = $normalize($staffJob?->division?->name ?? $staffJob?->divisi?->name);
+    $staffLevel   = $jabatanHierarchy[$staffJabatan] ?? null;
 
-                if($managerDivisi == $staffDivisi && $staffLevel > $managerLevel) {
-                    $canAssess = true;
-                } else {
-                    $canAssess = false;
-                    $reason = ($managerDivisi != $staffDivisi) ? 'Beda Divisi' : 'Level tidak sesuai';
-                }
-            }
-        @endphp
+    // ===== 3. DATA MANAGER =====
+    $managerJob = $karyawan->pekerjaan->first();
+    $managerJabatan = $normalize($managerJob?->Jabatan ?? $managerJob?->position?->name);
+    $managerDivisi  = $normalize($managerJob?->division?->name ?? $managerJob?->divisi?->name);
+    $managerLevel   = $jabatanHierarchy[$managerJabatan] ?? null;
 
-        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
-            {{-- KOLOM 1: NAMA --}}
-            <td class="p-4 font-medium text-gray-900 dark:text-white">
-                {{ $staff->Nama_Lengkap_Sesuai_Ijazah ?? $staff->Nama_Sesuai_KTP }}
-            </td>
+    // ===== 4. DEFAULT =====
+    $canAssess = false;
+    $reason = 'Tidak memenuhi kriteria';
 
-            {{-- KOLOM 2: NIK --}}
-            <td class="p-4 text-gray-600 dark:text-gray-400 text-center font-mono text-xs">
-                {{ $staff->NIK }}
-            </td>
+    // ===== 5. LOGIKA GM =====
+    if(!empty($isGM) && $isGM) {
+        if($staffLevel === 3) {
+            $canAssess = true;
+        } else {
+            $reason = 'GM hanya menilai Manager';
+        }
+    }
 
-            {{-- KOLOM 3: JABATAN --}}
-            <td class="p-4 text-gray-600 dark:text-gray-400 text-center hidden sm:table-cell">
-                {{ $staff->pekerjaan->first()?->Jabatan ?? '-' }}
-            </td>
+    // ===== 6. LOGIKA MANAGER =====
+    elseif(!empty($isManager) && $isManager) {
+        if(!$staffLevel || !$managerLevel) {
+            $reason = 'Jabatan tidak dikenali';
+        }
+        elseif($managerDivisi !== $staffDivisi) {
+            $reason = 'Beda divisi';
+        }
+        elseif($staffLevel <= $managerLevel) {
+            $reason = 'Level tidak di bawah Anda';
+        }
+        else {
+            $canAssess = true;
+        }
+    }
+@endphp
 
-            {{-- KOLOM 4: KETERANGAN STATUS (Dapat Dinilai / Locked) --}}
-            @if((isset($isGM) && $isGM) || (isset($isManager) && $isManager))
-                <td class="p-4 text-center">
-                    @if($canAssess)
-                        <span class="inline-flex items-center gap-1 text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded text-xs font-medium">
-                            <i class="fas fa-check"></i> Dapat dinilai
-                        </span>
-                    @else
-                        <span class="inline-flex items-center gap-1 text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-xs font-medium" title="{{ $reason }}">
-                            <i class="fas fa-lock"></i> Locked
-                        </span>
-                    @endif
-                </td>
-            @endif
 
-            {{-- KOLOM 5: TOMBOL AKSI --}}
-            <td class="p-4 text-center">
-                @if($staff->sudah_dinilai)
-                    {{-- JIKA SUDAH DINILAI --}}
-                    <span class="inline-flex items-center gap-1 text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800 px-3 py-1.5 rounded-lg text-xs font-semibold">
-                        <i class="fas fa-check-circle"></i> Selesai
-                    </span>
-                @else
-                    {{-- JIKA BELUM DINILAI --}}
-                    @if($canAssess)
-                        {{-- TAMPILKAN TOMBOL HANYA JIKA $canAssess TRUE --}}
-                        <a href="{{ route('kbi.create', ['karyawan_id' => $staff->id_karyawan, 'tipe' => 'ATASAN']) }}"
-                           class="inline-flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 hover:shadow-md">
-                            <i class="fas fa-pen-to-square"></i> Nilai
-                        </a>
-                    @else
-                        {{-- JIKA TIDAK BISA DINILAI, TAMPILKAN DISABLE BUTTON --}}
-                        <button disabled class="inline-flex items-center gap-1 bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 px-4 py-1.5 rounded-lg text-xs font-semibold cursor-not-allowed">
-                            <i class="fas fa-ban"></i> Nilai
-                        </button>
-                    @endif
-                @endif
-            </td>
-        </tr>
-    @empty
-        <tr>
-            <td colspan="{{ (isset($isGM) && $isGM) || (isset($isManager) && $isManager) ? '5' : '4' }}" class="p-8 text-center text-gray-400 dark:text-gray-500">
-                <div class="flex flex-col items-center justify-center">
-                    <i class="fas fa-inbox text-4xl mb-3 opacity-30"></i>
-                    <p class="text-sm">
-                        @if(auth()->user()->hasRole(['manager', 'gm']))
-                            Belum ada anggota tim yang sesuai kriteria.
-                        @else
-                            Data tidak ditemukan
-                        @endif
-                    </p>
-                </div>
-            </td>
-        </tr>
-    @endforelse
-</tbody>
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
+                                {{-- KOLOM 1: NAMA --}}
+                                <td class="p-4 font-medium text-gray-900 dark:text-white">
+                                    {{ $staff->Nama_Lengkap_Sesuai_Ijazah ?? $staff->Nama_Sesuai_KTP }}
+                                </td>
+
+                                {{-- KOLOM 2: NIK --}}
+                                <td class="p-4 text-gray-600 dark:text-gray-400 text-center font-mono text-xs">
+                                    {{ $staff->NIK }}
+                                </td>
+
+                                {{-- KOLOM 3: JABATAN --}}
+                                <td class="p-4 text-gray-600 dark:text-gray-400 text-center hidden sm:table-cell">
+                                    {{ $staff->pekerjaan->first()?->Jabatan ?? $staff->pekerjaan->first()?->position?->name ?? '-' }}
+                                </td>
+
+                                {{-- KOLOM 4: PERUSAHAAN --}}
+                                <td class="p-4 text-gray-600 dark:text-gray-400 text-center hidden md:table-cell">
+                                    {{ $staff->pekerjaan->first()?->company?->name ?? '-' }}
+                                </td>
+
+                                KOLOM 4: KETERANGAN STATUS (Dapat Dinilai / Locked)
+                                @if((isset($isGM) && $isGM) || (isset($isManager) && $isManager))
+                                    <td class="p-4 text-center">
+                                        @if($canAssess)
+                                            <span class="inline-flex items-center gap-1 text-green-700 bg-green-100 px-2 py-1 rounded text-xs font-medium">
+                                                <i class="fas fa-unlock"></i> Unlocked
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1 text-gray-500 bg-gray-100 px-2 py-1 rounded text-xs font-medium" title="{{ $reason }}">
+                                                <i class="fas fa-lock"></i> Locked
+                                            </span>
+                                        @endif
+                                    </td>
+                                @endif
+
+                                {{-- KOLOM 5: TOMBOL AKSI --}}
+                                <td class="p-4 text-center">
+                                    @if($staff->sudah_dinilai)
+                                        {{-- JIKA SUDAH DINILAI --}}
+                                        <span class="inline-flex items-center gap-1 text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800 px-3 py-1.5 rounded-lg text-xs font-semibold">
+                                            <i class="fas fa-check-circle"></i> Selesai
+                                        </span>
+                                    @else
+                                        {{-- JIKA BELUM DINILAI --}}
+                                        @if($canAssess)
+                                            {{-- TAMPILKAN TOMBOL HANYA JIKA $canAssess TRUE --}}
+                                            <a href="{{ route('kbi.create', ['karyawan_id' => $staff->id_karyawan, 'tipe' => 'ATASAN']) }}"
+                                            class="inline-flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 hover:shadow-md">
+                                                <i class="fas fa-pen-to-square"></i> Nilai
+                                            </a>
+                                        @else
+                                            {{-- JIKA TIDAK BISA DINILAI, TAMPILKAN DISABLE BUTTON --}}
+                                            <button disabled class="inline-flex items-center gap-1 bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 px-4 py-1.5 rounded-lg text-xs font-semibold cursor-not-allowed" title="{{ $reason }}">
+                                                <i class="fas fa-lock"></i> Nilai
+                                            </button>
+                                        @endif
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="{{ (isset($isGM) && $isGM) || (isset($isManager) && $isManager) ? '6' : '5' }}" class="p-8 text-center text-gray-400 dark:text-gray-500">
+                                    <div class="flex flex-col items-center justify-center">
+                                        <i class="fas fa-inbox text-4xl mb-3 opacity-30"></i>
+                                        <p class="text-sm">
+                                            @if(auth()->user()->hasRole(['manager', 'gm']))
+                                                Belum ada anggota tim yang sesuai kriteria.
+                                            @else
+                                                Data tidak ditemukan
+                                            @endif
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
                 </table>
             </div>
              {{-- PAGINATION --}}

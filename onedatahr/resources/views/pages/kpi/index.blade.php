@@ -16,45 +16,52 @@
 
     <div class="max-w-7xl mx-auto">
         {{-- TOMBOL KEMBALI --}}
-        <div class="mb-4">
+        <div class="mb-6 relative flex items-center pt-3 border-b border-gray-300 dark:border-gray-700 pb-5">
             <a href="{{ url('/dashboard') }}" class="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium text-sm">
                 <i class="fas fa-arrow-left"></i>
                 <span>Kembali ke Dashboard Utama</span>
             </a>
+            {{-- Toggle Dark Mode --}}
+            <div class="absolute right-0 justify-end sm:block">
+                <button id="theme-toggle"
+                    class="flex items-center gap-2 bg-white dark:bg-gray-800
+                        border border-gray-300 dark:border-gray-700
+                        text-gray-600 dark:text-gray-300
+                        px-4 py-2 rounded-lg
+                        hover:bg-gray-50 dark:hover:bg-gray-700
+                        transition text-sm font-medium shadow-sm">
+                    
+                    <i id="theme-toggle-light-icon" class="fas fa-sun hidden"></i>
+                    <i id="theme-toggle-dark-icon" class="fas fa-moon hidden"></i>
+                    <span>Switch Theme</span>
+                </button>
+            </div>
         </div>
 
-        {{-- HEADER & FILTER --}}
-        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
-            <div>
-                <h2 class="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white">Performance Dashboard</h2>
-                {{-- Menampilkan Tahun yang sedang dipilih --}}
-                <p class="text-gray-500 dark:text-gray-400 text-sm">Monitoring Penilaian Kinerja Karyawan Tahun {{ $tahun ?? date('Y') }}</p>
-            </div>
-            
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
-                {{-- Toggle Dark Mode --}}
-                <div class="flex justify-end sm:block">
-                    <button id="theme-toggle" class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition h-full">
-                        <i id="theme-toggle-light-icon" class="fas fa-sun hidden"></i>
-                        <i id="theme-toggle-dark-icon" class="fas fa-moon hidden"></i>
-                    </button>
-                </div>
-
-                {{-- FORM FILTER & SEARCH --}}
-                <div class="mb-6 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 w-full">
+        <div class="mb-5 text-center">
+            <h2 class="text-3xl sm:text-2xl font-bold text-gray-800 dark:text-white">Performance Dashboard</h2>
+            {{-- Menampilkan Tahun yang sedang dipilih --}}
+            <p class="text-gray-500 dark:text-gray-400 text-sm">Monitoring Penilaian Kinerja Karyawan Tahun {{ $tahun ?? date('Y') }}</p>
+        </div>
+        {{-- FILTER AREA (CENTERED) --}}
+        <div class="flex justify-center mb-8">
+            <div class="w-full max-w-6xl">
+                
+                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
                     <form method="GET" action="{{ route('kpi.index') }}">
                         
-                        {{-- GRID FILTER DIGANTI DARI 4 KOLOM JADI 5 KOLOM (ATAU SESUAI KEBUTUHAN) --}}
-                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                        <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
                             
-                            {{-- [BARU] 1. FILTER TAHUN --}}
-                            <div class="md:col-span-1">
+                            {{-- 1. TAHUN --}}
+                            <div>
                                 <label class="block text-xs font-bold text-gray-500 mb-1">Tahun</label>
-                                <select name="tahun" class="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600">
+                                <select name="tahun"
+                                    class="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg
+                                        focus:ring-blue-500 focus:border-blue-500
+                                        dark:bg-gray-700 dark:border-gray-600">
                                     @php
                                         $currentYear = date('Y');
-                                        // Pilihan Tahun: Tahun ini + 1 tahun ke depan, mundur 4 tahun ke belakang
-                                        $startYear = $currentYear - 4; 
+                                        $startYear = $currentYear - 4;
                                         $endYear = $currentYear + 1;
                                     @endphp
                                     @for($y = $endYear; $y >= $startYear; $y--)
@@ -66,23 +73,26 @@
                             </div>
 
                             {{-- 2. SEARCH --}}
-                            <div class="md:col-span-1">
-                                <label class="block text-xs font-bold text-gray-500 mb-1">Cari Nama / NIK</label>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1">Nama / NIK</label>
                                 <div class="relative">
-                                    <input type="text" name="search" value="{{ request('search') }}" 
-                                           class="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600" 
-                                           placeholder="Cari karyawan...">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i class="fas fa-search text-gray-400"></i>
-                                    </div>
+                                    <input type="text" name="search" value="{{ request('search') }}"
+                                        class="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg
+                                            focus:ring-blue-500 focus:border-blue-500
+                                            dark:bg-gray-700 dark:border-gray-600"
+                                        placeholder="Cari karyawan...">
+                                    <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
                                 </div>
                             </div>
 
-                            {{-- 3. FILTER JABATAN --}}
-                            <div class="md:col-span-1">
+                            {{-- 3. JABATAN --}}
+                            <div>
                                 <label class="block text-xs font-bold text-gray-500 mb-1">Jabatan</label>
-                                <select name="filter_jabatan" class="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600">
-                                    <option value="">Semua Jabatan</option>
+                                <select name="filter_jabatan"
+                                    class="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg
+                                        focus:ring-blue-500 focus:border-blue-500
+                                        dark:bg-gray-700 dark:border-gray-600">
+                                    <option value="">Semua</option>
                                     @foreach($listJabatan as $jabatan)
                                         <option value="{{ $jabatan }}" {{ request('filter_jabatan') == $jabatan ? 'selected' : '' }}>
                                             {{ $jabatan }}
@@ -91,37 +101,60 @@
                                 </select>
                             </div>
 
-                            {{-- 4. FILTER STATUS KPI --}}
-                            <div class="md:col-span-1">
+                            {{-- 4. STATUS KPI --}}
+                            <div>
                                 <label class="block text-xs font-bold text-gray-500 mb-1">Status KPI</label>
-                                <select name="filter_status" class="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600">
-                                    <option value="">Semua Status</option>
-                                    <option value="DRAFT" {{ request('filter_status') == 'DRAFT' ? 'selected' : '' }}>Draft (Proses)</option>
-                                    <option value="FINAL" {{ request('filter_status') == 'FINAL' ? 'selected' : '' }}>Final (Selesai)</option>
-                                    <option value="BELUM_ADA" {{ request('filter_status') == 'BELUM_ADA' ? 'selected' : '' }}>Belum Ada KPI</option>
+                                <select name="filter_status"
+                                    class="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg
+                                        focus:ring-blue-500 focus:border-blue-500
+                                        dark:bg-gray-700 dark:border-gray-600">
+                                    <option value="">Semua</option>
+                                    <option value="DRAFT" {{ request('filter_status') == 'DRAFT' ? 'selected' : '' }}>Draft</option>
+                                    <option value="FINAL" {{ request('filter_status') == 'FINAL' ? 'selected' : '' }}>Final</option>
+                                    <option value="BELUM_ADA" {{ request('filter_status') == 'BELUM_ADA' ? 'selected' : '' }}>Belum Ada</option>
                                 </select>
                             </div>
 
-                            {{-- 5. TOMBOL ACTION --}}
-                            <div class="md:col-span-1 flex gap-2">
-                                <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition shadow-sm">
+                            {{-- 5. PERUSAHAAN --}}
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1">Perusahaan</label>
+                                <select name="filter_company"
+                                    class="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg
+                                        focus:ring-blue-500 focus:border-blue-500
+                                        dark:bg-gray-700 dark:border-gray-600">
+                                    <option value="">Semua</option>
+                                    @foreach($listCompanies as $company)
+                                        <option value="{{ $company }}" {{ request('filter_company') == $company ? 'selected' : '' }}>
+                                            {{ $company }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            {{-- 6. ACTION --}}
+                            <div class="flex gap-2">
+                                <button type="submit"
+                                    class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold
+                                        py-2 px-4 rounded-lg text-sm transition shadow-sm">
                                     <i class="fas fa-filter mr-1"></i> Terapkan
                                 </button>
-                                
-                                {{-- Tombol Reset --}}
-                                @if(request('search') || request('filter_jabatan') || request('filter_status') || (request('tahun') && request('tahun') != date('Y')))
-                                    <a href="{{ route('kpi.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-600 font-bold py-2 px-3 rounded-lg text-sm transition" title="Reset Filter">
+
+                                @if(request()->query())
+                                    <a href="{{ route('kpi.index') }}"
+                                    class="bg-gray-200 hover:bg-gray-300 text-gray-600
+                                            px-3 py-2 rounded-lg text-sm font-bold flex items-center justify-center">
                                         <i class="fas fa-undo"></i>
                                     </a>
                                 @endif
                             </div>
 
                         </div>
-                        
                     </form>
                 </div>
+
             </div>
         </div>
+
 
         {{-- STATS CARDS (Kode card statistik tetap sama) --}}
         {{-- ... (Bagian card statistik tidak perlu diubah karena datanya ($stats) dikirim dari controller berdasarkan filter tahun ini) ... --}}
@@ -201,6 +234,7 @@
                                 <div>
                                     <div class="font-bold text-gray-200 dark:text-white text-base">{{ $kry->Nama_Lengkap_Sesuai_Ijazah }}</div>
                                     <div class="text-xs text-gray-500">{{ $kry->pekerjaan->first()?->position?->name ?? '-' }}</div>
+                                    <div class="text-xs text-gray-400">{{ $kry->pekerjaan->first()?->company?->name ?? '-' }}</div>
                                     <div class="text-xs text-gray-400 mt-0.5">NIK: {{ $kry->NIK ?? '-' }}</div>
                                 </div>
                                 <div class="text-xs dark:text-white text-gray-400 font-mono">#{{ $index + 1 }}</div>
@@ -276,6 +310,7 @@
                             <th scope="col" class="px-6 py-4 w-16 text-center">No</th>
                             <th scope="col" class="px-6 py-4">Nama Karyawan</th>
                             <th scope="col" class="px-6 py-4">Jabatan</th>
+                            <th scope="col" class="px-6 py-4">Perusahaan</th>
                             <th scope="col" class="px-6 py-4 text-center">Periode</th>
                             <th scope="col" class="px-6 py-4 text-center">Status</th>
                             <th scope="col" class="px-6 py-4 text-center">Skor & Grade</th>
@@ -294,6 +329,7 @@
                                 <div class="font-normal text-gray-500 text-xs">{{ $kry->NIK ?? '-' }}</div>
                             </td>
                             <td class="px-6 py-4">{{ $kry->pekerjaan->first()?->position?->name ?? '-' }}</td>
+                            <td class="px-6 py-4">{{ $kry->pekerjaan->first()?->company?->name ?? '-' }}</td>
                             {{-- Tampilkan Tahun sesuai filter --}}
                             <td class="px-6 py-4 text-center">{{ $tahun }}</td>
                             <td class="px-6 py-4 text-center whitespace-nowrap">
@@ -354,7 +390,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
+                            <td colspan="8" class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
                                 <div class="flex flex-col items-center justify-center">
                                     <i class="fas fa-search text-4xl mb-3 text-gray-300"></i>
                                     <p>Tidak ada data karyawan ditemukan.</p>

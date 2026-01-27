@@ -335,11 +335,11 @@
         <form action="{{ route('kpi.store-item') }}" method="POST">
             @csrf <input type="hidden" name="kpi_assessment_id" value="{{ $kpi->id_kpi_assessment }}">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div><label class="block text-sm font-medium text-gray-700">KRA</label><input type="text" name="key_result_area" class="border p-2 w-full rounded text-sm" required></div>
                 <div><label class="block text-sm font-medium text-gray-700">KPI</label><input type="text" name="key_performance_indicator" class="border p-2 w-full rounded text-sm" required></div>
                 <div><label class="block text-sm font-medium text-gray-700">Bobot (%)</label><input type="number" step="0.01" name="bobot" class="border p-2 w-full rounded text-sm" required></div>
                 <div><label class="block text-sm font-medium text-gray-700">Target</label><input type="text" name="target" class="border p-2 w-full rounded text-sm" required></div>
                 <div><label class="block text-sm font-medium text-gray-700">Perspektif</label><select name="perspektif" class="border p-2 w-full rounded text-sm"><option value="Financial">Financial</option><option value="Customer">Customer</option></select></div>
-                <div><label class="block text-sm font-medium text-gray-700">KRA</label><input type="text" name="key_result_area" class="border p-2 w-full rounded text-sm" required></div>
                 <div><label class="block text-sm font-medium text-gray-700">Units</label><input type="text" name="units" class="border p-2 w-full rounded text-sm" required></div>
                 <div><label class="block text-sm font-medium text-gray-700">Polaritas</label><select name="polaritas" class="border p-2 w-full rounded text-sm"><option value="Maximize">Positif</option><option value="Minimize">Negatif</option></select></div>
             </div>

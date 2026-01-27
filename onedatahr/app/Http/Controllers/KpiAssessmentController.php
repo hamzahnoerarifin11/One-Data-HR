@@ -25,7 +25,7 @@ class KpiAssessmentController extends Controller
         // --- SKENARIO 1: ADMIN & SUPERADMIN (Lihat Semua Data) ---
         if ($user->hasRole(['superadmin', 'admin'])) {
 
-            $query = Karyawan::with(['pekerjaan', 'kpiAssessment' => function ($q) use ($tahun) {
+            $query = Karyawan::with(['pekerjaan.company', 'pekerjaan.position', 'kpiAssessment' => function ($q) use ($tahun) {
                 $q->where('tahun', $tahun);
             }]);
 
@@ -51,6 +51,14 @@ class KpiAssessmentController extends Controller
                     $query->whereHas('kpiAssessment', fn($q) => $q->where('tahun', $tahun)->where('status', $request->filter_status));
                 }
             }
+            // Filter companies
+            if ($request->has('filter_company') && $request->filter_company != '') {
+                $query->whereHas('pekerjaan', function ($q) use ($request) {
+                    $q->whereHas('company', function ($companyQ) use ($request) {
+                        $companyQ->where('name', $request->filter_company);
+                    });
+                });
+            }
 
             // Statistik Sederhana
             $allKaryawan = $query->get(); // Clone query untuk statistik berat, disini pakai simple count saja
@@ -65,9 +73,12 @@ class KpiAssessmentController extends Controller
             // List Jabatan Dropdown
             $listJabatan = \App\Models\Position::distinct()->orderBy('name')->pluck('name');
 
+            // List Companies Dropdown
+            $listCompanies = \App\Models\Company::distinct()->orderBy('name')->pluck('name');
+
             $karyawanList = $query->paginate(10)->appends($request->all());
 
-            return view('pages.kpi.index', compact('karyawanList', 'tahun', 'stats', 'listJabatan'));
+            return view('pages.kpi.index', compact('karyawanList', 'tahun', 'stats', 'listJabatan', 'listCompanies'));
         }
 
         // --- SKENARIO 2: STAFF & MANAGER (Redirect ke Punya Sendiri) ---

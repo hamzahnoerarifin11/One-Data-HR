@@ -36,7 +36,7 @@ class KbiController extends Controller
             ->first();
 
         // D. Logic Daftar Karyawan (Tabel Kanan / Bawahan)
-        $query = Karyawan::query();
+        $query = Karyawan::with(['pekerjaan.position', 'pekerjaan.company']);
 
         // Filter: Jangan tampilkan diri sendiri
         $query->where('id_karyawan', '!=', $karyawan->id_karyawan);
@@ -50,8 +50,10 @@ class KbiController extends Controller
         $jabatanHierarchy = [
             'Direktur' => 1,
             'General Manager' => 2,
+            'General Manajer' => 2,
             'GM' => 2,
             'Manager' => 3,
+            'Manajer' => 3,
             'Supervisor' => 4,
             'Staff' => 5,
             'Officer' => 6,
@@ -114,6 +116,15 @@ class KbiController extends Controller
                 $q->where('Nama_Lengkap_Sesuai_Ijazah', 'LIKE', '%' . $keyword . '%')
                     ->orWhere('Nama_Sesuai_KTP', 'LIKE', '%' . $keyword . '%')
                     ->orWhere('NIK', 'LIKE', '%' . $keyword . '%');
+            });
+        }
+
+        // Filter Company
+        if ($request->has('filter_company') && $request->filter_company != '') {
+            $query->whereHas('pekerjaan', function ($q) use ($request) {
+                $q->whereHas('company', function ($companyQ) use ($request) {
+                    $companyQ->where('name', $request->filter_company);
+                });
             });
         }
 
@@ -183,7 +194,7 @@ class KbiController extends Controller
             // Ambil calon atasan dengan 2 kondisi:
             // 1. Jika level 1-2 (Direktur/GM): Bisa dari divisi manapun
             // 2. Jika level > 2 (Manager+): Hanya dari divisi yang sama
-            $listCalonAtasan = Karyawan::where('id_karyawan', '!=', $karyawan->id_karyawan)
+            $listCalonAtasan = Karyawan::with('pekerjaan.position')->where('id_karyawan', '!=', $karyawan->id_karyawan)
                 ->whereHas('pekerjaan', function ($q) use ($userDivisionId, $higherJabatan, $userLevel) {
                     if (!empty($higherJabatan)) {
                         $q->where(function ($subQ) use ($higherJabatan, $userDivisionId, $userLevel) {
@@ -213,6 +224,9 @@ class KbiController extends Controller
         }
         // -----------------------------------------------------------------------------------------
 
+        // List Companies Dropdown
+        $listCompanies = \App\Models\Company::distinct()->orderBy('name')->pluck('name');
+
         return view('pages.kbi.index', compact(
             'karyawan',
             'selfAssessment',
@@ -222,7 +236,8 @@ class KbiController extends Controller
             'listCalonAtasan',
             'tahun',
             'isGM',
-            'isManager'
+            'isManager',
+            'listCompanies'
         ));
     }
 
