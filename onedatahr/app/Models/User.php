@@ -50,40 +50,35 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    // Perbaiki method check role agar mengecek ke tabel relasi, bukan kolom string
-    public function isAdmin()
-    {
-        return $this->roles->whereIn('name', ['admin', 'superadmin'])->count() > 0;
-    }
-
     public function isStaff()
     {
-        return $this->roles->where('name', 'staff')->count() > 0;
+        // Cek apakah kolom role isinya 'staff' (huruf kecil sesuai database)
+        return $this->roles === 'staff';
+    }
+
+    public function isAdmin()
+    {
+        // Menganggap superadmin dan admin sebagai Admin
+        return in_array($this->roles, ['admin', 'superadmin']);
     }
 
     public function roles()
     {
-        return $this->belongsToMany(Role::class, 'role_user');
+        return $this->belongsToMany(Role::class);
     }
 
-    public function hasRole($roles)
+    // public function hasRole(string|array $role): bool
+    // {
+    //     if (is_string($role)) {
+    //         $role = [$role];
+    //     }
+    //     return $this->roles()->where('name', $role)->exists();
+    // }
+    public function hasRole(string|array $roles): bool
     {
-        // 1. Pastikan input selalu array
-        if (!is_array($roles)) {
+        if (is_string($roles)) {
             $roles = [$roles];
         }
-
-        // 2. Hapus atau komentari bagian "fallback data lama" ini
-        // karena property $this->role bisa mengembalikan string kosong/null
-        // yang mengacaukan in_array
-        /*
-        if ($this->role && in_array($this->role, $roles)) {
-            return true;
-        }
-        */
-
-        // 3. Langsung cek ke relasi tabel role_user
-        // Gunakan whereIn pada query builder untuk performa dan akurasi
         return $this->roles()->whereIn('name', $roles)->exists();
     }
 

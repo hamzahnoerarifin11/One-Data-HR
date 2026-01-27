@@ -9,389 +9,197 @@ use App\Models\KpiItem;
 use App\Models\KpiScore;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon; // Tambahan wajib
-use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\SingleKpiExport; // Jika pakai class export terpisah
+use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class KpiAssessmentController extends Controller
 {
-    // --- 1. INDEX (KODE ASLI ANDA DENGAN FILTER) ---
+    // =================================================================
+    // 1. INDEX: PENGATUR LALU LINTAS (TRAFFIC CONTROL)
+    // =================================================================
     public function index(Request $request)
     {
+        $user = Auth::user();
         $tahun = $request->input('tahun', date('Y'));
-        $search = $request->input('search');
-        $filterJabatan = $request->input('filter_jabatan');
-        $filterStatus  = $request->input('filter_status');
 
-        $query = Karyawan::with(['pekerjaan', 'kpiAssessment' => function($q) use ($tahun) {
-            $q->where('tahun', $tahun);
-        }]);
+        // --- SKENARIO 1: ADMIN & SUPERADMIN (Lihat Semua Data) ---
+        if ($user->hasRole(['superadmin', 'admin'])) {
 
-        // Logika Search
-        if ($search) {
-            $query->where(function($q) use ($search) {
-                $q->where('Nama_Lengkap_Sesuai_Ijazah', 'LIKE', "%{$search}%")
-                  ->orWhereHas('pekerjaan', function($subQ) use ($search) {
-                      $subQ->where('Jabatan', 'LIKE', "%{$search}%");
-                  });
-            });
-        }
+            $query = Karyawan::with(['pekerjaan', 'kpiAssessment' => function ($q) use ($tahun) {
+                $q->where('tahun', $tahun);
+            }]);
 
-        // Logika Filter
-        if ($filterJabatan) {
-            $query->whereHas('pekerjaan', function($q) use ($filterJabatan) {
-                $q->where('jabatan', $filterJabatan);
-            });
-        }
+            // Filter Search
+            if ($request->has('search') && $request->search != '') {
+                $search = $request->search;
+                $query->where('Nama_Lengkap_Sesuai_Ijazah', 'LIKE', "%{$search}%")
+                    ->orWhere('NIK', 'LIKE', "%{$search}%");
+            }
 
-        if ($filterStatus) {
-            if ($filterStatus == 'BELUM_ADA') {
-                $query->whereDoesntHave('kpiAssessment', function($q) use ($tahun) {
-                    $q->where('tahun', $tahun);
-                });
-            } else {
-                $query->whereHas('kpiAssessment', function($q) use ($filterStatus, $tahun) {
-                    $q->where('tahun', $tahun)->where('status', $filterStatus);
+            // Filter Jabatan
+            if ($request->has('filter_jabatan') && $request->filter_jabatan != '') {
+                $query->whereHas('pekerjaan', function ($q) use ($request) {
+                    $q->where('jabatan', $request->filter_jabatan);
                 });
             }
-        }
 
-        // Clone untuk Statistik
-        $queryForStats = $query->clone(); 
-        $allKaryawanForStats = $queryForStats->get(); 
-
-        // Pagination
-        $karyawanList = $query->paginate(10)->appends($request->all());
-
-        // Dropdown Jabatan
-        $listJabatan = DB::table('pekerjaan')
-                        ->select('jabatan')
-                        ->distinct()
-                        ->whereNotNull('jabatan')
-                        ->orderBy('jabatan', 'asc')
-                        ->pluck('jabatan');
-
-        // Hitung Statistik
-        $stats = [
-            'total_karyawan' => $allKaryawanForStats->count(),
-            'sudah_final'    => 0,
-            'draft'          => 0,
-            'belum_ada'      => 0,
-            'rata_rata'      => 0
-        ];
-
-        $totalSkor = 0;
-        $countSkor = 0;
-
-        foreach ($allKaryawanForStats as $kry) {
-            $kpi = $kry->kpiAssessment;
-            if ($kpi) {
-                if (in_array(strtoupper($kpi->status), ['FINAL', 'SELESAI', 'SUBMITTED', 'APPROVED', 'DONE'])) {
-                    $stats['sudah_final']++;
+            // Filter Status
+            if ($request->has('filter_status') && $request->filter_status != '') {
+                if ($request->filter_status == 'BELUM_ADA') {
+                    $query->whereDoesntHave('kpiAssessment', fn($q) => $q->where('tahun', $tahun));
+                } else {
+                    $query->whereHas('kpiAssessment', fn($q) => $q->where('tahun', $tahun)->where('status', $request->filter_status));
                 }
-                else {
-                    $stats['draft']++; 
-                }
-
-                if ($kpi->total_skor_akhir > 0) {
-                    $totalSkor += $kpi->total_skor_akhir;
-                    $countSkor++;
-                }
-            } else {
-                $stats['belum_ada']++; 
             }
+
+            // Statistik Sederhana
+            $allKaryawan = $query->get(); // Clone query untuk statistik berat, disini pakai simple count saja
+            $stats = [
+                'total_karyawan' => $allKaryawan->count(),
+                'sudah_final' => $allKaryawan->filter(fn($k) => $k->kpiAssessment && $k->kpiAssessment->status == 'FINAL')->count(),
+                'draft' => $allKaryawan->filter(fn($k) => $k->kpiAssessment && $k->kpiAssessment->status != 'FINAL')->count(),
+                'belum_ada'  => $allKaryawan->filter(fn($k) => !$k->kpiAssessment)->count(),
+                'rata_rata' => $allKaryawan->filter(fn($k) => $k->kpiAssessment)->avg(fn($k) => $k->kpiAssessment->total_skor_akhir),
+            ];
+
+            // List Jabatan Dropdown
+            $listJabatan = DB::table('pekerjaan')->select('jabatan')->distinct()->whereNotNull('jabatan')->orderBy('jabatan')->pluck('jabatan');
+
+            $karyawanList = $query->paginate(10)->appends($request->all());
+
+            return view('pages.kpi.index', compact('karyawanList', 'tahun', 'stats', 'listJabatan'));
         }
 
-        $stats['rata_rata'] = $countSkor > 0 ? round($totalSkor / $countSkor, 2) : 0;
+        // --- SKENARIO 2: STAFF & MANAGER (Redirect ke Punya Sendiri) ---
 
-        return view('pages.kpi.index', compact('karyawanList', 'tahun', 'stats', 'listJabatan'));
-    }
+        $me = Karyawan::where('nik', $user->nik)->first();
 
-    public function store(Request $request)
-    {
-        // 1. Validasi Input
-        $request->validate([
-            'karyawan_id' => 'required|exists:karyawan,id_karyawan',
-            'tahun'       => 'required|integer'
-        ]);
-
-        // 2. Cek apakah sudah ada KPI untuk karyawan & tahun tersebut
-        $cek = KpiAssessment::where('karyawan_id', $request->karyawan_id)
-                            ->where('tahun', $request->tahun)
-                            ->first();
-
-        // Jika sudah ada, langsung buka (jangan buat baru)
-        if ($cek) {
-            return redirect()->route('kpi.show', ['karyawan_id' => $request->karyawan_id, 'tahun' => $request->tahun])
-                             ->with('info', 'Data KPI untuk tahun ini sudah ada.');
+        if (!$me) {
+            return redirect()->back()->with('error', 'Profil karyawan tidak ditemukan. Hubungi HRD.');
         }
 
-        DB::beginTransaction();
-        try {
-            // 3. Buat Header KPI (Wadah Penilaian)
+        // Cek apakah KPI tahun ini sudah ada?
+        $existingKpi = KpiAssessment::where('karyawan_id', $me->id_karyawan)
+            ->where('tahun', $tahun)
+            ->first();
+
+        if ($existingKpi) {
+            // Jika sudah ada, langsung BUKA (Show)
+            return redirect()->route('kpi.show', [
+                'karyawan_id' => $me->id_karyawan,
+                'tahun' => $tahun
+            ]);
+        } else {
+            // Jika belum ada, BUAT BARU OTOMATIS (Store)
+            // Kita panggil method store manual atau redirect ke route store dengan hidden input
+            // Cara paling aman: Tampilkan view konfirmasi "Buat KPI Baru" atau auto-create di sini.
+
+            // Auto Create Header KPI
             $newKpi = KpiAssessment::create([
-                'karyawan_id'       => $request->karyawan_id,
-                'tahun'             => $request->tahun,
+                'karyawan_id'       => $me->id_karyawan,
+                'tahun'             => $tahun,
                 'periode'           => 'Tahunan',
                 'tanggal_penilaian' => now(),
                 'status'            => 'DRAFT',
                 'total_skor_akhir'  => 0,
-                'penilai_id'        => Auth::id() ?? 1
+                'penilai_id'        => $user->id
             ]);
 
-            // --- BAGIAN TEMPLATE DIHAPUS DISINI ---
-            // Sistem tidak akan membuat KpiItem atau KpiScore apapun secara otomatis.
-            
-            DB::commit();
-
-            // 4. Redirect ke halaman Form dengan pesan sukses
-            return redirect()->route('kpi.show', ['karyawan_id' => $request->karyawan_id, 'tahun' => $request->tahun])
-                             ->with('success', 'Dokumen KPI berhasil dibuat. Silakan tambah indikator kinerja secara manual.');
-
-        } catch (\Exception $e) {
-            DB::rollback();
-            return redirect()->back()->with('error', 'Gagal membuat KPI: ' . $e->getMessage());
+            return redirect()->route('kpi.show', [
+                'karyawan_id' => $me->id_karyawan,
+                'tahun' => $tahun
+            ])->with('success', 'Dokumen KPI Tahun ' . $tahun . ' berhasil dibuat. Silakan isi indikator.');
         }
     }
-      
 
-    // --- 3. SHOW (FIX ERROR $ITEMS) ---
+    // =================================================================
+    // 2. SHOW: HALAMAN UTAMA FORM KPI (DETAIL & EDIT SCORE)
+    // =================================================================
     public function show($karyawanId, $tahun)
     {
         $karyawan = Karyawan::findOrFail($karyawanId);
 
-        $kpi = KpiAssessment::where('karyawan_id', $karyawanId)
-                            ->where('tahun', $tahun)
-                            ->first();
-
-        if (!$kpi) {
-            return redirect()->route('kpi.index')->with('error', 'Data KPI belum dibuat. Silakan klik "Buat" di dashboard.');
-        }
-
-        // [MODIFIKASI] Menambahkan variabel $items dengan pagination untuk View
-        $items = KpiItem::where('kpi_assessment_id', $kpi->id_kpi_assessment)
-                        ->with('scores')
-                        ->paginate(10); // Wajib ada untuk table baru
-
-        // Kirim $items ke view
-        return view('pages.kpi.form', compact('karyawan', 'kpi', 'items'));
-    }
-
-    // --- 4. UPDATE (LOGIKA BARU ADJUSTMENT + SMT 1 & 2) ---
-    public function update(Request $request, $id_kpi_assessment)
-{
-    // 1. Ambil Data Assessment & Eager Load Karyawan (untuk cek atasan nanti)
-    $assessment = KpiAssessment::with('karyawan')->findOrFail($id_kpi_assessment);
-    $inputs = $request->input('kpi');
-
-    if (!$inputs) {
-        return redirect()->back()->with('error', 'Tidak ada data yang dikirim.');
-    }
-
-    DB::beginTransaction();
-    try {
-        // 2. Loop & Update Item/Score (Logika Perhitungan)
-        foreach ($inputs as $itemId => $data) {
-            $item = KpiItem::find($itemId);
-            if (!$item) continue;
-
-            $scoreRecord = KpiScore::where('kpi_item_id', $itemId)->first();
-
-            if ($scoreRecord) {
-                // --- SMT 1 ---
-                $target1 = $this->cleanInput($data['target_smt1'] ?? $item->target);
-                $real1   = $this->cleanInput($data['real_smt1'] ?? 0);
-                
-                $skorMurni1 = $this->hitungSkor($target1, $real1, $item->polaritas);
-                $nilaiSmt1  = ($skorMurni1 * $item->bobot) / 100;
-
-                // Adjustment Smt 1
-                $adjSmt1 = isset($data['adjustment_smt1']) ? $this->cleanInput($data['adjustment_smt1']) : null;
-                $finalSmt1 = ($adjSmt1 !== null && $data['adjustment_smt1'] !== '') ? $adjSmt1 : $nilaiSmt1;
-
-                // --- SMT 2 ---
-                $target2 = $this->cleanInput($data['total_target_smt2'] ?? 0);
-                $real2   = $this->cleanInput($data['total_real_smt2'] ?? 0);
-
-                $skorMurni2 = $this->hitungSkor($target2, $real2, $item->polaritas);
-                $nilaiSmt2  = ($skorMurni2 * $item->bobot) / 100;
-
-                // Adjustment Smt 2
-                $adjSmt2 = isset($data['adjustment_smt2']) ? $this->cleanInput($data['adjustment_smt2']) : null;
-                $finalSmt2 = ($adjSmt2 !== null && $data['adjustment_smt2'] !== '') ? $adjSmt2 : $nilaiSmt2;
-
-                // --- FINAL ---
-                $grandFinal = $finalSmt1 + $finalSmt2;
-
-                // Prepare Update Data
-                $updateData = [
-                    'target_smt1'          => $target1,
-                    'real_smt1'            => $real1,
-                    'adjustment_smt1'      => $adjSmt1,
-                    'adjustment_real_smt1' => $this->cleanInput($data['adjustment_real_smt1'] ?? 0),
-                    'total_target_smt2'    => $target2,
-                    'total_real_smt2'      => $real2,
-                    'adjustment_smt2'      => $adjSmt2,
-                    'adjustment_target_smt2' => $this->cleanInput($data['adjustment_target_smt2'] ?? 0),
-                    'adjustment_real_smt2'   => $this->cleanInput($data['adjustment_real_smt2'] ?? 0),
-                    'target'               => $target1 + $target2,
-                    'realisasi'            => $real1 + $real2,
-                    'skor'                 => ($skorMurni1 + $skorMurni2) / 2, // Rata-rata
-                    'skor_akhir'           => $grandFinal,
-                ];
-
-                // Simpan data bulanan (Target & Real)
-                $months = ['jul','aug','sep','okt','nov','des'];
-                foreach($months as $bln) {
-                    $updateData['target_'.$bln] = $this->cleanInput($data['target_'.$bln] ?? 0);
-                    $updateData['real_'.$bln]   = $this->cleanInput($data['real_'.$bln] ?? 0);
-                }
-
-                $scoreRecord->update($updateData);
+        // Validasi Akses (Cegah Staff A mengintip Staff B)
+        $user = Auth::user();
+        if (!$user->hasRole(['admin', 'superadmin'])) {
+            // Jika bukan admin, pastikan dia melihat punya sendiri atau punya bawahannya
+            $me = Karyawan::where('nik', $user->nik)->first();
+            if ($me->id_karyawan != $karyawanId && $karyawan->atasan_id != $me->id_karyawan) {
+                return abort(403, 'Anda tidak berhak melihat dokumen ini.');
             }
         }
 
-        // 3. Hitung Ulang Total Skor Akhir
-        $totalSkorAkhir = KpiScore::join('kpi_items', 'kpi_scores.kpi_item_id', '=', 'kpi_items.id_kpi_item')
-            ->where('kpi_items.kpi_assessment_id', $id_kpi_assessment)
-            ->sum('kpi_scores.skor_akhir');
+        $kpi = KpiAssessment::where('karyawan_id', $karyawanId)
+            ->where('tahun', $tahun)
+            ->first();
 
-        // 4. [PERBAIKAN UTAMA] Logika Penentuan Status
-        $user = Auth::user();
-        $userKaryawan = Karyawan::where('nik', $user->nik)->first();
-        
-        // Status default (jika staff mengisi sendiri)
-        $statusBaru = 'SUBMITTED'; 
-        $tanggalVerif = null;
-
-        // Cek 1: Jika user adalah ATASAN dari pemilik KPI
-        if ($userKaryawan && $assessment->karyawan->atasan_id == $userKaryawan->id_karyawan) {
-            $statusBaru = 'FINAL';
-            $tanggalVerif = now();
-        }
-        // Cek 2: Jika user adalah ADMIN / SUPERADMIN
-        elseif (in_array($user->role, ['superadmin', 'admin'])) {
-            $statusBaru = 'FINAL';
-            $tanggalVerif = now();
-        }
-        // Cek 3: Jika status sebelumnya sudah FINAL, jangan ubah jadi SUBMITTED lagi (kecuali direset)
-        elseif ($assessment->status == 'FINAL') {
-            $statusBaru = 'FINAL';
-            $tanggalVerif = $assessment->tanggal_verifikasi; // Pertahankan tanggal lama
+        // Jika KPI belum ada, buat baru dengan status DRAFT
+        if (!$kpi) {
+            $kpi = KpiAssessment::create([
+                'karyawan_id' => $karyawanId,
+                'tahun' => $tahun,
+                'periode' => 'Tahunan',
+                'status' => 'DRAFT',
+                'total_skor_akhir' => 0,
+                'nama_periode' => "KPI Tahun {$tahun}",
+            ]);
         }
 
-        // 5. Update Header Assessment
-        $assessment->update([
-            'total_skor_akhir'   => $totalSkorAkhir,
-            'grade'              => $this->determineGrade($totalSkorAkhir),
-            'status'             => $statusBaru,
-            'tanggal_verifikasi' => $tanggalVerif
+        $items = KpiItem::where('kpi_assessment_id', $kpi->id_kpi_assessment)
+            ->with('scores')
+            ->paginate(10); // Pagination untuk item
+
+        return view('pages.kpi.form', compact('karyawan', 'kpi', 'items', 'tahun'));
+    }
+
+
+    // =================================================================
+    // 3. STORE HEADER (Opsional, karena sudah dihandle di Index)
+    // =================================================================
+    public function store(Request $request)
+    {
+        // Method ini dipakai jika Admin membuatkan KPI untuk orang lain
+        $request->validate([
+            'karyawan_id' => 'required',
+            'tahun'       => 'required'
         ]);
 
-        DB::commit();
-
-        // 6. Pesan Feedback yang Dinamis
-        $pesan = ($statusBaru == 'FINAL') 
-            ? 'Data berhasil disimpan dan disetujui (Approved).' 
-            : 'Data berhasil disimpan (Menunggu Approval).';
-
-        return redirect()->back()->with('success', $pesan . ' Skor Akhir: ' . number_format($totalSkorAkhir, 2));
-
-    } catch (\Exception $e) {
-        DB::rollback();
-        return redirect()->back()->withInput()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
-    }
-}
-
-    // --- 5. LOGIKA HITUNG SKOR (UPDATE: YES/NO & CLEAN INPUT) ---
-    // PERBAIKAN: Hanya butuh 3 parameter & Return langsung angka (Float)
-    private function hitungSkor($target, $realisasi, $polaritas)
-    {
-        // Bersihkan input
-        $t = $this->cleanInput($target);
-        $r = $this->cleanInput($realisasi);
-
-        $pencapaian = 0;
-
-        // Logika Perhitungan
-        if ($t != 0) {
-            // Normalisasi polaritas ke huruf kecil agar cocok (Positif/positif/Maximize)
-            $p = strtolower($polaritas); 
-
-            if (str_contains($p, 'max') || str_contains($p, 'pos')) { 
-                // Maximize / Positif
-                $pencapaian = ($r / $t) * 100;
-            } 
-            elseif (str_contains($p, 'min') || str_contains($p, 'neg')) { 
-                // Minimize / Negatif
-                $ratio = $r / $t;
-                $pencapaian = (2 - $ratio) * 100;
-            }
-            elseif (str_contains($p, 'yes') || str_contains($p, 'no')) { 
-                // Yes/No
-                $pencapaian = ($r >= $t) ? 100 : 0;
-            }
-        } else {
-             // Jika Target 0, Realisasi 0 = 100%
-             $pencapaian = ($r == 0) ? 100 : 0;
+        // Cek duplikasi
+        $cek = KpiAssessment::where('karyawan_id', $request->karyawan_id)->where('tahun', $request->tahun)->first();
+        if ($cek) {
+            return redirect()->route('kpi.show', ['karyawan_id' => $request->karyawan_id, 'tahun' => $request->tahun]);
         }
 
-        // Return angka mentah (misal: 120.5), bukan Array
-        return max(0, round($pencapaian, 2)); 
+        KpiAssessment::create([
+            'karyawan_id' => $request->karyawan_id,
+            'tahun' => $request->tahun,
+            'periode' => 'Tahunan',
+            'status' => 'DRAFT',
+            'total_skor_akhir' => 0,
+            'nama_periode' => 'Tahunan',
+        ]);
+
+        return redirect()->route('kpi.show', ['karyawan_id' => $request->karyawan_id, 'tahun' => $request->tahun]);
     }
 
-    // [BARU] HELPER MEMBERSIHKAN INPUT (Hapus % dan ubah koma)
-    private function cleanInput($value)
-    {
-        if (is_null($value)) return 0;
-        $clean = str_replace(['%', ' ', ','], ['', '', '.'], $value);
-        return floatval($clean);
-    }
+    // =================================================================
+    // 4. CRUD ITEM & SCORE (Sangat Penting)
+    // =================================================================
 
-    // --- 6. METHOD LAINNYA (TETAP SAMA) ---
-    public function destroy($id)
-    {
-        $kpi = KpiAssessment::findOrFail($id);
-        foreach($kpi->items as $item) {
-            $item->scores()->delete();
-            $item->delete();
-        }
-        $kpi->delete();
-        return redirect()->back()->with('success', 'Data KPI berhasil dihapus/reset.');
-    }
-
-    public function finalize($id)
-    {
-        $kpi = KpiAssessment::findOrFail($id);
-        if ($kpi->total_skor_akhir == 0) {
-            return redirect()->back()->with('error', 'Tidak bisa finalisasi karena skor masih 0.');
-        }
-        $kpi->update(['status' => 'FINAL']);
-        return redirect()->back()->with('success', 'KPI berhasil difinalisasi!');
-    }
-
-    private function determineGrade($skor)
-    {
-        if ($skor > 89) return 'Great';
-        if ($skor > 79) return 'Good';
-        if ($skor > 69) return 'Average';
-        return 'Need Improvement';
-    }
-
+    // Tambah Indikator Baru
     public function storeItem(Request $request)
     {
         $request->validate([
-            'kpi_assessment_id'         => 'required|exists:kpi_assessments,id_kpi_assessment',
-            'key_performance_indicator' => 'required|string',
+            'kpi_assessment_id'         => 'required',
+            'key_performance_indicator' => 'required',
             'bobot'                     => 'required|numeric',
-            'target'                    => 'required', // Bisa string "100%"
+            'target'                    => 'required',
         ]);
 
-        // Bersihkan target
         $cleanTarget = $this->cleanInput($request->target);
 
-        $newItem = KpiItem::create([
+        // 1. Simpan Item KPI
+        $item = KpiItem::create([
             'kpi_assessment_id'         => $request->kpi_assessment_id,
             'perspektif'                => $request->perspektif,
             'key_result_area'           => $request->key_result_area,
@@ -402,62 +210,264 @@ class KpiAssessmentController extends Controller
             'target'                    => $cleanTarget,
         ]);
 
-        // Create Score
+        // 2. Simpan Score (Disini Error 1364 Muncul)
         KpiScore::create([
-            'kpi_item_id'  => $newItem->id_kpi_item,
-            'nama_periode' => 'Semester 1', // Samakan dengan store()
+            'kpi_item_id'  => $item->id_kpi_item,
             'target'       => $cleanTarget,
             'target_smt1'  => $cleanTarget,
-            'realisasi'    => 0,
+
+            // PERBAIKAN DISINI: Jangan pakai $request->nama_periode
+            'nama_periode' => 'Semester 1', // <--- ISI MANUAL AGAR TIDAK EROR
+
+            'realisasi'    => 0
         ]);
 
-        return redirect()->back()->with('success', 'Indikator KPI berhasil ditambahkan!');
+        return redirect()->back()->with('success', 'Indikator berhasil ditambahkan');
     }
 
+    // Update Nilai / Realisasi (Dipanggil saat tombol Simpan di form ditekan)
+    public function update(Request $request, $id_kpi_assessment)
+    {
+        $assessment = KpiAssessment::with('karyawan')->findOrFail($id_kpi_assessment);
+        $inputs = $request->input('kpi'); // Array dari form
+
+        if (!$inputs) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Tidak ada data dikirim.']);
+            }
+            return redirect()->back()->with('error', 'Tidak ada data dikirim.');
+        }
+
+        DB::beginTransaction();
+        try {
+            foreach ($inputs as $itemId => $data) {
+
+                $item = KpiItem::find($itemId);
+                if (!$item) continue;
+
+                $score = KpiScore::where('kpi_item_id', $itemId)->first();
+
+                if ($score) {
+                    // ====================================================
+                    // 1. AMBIL SEMUA INPUT (BERSIHKAN DARI KOMA/PERSEN)
+                    // ====================================================
+
+                    // --- Semester 1 ---
+                    $target1 = $this->cleanInput($data['target_smt1'] ?? $item->target);
+                    $real1   = $this->cleanInput($data['real_smt1'] ?? 0);
+                    // Tangkap Adjustment Smt 1
+                    $adjReal1 = isset($data['adjustment_real_smt1']) ? $this->cleanInput($data['adjustment_real_smt1']) : null;
+
+                    // --- Bulanan (Juli - Desember) ---
+                    // WAJIB DITANGKAP AGAR TIDAK HILANG
+                    $t_jul = $this->cleanInput($data['target_jul'] ?? 0);
+                    $r_jul = $this->cleanInput($data['real_jul'] ?? 0);
+                    $t_aug = $this->cleanInput($data['target_aug'] ?? 0);
+                    $r_aug = $this->cleanInput($data['real_aug'] ?? 0);
+                    $t_sep = $this->cleanInput($data['target_sep'] ?? 0);
+                    $r_sep = $this->cleanInput($data['real_sep'] ?? 0);
+                    $t_okt = $this->cleanInput($data['target_okt'] ?? 0);
+                    $r_okt = $this->cleanInput($data['real_okt'] ?? 0);
+                    $t_nov = $this->cleanInput($data['target_nov'] ?? 0);
+                    $r_nov = $this->cleanInput($data['real_nov'] ?? 0);
+                    $t_des = $this->cleanInput($data['target_des'] ?? 0);
+                    $r_des = $this->cleanInput($data['real_des'] ?? 0);
+
+                    // --- Semester 2 (Manual) ---
+                    $target2 = $this->cleanInput($data['total_target_smt2'] ?? 0);
+                    $real2   = $this->cleanInput($data['total_real_smt2'] ?? 0);
+                    // Tangkap Adjustment Smt 2
+                    $adjReal2   = isset($data['adjustment_real_smt2']) ? $this->cleanInput($data['adjustment_real_smt2']) : null;
+                    $adjTarget2 = isset($data['adjustment_target_smt2']) ? $this->cleanInput($data['adjustment_target_smt2']) : null;
+
+                    // ====================================================
+                    // 2. HITUNG SKOR DI BACKEND (LOGIKA PENILAIAN)
+                    // ====================================================
+
+                    // --- Hitung SMT 1 ---
+                    // Gunakan Adjustment Real jika ada, jika tidak pakai Real biasa
+                    $real1Final = ($adjReal1 !== null && $data['adjustment_real_smt1'] !== "") ? $adjReal1 : $real1;
+                    $skor1      = $this->hitungSkor($target1, $real1Final, $item->polaritas);
+
+                    // --- Hitung SMT 2 ---
+                    // Gunakan Adjustment Target/Real jika ada
+                    $target2Final = ($adjTarget2 !== null && $data['adjustment_target_smt2'] !== "") ? $adjTarget2 : $target2;
+                    $real2Final   = ($adjReal2 !== null && $data['adjustment_real_smt2'] !== "") ? $adjReal2 : $real2;
+                    $skor2        = $this->hitungSkor($target2Final, $real2Final, $item->polaritas);
+
+                    // --- Final Score Item ---
+                    $pencapaianTotal = ($skor1 + $skor2) / 2;
+                    $finalSkorItem   = ($pencapaianTotal * $item->bobot) / 100;
+
+                    // ====================================================
+                    // 3. SIMPAN KE DATABASE (UPDATE LENGKAP)
+                    // ====================================================
+                    $score->update([
+                        // Data Semester 1
+                        'target_smt1' => $target1,
+                        'real_smt1'   => $real1,
+                        'adjustment_real_smt1' => $adjReal1, // <--- Jangan Lupa Disimpan
+
+                        // Data Bulanan (AGAR TIDAK HILANG)
+                        'target_jul' => $t_jul,
+                        'real_jul' => $r_jul,
+                        'target_aug' => $t_aug,
+                        'real_aug' => $r_aug,
+                        'target_sep' => $t_sep,
+                        'real_sep' => $r_sep,
+                        'target_okt' => $t_okt,
+                        'real_okt' => $r_okt,
+                        'target_nov' => $t_nov,
+                        'real_nov' => $r_nov,
+                        'target_des' => $t_des,
+                        'real_des' => $r_des,
+
+                        // Data Semester 2
+                        'total_target_smt2' => $target2,
+                        'total_real_smt2'   => $real2,
+                        'adjustment_target_smt2' => $adjTarget2, // <--- Jangan Lupa Disimpan
+                        'adjustment_real_smt2'   => $adjReal2,   // <--- Jangan Lupa Disimpan
+
+                        // Skor Akhir
+                        'skor_akhir' => $finalSkorItem
+                    ]);
+                }
+            }
+
+            // Hitung Total Header
+            $grandTotal = KpiScore::join('kpi_items', 'kpi_scores.kpi_item_id', '=', 'kpi_items.id_kpi_item')
+                ->where('kpi_items.kpi_assessment_id', $id_kpi_assessment)
+                ->sum('kpi_scores.skor_akhir');
+
+            $user = Auth::user();
+            $statusSekarang = $assessment->status;
+            $statusBaru = $statusSekarang; // Default tidak berubah
+
+            // SKENARIO 1: STAFF (Pemilik KPI) KLIK SIMPAN
+            // Jika yang login adalah Staff, otomatis jadi "SUBMITTED" (Menunggu Approval)
+            if ($user->hasRole('staff')) {
+                $statusBaru = 'SUBMITTED';
+            }
+
+            // SKENARIO 2: MANAGER / ADMIN KLIK SIMPAN
+            // Jika Manager/Admin yang simpan, otomatis jadi "FINAL" (Approved)
+            elseif ($user->hasRole(['manager', 'admin', 'superadmin'])) {
+                $statusBaru = 'FINAL';
+            }
+
+            // Update Header KPI
+            $assessment->update([
+                'total_skor_akhir' => $grandTotal,
+                'grade'            => $this->determineGrade($grandTotal),
+                'status'           => $statusBaru, // <--- PENTING: UPDATE STATUS DISINI
+            ]);
+
+            DB::commit();
+
+            // Pesan Feedback Disesuaikan
+            $pesan = ($statusBaru == 'FINAL') ? 'Data disetujui & difinalisasi.' : 'Data berhasil dikirim ke Atasan.';
+
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => $pesan . ' Skor Akhir: ' . number_format($grandTotal, 2)]);
+            }
+
+            return redirect()->back()->with('success', $pesan . ' Skor Akhir: ' . number_format($grandTotal, 2));
+        } catch (\Exception $e) {
+            DB::rollback();
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Gagal menyimpan: ' . $e->getMessage()]);
+            }
+            return redirect()->back()->with('error', 'Gagal menyimpan: ' . $e->getMessage());
+        }
+    }
+
+    // =================================================================
+    // 5. HELPER FUNCTION
+    // =================================================================
+
+    private function cleanInput($value)
+    {
+        if (is_null($value)) return 0;
+        return floatval(str_replace(['%', ','], ['', '.'], $value));
+    }
+
+    private function hitungSkor($target, $realisasi, $polaritas)
+    {
+        $t = $this->cleanInput($target);
+        $r = $this->cleanInput($realisasi);
+
+        if ($t == 0) return 0;
+
+        $p = strtolower($polaritas);
+        if (str_contains($p, 'min')) {
+            // Minimize: Makin kecil makin bagus
+            return ($t / ($r == 0 ? 1 : $r)) * 100; // Rumus sederhana minimize
+        } else {
+            // Maximize: Makin besar makin bagus
+            return ($r / $t) * 100;
+        }
+    }
+
+    private function determineGrade($skor)
+    {
+        if ($skor > 90) return 'Great';
+        if ($skor > 80) return 'Good';
+        if ($skor > 70) return 'Standard';
+        return 'Low';
+    }
+
+    // =================================================================
+    // 6. UPDATE ITEM & DELETE ITEM (INI YANG HILANG)
+    // =================================================================
+
+    // Hapus Item KPI
     public function destroyItem($id)
     {
         $item = KpiItem::findOrFail($id);
+
+        // Hapus skor terkait dulu agar bersih
+        KpiScore::where('kpi_item_id', $id)->delete();
+
+        // Hapus itemnya
         $item->delete();
-        return redirect()->back()->with('success', 'Item KPI berhasil dihapus.');
+
+        return redirect()->back()->with('success', 'Indikator KPI berhasil dihapus.');
     }
 
+    // Update Item KPI (Edit via Modal)
     public function updateItem(Request $request, $id)
     {
-        // 1. Validasi (Target boleh string karena bisa %)
+        // 1. Validasi
         $request->validate([
             'key_performance_indicator' => 'required|string',
             'bobot'                     => 'required|numeric',
-            'target'                    => 'required', 
+            'target'                    => 'required',
         ]);
 
         $item = KpiItem::findOrFail($id);
-        
-        // 2. Bersihkan Input Target (Hapus % dan ubah koma)
-        // Pastikan method cleanInput() sudah ada di controller Anda
+
+        // 2. Bersihkan Input Target
         $cleanTarget = $this->cleanInput($request->target);
 
         // 3. Update Master Item
         $item->update([
             'perspektif'                => $request->perspektif,
-            'key_result_area'           => $request->key_result_area,
-            'key_performance_indicator' => $request->key_performance_indicator,
+            'key_result_area'           => $request->key_result_area, // atau 'kra' sesuaikan database
+            'key_performance_indicator' => $request->key_performance_indicator, // atau 'indikator'
             'units'                     => $request->units,
             'polaritas'                 => $request->polaritas,
             'bobot'                     => $request->bobot,
             'target'                    => $cleanTarget,
         ]);
 
-        // 4. PENTING: Update juga Tabel Score agar Form Input berubah
+        // 4. Update Tabel Score juga (agar Target di tabel berubah)
         $score = KpiScore::where('kpi_item_id', $id)->first();
-        
-        if($score) {
+
+        if ($score) {
             $score->update([
                 'target'      => $cleanTarget,
-                
-                // Update Target Semester 1
                 'target_smt1' => $cleanTarget,
-                
-                // Update Target Bulanan (Reset ke target baru)
+                // Reset target bulanan ke target baru
                 'target_jul'  => $cleanTarget,
                 'target_aug'  => $cleanTarget,
                 'target_sep'  => $cleanTarget,
@@ -470,49 +480,81 @@ class KpiAssessmentController extends Controller
         return redirect()->back()->with('success', 'KPI berhasil diperbarui!');
     }
 
+    // =================================================================
+    // 6. EXPORT FUNCTIONS
+    // =================================================================
+
     public function exportExcel(Request $request)
     {
-        // Validasi input
-        $request->validate([
-            'karyawan_id' => 'required|exists:karyawan,id_karyawan',
-            'tahun'       => 'required|integer'
-        ]);
+        $karyawanId = $request->get('karyawan_id');
+        $tahun = $request->get('tahun');
 
-        // Opsional: Cek apakah data KPI ada
-        $cek = KpiAssessment::where('karyawan_id', $request->karyawan_id)
-                            ->where('tahun', $request->tahun)
-                            ->first();
-
-        if (!$cek) {
-            return redirect()->back()->with('error', 'Data KPI tidak ditemukan untuk diexport.');
+        if (!$karyawanId || !$tahun) {
+            return redirect()->back()->with('error', 'Parameter karyawan_id dan tahun diperlukan.');
         }
 
-        // Panggil class Export (Cara paling rapi)
-        return Excel::download(new SingleKpiExport($request->karyawan_id, $request->tahun), 'KPI-'.$request->tahun.'.xlsx');
-    }
-
-    // --- TAMBAHAN: EXPORT PDF ---
-    public function exportPdf(Request $request)
-    {
-        $karyawanId = $request->input('karyawan_id');
-        $tahun = $request->input('tahun');
-
-        // Ambil data yang sama persis dengan method SHOW
         $karyawan = Karyawan::findOrFail($karyawanId);
         $kpi = KpiAssessment::where('karyawan_id', $karyawanId)
-                            ->where('tahun', $tahun)
-                            ->firstOrFail();
-        
-        $items = KpiItem::where('kpi_assessment_id', $kpi->id_kpi_assessment)
-                        ->with('scores')
-                        ->get(); // Gunakan get() bukan paginate() untuk PDF
+            ->where('tahun', $tahun)
+            ->first();
 
-        // Load View PDF (Anda perlu buat file view baru: pages.kpi.pdf)
-        $pdf = Pdf::loadView('pages.kpi.pdf', compact('karyawan', 'kpi', 'items'));
-        
-        // Atur orientasi landscape karena tabel KPI lebar
-        $pdf->setPaper('a4', 'landscape');
+        if (!$kpi) {
+            return redirect()->back()->with('error', 'Data KPI tidak ditemukan.');
+        }
 
-        return $pdf->download('KPI-'.$karyawan->Nama_Lengkap_Sesuai_Ijazah.'-'.$tahun.'.pdf');
-    } 
+        return \App\Exports\SingleKpiExport::download($kpi->id_kpi_assessment);
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $karyawanId = $request->get('karyawan_id');
+        $tahun = $request->get('tahun');
+
+        if (!$karyawanId || !$tahun) {
+            return redirect()->back()->with('error', 'Parameter karyawan_id dan tahun diperlukan.');
+        }
+
+        $karyawan = Karyawan::findOrFail($karyawanId);
+        $kpi = KpiAssessment::where('karyawan_id', $karyawanId)
+            ->where('tahun', $tahun)
+            ->with(['items.scores'])
+            ->first();
+
+        if (!$kpi) {
+            return redirect()->back()->with('error', 'Data KPI tidak ditemukan.');
+        }
+
+        $items = $kpi->items ?? collect(); // Pastikan items selalu ada, meskipun kosong
+
+        $filename = "KPI_{$karyawan->NIK}_{$tahun}.pdf";
+
+        $pdf = Pdf::loadView('pages.kpi.pdf', compact('karyawan', 'kpi', 'items', 'tahun'))->setPaper('a4', 'landscape');
+
+        return $pdf->download($filename);
+    }
+
+    // =================================================================
+    // DESTROY: Hapus KPI Assessment
+    // =================================================================
+    public function destroy($id)
+    {
+        try {
+            $kpi = KpiAssessment::findOrFail($id);
+
+            // Hapus scores terkait
+            KpiScore::whereHas('item', function ($query) use ($kpi) {
+                $query->where('kpi_assessment_id', $kpi->id_kpi_assessment);
+            })->delete();
+
+            // Hapus items terkait
+            KpiItem::where('kpi_assessment_id', $kpi->id_kpi_assessment)->delete();
+
+            // Hapus assessment utama
+            $kpi->delete();
+
+            return redirect()->back()->with('success', 'Data KPI berhasil dihapus.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal menghapus data KPI: ' . $e->getMessage());
+        }
+    }
 }

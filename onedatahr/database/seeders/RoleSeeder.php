@@ -16,6 +16,7 @@ class RoleSeeder extends Seeder
             'superadmin',
             'admin',
             'manager',
+            'gm',
             'staff',
             'ketua_tempa',
         ];
@@ -24,5 +25,4 @@ class RoleSeeder extends Seeder
             \App\Models\Role::firstOrCreate(['name' => $role]);
         }
     }
-
 }

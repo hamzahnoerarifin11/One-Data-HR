@@ -8,6 +8,8 @@ use App\Models\KpiAssessment;
 use App\Models\Pekerjaan;
 use App\Models\User;
 use App\Models\KbiAssessment;
+use App\Models\Position;
+
 
 class Karyawan extends Model
 {
@@ -20,19 +22,26 @@ class Karyawan extends Model
 
     // Gunakan guarded kosong agar semua kolom bisa diisi (lebih praktis)
     // protected $fillable = [ ... ]; // Ini bisa dihapus jika sudah pakai guarded
-    protected $guarded = []; 
+    protected $guarded = [];
 
     // =========================================================
     // PERBAIKAN UTAMA: RELASI KE PEKERJAAN (JABATAN)
     // =========================================================
-    
-    // Karena di tabel 'pekerjaan' ada kolom 'id_karyawan', 
-    // kita pakai hasOne (untuk mengambil 1 jabatan aktif).
+
+    // Karena di tabel 'pekerjaan' ada kolom 'id_karyawan',
+    // kita pakai hasMany untuk history pekerjaan
     public function pekerjaan()
     {
         // hasOne(ModelTujuan, 'Foreign_Key_di_Tabel_Tujuan', 'Local_Key_di_Sini')
+        return $this->hasMany(Pekerjaan::class, 'id_karyawan', 'id_karyawan')
+            ->latest('id_pekerjaan'); // Opsional: Ambil yang paling baru diinput
+    }
+
+    // Ambil pekerjaan terkini/terbaru saja (single record)
+    public function pekerjaanTerkini()
+    {
         return $this->hasOne(Pekerjaan::class, 'id_karyawan', 'id_karyawan')
-                    ->latest('id_pekerjaan'); // Opsional: Ambil yang paling baru diinput
+            ->latest('id_pekerjaan');
     }
 
     // =========================================================
@@ -74,7 +83,7 @@ class Karyawan extends Model
         return $this->hasOne(KpiAssessment::class, 'karyawan_id', 'id_karyawan');
     }
     /**
-     * Relasi ke KBI (Key Behavior Indicator / Perilaku)  
+     * Relasi ke KBI (Key Behavior Indicator / Perilaku)
      * Satu karyawan punya banyak history penilaian perilaku
      */
     public function kbiAssessment()
@@ -99,7 +108,11 @@ class Karyawan extends Model
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    
+    public function positions()
+    {
+        return $this->belongsTo(Position::class, 'position_id', 'id');
+    }
+
     // Konversi kolom created_at dan updated_at ke format DateTime
     protected $casts = [
         'created_at' => 'datetime',

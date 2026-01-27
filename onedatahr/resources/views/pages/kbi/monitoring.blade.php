@@ -50,7 +50,7 @@
                     <select name="jabatan" class="w-full text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-colors">
                         <option value="">- Semua Jabatan -</option>
                         @foreach($listJabatan as $jab)
-                            <option value="{{ $jab }}" {{ request('jabatan') == $jab ? 'selected' : '' }}>
+                            <option value="{{ $jab }}" {{ request('Jabatan') == $jab ? 'selected' : '' }}>
                                 {{ $jab }}
                             </option>
                         @endforeach
@@ -73,7 +73,7 @@
                         <i class="fas fa-filter mr-1"></i> Filter
                     </button>
                     @if(request()->hasAny(['search', 'jabatan', 'status']) || (request('tahun') && request('tahun') != date('Y')))
-                        <a href="{{ route('kbi.monitoring') }}" class="bg-gray-800 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 font-bold py-2 px-3 rounded-lg text-sm transition flex items-center justify-center" title="Reset Filter">
+                        <a href="{{ route('kbi.monitoring') }}" class="bg-gray-300 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-300 font-bold py-2 px-3 rounded-lg text-sm transition flex items-center justify-center" title="Reset Filter">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                             </svg>
@@ -136,7 +136,7 @@
                         </td>
                         <td class="px-6 py-4">
                             <div class="text-gray-700 dark:text-gray-300 text-xs font-semibold bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded inline-block border border-gray-200 dark:border-gray-600">
-                                {{ $kry->pekerjaan->Jabatan ?? '-' }}
+                                {{ $kry->pekerjaan->first()?->Jabatan ?? '-' }}
                             </div>
                             <div class="text-xs text-gray-400 dark:text-gray-500 mt-1">
                                 Atasan: <span class="text-gray-600 dark:text-gray-300">{{ $kry->atasan->Nama_Lengkap_Sesuai_Ijazah ?? 'Tidak Ada' }}</span>

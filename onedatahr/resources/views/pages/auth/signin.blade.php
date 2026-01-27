@@ -1,16 +1,16 @@
 @extends('layouts.fullscreen-layout')
 
 @section('content')
-    <div class="relative z-1 min-h-screen bg-gradient-to-br from-brand-600 via-brand-500 to-brand-400">
+    <div class="relative z-1 min-h-screen bg-black">
         <div class="relative min-h-screen flex items-center justify-center p-6">
             <!-- Form -->
-            <div class="w-full max-w-md">
+            <div class="w-full max-w-md border-amber-50">
                 <div class="mx-auto w-full max-w-md">
-                <div class="relative bg-white/95 dark:bg-gray-900/95 rounded-2xl shadow-xl p-6 sm:p-8">
+                <div class="relative bg-white/95 dark:border dark:bg-gray-900/95 rounded-2xl shadow-xl p-6 sm:p-8">
                     <div>
                         <div class="mb-6 text-center">
                             <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-brand-600 dark:text-white shadow-md">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 dark:text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                     <path d="M3 21V3h13v18" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                                     <path d="M16 7h4v14" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                                     <circle cx="8.5" cy="13.5" r=".5" class="" />
@@ -65,6 +65,14 @@
                             </div>
                             <form method="POST" action="{{ route('signin.post') }}" class="bg-transparent p-0">
                                 @csrf
+
+                                <!-- ERROR ALERT -->
+                                @if(session('error'))
+                                    <div class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-red-800 dark:border-red-900 dark:bg-red-900/20 dark:text-red-400">
+                                        {{ session('error') }}
+                                    </div>
+                                @endif
+
                                 <div class="space-y-5">
                                     <!-- Email -->
                                     <div>

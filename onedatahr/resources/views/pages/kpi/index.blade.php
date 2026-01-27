@@ -200,7 +200,7 @@
                             <div class="flex justify-between items-start mb-3">
                                 <div>
                                     <div class="font-bold text-gray-200 dark:text-white text-base">{{ $kry->Nama_Lengkap_Sesuai_Ijazah }}</div>
-                                    <div class="text-xs text-gray-500">{{ $kry->pekerjaan->Jabatan ?? '-' }}</div>
+                                    <div class="text-xs text-gray-500">{{ $kry->pekerjaan->first()?->Jabatan ?? '-' }}</div>
                                     <div class="text-xs text-gray-400 mt-0.5">NIK: {{ $kry->NIK ?? '-' }}</div>
                                 </div>
                                 <div class="text-xs dark:text-white text-gray-400 font-mono">#{{ $index + 1 }}</div>
@@ -293,7 +293,7 @@
                                 <div class="text-base font-semibold">{{ $kry->Nama_Lengkap_Sesuai_Ijazah }}</div>
                                 <div class="font-normal text-gray-500 text-xs">{{ $kry->NIK ?? '-' }}</div>
                             </td>
-                            <td class="px-6 py-4">{{ $kry->pekerjaan->Jabatan ?? '-' }}</td>
+                            <td class="px-6 py-4">{{ $kry->pekerjaan->first()?->Jabatan ?? '-' }}</td>
                             {{-- Tampilkan Tahun sesuai filter --}}
                             <td class="px-6 py-4 text-center">{{ $tahun }}</td>
                             <td class="px-6 py-4 text-center whitespace-nowrap">

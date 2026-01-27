@@ -4,21 +4,29 @@
 <div class="p-4 sm:p-8 max-w-5xl mx-auto space-y-6">
 
     {{-- Welcome Banner --}}
-    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg">
+    <div class="bg-linear-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-black dark:text-white shadow-lg dark:from-blue-500 dark:to-indigo-500">
         <h1 class="text-2xl font-bold">Halo, {{ $karyawan->Nama_Lengkap_Sesuai_Ijazah }}! 👋</h1>
         <p class="opacity-90 mt-1">Selamat datang di Dashboard Kinerja. Berikut adalah status penilaian Anda untuk tahun <strong>{{ $tahun }}</strong>.</p>
     </div>
 
     {{-- Filter Tahun (Opsional, jika ingin lihat history) --}}
-    <div class="flex justify-end">
-        <form method="GET">
-            <select name="tahun" onchange="this.form.submit()" class="border-gray-300 rounded-lg text-sm shadow-sm">
-                @for($y = date('Y'); $y >= date('Y')-2; $y--)
-                    <option value="{{ $y }}" {{ $tahun == $y ? 'selected' : '' }}>Tahun {{ $y }}</option>
-                @endfor
-            </select>
-        </form>
-    </div>
+    <form method="GET" class="flex justify-end">
+        <div class="flex flex-col items-end gap-1">
+            <div class="flex items-center gap-2">
+                <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    <i class="fas fa-calendar-alt mr-1 text-blue-600"></i>Pilih Tahun:
+                </label>
+                <select name="tahun" onchange="this.form.submit()" class="px-3 py-2 border border-blue-300 dark:border-blue-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm">
+                    @for($y = date('Y'); $y >= date('Y')-5; $y--)
+                        <option value="{{ $y }}" {{ $tahun == $y ? 'selected' : '' }}>Tahun {{ $y }}</option>
+                    @endfor
+                </select>
+            </div>
+            <p class="text-xs text-gray-600 dark:text-gray-400 italic">
+                Menampilkan tahun <strong class="text-blue-600 dark:text-blue-400">{{ $tahun }}</strong>
+            </p>
+        </div>
+    </form>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         
@@ -88,7 +96,7 @@
                 @else
                     <div class="text-center py-6">
                         <p class="text-gray-500 mb-4">Silakan isi penilaian perilaku diri sendiri (Self Assessment).</p>
-                        <a href="#" class="inline-block bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-lg shadow transition">
+                        <a href="{{ route('kbi.index') }}" class="inline-block bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-lg shadow transition">
                             Mulai Penilaian Diri
                         </a>
                     </div>

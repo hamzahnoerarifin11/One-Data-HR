@@ -80,7 +80,7 @@
         </tr>
         <tr>
             <td><strong>Jabatan</strong></td>
-            <td>: {{ $karyawan->pekerjaan->jabatan ?? '-' }}</td>
+            <td>: {{ $karyawan->pekerjaan->first()?->jabatan ?? '-' }}</td>
             <td><strong>Status KPI</strong></td>
             <td>: {{ strtoupper($kpi->status) }}</td>
         </tr>
@@ -92,17 +92,17 @@
             <tr>
                 <th width="5%">No</th>
                 <th width="35%">Indikator Kinerja (KPI)</th>
+                <th width="15%">KRA</th>
                 <th width="10%">Bobot</th>
                 <th width="10%">Target</th>
                 <th width="15%">Realisasi (Total)</th>
                 <th width="10%">Skor Akhir</th>
-                <th width="15%">Ket</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($items as $index => $item)
-            @php 
-                $score = $item->scores->first(); 
+            @forelse($items as $index => $item)
+            @php
+                $score = $item->scores->first();
                 // Hitung total realisasi (Smt1 + Smt2) untuk tampilan report
                 $totalRealisasi = 0;
                 if($score) {
@@ -114,7 +114,10 @@
                 <td class="text-left">
                     <b>{{ $item->key_performance_indicator }}</b><br>
                     <span style="font-size: 8pt; color: #555;">Perspektif: {{ $item->perspektif }}</span>
+                    ||
+                    <span style="font-size: 8pt; color: #555;">Polaritas: {{ $item->polaritas }}</span>
                 </td>
+                <td>{{ $item->key_result_area }}</td>
                 <td>{{ $item->bobot }}%</td>
                 <td>{{ $item->target }} {{ $item->units }}</td>
                 <td>
@@ -123,20 +126,23 @@
                 <td style="font-weight: bold;">
                     {{ $score ? number_format($score->skor_akhir, 2) : '0.00' }}
                 </td>
-                <td>{{ $item->polaritas }}</td>
             </tr>
-            @endforeach
+            @empty
+            <tr>
+                <td colspan="7" style="text-align: center; font-style: italic; color: #666;">
+                    Belum ada indikator KPI yang ditambahkan
+                </td>
+            </tr>
+            @endforelse
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="5" style="text-align: right; padding-right: 10px;"><strong>TOTAL SKOR AKHIR</strong></td>
+                <td colspan="6" style="text-align: right; padding-right: 10px;"><strong>TOTAL SKOR AKHIR</strong></td>
                 <td style="background-color: #eee;"><strong>{{ number_format($kpi->total_skor_akhir, 2) }}</strong></td>
-                <td></td>
             </tr>
             <tr>
-                <td colspan="5" style="text-align: right; padding-right: 10px;"><strong>GRADE / PREDIKAT</strong></td>
+                <td colspan="6" style="text-align: right; padding-right: 10px;"><strong>GRADE / PREDIKAT</strong></td>
                 <td><strong>{{ $kpi->grade }}</strong></td>
-                <td></td>
             </tr>
         </tfoot>
     </table>
@@ -157,7 +163,7 @@
                 Disetujui Oleh,<br>
                 (Atasan Langsung)
                 <div class="sign-space"></div>
-                <u>_______________________</u>
+                <u>{{ $karyawan->atasan->Nama_Lengkap_Sesuai_Ijazah ?? '-' }}</u>
             </td>
         </tr>
     </table>

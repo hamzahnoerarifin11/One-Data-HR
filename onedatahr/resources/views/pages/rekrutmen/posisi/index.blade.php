@@ -256,6 +256,14 @@ function posisiTable() {
         sortAsc: true,
 
         resetPage() { this.page = 1; },
+        get startItem() {
+            if (this.filtered.length === 0) return 0;
+            return (this.page - 1) * this.perPage + 1;
+        },
+
+        get endItem() {
+            return Math.min(this.page * this.perPage, this.filtered.length);
+        },
 
         get filtered() {
             let filtered = this.data.filter(d =>

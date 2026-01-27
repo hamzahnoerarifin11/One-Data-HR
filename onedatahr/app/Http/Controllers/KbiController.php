@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\KbiAssessment; 
-use App\Models\Karyawan;      
+use App\Models\KbiAssessment;
+use App\Models\Karyawan;
+use App\Models\Position;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -16,7 +17,7 @@ class KbiController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $tahun = date('Y');
+        $tahun = $request->input('tahun', date('Y'));
 
         // A. Validasi NIK User Login
         if (empty($user->nik)) {
@@ -24,48 +25,99 @@ class KbiController extends Controller
         }
 
         // B. Cari Data Karyawan (Diri Sendiri)
-        $karyawan = Karyawan::with('atasan')->where('nik', $user->nik)->first();
+        $karyawan = Karyawan::with(['atasan', 'pekerjaan'])->where('nik', $user->nik)->first();
         if (!$karyawan) {
             return redirect()->back()->with('error', 'Data Karyawan tidak ditemukan.');
         }
 
-        // C. Cek Penilaian Diri Sendiri (Variabel yang tadi Error)
+        // C. Cek Penilaian Diri Sendiri
         $selfAssessment = KbiAssessment::where('karyawan_id', $karyawan->id_karyawan)
             ->where('tipe_penilai', 'DIRI_SENDIRI')
             ->where('tahun', $tahun)
             ->first();
 
-        // D. Logic Daftar Karyawan (Tabel Kanan)
+        // D. Logic Daftar Karyawan (Tabel Kanan / Bawahan)
         $query = Karyawan::query();
-        
-        // Filter: Jangan tampilkan diri sendiri di tabel
+
+        // Filter: Jangan tampilkan diri sendiri
         $query->where('id_karyawan', '!=', $karyawan->id_karyawan);
 
-        // Filter Search
+        // --- [LOGIC BARU: FILTER KHUSUS MANAGER/GM] ---
+        // Cek Jabatan User Login
+        $userJabatan = $karyawan->pekerjaan->first()?->position->name;
+        $userDivisionId = $karyawan->pekerjaan->first()?->division_id;
+
+        // Tentukan level jabatan user
+        $jabatanHierarchy = [
+            'Direktur' => 1,
+            'General Manager' => 2,
+            'GM' => 2,
+            'Manager' => 3,
+            'Supervisor' => 4,
+            'Staff' => 5,
+            'Officer' => 6,
+            'Assistant' => 7,
+        ];
+        $userLevel = 99;
+        foreach ($jabatanHierarchy as $key => $level) {
+            if (stripos($userJabatan, $key) !== false) {
+                if ($level < $userLevel) {
+                    $userLevel = $level;
+                }
+            }
+        }
+
+        $isGM = $userLevel == 2; // GM level 2
+        $isManager = $userLevel == 3; // Manager level 3
+
+        if ($isGM) {
+            // GM melihat semua karyawan di divisi yang sama
+            if ($userDivisionId) {
+                $query->whereHas('pekerjaan', function ($q) use ($userDivisionId) {
+                    $q->where('division_id', $userDivisionId);
+                });
+            }
+        } elseif ($isManager) {
+            // Manager hanya melihat staff di bawahnya (bukan Manager/GM)
+            if ($userDivisionId) {
+                $query->whereHas('positions', function ($q) use ($userDivisionId) {
+                    $q->where('division_id', $userDivisionId)
+                        ->where(function ($sq) {
+                            // Jabatan di bawah Manager: Supervisor, Staff, Officer, Assistant
+                            $sq->where('name', 'LIKE', '%Supervisor%')
+                                ->orWhere('name', 'LIKE', '%Staff%')
+                                ->orWhere('name', 'LIKE', '%Officer%')
+                                ->orWhere('name', 'LIKE', '%Assistant%');
+                        });
+                });
+            }
+        }
+
+        // Filter Search (Tetap ada)
         if ($request->has('search') && $request->search != '') {
             $keyword = $request->search;
-            $query->where(function($q) use ($keyword) {
+            $query->where(function ($q) use ($keyword) {
                 $q->where('Nama_Lengkap_Sesuai_Ijazah', 'LIKE', '%' . $keyword . '%')
-                  ->orWhere('Nama_Sesuai_KTP', 'LIKE', '%' . $keyword . '%')
-                  ->orWhere('NIK', 'LIKE', '%' . $keyword . '%');
+                    ->orWhere('Nama_Sesuai_KTP', 'LIKE', '%' . $keyword . '%')
+                    ->orWhere('NIK', 'LIKE', '%' . $keyword . '%');
             });
         }
 
-        // Eksekusi Pagination (10 per halaman)
-        $bawahanList = $query->paginate(10)->onEachSide(1); 
-        
-        // Cek Status Penilaian untuk setiap karyawan di list
+        // Eksekusi Pagination
+        $bawahanList = $query->paginate(10)->onEachSide(1)->appends(['tahun' => $tahun]);
+
+        // Cek Status Penilaian (Looping)
         $bawahanList->through(function ($staff) use ($tahun, $user) {
             $staff->sudah_dinilai = KbiAssessment::where('karyawan_id', $staff->id_karyawan)
                 ->where('penilai_id', $user->id)
-                ->where('tipe_penilai', 'ATASAN')
+                ->where('tipe_penilai', 'ATASAN') // Manager menilai Bawahan
                 ->where('tahun', $tahun)
                 ->exists();
             return $staff;
         });
 
-        // E. Ambil Data Atasan (Kotak Kiri Bawah)
-        $atasan = $karyawan->atasan; 
+        // E. Ambil Data Atasan (Kotak Kiri Bawah - Tetap Sama)
+        $atasan = $karyawan->atasan;
         $sudahMenilaiAtasan = false;
         if ($atasan) {
             $sudahMenilaiAtasan = KbiAssessment::where('karyawan_id', $atasan->id_karyawan)
@@ -74,20 +126,84 @@ class KbiController extends Controller
                 ->where('tahun', $tahun)
                 ->exists();
         }
-        // [BARU] Ambil List Semua Karyawan untuk Dropdown Pilihan Atasan
-        // Kita kecualikan diri sendiri, biar gak milih diri sendiri jadi bos
-        $listCalonAtasan = Karyawan::where('id_karyawan', '!=', $karyawan->id_karyawan)
-                                    ->orderBy('Nama_Lengkap_Sesuai_Ijazah', 'ASC')
-                                    ->get();
 
-        // Kirim semua variabel ke View
+        // F. Logic Dropdown Pilih Atasan (Tetap Sama - Saya ringkas di sini agar tidak kepanjangan,
+        // tapi pastikan Anda copy paste bagian "Logika Baru Ambil List Semua Karyawan..." dari kode lama Anda)
+        // ... (Masukkan kode $jabatanHierarchy dan logic $listCalonAtasan di sini) ...
+
+        // --- SAYA SALIN ULANG BAGIAN PENTING HIERARKI AGAR ANDA BISA LANGSUNG COPY-PASTE UTUH ---
+        $jabatanHierarchy = [
+            'Direktur' => 1,
+            'General Manager' => 2,
+            'GM' => 2,
+            'Manager' => 3,
+            'Supervisor' => 4,
+            'Staff' => 5,
+            'Officer' => 6,
+            'Assistant' => 7,
+        ];
+        $userLevel = 99;
+
+        foreach ($jabatanHierarchy as $key => $level) {
+            if (stripos($userJabatan, $key) !== false) {
+                if ($level < $userLevel) {
+                    $userLevel = $level;
+                }
+            }
+        }
+
+        if ($userLevel <= 1 || empty($userDivisionId)) {
+            $listCalonAtasan = collect();
+        } else {
+            $higherJabatan = [];
+            foreach ($jabatanHierarchy as $jabatan => $level) {
+                if ($level < $userLevel) $higherJabatan[] = $jabatan;
+            }
+
+            // Untuk GM (level 2), hanya tampilkan jabatan level 1 (Direktur Utama)
+            if ($userLevel == 2) {
+                $higherJabatan = array_filter($higherJabatan, function ($jabatan) use ($jabatanHierarchy) {
+                    return ($jabatanHierarchy[$jabatan] ?? 99) == 1;
+                });
+            }
+            // Ambil calon atasan dengan 2 kondisi:
+            // 1. Jika level 1-2 (Direktur/GM): Bisa dari divisi manapun
+            // 2. Jika level > 2 (Manager+): Hanya dari divisi yang sama
+            $listCalonAtasan = Karyawan::where('id_karyawan', '!=', $karyawan->id_karyawan)
+                ->whereHas('positions', function ($q) use ($userDivisionId, $higherJabatan, $userLevel) {
+                    if (!empty($higherJabatan)) {
+                        $q->where(function ($subQ) use ($higherJabatan, $userDivisionId, $userLevel) {
+                            // Jika level 1-2 (Direktur/GM): Bisa dari divisi apapun
+                            if ($userLevel <= 2) {
+                                foreach ($higherJabatan as $jab) {
+                                    $subQ->orWhere('name', 'LIKE', '%' . $jab . '%');
+                                }
+                            } else {
+                                // Jika level > 2 (Manager+): Hanya dari divisi yang sama
+                                $subQ->where('division_id', $userDivisionId)
+                                    ->where(function ($sq) use ($higherJabatan) {
+                                        foreach ($higherJabatan as $jab) {
+                                            $sq->orWhere('name', 'LIKE', '%' . $jab . '%');
+                                        }
+                                    });
+                            }
+                        });
+                    } else {
+                        $q->where('name', 'NONEXISTENT');
+                    }
+                })->orderBy('Nama_Lengkap_Sesuai_Ijazah', 'ASC')->get();
+        }
+        // -----------------------------------------------------------------------------------------
+
         return view('pages.kbi.index', compact(
-            'karyawan', 
-            'selfAssessment', 
-            'bawahanList', 
-            'atasan', 
+            'karyawan',
+            'selfAssessment',
+            'bawahanList',
+            'atasan',
             'sudahMenilaiAtasan',
-            'listCalonAtasan'
+            'listCalonAtasan',
+            'tahun',
+            'isGM'
         ));
     }
 
@@ -97,14 +213,14 @@ class KbiController extends Controller
     public function create(Request $request)
     {
         $targetId = $request->karyawan_id;
-        $tipe = $request->tipe; 
+        $tipe = $request->tipe;
 
         if (!$targetId || !$tipe) {
             return redirect()->route('kbi.index')->with('error', 'Data tidak lengkap.');
         }
 
         $targetKaryawan = Karyawan::with('pekerjaan')->where('id_karyawan', $targetId)->first();
-        
+
         if (!$targetKaryawan) {
             return redirect()->route('kbi.index')->with('error', 'Karyawan tidak ditemukan.');
         }
@@ -132,19 +248,19 @@ class KbiController extends Controller
         $skorInput = $request->skor;
         $totalSkor = array_sum($skorInput);
         $jumlahSoal = count($skorInput);
-        
+
         $rataRata = $jumlahSoal > 0 ? round($totalSkor / $jumlahSoal, 2) : 0;
 
         KbiAssessment::updateOrCreate(
             [
-                'karyawan_id' => $request->karyawan_id, 
-                'penilai_id' => $user->id,              
+                'karyawan_id' => $request->karyawan_id,
+                'penilai_id' => $user->id,
                 'tipe_penilai' => $request->tipe_penilai,
                 'tahun' => $tahun,
             ],
             [
                 'rata_rata_akhir' => $rataRata,
-                'status' => 'FINAL', 
+                'status' => 'FINAL',
                 'tanggal_penilaian' => now(),
             ]
         );
@@ -276,27 +392,57 @@ class KbiController extends Controller
         return redirect()->back()->with('success', 'Data Atasan berhasil direset! Silakan pilih atasan baru.');
     }
 
-   public function monitoring(Request $request)
+    public function monitoring(Request $request)
     {
         $tahun = request()->get('tahun', date('Y'));
 
         // 1. Query Dasar
         $query = Karyawan::with(['pekerjaan', 'atasan']);
 
-        // 2. Filter Search
+        // Kecualikan user yang sedang login dari list monitoring
+        $user = auth()->user();
+        if ($user && $user->nik) {
+            $query->where('NIK', '!=', $user->nik);
+        }
+        if ($user) {
+            // Jika admin atau superadmin, tampilkan semua
+            if ($user->hasRole(['admin', 'superadmin'])) {
+                // No filter, show all
+            } else {
+                $karyawanUser = Karyawan::where('NIK', $user->nik)->first();
+                if ($karyawanUser) {
+                    $jabatanUser = $karyawanUser->pekerjaan->first()?->position->name ?? '';
+                    $jabatanLower = strtolower($jabatanUser);
+
+                    // Jika GM atau General Manager, tampilkan semua karyawan di divisi yang sama
+                    if (strpos($jabatanLower, 'general manager') !== false || strpos($jabatanLower, 'GM') !== false) {
+                        $divisiUser = $karyawanUser->pekerjaan->first()?->Divisi ?? '';
+                        $query->whereHas('pekerjaan', function ($q) use ($divisiUser) {
+                            $q->where('Divisi', $divisiUser);
+                        });
+                    } elseif (strpos($jabatanLower, 'manager') !== false) {
+                        // Jika manager (tapi bukan general manager), tampilkan bawahan langsung
+                        $query->where('atasan_id', $karyawanUser->id_karyawan);
+                    } else {
+                        // Untuk jabatan lain dengan role manager, mungkin tampilkan bawahan
+                        $query->where('atasan_id', $karyawanUser->id_karyawan);
+                    }
+                }
+            }
+        }
         if ($request->has('search') && $request->search != '') {
             $keyword = $request->search;
-            $query->where(function($q) use ($keyword) {
-                $q->where('Nama_Lengkap_Sesuai_Ijazah', 'LIKE', '%'.$keyword.'%')
-                ->orWhere('NIK', 'LIKE', '%'.$keyword.'%');
+            $query->where(function ($q) use ($keyword) {
+                $q->where('Nama_Lengkap_Sesuai_Ijazah', 'LIKE', '%' . $keyword . '%')
+                    ->orWhere('NIK', 'LIKE', '%' . $keyword . '%');
             });
         }
 
         // 3. Filter Jabatan (PERBAIKAN DISINI)
         if ($request->has('jabatan') && $request->jabatan != '') {
-            $query->whereHas('pekerjaan', function($q) use ($request) {
+            $query->whereHas('positions', function ($q) use ($request) {
                 // Ubah 'nama_jabatan' jadi 'Jabatan'
-                $q->where('Jabatan', $request->jabatan); // <--- UBAH INI
+                $q->where('name', $request->jabatan); // <--- UBAH INI
             });
         }
 
@@ -314,14 +460,14 @@ class KbiController extends Controller
                 $penilaiUserId = $userMap[$kry->NIK] ?? 0;
                 if ($penilaiUserId > 0) {
                     $sudahNilaiAtasan = KbiAssessment::where('karyawan_id', $kry->atasan_id)
-                    ->where('penilai_id', $penilaiUserId) // Sesuaikan logic user_id
-                    ->where('tipe_penilai', 'BAWAHAN')
-                    ->where('tahun', $tahun)
-                    ->exists();
-                $kry->status_atasan = $sudahNilaiAtasan ? 'DONE' : 'PENDING';
-            } else {
-                $kry->status_atasan = 'PENDING';
-            }
+                        ->where('penilai_id', $penilaiUserId) // Sesuaikan logic user_id
+                        ->where('tipe_penilai', 'BAWAHAN')
+                        ->where('tahun', $tahun)
+                        ->exists();
+                    $kry->status_atasan = $sudahNilaiAtasan ? 'DONE' : 'PENDING';
+                } else {
+                    $kry->status_atasan = 'PENDING';
+                }
             } else {
                 $kry->status_atasan = 'NA';
             }
@@ -341,10 +487,10 @@ class KbiController extends Controller
 
         // 6. List Jabatan untuk Dropdown (PERBAIKAN DISINI)
         // Ubah 'nama_jabatan' jadi 'Jabatan'
-        $listJabatan = \App\Models\Pekerjaan::distinct()
-                        ->pluck('Jabatan') // <--- UBAH INI
-                        ->filter()
-                        ->sort();
+        $listJabatan = \App\Models\Position::distinct()
+            ->pluck('name') // <--- UBAH INI
+            ->filter()
+            ->sort();
 
         $totalKaryawan = $listKaryawan->count();
         $sudahSelesaiSemua = $listKaryawan->where('is_complete', true)->count();
@@ -353,16 +499,16 @@ class KbiController extends Controller
         $page = LengthAwarePaginator::resolveCurrentPage();
         $perPage = 10;
         $results = $listKaryawan->slice(($page - 1) * $perPage, $perPage)->all();
-        
+
         $paginatedKaryawan = new LengthAwarePaginator($results, count($listKaryawan), $perPage);
         $paginatedKaryawan->setPath($request->url());
         $paginatedKaryawan->appends($request->all());
         $paginatedKaryawan->onEachSide(1);
 
-        return view('pages.kbi.monitoring', compact( 
-            'totalKaryawan', 
-            'sudahSelesaiSemua', 
-            'belumSelesai', 
+        return view('pages.kbi.monitoring', compact(
+            'totalKaryawan',
+            'sudahSelesaiSemua',
+            'belumSelesai',
             'listJabatan'
         ) + [
             'listKaryawan' => $paginatedKaryawan,

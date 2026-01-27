@@ -10,11 +10,11 @@ class ProsesRekrutmenController extends Controller
 {
     public function edit($id)
     {
-        $proses = ProsesRekrutmen::where('kandidat_id',$id)->first();
+        $proses = ProsesRekrutmen::where('kandidat_id', $id)->first();
         $kandidat = Kandidat::findOrFail($id);
         // only admin can edit process
-        abort_unless(auth()->user() && auth()->user()->role === 'admin', 403);
-        return view('pages.rekrutmen.proses.edit', compact('proses','kandidat'));
+        abort_unless(auth()->user() && auth()->user()->hasRole('admin'), 403);
+        return view('pages.rekrutmen.proses.edit', compact('proses', 'kandidat'));
     }
 
     public function store(Request $request)
@@ -42,8 +42,8 @@ class ProsesRekrutmenController extends Controller
         $validated['interview_user_lolos'] = $request->has('interview_user_lolos') ? 1 : 0;
 
         // restrict updates to admins only
-        abort_unless(auth()->user() && auth()->user()->role === 'admin', 403);
-        ProsesRekrutmen::updateOrCreate(['kandidat_id'=>$validated['kandidat_id']],$validated);
-        return back()->with('success','Proses updated');
+        abort_unless(auth()->user() && auth()->user()->hasRole('admin'), 403);
+        ProsesRekrutmen::updateOrCreate(['kandidat_id' => $validated['kandidat_id']], $validated);
+        return back()->with('success', 'Proses updated');
     }
 }

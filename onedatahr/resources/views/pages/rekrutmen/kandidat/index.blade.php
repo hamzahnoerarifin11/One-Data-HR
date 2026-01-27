@@ -57,6 +57,12 @@
 
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <div class="relative">
+                    <select x-model="year" @change="resetPage" class="dark:bg-dark-900 h-11 w-40 appearance-none rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 pr-9 text-sm text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 mr-2">
+                        <option value="">Semua Tahun</option>
+                        <template x-for="y in years" :key="y">
+                            <option :value="y" x-text="y"></option>
+                        </template>
+                    </select>
                     <button class="absolute text-gray-500 -translate-y-1/2 left-4 top-1/2">
                         <svg class="h-5 w-5 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.04199 9.37363C3.04199 5.87693 5.87735 3.04199 9.37533 3.04199C12.8733 3.04199 15.7087 5.87693 15.7087 9.37363C15.7087 12.8703 12.8733 15.7053 9.37533 15.7053C5.87735 15.7053 3.04199 12.8703 3.04199 9.37363ZM9.37533 1.54199C5.04926 1.54199 1.54199 5.04817 1.54199 9.37363C1.54199 13.6991 5.04926 17.2053 9.37533 17.2053C11.2676 17.2053 13.0032 16.5344 14.3572 15.4176L17.1773 18.238C17.4702 18.5309 17.945 18.5309 18.2379 18.238C18.5308 17.9451 18.5309 17.4703 18.238 17.1773L15.4182 14.3573C16.5367 13.0033 17.2087 11.2669 17.2087 9.37363C17.2087 5.04817 13.7014 1.54199 9.37533 1.54199Z"/></svg>
                     </button>
@@ -69,7 +75,7 @@
             <table class="w-full min-w-full border-collapse">
                 <thead>
                     <tr class="border-y border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-900">
-                        <th class="px-6 py-3 text-left text-md font-medium text-gray-600 dark:text-gray-400">#</th>
+                        <th class="px-6 py-3 text-left text-md font-medium text-gray-600 dark:text-gray-400">No</th>
                         <th @click="sort('nama')" class="cursor-pointer px-6 py-3 text-left text-md font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600 transition">
                             <div class="flex items-center gap-1">Nama Kandidat <svg class="h-4 w-4" :class="sortCol === 'nama' ? (sortAsc ? '' : 'rotate-180') : 'opacity-20'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></div>
                         </th>
@@ -366,6 +372,7 @@ function kandidatTable() {
     return {
         data: @json($kandidats instanceof \Illuminate\Pagination\LengthAwarePaginator ? $kandidats->items() : $kandidats),
         search: '',
+        year: '',
         page: 1,
         perPage: 10,
         sortCol: 'nama',
@@ -381,13 +388,32 @@ function kandidatTable() {
             return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
         },
 
+        get years() {
+            const ys = new Set();
+            this.data.forEach(d => {
+                const dateStr = d.tanggal_melamar || d.created_at || null;
+                if (!dateStr) return;
+                const y = new Date(dateStr).getFullYear();
+                if (!isNaN(y)) ys.add(y);
+            });
+            return Array.from(ys).sort((a,b) => b - a);
+        },
+
         get filtered() {
             let filtered = this.data.filter(d =>
                 (d.nama && d.nama.toLowerCase().includes(this.search.toLowerCase())) ||
                 (d.posisi && d.posisi.nama_posisi.toLowerCase().includes(this.search.toLowerCase())) ||
                 (d.status_akhir && d.status_akhir.toLowerCase().includes(this.search.toLowerCase()))
             );
-
+            // Year filtering
+            if (this.year) {
+                filtered = filtered.filter(d => {
+                    const dateStr = d.tanggal_melamar || d.created_at || null;
+                    if (!dateStr) return false;
+                    const y = new Date(dateStr).getFullYear();
+                    return y.toString() === this.year.toString();
+                });
+            }
             filtered.sort((a, b) => {
                 let valA = (a[this.sortCol] || '').toString().toLowerCase();
                 let valB = (b[this.sortCol] || '').toString().toLowerCase();
@@ -424,6 +450,9 @@ function kandidatTable() {
             }
             return range;
         },
+
+        get startItem() { return this.filtered.length === 0 ? 0 : (this.page - 1) * this.perPage + 1; },
+        get endItem() { return Math.min(this.page * this.perPage, this.filtered.length); },
 
        openShowModal(row) {
             const formatDate = (dateString) => {

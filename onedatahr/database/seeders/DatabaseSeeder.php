@@ -40,7 +40,9 @@ class DatabaseSeeder extends Seeder
         KpiSeeder::class,
         KpiTargetSeeder::class,
         KpiRealizationSeeder::class,
-    ]);
+        ]);
+    // Seed roles
+    $this->call(RoleSeeder::class);
 
 
         // Seed recruitment demo data

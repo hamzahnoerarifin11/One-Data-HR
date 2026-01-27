@@ -27,7 +27,7 @@ class KaryawanController extends Controller
 
     public function index(Request $request)
     {
-        $query = Karyawan::with(['pekerjaan.company', 'pekerjaan.division', 'pekerjaan.department', 'pekerjaan.unit', 'pekerjaan.position', 'pendidikan', 'kontrak', 'keluarga', 'bpjs', 'perusahaan', 'status']);
+        $query = Karyawan::with(['pekerjaan.company', 'pekerjaan.division', 'pekerjaan.department', 'pekerjaan.unit', 'pendidikan', 'kontrak', 'keluarga', 'bpjs', 'perusahaan', 'status']);
 
         // Apply filters
         if ($request->filled('nama')) {
@@ -39,8 +39,8 @@ class KaryawanController extends Controller
         }
 
         if ($request->filled('jabatan')) {
-            $query->whereHas('pekerjaan.position', function($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->jabatan . '%');
+            $query->whereHas('pekerjaan', function($q) use ($request) {
+                $q->where('Bagian', 'like', '%' . $request->jabatan . '%');
             });
         }
 
@@ -105,20 +105,49 @@ class KaryawanController extends Controller
         DB::beginTransaction();
         try {
             $karyawanData = $request->only([
-                'NIK', 'Status', 'Kode', 'Nama_Sesuai_KTP', 'NIK_KTP', 'Nama_Lengkap_Sesuai_Ijazah',
-                'Tempat_Lahir_Karyawan', 'Tanggal_Lahir_Karyawan', 'Umur_Karyawan', 'Jenis_Kelamin_Karyawan',
-                'Status_Pernikahan', 'Golongan_Darah', 'Nomor_Telepon_Aktif_Karyawan', 'Email', 'Alamat_KTP',
-                'RT', 'RW', 'Kelurahan_Desa', 'Kecamatan', 'Kabupaten_Kota', 'Provinsi', 'Alamat_Domisili',
-                'RT_Sesuai_Domisili', 'RW_Sesuai_Domisili', 'Kelurahan_Desa_Domisili', 'Kecamatan_Sesuai_Domisili',
-                'Kabupaten_Kota_Sesuai_Domisili', 'Provinsi_Sesuai_Domisili', 'Alamat_Lengkap'
+                'NIK',
+                'Status',
+                'Kode',
+                'Nama_Sesuai_KTP',
+                'NIK_KTP',
+                'Nama_Lengkap_Sesuai_Ijazah',
+                'Tempat_Lahir_Karyawan',
+                'Tanggal_Lahir_Karyawan',
+                'Umur_Karyawan',
+                'Jenis_Kelamin_Karyawan',
+                'Status_Pernikahan',
+                'Golongan_Darah',
+                'Nomor_Telepon_Aktif_Karyawan',
+                'Email',
+                'Alamat_KTP',
+                'RT',
+                'RW',
+                'Kelurahan_Desa',
+                'Kecamatan',
+                'Kabupaten_Kota',
+                'Provinsi',
+                'Alamat_Domisili',
+                'RT_Sesuai_Domisili',
+                'RW_Sesuai_Domisili',
+                'Kelurahan_Desa_Domisili',
+                'Kecamatan_Sesuai_Domisili',
+                'Kabupaten_Kota_Sesuai_Domisili',
+                'Provinsi_Sesuai_Domisili',
+                'Alamat_Lengkap'
             ]);
 
             $karyawan = Karyawan::create($karyawanData);
 
             // Data Keluarga
             $keluargaData = $request->only([
-                'Nama_Ayah_Kandung', 'Nama_Ibu_Kandung', 'Nama_Lengkap_Suami_Istri', 'NIK_KTP_Suami_Istri', 'Tempat_Lahir_Suami_Istri',
-                'Tanggal_Lahir_Suami_Istri', 'Nomor_Telepon_Suami_Istri', 'Pendidikan_Terakhir_Suami_Istri'
+                'Nama_Ayah_Kandung',
+                'Nama_Ibu_Kandung',
+                'Nama_Lengkap_Suami_Istri',
+                'NIK_KTP_Suami_Istri',
+                'Tempat_Lahir_Suami_Istri',
+                'Tanggal_Lahir_Suami_Istri',
+                'Nomor_Telepon_Suami_Istri',
+                'Pendidikan_Terakhir_Suami_Istri'
             ]);
             $keluargaData['anak'] = $request->input('anak', []);
             $keluargaData['id_karyawan'] = $karyawan->id_karyawan;
@@ -155,7 +184,8 @@ class KaryawanController extends Controller
                         $diff = $start->diff($now);
                         $masaKerja = "{$diff->y} Tahun {$diff->m} Bulan {$diff->d} Hari";
                     }
-                } catch (\Exception $e) {}
+                } catch (\Exception $e) {
+                }
             }
 
             Kontrak::create([
@@ -206,10 +236,17 @@ class KaryawanController extends Controller
     {
         $karyawan = Karyawan::with(['pekerjaan.company', 'pekerjaan.division', 'pekerjaan.department', 'pekerjaan.unit', 'pekerjaan.position', 'pendidikan', 'kontrak', 'keluarga', 'bpjs', 'perusahaan', 'status'])->findOrFail($id);
         $companies = \App\Models\Company::all();
-        return view('pages.karyawan.edit', array_merge(compact('karyawan', 'companies'), [
+        $positions = \App\Models\Position::all();
+        $departments = \App\Models\Department::all();
+        $divisions = \App\Models\Division::all();
+        $units = \App\Models\Unit::all();
+        return view('pages.karyawan.edit', array_merge(compact('karyawan', 'companies', 'positions', 'departments', 'divisions', 'units'), [
             'lokasikerjaOptions' => getlokasikerja('pekerjaan', 'Lokasi_Kerja'),
             'perusahaanOptions' => getperusahaan('perusahaan', 'Perusahaan'),
             'pendidikanOptions' => getpendidikan('pendidikan', 'Pendidikan_Terakhir'),
+            'departementOptions' => getdepartement('pekerjaan', 'Departement'),
+            'divisiOptions' => getdivisi('pekerjaan', 'Divisi'),
+            'unitOptions' => getunit('pekerjaan', 'Unit'),
         ]));
     }
 
@@ -230,18 +267,47 @@ class KaryawanController extends Controller
         try {
             // 1. Update Tabel Utama Karyawan
             $karyawan->update($request->only([
-                'NIK', 'Status', 'Kode', 'Nama_Sesuai_KTP', 'NIK_KTP', 'Nama_Lengkap_Sesuai_Ijazah',
-                'Tempat_Lahir_Karyawan', 'Tanggal_Lahir_Karyawan', 'Umur_Karyawan', 'Jenis_Kelamin_Karyawan',
-                'Status_Pernikahan', 'Golongan_Darah', 'Nomor_Telepon_Aktif_Karyawan', 'Email', 'Alamat_KTP',
-                'RT', 'RW', 'Kelurahan_Desa', 'Kecamatan', 'Kabupaten_Kota', 'Provinsi', 'Alamat_Domisili',
-                'RT_Sesuai_Domisili', 'RW_Sesuai_Domisili', 'Kelurahan_Desa_Domisili', 'Kecamatan_Sesuai_Domisili',
-                'Kabupaten_Kota_Sesuai_Domisili', 'Provinsi_Sesuai_Domisili', 'Alamat_Lengkap'
+                'NIK',
+                'Status',
+                'Kode',
+                'Nama_Sesuai_KTP',
+                'NIK_KTP',
+                'Nama_Lengkap_Sesuai_Ijazah',
+                'Tempat_Lahir_Karyawan',
+                'Tanggal_Lahir_Karyawan',
+                'Umur_Karyawan',
+                'Jenis_Kelamin_Karyawan',
+                'Status_Pernikahan',
+                'Golongan_Darah',
+                'Nomor_Telepon_Aktif_Karyawan',
+                'Email',
+                'Alamat_KTP',
+                'RT',
+                'RW',
+                'Kelurahan_Desa',
+                'Kecamatan',
+                'Kabupaten_Kota',
+                'Provinsi',
+                'Alamat_Domisili',
+                'RT_Sesuai_Domisili',
+                'RW_Sesuai_Domisili',
+                'Kelurahan_Desa_Domisili',
+                'Kecamatan_Sesuai_Domisili',
+                'Kabupaten_Kota_Sesuai_Domisili',
+                'Provinsi_Sesuai_Domisili',
+                'Alamat_Lengkap'
             ]));
 
             // 2. Update Keluarga
             $dataKel = $request->only([
-                'Nama_Ayah_Kandung', 'Nama_Ibu_Kandung', 'Nama_Lengkap_Suami_Istri', 'NIK_KTP_Suami_Istri',
-                'Tempat_Lahir_Suami_Istri', 'Tanggal_Lahir_Suami_Istri', 'Nomor_Telepon_Suami_Istri', 'Pendidikan_Terakhir_Suami_Istri'
+                'Nama_Ayah_Kandung',
+                'Nama_Ibu_Kandung',
+                'Nama_Lengkap_Suami_Istri',
+                'NIK_KTP_Suami_Istri',
+                'Tempat_Lahir_Suami_Istri',
+                'Tanggal_Lahir_Suami_Istri',
+                'Nomor_Telepon_Suami_Istri',
+                'Pendidikan_Terakhir_Suami_Istri'
             ]);
             $dataKel['anak'] = $request->input('anak', []);
             $karyawan->keluarga ? $karyawan->keluarga->update($dataKel) : DataKeluarga::create(array_merge(['id_karyawan' => $id], $dataKel));
@@ -272,12 +338,19 @@ class KaryawanController extends Controller
                         $diff = $start->diff($now);
                         $masaKerja = "{$diff->y} Tahun {$diff->m} Bulan {$diff->d} Hari";
                     }
-                } catch (\Exception $e) {}
+                } catch (\Exception $e) {
+                }
             }
             $dataKontrak = array_merge($request->only([
-                'Tanggal_Mulai_Tugas', 'PKWT_Berakhir', 'Tanggal_Diangkat_Menjadi_Karyawan_Tetap',
-                'Riwayat_Penempatan', 'Tanggal_Riwayat_Penempatan', 'Mutasi_Promosi_Demosi',
-                'Tanggal_Mutasi_Promosi_Demosi', 'NO_PKWT_PERTAMA', 'NO_SK_PERTAMA'
+                'Tanggal_Mulai_Tugas',
+                'PKWT_Berakhir',
+                'Tanggal_Diangkat_Menjadi_Karyawan_Tetap',
+                'Riwayat_Penempatan',
+                'Tanggal_Riwayat_Penempatan',
+                'Mutasi_Promosi_Demosi',
+                'Tanggal_Mutasi_Promosi_Demosi',
+                'NO_PKWT_PERTAMA',
+                'NO_SK_PERTAMA'
             ]), ['Masa_Kerja' => $masaKerja]);
 
             $karyawan->kontrak ? $karyawan->kontrak->update($dataKontrak) : Kontrak::create(array_merge(['id_karyawan' => $id], $dataKontrak));
