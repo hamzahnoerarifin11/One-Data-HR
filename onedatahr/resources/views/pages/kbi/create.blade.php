@@ -99,7 +99,7 @@
                     </div>
                     <div class="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded border border-gray-100">
                         <i class="fas fa-briefcase text-blue-400"></i> 
-                        <span>Jabatan: <strong>{{ $targetKaryawan->pekerjaan->first()?->Jabatan ?? '-' }}</strong></span>
+                        <span>Jabatan: <strong>{{ $targetKaryawan->pekerjaan->first()?->position?->name ?? '-' }}</strong></span>
                     </div>
                     <div class="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded border border-gray-100">
                         <i class="fas fa-user-tag text-blue-400"></i> 

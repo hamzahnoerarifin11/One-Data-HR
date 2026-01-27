@@ -6,10 +6,10 @@
     <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-                Data Jabatan
+                Data Level Jabatan
             </h1>
             <p class="mt-1 text-gray-600 dark:text-gray-400">
-                Kelola data jabatan perusahaan yang terdaftar
+                Kelola data level jabatan perusahaan yang terdaftar
             </p>
         </div>
 
@@ -18,7 +18,7 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
-            Tambah Jabatan
+            Tambah Level Jabatan
         </a>
     </div>
 
@@ -83,7 +83,7 @@
                         </th>
                         <th @click="sortBy('name')" class="px-5 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400 cursor-pointer hover:text-blue-600">
                             <div class="flex items-center gap-1">
-                                Nama Jabatan
+                                Nama Level Jabatan
                                 <svg :class="sortCol === 'name' ? (sortDir === 'asc' ? 'rotate-0' : 'rotate-180') : 'opacity-20'" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
                             </div>
                         </th>

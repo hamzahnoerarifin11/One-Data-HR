@@ -136,7 +136,7 @@
                         </td>
                         <td class="px-6 py-4">
                             <div class="text-gray-700 dark:text-gray-300 text-xs font-semibold bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded inline-block border border-gray-200 dark:border-gray-600">
-                                {{ $kry->pekerjaan->first()?->Jabatan ?? '-' }}
+                                {{ $kry->pekerjaan->first()?->position?->name ?? '-' }}
                             </div>
                             <div class="text-xs text-gray-400 dark:text-gray-500 mt-1">
                                 Atasan: <span class="text-gray-600 dark:text-gray-300">{{ $kry->atasan->Nama_Lengkap_Sesuai_Ijazah ?? 'Tidak Ada' }}</span>

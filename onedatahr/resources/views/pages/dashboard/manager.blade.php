@@ -92,7 +92,7 @@
                         <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                             <td class="px-6 py-4">
                                 <div class="font-medium text-gray-900 dark:text-white">{{ $member->Nama_Lengkap_Sesuai_Ijazah }}</div>
-                                <div class="text-xs text-gray-500">{{ $member->pekerjaan->first()?->Jabatan ?? '-' }}</div>
+                                <div class="text-xs text-gray-500">{{ $member->pekerjaan->first()?->position?->name ?? '-' }}</div>
                             </td>
                             
                             {{-- STATUS KPI --}}

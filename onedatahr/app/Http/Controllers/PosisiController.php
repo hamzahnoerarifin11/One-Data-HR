@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Posisi;
+use App\Models\Pekerjaan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\QueryException;
@@ -26,7 +27,7 @@ class PosisiController extends Controller
     $pos = Posisi::withCount('kandidat as total_pelamar')
         ->orderBy('id_posisi', 'DESC')
         ->get();
-        
+
     // Jika Anda butuh 'progress_rekrutmen', kita bisa manipulasi collection
     // Atau sementara kita samakan saja dengan status
     $pos->transform(function($item) {
@@ -34,7 +35,19 @@ class PosisiController extends Controller
         return $item;
     });
 
-    return view('pages.rekrutmen.posisi.index', ['posisis' => $pos]);
+    // Get unique job titles from employee work data
+    $jobTitles = Pekerjaan::select('Jabatan')
+        ->whereNotNull('Jabatan')
+        ->where('Jabatan', '!=', '')
+        ->distinct()
+        ->orderBy('Jabatan')
+        ->pluck('Jabatan')
+        ->toArray();
+
+    return view('pages.rekrutmen.posisi.index', [
+        'posisis' => $pos,
+        'jobTitles' => $jobTitles
+    ]);
     }
 
     public function index()
@@ -108,15 +121,15 @@ class PosisiController extends Controller
 {
     try {
         $pos = Posisi::findOrFail($id);
-        
+
         // Opsi 1: Cek Manual (Lebih User Friendly)
         // Asumsi relasi di model Posisi bernama 'kandidats'
         // atau cek manual ke tabel kandidat
         $terpakai = DB::table('kandidat')->where('posisi_id', $id)->exists();
-        
+
         if ($terpakai) {
             return response()->json([
-                'success' => false, 
+                'success' => false,
                 'message' => 'Posisi tidak bisa dihapus karena sudah ada kandidat yang melamar di posisi ini. Silakan nonaktifkan saja statusnya.'
             ], 422);
         }

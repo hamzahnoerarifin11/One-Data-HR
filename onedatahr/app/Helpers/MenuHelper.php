@@ -33,7 +33,7 @@ class MenuHelper
                     ['name' => 'Divisi', 'path' => '/organization/division'],
                     ['name' => 'Departement', 'path' => '/organization/department'],
                     ['name' => 'Unit', 'path' => '/organization/unit'],
-                    ['name' => 'Jabatan', 'path' => '/organization/position'],
+                    ['name' => 'Level Jabatan', 'path' => '/organization/position'],
                 ],
             ];
         }

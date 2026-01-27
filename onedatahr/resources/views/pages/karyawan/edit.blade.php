@@ -917,7 +917,7 @@
                     <!-- JABATAN -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Jabatan
+                            Level Jabatan
                         </label>
 
                         <div class="relative z-20">
@@ -927,7 +927,7 @@
                                     focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
                                     dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
 
-                                <option value="">-- Pilih Jabatan --</option>
+                                <option value="">-- Pilih Level Jabatan --</option>
                             </select>
 
                             <!-- Arrow -->
@@ -945,10 +945,10 @@
 
                     <!-- BAGIAN -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Bagian</label>
-                        <input name="Bagian"
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Nama Jabatan</label>
+                        <input name="Jabatan"
                             placeholder="Contoh: Administrasi / Operasional"
-                            value="{{ old('Bagian', optional($karyawan->pekerjaan->first())->Bagian) }}"
+                            value="{{ old('Jabatan', optional($karyawan->pekerjaan->first())->Jabatan) }}"
                             class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10
                             dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent
                             px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden
@@ -994,7 +994,7 @@
                         </div>
                     </div> --}}
 
-                    
+
 
                     <!-- JENIS KONTRAK & PERJANJIAN (DEPENDENT DROPDOWN) -->
                     <div class="grid grid-cols-2 gap-4">
@@ -2055,14 +2055,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Reset dependent selects
                     departmentSelect.innerHTML = '<option value="">-- Pilih Departement --</option>';
                     unitSelect.innerHTML = '<option value="">-- Pilih Unit --</option>';
-                    positionSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+                    positionSelect.innerHTML = '<option value="">-- Pilih Level Jabatan --</option>';
                 })
                 .catch(error => console.error('Error fetching divisions:', error));
         } else {
             divisionSelect.innerHTML = '<option value="">-- Pilih Divisi --</option>';
             departmentSelect.innerHTML = '<option value="">-- Pilih Departement --</option>';
             unitSelect.innerHTML = '<option value="">-- Pilih Unit --</option>';
-            positionSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+            positionSelect.innerHTML = '<option value="">-- Pilih Level Jabatan --</option>';
         }
     });
 
@@ -2076,12 +2076,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     populateSelect(departmentSelect, data, '-- Pilih Departement --');
                     // Reset dependent selects
                     unitSelect.innerHTML = '<option value="">-- Pilih Unit --</option>';
-                    positionSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+                    positionSelect.innerHTML = '<option value="">-- Pilih Level Jabatan --</option>';
                 });
         } else {
             departmentSelect.innerHTML = '<option value="">-- Pilih Departement --</option>';
             unitSelect.innerHTML = '<option value="">-- Pilih Unit --</option>';
-            positionSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+            positionSelect.innerHTML = '<option value="">-- Pilih Level Jabatan --</option>';
         }
     });
 
@@ -2094,11 +2094,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(data => {
                     populateSelect(unitSelect, data, '-- Pilih Unit --');
                     // Reset dependent select
-                    positionSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+                    positionSelect.innerHTML = '<option value="">-- Pilih Level Jabatan --</option>';
                 });
         } else {
             unitSelect.innerHTML = '<option value="">-- Pilih Unit --</option>';
-            positionSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+            positionSelect.innerHTML = '<option value="">-- Pilih Level Jabatan --</option>';
         }
     });
 
@@ -2109,10 +2109,10 @@ document.addEventListener('DOMContentLoaded', function() {
             fetch(`/karyawan/positions/${unitId}`)
                 .then(response => response.json())
                 .then(data => {
-                    populateSelect(positionSelect, data, '-- Pilih Jabatan --');
+                    populateSelect(positionSelect, data, '-- Pilih Level Jabatan --');
                 });
         } else {
-            positionSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+            positionSelect.innerHTML = '<option value="">-- Pilih Level Jabatan --</option>';
         }
     });
 
@@ -2152,7 +2152,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                             fetch(`/karyawan/positions/${initialUnitId}`)
                                                 .then(response => response.json())
                                                 .then(data => {
-                                                    populateSelect(positionSelect, data, '-- Pilih Jabatan --');
+                                                    populateSelect(positionSelect, data, '-- Pilih Level Jabatan --');
                                                     if (initialPositionId) {
                                                         positionSelect.value = initialPositionId;
                                                     }

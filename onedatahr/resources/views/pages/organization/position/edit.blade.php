@@ -14,13 +14,13 @@
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 01-1.414 1.414L7.293 14.707z" clip-rule="evenodd"/>
                 </svg>
-                <a href="{{ route('organization.position.index') }}" class="hover:text-blue-600 transition">Data Jabatan</a>
+                <a href="{{ route('organization.position.index') }}" class="hover:text-blue-600 transition">Data Level Jabatan</a>
             </li>
             <li class="flex items-center gap-2">
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 01-1.414 1.414L7.293 14.707z" clip-rule="evenodd"/>
                 </svg>
-                <span class="text-gray-900 dark:text-white">Edit Jabatan</span>
+                <span class="text-gray-900 dark:text-white">Edit Level Jabatan</span>
             </li>
         </ol>
     </nav>
@@ -28,7 +28,7 @@
     <!-- HEADER -->
     <div class="mb-6">
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-            Edit Jabatan
+            Edit Level Jabatan
         </h1>
         <p class="mt-1 text-gray-600 dark:text-gray-400">
             Edit data jabatan
@@ -194,10 +194,10 @@
                 @enderror
             </div>
 
-            <!-- Nama Jabatan -->
+            <!-- Nama Level Jabatan -->
             <div>
                 <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Nama Jabatan <span class="text-red-500">*</span>
+                    Nama Level Jabatan <span class="text-red-500">*</span>
                 </label>
                 <input
                     type="text"

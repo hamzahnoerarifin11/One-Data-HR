@@ -57,11 +57,22 @@ Route::get('karyawan/departments/{divisionId}', [KaryawanController::class, 'get
 Route::get('karyawan/units/{departmentId}', [KaryawanController::class, 'getUnits'])->name('karyawan.units');
 Route::get('karyawan/positions/{unitId}', [KaryawanController::class, 'getPositions'])->name('karyawan.positions');
 
+Route::post('karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
+
+Route::middleware(['auth'])->group(function () {
+});
+
+Route::middleware(['auth'])->group(function () {
+    // other routes
+});
+
+Route::post('karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
+
 Route::middleware(['auth', 'role:admin|superadmin'])->group(function () {
         // --- KARYAWAN MANAGEMENT ---
-        Route::post('karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
         Route::resource('karyawan', KaryawanController::class);
-        Route::middleware(['auth', 'role:superadmin'])->group(function () {
+        // Route::post('karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
+    Route::middleware(['auth', 'role:superadmin'])->group(function () {
     // User management resource
     Route::resource('users', UserController::class);
     Route::delete('/users/batch-delete', [UserController::class, 'batchDelete'])->name('users.batchDelete');

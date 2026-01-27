@@ -52,102 +52,26 @@
             </button>
         </div>
 
-        <form method="GET" action="{{ route('karyawan.index') }}" class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" id="filter-form">
-            <div>
-                <label for="nama" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nama Karyawan</label>
+        <form method="GET" action="{{ route('karyawan.index') }}" class="flex flex-col gap-4 md:flex-row md:items-end" id="filter-form">
+            <div class="flex-1">
+                <!-- <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Pencarian Karyawan</label> -->
                 <div class="relative">
-                    <input type="text" name="nama" id="nama" value="{{ request('nama') }}" placeholder="Masukkan nama karyawan"
+                    <input type="text" name="search" id="search" value="{{ request('search') }}" placeholder="Cari nama, NIK, jabatan, lokasi kerja, divisi, perusahaan..."
                            class="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-4 pr-10 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-3">
                         <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
                     </div>
                 </div>
             </div>
 
-            <div>
-                <label for="nik" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">NIK</label>
-                <div class="relative">
-                    <input type="text" name="nik" id="nik" value="{{ request('nik') }}" placeholder="Masukkan NIK"
-                           class="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-4 pr-10 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400">
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-                        <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <label for="jabatan" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Jabatan</label>
-                <div class="relative">
-                    <input type="text" name="jabatan" id="jabatan" value="{{ request('jabatan') }}" placeholder="Masukkan jabatan"
-                           class="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-4 pr-10 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400">
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-                        <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m8 0V8a2 2 0 01-2 2H8a2 2 0 01-2-2V6m8 0H8"></path>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <label for="lokasi_kerja" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Lokasi Kerja</label>
-                <div class="relative">
-                    <input type="text" name="lokasi_kerja" id="lokasi_kerja" value="{{ request('lokasi_kerja') }}" placeholder="Masukkan lokasi kerja"
-                           class="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-4 pr-10 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400">
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-                        <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <label for="divisi" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Divisi</label>
-                <div class="relative">
-                    <input type="text" name="divisi" id="divisi" value="{{ request('divisi') }}" placeholder="Masukkan divisi"
-                           class="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-4 pr-10 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400">
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-                        <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <label for="perusahaan" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Perusahaan</label>
-                <div class="relative">
-                    <input type="text" name="perusahaan" id="perusahaan" value="{{ request('perusahaan') }}" placeholder="Masukkan perusahaan"
-                           class="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-4 pr-10 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400">
-                    <div class="absolute inset-y-0 right-0 flex items-center pr-3">
-                        <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
-                <select name="status" id="status"
-                        class="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-4 pr-10 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
-                    <option value="">Semua Status</option>
-                    <option value="Aktif" {{ request('status') == 'Aktif' ? 'selected' : '' }}>Aktif</option>
-                    <option value="Non Aktif" {{ request('status') == 'Non Aktif' ? 'selected' : '' }}>Non Aktif</option>
-                </select>
-            </div>
-
-            <div class="flex items-end gap-2 lg:col-span-1 xl:col-span-1">
+            <div class="flex items-center gap-2">
                 <button type="submit" class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 transition focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
-                    Filter
+                    Cari
                 </button>
                 <a href="{{ route('karyawan.index') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -160,9 +84,13 @@
     </div>
 
     <!-- TABLE -->
-    <form id="batch-delete-form" action="{{ route('karyawan.batchDelete') }}" method="POST">
+    <form
+        id="batch-delete-form"
+        action="{{ route('karyawan.batchDelete') }}"
+        method="POST"
+    >
         @csrf
-        @method('DELETE')
+
         <div class="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
 
             <!-- TOP BAR -->
@@ -172,10 +100,19 @@
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <button type="button" onclick="batchDelete()" id="batch-delete-btn" class="hidden inline-flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2.5 text-center text-white font-medium hover:bg-red-700 transition shadow-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    <button
+                        type="button"
+                        id="batch-delete-btn"
+                        onclick="batchDelete()"
+                        class="hidden inline-flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2.5 text-white font-medium hover:bg-red-700 transition shadow-sm"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
                         Hapus Terpilih
                     </button>
+
                     <button class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2v6m0 0l-2-2m2 2l2-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         Download
@@ -189,12 +126,12 @@
                 <thead>
                     <tr class="border-y border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-900">
                         <th class="px-4 py-3 text-center w-10">
-                            <input type="checkbox" id="select-all" onclick="toggleAllCheckboxes()" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                            <input type="checkbox" id="select-all" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
                         </th>
                         <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400">Nama</th>
                         <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400">NIK</th>
                         <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400">Nomor Telepon</th>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400">Jabatan</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400">Level Jabatan</th>
                         <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400">Lokasi Kerja</th>
                         <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400">Divisi</th>
                         <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400">Perusahaan</th>
@@ -282,58 +219,61 @@ function toggleFilter() {
     form.classList.toggle('hidden');
 }
 
-function toggleAllCheckboxes() {
-    const selectAllCheckbox = document.getElementById('select-all');
-    const checkboxes = document.querySelectorAll('input[name="selected_karyawan[]"]');
-    const batchDeleteBtn = document.getElementById('batch-delete-btn');
-
-    checkboxes.forEach(checkbox => {
-        checkbox.checked = selectAllCheckbox.checked;
-    });
-
-    updateBatchDeleteButton();
-}
-
-function updateBatchDeleteButton() {
-    const checkboxes = document.querySelectorAll('input[name="selected_karyawan[]"]:checked');
-    const batchDeleteBtn = document.getElementById('batch-delete-btn');
-
-    if (checkboxes.length > 0) {
-        batchDeleteBtn.classList.remove('hidden');
-        batchDeleteBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg> Hapus (${checkboxes.length})`;
-    } else {
-        batchDeleteBtn.classList.add('hidden');
-    }
-}
-
-function updateSelectAllCheckbox() {
-    const selectAllCheckbox = document.getElementById('select-all');
-    const checkboxes = document.querySelectorAll('input[name="selected_karyawan[]"]');
-    const checkedCheckboxes = document.querySelectorAll('input[name="selected_karyawan[]"]:checked');
-
-    selectAllCheckbox.checked = checkboxes.length === checkedCheckboxes.length && checkboxes.length > 0;
-    selectAllCheckbox.indeterminate = checkedCheckboxes.length > 0 && checkedCheckboxes.length < checkboxes.length;
-
-    updateBatchDeleteButton();
-}
-
-function batchDelete() {
-    const checkboxes = document.querySelectorAll('input[name="selected_karyawan[]"]:checked');
-    if (checkboxes.length === 0) return;
-
-    if (confirm(`Hapus ${checkboxes.length} karyawan terpilih?`)) {
-        document.getElementById('batch-delete-form').submit();
-    }
-}
-
 // Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
-    updateBatchDeleteButton();
+document.addEventListener('DOMContentLoaded', function () {
+    const selectAll = document.getElementById('select-all');
+    const checkboxes = document.querySelectorAll('input[name="selected_karyawan[]"]');
+    const deleteBtn = document.getElementById('batch-delete-btn');
+    const form = document.getElementById('batch-delete-form');
 
-    // Add event listeners to checkboxes
-    document.querySelectorAll('input[name="selected_karyawan[]"]').forEach(checkbox => {
-        checkbox.addEventListener('change', updateSelectAllCheckbox);
+    function updateButton() {
+        const checked = document.querySelectorAll('input[name="selected_karyawan[]"]:checked');
+
+        if (checked.length > 0) {
+            deleteBtn.classList.remove('hidden');
+            deleteBtn.innerHTML = `
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+                Hapus (${checked.length})
+            `;
+        } else {
+            deleteBtn.classList.add('hidden');
+        }
+
+        // Update select all state
+        selectAll.checked = checked.length === checkboxes.length && checkboxes.length > 0;
+        selectAll.indeterminate = checked.length > 0 && checked.length < checkboxes.length;
+    }
+
+    // Add event listeners to individual checkboxes
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', updateButton);
     });
+
+    // Add event listener to select all checkbox
+    selectAll.addEventListener('change', function () {
+        checkboxes.forEach(cb => cb.checked = this.checked);
+        updateButton();
+    });
+
+    // Initialize button state
+    updateButton();
+
+    // Global batch delete function
+    window.batchDelete = function () {
+        const checked = document.querySelectorAll('input[name="selected_karyawan[]"]:checked');
+
+        if (checked.length === 0) {
+            alert('Pilih data yang ingin dihapus terlebih dahulu');
+            return;
+        }
+
+        if (confirm(`Yakin ingin menghapus ${checked.length} karyawan terpilih?`)) {
+            form.submit();
+        }
+    };
 });
 </script>
 @endsection

@@ -27,56 +27,65 @@ class KaryawanController extends Controller
 
     public function index(Request $request)
     {
-        $query = Karyawan::with(['pekerjaan.company', 'pekerjaan.division', 'pekerjaan.department', 'pekerjaan.unit', 'pendidikan', 'kontrak', 'keluarga', 'bpjs', 'perusahaan', 'status']);
+        $query = Karyawan::with(['pekerjaan.company', 'pekerjaan.division', 'pekerjaan.department', 'pekerjaan.unit', 'pekerjaan.position', 'pendidikan', 'kontrak', 'keluarga', 'bpjs', 'perusahaan', 'status']);
 
-        // Apply filters
-        if ($request->filled('nama')) {
-            $query->where('Nama_Sesuai_KTP', 'like', '%' . $request->nama . '%');
-        }
-
-        if ($request->filled('nik')) {
-            $query->where('NIK', 'like', '%' . $request->nik . '%');
-        }
-
-        if ($request->filled('jabatan')) {
-            $query->whereHas('pekerjaan', function($q) use ($request) {
-                $q->where('Bagian', 'like', '%' . $request->jabatan . '%');
+        // Apply search filter
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('Nama_Sesuai_KTP', 'like', '%' . $search . '%')
+                  ->orWhere('NIK', 'like', '%' . $search . '%')
+                  ->orWhere('Nomor_Telepon_Aktif_Karyawan', 'like', '%' . $search . '%')
+                  ->orWhereHas('pekerjaan.position', function($subQ) use ($search) {
+                      $subQ->where('name', 'like', '%' . $search . '%');
+                  })
+                  ->orWhereHas('pekerjaan', function($subQ) use ($search) {
+                      $subQ->where('Lokasi_Kerja', 'like', '%' . $search . '%');
+                  })
+                  ->orWhereHas('pekerjaan.division', function($subQ) use ($search) {
+                      $subQ->where('name', 'like', '%' . $search . '%');
+                  })
+                  ->orWhereHas('pekerjaan.company', function($subQ) use ($search) {
+                      $subQ->where('name', 'like', '%' . $search . '%');
+                  });
             });
         }
 
-        if ($request->filled('lokasi_kerja')) {
-            $query->whereHas('pekerjaan', function($q) use ($request) {
-                $q->where('Lokasi_Kerja', 'like', '%' . $request->lokasi_kerja . '%');
-            });
-        }
-
-        if ($request->filled('divisi')) {
-            $query->whereHas('pekerjaan.division', function($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->divisi . '%');
-            });
-        }
-
-        if ($request->filled('perusahaan')) {
-            $query->whereHas('pekerjaan.company', function($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->perusahaan . '%');
-            });
-        }
-
-        if ($request->filled('status')) {
-            $query->where('Kode', $request->status);
-        }
-
-        $karyawans = $query->orderBy('id_karyawan', 'desc')->paginate(10);
+        $karyawans = $query->orderBy('id_karyawan', 'desc')->paginate(10)->appends($request->query());
 
         return view('pages.karyawan.index', compact('karyawans'));
     }
 
     public function batchDelete(Request $request)
     {
-        $ids = explode(',', $request->ids);
-        Karyawan::whereIn('id_karyawan', $ids)->delete();
-        return back()->with('success', count($ids) . ' karyawan berhasil dihapus.');
+        \Log::info('Batch delete request received', [
+            'method' => $request->method(),
+            'url' => $request->fullUrl(),
+            'all_data' => $request->all(),
+            'selected_karyawan' => $request->selected_karyawan,
+            'csrf_token' => $request->_token ?? 'no token'
+        ]);
+
+        $ids = $request->selected_karyawan;
+
+        if (!$ids || !is_array($ids) || count($ids) === 0) {
+            return back()->with('error', 'Tidak ada data yang dipilih untuk dihapus');
+        }
+
+        try {
+            $deletedCount = Karyawan::whereIn('id_karyawan', $ids)->delete();
+
+            if ($deletedCount > 0) {
+                return back()->with('success', $deletedCount . ' karyawan berhasil dihapus');
+            } else {
+                return back()->with('error', 'Tidak ada data yang berhasil dihapus');
+            }
+        } catch (\Exception $e) {
+            \Log::error('Batch delete error: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan saat menghapus data');
+        }
     }
+
 
     public function create()
     {
@@ -154,7 +163,7 @@ class KaryawanController extends Controller
             DataKeluarga::create($keluargaData);
 
             // Pekerjaan
-            $pekerjaanData = $request->only(['position_id', 'Bagian', 'department_id', 'division_id', 'unit_id', 'company_id', 'Jenis_Kontrak', 'Perjanjian', 'Lokasi_Kerja']);
+            $pekerjaanData = $request->only(['position_id', 'Jabatan', 'department_id', 'division_id', 'unit_id', 'company_id', 'Jenis_Kontrak', 'Perjanjian', 'Lokasi_Kerja']);
             $pekerjaanData['id_karyawan'] = $karyawan->id_karyawan;
             Pekerjaan::create($pekerjaanData);
 
@@ -316,7 +325,7 @@ class KaryawanController extends Controller
             $dataBpjs = $request->only(['Status_BPJS_KT', 'Status_BPJS_KS']);
             $karyawan->bpjs ? $karyawan->bpjs->update($dataBpjs) : Bpjs::create(array_merge(['id_karyawan' => $id], $dataBpjs));
 
-            // 4. Update Status Karyawan (Bagian yang Anda tanyakan)
+            // 4. Update Status Karyawan (Jabatan yang Anda tanyakan)
             $dataStatus = $request->only(['Tanggal_Non_Aktif', 'Alasan_Non_Aktif', 'Ijazah_Dikembalikan', 'Bulan']);
             $karyawan->status ? $karyawan->status->update($dataStatus) : StatusKaryawan::create(array_merge(['id_karyawan' => $id], $dataStatus));
 
@@ -356,7 +365,7 @@ class KaryawanController extends Controller
             $karyawan->kontrak ? $karyawan->kontrak->update($dataKontrak) : Kontrak::create(array_merge(['id_karyawan' => $id], $dataKontrak));
 
             // 8. Update Pekerjaan
-            $dataKerja = $request->only(['position_id', 'Bagian', 'department_id', 'division_id', 'unit_id', 'company_id', 'Jenis_Kontrak', 'Perjanjian', 'Lokasi_Kerja']);
+            $dataKerja = $request->only(['position_id', 'Jabatan', 'department_id', 'division_id', 'unit_id', 'company_id', 'Jenis_Kontrak', 'Perjanjian', 'Lokasi_Kerja']);
             $karyawan->pekerjaan()->exists() ? $karyawan->pekerjaan()->first()->update($dataKerja) : Pekerjaan::create(array_merge(['id_karyawan' => $id], $dataKerja));
 
             DB::commit();

@@ -63,7 +63,7 @@ class KpiAssessmentController extends Controller
             ];
 
             // List Jabatan Dropdown
-            $listJabatan = DB::table('pekerjaan')->select('jabatan')->distinct()->whereNotNull('jabatan')->orderBy('jabatan')->pluck('jabatan');
+            $listJabatan = \App\Models\Position::distinct()->orderBy('name')->pluck('name');
 
             $karyawanList = $query->paginate(10)->appends($request->all());
 
