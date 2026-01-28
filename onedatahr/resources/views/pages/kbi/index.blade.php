@@ -293,63 +293,63 @@
                         @forelse($bawahanList as $staff)
                             {{-- === LOGIKA PENILAIAN DIHITUNG DI SINI AGAR BISA DIPAKAI DI KOLOM KETERANGAN & AKSI === --}}
                             @php
-    // ===== 1. HIERARKI JABATAN =====
-    $jabatanHierarchy = [
-        'direktur' => 1,
-        'general manager' => 2,
-        'gm' => 2,
-        'manager' => 3,
-        'manajer' => 3,
-        'supervisor' => 4,
-        'staff' => 5,
-        'officer' => 6,
-        'assistant' => 7,
-    ];
+                                // ===== 1. HIERARKI JABATAN =====
+                                $jabatanHierarchy = [
+                                    'direktur' => 1,
+                                    'general manager' => 2,
+                                    'gm' => 2,
+                                    'manager' => 3,
+                                    'manajer' => 3,
+                                    'supervisor' => 4,
+                                    'staff' => 5,
+                                    'officer' => 6,
+                                    'assistant' => 7,
+                                ];
 
-    // helper normalisasi
-    $normalize = fn($v) => strtolower(trim($v ?? ''));
+                                // helper normalisasi
+                                $normalize = fn($v) => strtolower(trim($v ?? ''));
 
-    // ===== 2. DATA STAFF =====
-    $staffJob = $staff->pekerjaan->first();
-    $staffJabatan = $normalize($staffJob?->Jabatan ?? $staffJob?->position?->name);
-    $staffDivisi  = $normalize($staffJob?->division?->name ?? $staffJob?->divisi?->name);
-    $staffLevel   = $jabatanHierarchy[$staffJabatan] ?? null;
+                                // ===== 2. DATA STAFF =====
+                                $staffJob = $staff->pekerjaan->first();
+                                $staffJabatan = $normalize($staffJob?->Jabatan ?? $staffJob?->position?->name);
+                                $staffDivisi  = $normalize($staffJob?->division?->name ?? $staffJob?->divisi?->name);
+                                $staffLevel   = $jabatanHierarchy[$staffJabatan] ?? null;
 
-    // ===== 3. DATA MANAGER =====
-    $managerJob = $karyawan->pekerjaan->first();
-    $managerJabatan = $normalize($managerJob?->Jabatan ?? $managerJob?->position?->name);
-    $managerDivisi  = $normalize($managerJob?->division?->name ?? $managerJob?->divisi?->name);
-    $managerLevel   = $jabatanHierarchy[$managerJabatan] ?? null;
+                                // ===== 3. DATA MANAGER =====
+                                $managerJob = $karyawan->pekerjaan->first();
+                                $managerJabatan = $normalize($managerJob?->Jabatan ?? $managerJob?->position?->name);
+                                $managerDivisi  = $normalize($managerJob?->division?->name ?? $managerJob?->divisi?->name);
+                                $managerLevel   = $jabatanHierarchy[$managerJabatan] ?? null;
 
-    // ===== 4. DEFAULT =====
-    $canAssess = false;
-    $reason = 'Tidak memenuhi kriteria';
+                                // ===== 4. DEFAULT =====
+                                $canAssess = false;
+                                $reason = 'Tidak memenuhi kriteria';
 
-    // ===== 5. LOGIKA GM =====
-    if(!empty($isGM) && $isGM) {
-        if($staffLevel === 3) {
-            $canAssess = true;
-        } else {
-            $reason = 'GM hanya menilai Manager';
-        }
-    }
+                                // ===== 5. LOGIKA GM =====
+                                if(!empty($isGM) && $isGM) {
+                                    if($staffLevel === 3) {
+                                        $canAssess = true;
+                                    } else {
+                                        $reason = 'GM hanya menilai Manager';
+                                    }
+                                }
 
-    // ===== 6. LOGIKA MANAGER =====
-    elseif(!empty($isManager) && $isManager) {
-        if(!$staffLevel || !$managerLevel) {
-            $reason = 'Jabatan tidak dikenali';
-        }
-        elseif($managerDivisi !== $staffDivisi) {
-            $reason = 'Beda divisi';
-        }
-        elseif($staffLevel <= $managerLevel) {
-            $reason = 'Level tidak di bawah Anda';
-        }
-        else {
-            $canAssess = true;
-        }
-    }
-@endphp
+                                // ===== 6. LOGIKA MANAGER =====
+                                elseif(!empty($isManager) && $isManager) {
+                                    if(!$staffLevel || !$managerLevel) {
+                                        $reason = 'Jabatan tidak dikenali';
+                                    }
+                                    elseif($managerDivisi !== $staffDivisi) {
+                                        $reason = 'Beda divisi';
+                                    }
+                                    elseif($staffLevel <= $managerLevel) {
+                                        $reason = 'Level tidak di bawah Anda';
+                                    }
+                                    else {
+                                        $canAssess = true;
+                                    }
+                                }
+                            @endphp
 
 
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
@@ -373,7 +373,7 @@
                                     {{ $staff->pekerjaan->first()?->company?->name ?? '-' }}
                                 </td>
 
-                                KOLOM 4: KETERANGAN STATUS (Dapat Dinilai / Locked)
+                                {{-- KOLOM 4: KETERANGAN STATUS (Dapat Dinilai / Locked) --}}
                                 @if((isset($isGM) && $isGM) || (isset($isManager) && $isManager))
                                     <td class="p-4 text-center">
                                         @if($canAssess)
