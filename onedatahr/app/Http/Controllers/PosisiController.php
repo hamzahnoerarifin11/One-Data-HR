@@ -22,32 +22,24 @@ class PosisiController extends Controller
 
     public function manage()
     {
-    // Tambahkan withCount untuk menghitung jumlah kandidat per posisi
-    // Pastikan di model Posisi ada function kandidat() { return $this->hasMany(Kandidat::class, ...); }
-    $pos = Posisi::withCount('kandidat as total_pelamar')
-        ->orderBy('id_posisi', 'DESC')
-        ->get();
+        // Ambil semua posisi dengan total pelamar, sudah tersetting dengan progress_rekrutmen otomatis dari KandidatObserver
+        $pos = Posisi::withCount('kandidat as total_pelamar_view')
+            ->orderBy('id_posisi', 'DESC')
+            ->get();
 
-    // Jika Anda butuh 'progress_rekrutmen', kita bisa manipulasi collection
-    // Atau sementara kita samakan saja dengan status
-    $pos->transform(function($item) {
-        $item->progress_rekrutmen = $item->status == 'Aktif' ? 'Menerima Kandidat' : 'Tidak Menerima Kandidat';
-        return $item;
-    });
+        // Get unique job titles from employee work data
+        $jobTitles = Pekerjaan::select('Jabatan')
+            ->whereNotNull('Jabatan')
+            ->where('Jabatan', '!=', '')
+            ->distinct()
+            ->orderBy('Jabatan')
+            ->pluck('Jabatan')
+            ->toArray();
 
-    // Get unique job titles from employee work data
-    $jobTitles = Pekerjaan::select('Jabatan')
-        ->whereNotNull('Jabatan')
-        ->where('Jabatan', '!=', '')
-        ->distinct()
-        ->orderBy('Jabatan')
-        ->pluck('Jabatan')
-        ->toArray();
-
-    return view('pages.rekrutmen.posisi.index', [
-        'posisis' => $pos,
-        'jobTitles' => $jobTitles
-    ]);
+        return view('pages.rekrutmen.posisi.index', [
+            'posisis' => $pos,
+            'jobTitles' => $jobTitles
+        ]);
     }
 
     public function index()

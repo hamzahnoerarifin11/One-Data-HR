@@ -12,10 +12,12 @@
     </div>
 
     <div class="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-        
+
         <div class="flex items-center gap-2">
             <span class="text-xs font-bold uppercase text-gray-500">Filter Data:</span>
-            <select id="stage-select" class="h-10 rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm font-semibold text-gray-700 dark:text-white focus:border-purple-500 focus:ring-purple-500">
+            <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
+            <select id="stage-select" class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
+                           :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true">
                 <option value="total_pelamar">🟢 Total Pelamar (Manual)</option>
                 <option value="lolos_cv">🔵 Lolos CV</option>
                 <option value="lolos_psikotes">🟣 Lolos Psikotes</option>
@@ -23,13 +25,35 @@
                 <option value="lolos_hr">🔴 Lolos HR</option>
                 <option value="lolos_user">⚫ Lolos User</option>
             </select>
+            <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
+                            <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </span>
+            </div>
         </div>
 
         <div class="flex items-center gap-2">
-            <select id="month-select" class="h-10 rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm text-gray-700 dark:text-white focus:border-purple-500 focus:ring-purple-500"></select>
-            
-            <select id="year-select" class="h-10 rounded-lg border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm text-gray-700 dark:text-white focus:border-purple-500 focus:ring-purple-500"></select>
-            
+            <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
+                <select id="month-select" class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
+                            :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true">
+                </select>
+                <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
+                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </span>
+            </div>
+            <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
+            <select id="year-select" class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
+                            :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true">
+            </select>
+            <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
+                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                            </span>
+            </div>
             <button id="refresh-calendar" class="h-10 px-4 flex items-center gap-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-medium transition-colors shadow-sm">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                 <span>Refresh</span>
@@ -47,7 +71,7 @@
                             Posisi
                         </th>
                         <th id="month-header" class="border-b border-r border-purple-800 p-2 bg-purple-700 text-white font-bold text-center tracking-wider uppercase"></th>
-                        
+
                         <th rowspan="2" class="sticky right-[80px] z-30 bg-blue-600 border-b border-l border-blue-700 p-2 min-w-[80px] text-center font-bold text-white shadow-[-4px_0_10px_-4px_rgba(0,0,0,0.2)]">
                             Total<br>Bulan
                         </th>
@@ -67,12 +91,12 @@
 
         <div class="flex flex-wrap gap-6 items-center p-4 bg-gray-50 border-t border-gray-200 text-xs">
             <span class="font-bold uppercase text-gray-500 tracking-wider">Keterangan:</span>
-            
+
             <div class="flex items-center gap-2">
                 <div class="w-3 h-3 bg-green-500 rounded-sm"></div>
                 <span class="text-gray-700 font-medium">Input Manual (Total Pelamar)</span>
             </div>
-            
+
             <div class="flex items-center gap-2">
                 <div class="w-3 h-3 bg-blue-500 rounded-sm"></div>
                 <span class="text-gray-700 font-medium">Data Otomatis (Lolos Tahapan)</span>
@@ -130,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const tableFooter = document.getElementById('table-footer');
     const headerDays = document.getElementById('header-row-days');
     const monthHeader = document.getElementById('month-header');
-    
+
     // --- SAFETY CHECK (PENTING) ---
     const monthSel = document.getElementById('month-select');
     const yearSel = document.getElementById('year-select');
@@ -177,7 +201,7 @@ document.addEventListener('DOMContentLoaded', function() {
     async function renderTable() {
         const month = parseInt(monthSel.value);
         const year = parseInt(yearSel.value);
-        const currentStage = stageSel.value; 
+        const currentStage = stageSel.value;
         const daysInMonth = new Date(year, month, 0).getDate();
         const isManual = currentStage === 'total_pelamar';
 
@@ -221,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Render Rows
             tableBody.innerHTML = '';
-            let dailyTotals = Array(daysInMonth).fill(0); 
+            let dailyTotals = Array(daysInMonth).fill(0);
             let monthlyGrandTotal = 0;
             let yearlyGrandTotal = 0;
 
@@ -237,21 +261,21 @@ document.addEventListener('DOMContentLoaded', function() {
                     rowMonthlyTotal += val;
                     dailyTotals[d-1] += val;
 
-                    let cellClass = "text-gray-300"; 
+                    let cellClass = "text-gray-300";
                     // Escape petik satu pada nama posisi agar JS tidak error
                     const safeName = p.nama_posisi.replace(/'/g, "\\'");
                     let clickAction = `onclick="openEdit(${p.id_posisi}, '${safeName}', '${dateStr}', ${val})"`;
 
                     if (val > 0) {
-                        cellClass = isManual 
+                        cellClass = isManual
                             ? "font-bold text-green-700 bg-green-50 hover:bg-green-100 cursor-pointer border-green-200"
                             : "font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 cursor-pointer border-blue-200";
                     } else {
                         if (isManual) {
                             cellClass = "hover:bg-gray-50 cursor-pointer text-transparent hover:text-gray-400";
                         } else {
-                            cellClass = "bg-gray-50/50 cursor-not-allowed"; 
-                            clickAction = ""; 
+                            cellClass = "bg-gray-50/50 cursor-not-allowed";
+                            clickAction = "";
                         }
                     }
 
@@ -318,7 +342,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const infoBox = document.getElementById('modal-info-box');
 
         inputVal.value = val;
-        
+
         if (isManual) {
             inputVal.disabled = false;
             inputVal.classList.remove('bg-gray-100', 'text-gray-400');
@@ -376,7 +400,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 alert("Gagal menyimpan data.");
             }
-        } catch (err) { console.error(err); } 
+        } catch (err) { console.error(err); }
         finally { btn.disabled = false; btn.innerText = 'Simpan Perubahan'; }
     };
 
