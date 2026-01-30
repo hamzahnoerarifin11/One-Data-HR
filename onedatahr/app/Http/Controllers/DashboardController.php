@@ -15,8 +15,8 @@ use App\Models\Kontrak;
 use App\Models\Perusahaan;
 use App\Models\KpiAssessment;
 use App\Models\KbiAssessment;
-use App\Models\Role;
-use App\Models\User;
+use App\Models\Division;
+use App\Models\Company;
 
 class DashboardController extends Controller
 {
@@ -65,7 +65,7 @@ class DashboardController extends Controller
         $totalKaryawan   = Karyawan::count();
         $karyawanAktif   = Karyawan::where('Kode', 'Aktif')->count();
         $totalKontrak    = Kontrak::count();
-        $totalDepartemen = Pekerjaan::distinct('Departement')->count('Departement');
+        $totaldepartment_id = Pekerjaan::distinct('department_id')->count('department_id');
 
         // --- Statistik Demografi (Gender, Jabatan, Divisi, dll) ---
         // (Kode query sama persis seperti sebelumnya)
@@ -73,7 +73,7 @@ class DashboardController extends Controller
 
         $jabatanData = Pekerjaan::with('position')->whereHas('position')->groupBy('position_id')->select('position_id', DB::raw('count(*) as total'))->get()->pluck('total', 'position.name')->toArray();
 
-        $divisiData = Pekerjaan::whereNotNull('Divisi')->groupBy('Divisi')->select('Divisi', DB::raw('count(*) as total'))->pluck('total', 'Divisi')->toArray();
+        $divisiData = Division::whereNotNull('name')->groupBy('name')->select('name', DB::raw('count(*) as total'))->pluck('total','name')->toArray();
 
         $pendidikanData = Pendidikan::whereNotNull('Pendidikan_Terakhir')->groupBy('Pendidikan_Terakhir')->select('Pendidikan_Terakhir', DB::raw('count(*) as total'))->pluck('total', 'Pendidikan_Terakhir')->toArray();
 
@@ -98,21 +98,39 @@ class DashboardController extends Controller
             else $ageCounts['> 50']++;
         }
 
-        $perusahaanData = Perusahaan::whereNotNull('Perusahaan')->groupBy('Perusahaan')->select('Perusahaan', DB::raw('count(*) as total'))->pluck('total', 'Perusahaan')->toArray();
+        $perusahaanData = Company::whereNotNull('name')->groupBy('name')->select('name', DB::raw('count(*) as total'))->pluck('total','name')->toArray();
+
+        // --- Data Turnover (Keluar Masuk per Bulan per Perusahaan) ---
+        $turnoverData = [];
+        $companies = Company::all();
+        $currentYear = date('Y');
+        for ($month = 1; $month <= 12; $month++) {
+            $turnoverData[$month] = [];
+            foreach ($companies as $company) {
+                // Masuk: Tanggal_Mulai_Tugas dari kontrak
+                $masuk = Kontrak::join('pekerjaan', 'kontrak.id_karyawan', '=', 'pekerjaan.id_karyawan')
+                    ->where('pekerjaan.company_id', $company->id)
+                    ->whereYear('kontrak.Tanggal_Mulai_Tugas', $currentYear)
+                    ->whereMonth('kontrak.Tanggal_Mulai_Tugas', $month)
+                    ->count();
+
+                // Keluar: Karyawan dengan Kode = 'Non Aktif', asumsikan updated_at sebagai tanggal keluar
+                $keluar = Karyawan::join('pekerjaan', 'karyawan.id_karyawan', '=', 'pekerjaan.id_karyawan')
+                    ->where('pekerjaan.company_id', $company->id)
+                    ->where('karyawan.Kode', 'Non Aktif')
+                    ->whereYear('karyawan.updated_at', $currentYear)
+                    ->whereMonth('karyawan.updated_at', $month)
+                    ->count();
+
+                $turnoverData[$month][$company->name] = ['masuk' => $masuk, 'keluar' => $keluar];
+            }
+        }
 
         // View: pages/dashboard/admin.blade.php (atau dashboard.blade.php yang lama)
         return view('pages.dashboard', compact(
-            'totalKaryawan',
-            'karyawanAktif',
-            'totalKontrak',
-            'totalDepartemen',
-            'genderData',
-            'jabatanData',
-            'divisiData',
-            'pendidikanData',
-            'tenureCounts',
-            'ageCounts',
-            'perusahaanData'
+            'totalKaryawan', 'karyawanAktif', 'totalKontrak', 'totaldepartment_id',
+            'genderData', 'jabatanData', 'divisiData', 'pendidikanData',
+            'tenureCounts', 'ageCounts', 'perusahaanData', 'turnoverData'
         ));
     }
 

@@ -883,22 +883,36 @@
                         </div>
                     </div>
 
-                    <!-- JABATAN -->
+                    <!-- LEVEL JABATAN -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Jabatan
-                        </label>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                Level Jabatan
+                            </label>
+                            <button type="button"
+                                    @click="openLevelModal()"
+                                    class="text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 px-2 py-1 rounded transition dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/40">
+                                <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                                Tambah Level
+                            </button>
+                        </div>
 
                         <div class="relative z-20">
-                            <select id="position" name="position_id"
-                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 px-4 pr-11 text-sm
+                            <select name="level_id" required id="levelSelect"
+                                    class="h-11 w-full appearance-none rounded-lg border border-gray-300 px-4 pr-11 text-sm
                                     shadow-theme-xs bg-transparent
                                     focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
                                     dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
 
-                                <option value="">-- Pilih Jabatan --</option>
+                                <option value="">-- Pilih Level --</option>
+                                @foreach ($levels as $level)
+                                    <option value="{{ $level->id }}">
+                                        {{ $level->name }}
+                                    </option>
+                                @endforeach
                             </select>
-
                             <!-- Arrow -->
                             <span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-gray-500">
                                 <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -912,12 +926,12 @@
                     </div>
 
 
-                    <!-- BAGIAN -->
+                    <!-- JABATAN -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Bagian</label>
-                        <input name="Bagian"
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Nama Jabatan</label>
+                        <input name="Jabatan"
                             placeholder="Contoh: Administrasi / Operasional"
-                            value="{{ old('Bagian') }}"
+                            value="{{ old('Jabatan') }}"
                              class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10
                             dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent
                             px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden
@@ -1908,14 +1922,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Reset dependent selects
                     departmentSelect.innerHTML = '<option value="">-- Pilih Departement --</option>';
                     unitSelect.innerHTML = '<option value="">-- Pilih Unit --</option>';
-                    positionSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+                    positionSelect.innerHTML = '<option value="">-- Pilih Level Jabatan --</option>';
                 })
                 .catch(error => console.error('Error fetching divisions:', error));
         } else {
             divisionSelect.innerHTML = '<option value="">-- Pilih Divisi --</option>';
             departmentSelect.innerHTML = '<option value="">-- Pilih Departement --</option>';
             unitSelect.innerHTML = '<option value="">-- Pilih Unit --</option>';
-            positionSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+            positionSelect.innerHTML = '<option value="">-- Pilih Level Jabatan --</option>';
         }
     });
 
@@ -1929,12 +1943,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     populateSelect(departmentSelect, data, '-- Pilih Departement --');
                     // Reset dependent selects
                     unitSelect.innerHTML = '<option value="">-- Pilih Unit --</option>';
-                    positionSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+                    positionSelect.innerHTML = '<option value="">-- Pilih Level Jabatan --</option>';
                 });
         } else {
             departmentSelect.innerHTML = '<option value="">-- Pilih Departement --</option>';
             unitSelect.innerHTML = '<option value="">-- Pilih Unit --</option>';
-            positionSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+            positionSelect.innerHTML = '<option value="">-- Pilih Level Jabatan --</option>';
         }
     });
 
@@ -1947,11 +1961,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(data => {
                     populateSelect(unitSelect, data, '-- Pilih Unit --');
                     // Reset dependent select
-                    positionSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+                    positionSelect.innerHTML = '<option value="">-- Pilih Level Jabatan --</option>';
                 });
         } else {
             unitSelect.innerHTML = '<option value="">-- Pilih Unit --</option>';
-            positionSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+            positionSelect.innerHTML = '<option value="">-- Pilih Level Jabatan --</option>';
         }
     });
 
@@ -1962,13 +1976,15 @@ document.addEventListener('DOMContentLoaded', function() {
             fetch(`/karyawan/positions/${unitId}`)
                 .then(response => response.json())
                 .then(data => {
-                    populateSelect(positionSelect, data, '-- Pilih Jabatan --');
+                    populateSelect(positionSelect, data, '-- Pilih Level Jabatan --');
                 });
         } else {
-            positionSelect.innerHTML = '<option value="">-- Pilih Jabatan --</option>';
+            positionSelect.innerHTML = '<option value="">-- Pilih Level Jabatan --</option>';
         }
     });
 });
 </script>
+
+@include('pages.karyawan.partials.level-modal')
 
 @endsection

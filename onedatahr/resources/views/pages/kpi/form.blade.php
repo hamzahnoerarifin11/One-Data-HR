@@ -83,7 +83,7 @@
                 Menampilkan KPI tahun <strong class="text-blue-600 dark:text-blue-400" id="currentYearDisplay">{{ $tahun }}</strong>
             </div>
         </div>
-        
+
         <div class="flex flex-wrap gap-2 w-full lg:w-auto justify-start lg:justify-end items-center">
             {{-- LOGIKA TOMBOL KEMBALI DINAMIS --}}
             @if(auth()->user()->hasRole(['superadmin', 'admin']))
@@ -101,21 +101,21 @@
             {{-- 2. [BARU] Tombol Export Dropdown --}}
             <div class="relative group">
                 <button type="button" class="px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition flex items-center gap-2 border border-gray-200 dark:border-gray-600">
-                    <i class="fas fa-download"></i> 
+                    <i class="fas fa-download"></i>
                     <span class="hidden sm:inline font-medium">Export</span>
                     <i class="fas fa-chevron-down text-xs ml-1"></i>
                 </button>
-                
+
                 {{-- Isi Dropdown (Muncul saat Hover) --}}
                 <div class="absolute right-0 mt-1 w-40 bg-white dark:bg-gray-800 rounded-md shadow-xl border border-gray-100 dark:border-gray-700 hidden group-hover:block z-50 overflow-hidden">
                     {{-- Link Excel --}}
-                    <a href="{{ route('performance.export.excel', ['karyawan_id' => $karyawan->id_karyawan, 'tahun' => $kpi->tahun]) }}" 
+                    <a href="{{ route('performance.export.excel', ['karyawan_id' => $karyawan->id_karyawan, 'tahun' => $kpi->tahun]) }}"
                        class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-green-50 hover:text-green-700 dark:hover:bg-gray-700 flex items-center gap-2 transition">
                         <i class="fas fa-file-excel text-green-600 w-4"></i> Export Excel
                     </a>
-                    
+
                     {{-- Link PDF --}}
-                    <a href="{{ route('performance.export.pdf', ['karyawan_id' => $karyawan->id_karyawan, 'tahun' => $kpi->tahun]) }}" 
+                    <a href="{{ route('performance.export.pdf', ['karyawan_id' => $karyawan->id_karyawan, 'tahun' => $kpi->tahun]) }}"
                        class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-red-50 hover:text-red-700 dark:hover:bg-gray-700 flex items-center gap-2 transition border-t border-gray-100 dark:border-gray-700">
                         <i class="fas fa-file-pdf text-red-600 w-4"></i> Export PDF
                     </a>
@@ -124,7 +124,7 @@
             {{-- 3. Tombol Simpan --}}
             <button id="btnSimpan" type="button" onclick="submitKpiForm()" disabled
                 class="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm transition shadow-lg flex items-center justify-center gap-2 flex-1 lg:flex-none opacity-50 cursor-not-allowed">
-                
+
                 @if($isManager)
                     <i class="fas fa-check-double"></i> <span class="hidden sm:inline">Simpan & Approve</span>
                 @else
@@ -173,10 +173,10 @@
 
     @php
     // Cek apakah user yang login berhak melakukan adjustment?
-    // Staff TIDAK BOLEH (False), Manager TIDAK BOLEH kecuali GM (superadmin)
+    // Staff TIDAK BOLEH (False), Manager TIDAK BOLEH kecuali senior_manager (superadmin)
     $isStaff = auth()->user()->hasRole(['staff']);
-    $canAdjust = auth()->user()->hasRole(['superadmin', 'gm']); // GM dan superadmin yang bisa adjust
-    
+    $canAdjust = auth()->user()->hasRole(['superadmin', 'senior_manager']); // senior_manager dan superadmin yang bisa adjust
+
     // Class CSS untuk input yang dikunci (Abu-abu & tidak bisa diklik)
     $readonlyClass = $isStaff ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-transparent text-orange-700 font-bold border-b border-orange-300';
     @endphp
@@ -187,10 +187,10 @@
         @if(!$items->isEmpty())
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700 relative">
             <div class="w-full overflow-x-auto custom-scrollbar">
-                <table 
+                <table
                     class="w-full text-sm text-left min-w-[3000px] md:min-w-[4500px] border-collapse"
                     style="--col-no:48px; --col-kra:220px;"
-                    > 
+                    >
                     <thead class="text-xs text-gray-700 uppercase bg-gray-100 sticky top-0 z-20 shadow-sm">
                         <tr>
                             <th rowspan="2" class="sticky left-0 z-40 bg-gray-200 p-2 w-10 text-center border border-gray-300 shadow-sm">No</th>
@@ -230,7 +230,7 @@
                                         <button type="button" onclick="confirmDelete('{{ route('kpi.delete-item', $item->id_kpi_item) }}')" class="text-gray-400 hover:text-red-600 p-1"><i class="fas fa-trash-alt text-[10px]"></i></button>
                                     </div>
                                 </div>
-                                
+
                                 {{-- <div class="text-[15px] text-gray-500 mt-1">{{ $item->key_performance_indicator ?? $item->indikator }}</div> --}}
                                 <div class="text-[15px] text-gray-500 mt-1">{{ $item->units ?? $item->satuan }} | {{ $item->polaritas }}</div>
                                 <input type="hidden" class="input-bobot" value="{{ $item->bobot }}">
@@ -276,11 +276,11 @@
 
                             {{-- ADJ S-I --}}
                             <td class="p-1 text-center border-r bg-orange-50/30 align-center">
-                                <input 
-                                type="number" 
-                                name="kpi[{{ $item->id_kpi_item }}][adjustment_real_smt1]" 
+                                <input
+                                type="number"
+                                name="kpi[{{ $item->id_kpi_item }}][adjustment_real_smt1]"
                                 value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_real_smt1', $score->adjustment_real_smt1 ?? '') }}"
-                                {{ !$canAdjust ? 'readonly' : '' }} 
+                                {{ !$canAdjust ? 'readonly' : '' }}
                                 step="0.01" class="input-adj-real-smt1 w-full h-8 px-1 bg-transparent text-center border-b border-orange-200 outline-none" placeholder="Real"></td>
                             <td class="p-1 border-r bg-orange-50/30 align-center text-center pt-2">
                                 <span class="span-adj-skor-smt1 font-bold text-orange-600"></span>%</td>
@@ -289,16 +289,16 @@
 
                             {{-- ADJ S-II --}}
                             <td class="p-1 border-r bg-orange-50/30 align-center">
-                                <input type="number" 
-                                name="kpi[{{ $item->id_kpi_item }}][adjustment_target_smt2]" 
+                                <input type="number"
+                                name="kpi[{{ $item->id_kpi_item }}][adjustment_target_smt2]"
                                 value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_target_smt2', $score->adjustment_target_smt2 ?? '') }}"
                                 {{ !$canAdjust ? 'readonly' : '' }}
                                 step="0.01" class="input-adj-target-smt2 w-full h-8 px-1 bg-transparent text-center border-b border-orange-200 outline-none" placeholder="Tgt"></td>
                             <td class="p-1 border-r bg-orange-50/30 align-center">
-                                <input type="number" 
-                                name="kpi[{{ $item->id_kpi_item }}][adjustment_real_smt2]" 
+                                <input type="number"
+                                name="kpi[{{ $item->id_kpi_item }}][adjustment_real_smt2]"
                                 value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_real_smt2', $score->adjustment_real_smt2 ?? '') }}"
-                                {{ !$canAdjust ? 'readonly' : '' }} 
+                                {{ !$canAdjust ? 'readonly' : '' }}
                                 step="0.01" class="input-adj-real-smt2 w-full h-8 px-1 bg-transparent text-center border-b border-orange-200 outline-none" placeholder="Real"></td>
                             <td class="p-1 border-r bg-orange-50/30 align-center text-center pt-2"><span class="span-adj-skor-smt2 font-bold text-orange-600"></span>%</td>
                             <td class="p-1 border-r bg-orange-50/30 align-center"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][adjustment_smt2]" value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_smt2', $score->adjustment_smt2 ?? '') }}" class="input-adj-nilai-smt2 w-full h-8 px-1 bg-transparent text-center font-bold text-orange-600 border-b border-orange-200 outline-none" placeholder="Nilai" readonly></td>
@@ -418,10 +418,10 @@
 {{-- SCRIPT--}}
 <script>
     // --- KONFIGURASI & VARIABEL ---
-    let initialFormState = null;   
+    let initialFormState = null;
     let targetUrl = null;
-    let isSubmitting = false;      
-    let isMonitoring = false;      
+    let isSubmitting = false;
+    let isMonitoring = false;
 
     // --- HELPER DATA FORM ---
     function getFormDataString() {
@@ -432,21 +432,21 @@
 
     // --- LOGIC UTAMA (LOAD) ---
     document.addEventListener('DOMContentLoaded', function() {
-        
+
         // 1. Matikan Tombol Simpan saat awal load
-        toggleSaveButton(false); 
+        toggleSaveButton(false);
 
         // 2. Jalankan Matematika
         calculateAll();
 
         // 3. AMBIL SNAPSHOT & AKTIFKAN MONITORING
         setTimeout(() => {
-            initialFormState = getFormDataString(); 
-            isMonitoring = true; 
-            
+            initialFormState = getFormDataString();
+            isMonitoring = true;
+
             // Pastikan status tombol sesuai kondisi awal (seharusnya mati/disabled)
             updateSystemState();
-            
+
             console.log("System Ready: Button Logic Active.");
         }, 800);
 
@@ -474,7 +474,7 @@
     // --- FUNGSI PUSAT KONTROL STATUS ---
     function updateSystemState() {
         const isChanged = hasUnsavedChanges();
-        
+
         // 1. Update Badge Kuning
         const badge = document.getElementById('unsaved-badge');
         if(badge) {
@@ -522,14 +522,14 @@
         }
 
         // KUNCI: Set flag submitting
-        isSubmitting = true; 
-        isMonitoring = false; 
+        isSubmitting = true;
+        isMonitoring = false;
 
         // UI Loading (Tetap disable tombol agar tidak double click)
-        if(btn) { 
-            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Menyimpan...'; 
-            btn.disabled = true; 
-            btn.classList.add('opacity-75', 'cursor-wait'); 
+        if(btn) {
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Menyimpan...';
+            btn.disabled = true;
+            btn.classList.add('opacity-75', 'cursor-wait');
         }
 
         document.getElementById('kpiForm').submit();
@@ -539,13 +539,13 @@
     // Dinonaktifkan: Peringatan saat refresh/close tab dihilangkan
     /*
     window.addEventListener('beforeunload', function (e) {
-        if (isSubmitting) return; 
-        if (!isMonitoring) return; 
-        if (document.getElementById('successModal')) return; 
+        if (isSubmitting) return;
+        if (!isMonitoring) return;
+        if (document.getElementById('successModal')) return;
 
         if (hasUnsavedChanges()) {
             e.preventDefault();
-            e.returnValue = ''; 
+            e.returnValue = '';
         }
     });
     */
@@ -559,12 +559,12 @@
             if (!href || href.startsWith('#') || href.startsWith('javascript') || this.target === '_blank' || href.includes('export') || href.includes('download')) return;
 
             if (isSubmitting) return;
-            if (document.getElementById('successModal')) return; 
+            if (document.getElementById('successModal')) return;
 
             if (hasUnsavedChanges()) {
-                e.preventDefault(); 
-                targetUrl = href;   
-                document.getElementById('unsavedModal').style.display = 'flex'; 
+                e.preventDefault();
+                targetUrl = href;
+                document.getElementById('unsavedModal').style.display = 'flex';
             }
         });
     });
@@ -587,7 +587,7 @@
     // --- FILTER TAHUN ---
     function changeKpiYear(selectedYear) {
         if (!selectedYear) { alert('Pilih tahun!'); return; }
-        
+
         if (hasUnsavedChanges() && !document.getElementById('successModal')) {
             targetUrl = "{{ route('kpi.show', ['karyawan_id' => $karyawan->id_karyawan, 'tahun' => '8888']) }}".replace('8888', selectedYear);
             document.getElementById('unsavedModal').style.display = 'flex';
@@ -602,7 +602,7 @@
 
     function parseNumber(val) { if (!val || val === '') return 0; return parseFloat(val.toString().replace(',', '.')) || 0; }
     function formatNumber(num) { return num.toFixed(2).replace(/\.00$/, ''); }
-    
+
     function calculateSingleScore(target, real, polaritas) {
         if (target === 0) return 0;
         let score = 0;
@@ -610,7 +610,7 @@
         if (p.includes('positif') || p.includes('maximize')) score = (real / target) * 100;
         else if (p.includes('negatif') || p.includes('minimize')) score = (real === 0) ? 100 : (target / real) * 100;
         else if (p.includes('yes') || p.includes('no')) score = (real >= target) ? 100 : 0;
-        return Math.max(0, score); 
+        return Math.max(0, score);
     }
 
     function calculateAll() {
@@ -664,7 +664,7 @@
             // ADJ SMT 1
             const adjReal1Input = row.querySelector('.input-adj-real-smt1');
             const adjNilaiInput1 = row.querySelector('.input-adj-nilai-smt1');
-            let finalSmt1 = nilaiSmt1; 
+            let finalSmt1 = nilaiSmt1;
             if (adjReal1Input && adjReal1Input.value !== "") {
                 let adjSkor1 = calculateSingleScore(targetTahunan, parseNumber(adjReal1Input.value), polaritas);
                 let adjNilai1 = (adjSkor1 * bobot) / 100;
@@ -697,7 +697,7 @@
             footerSmt2 += nilaiTotalSmt2;
             footerAdjSmt1 += (adjReal1Input && adjReal1Input.value !== "") ? finalSmt1 : nilaiSmt1;
             footerAdjSmt2 += (adjTarget2Input && adjReal2Input.value !== "") ? finalSmt2 : nilaiTotalSmt2;
-            let grandFinal = (finalSmt1 + finalSmt2) / 2; 
+            let grandFinal = (finalSmt1 + finalSmt2) / 2;
             row.querySelector('.span-final-score').textContent = formatNumber(grandFinal);
             footerGrandTotal += grandFinal;
         });
@@ -718,7 +718,7 @@
         totalBobot = Math.round(totalBobot * 100) / 100;
         const alertBox = document.getElementById('total-bobot-alert');
         if (alertBox) {
-            alertBox.innerHTML = totalBobot != 100 
+            alertBox.innerHTML = totalBobot != 100
                 ? `<span class="text-white bg-red-600 px-2 py-1 rounded border border-red-200"><i class="fas fa-exclamation-triangle"></i> Total Bobot: ${totalBobot}% (Harus 100%)</span>`
                 : `<span class="text-white bg-green-600 px-2 py-1 rounded border border-green-200"><i class="fas fa-check-circle"></i> Total Bobot: 100% (OK)</span>`;
         }

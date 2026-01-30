@@ -57,14 +57,25 @@ Route::get('karyawan/departments/{divisionId}', [KaryawanController::class, 'get
 Route::get('karyawan/units/{departmentId}', [KaryawanController::class, 'getUnits'])->name('karyawan.units');
 Route::get('karyawan/positions/{unitId}', [KaryawanController::class, 'getPositions'])->name('karyawan.positions');
 
+Route::post('karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
+
+Route::middleware(['auth'])->group(function () {
+});
+
+Route::middleware(['auth'])->group(function () {
+    // other routes
+});
+
+Route::post('karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
+
 Route::middleware(['auth', 'role:admin|superadmin'])->group(function () {
-    // --- KARYAWAN MANAGEMENT ---
-    Route::post('karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
-    Route::resource('karyawan', KaryawanController::class);
+        // --- KARYAWAN MANAGEMENT ---
+        Route::resource('karyawan', KaryawanController::class);
+        // Route::post('karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
     Route::middleware(['auth', 'role:superadmin'])->group(function () {
-        // User management resource
-        Route::resource('users', UserController::class);
-        Route::delete('/users/batch-delete', [UserController::class, 'batchDelete'])->name('users.batchDelete');
+    // User management resource
+    Route::resource('users', UserController::class);
+    Route::delete('/users/batch-delete', [UserController::class, 'batchDelete'])->name('users.batchDelete');
     });
 
     // --- REKRUTMEN MODULE ---
@@ -147,9 +158,17 @@ Route::middleware(['auth', 'role:admin|superadmin'])->group(function () {
         Route::get('/export-excel', [TurnoverController::class, 'exportExcel'])->name('export.excel');
         Route::get('/export-pdf', [TurnoverController::class, 'exportPdf'])->name('export.pdf');
     });
-});
+    Route::middleware(['auth', 'role:admin|superadmin|manager|senior_manager'])->group(function () {
+        // User management resource
+        // 7. monitoring
+        Route::get('/kbi/monitoring', [App\Http\Controllers\KbiController::class, 'monitoring'])->name('kbi.monitoring');
+        // --- rekap PERFORMANCE ROUTES ---
+        Route::get('/performance/rekap', [App\Http\Controllers\PerformanceController::class, 'index'])->name('performance.rekap');
+    });
+    // Route::resource('wig-rekrutmen', WigRekrutmenController::class);
 
 // Route::resource('karyawan', KaryawanController::class);
+});
 
 Route::middleware(['auth', 'role:superadmin'])->group(function () {
     // User management resource
@@ -289,4 +308,9 @@ Route::middleware(['auth', 'role:admin|superadmin'])->prefix('organization')->na
     Route::resource('position', \App\Http\Controllers\PositionController::class)->parameters([
         'position' => 'position'
     ]);
+    Route::resource('level', \App\Http\Controllers\LevelController::class)->parameters([
+        'level' => 'level'
+    ]);
+    // API endpoint untuk get levels
+    Route::get('level/api/get-levels', [\App\Http\Controllers\LevelController::class, 'getLevels'])->name('level.api');
 });

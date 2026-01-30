@@ -8,6 +8,8 @@ use App\Models\KpiAssessment;
 use App\Models\Pekerjaan;
 use App\Models\User;
 use App\Models\KbiAssessment;
+use App\Models\Position;
+
 
 class Karyawan extends Model
 {
@@ -26,7 +28,7 @@ class Karyawan extends Model
     // PERBAIKAN UTAMA: RELASI KE PEKERJAAN (JABATAN)
     // =========================================================
 
-    // Karena di tabel 'pekerjaan' ada kolom 'id_karyawan', 
+    // Karena di tabel 'pekerjaan' ada kolom 'id_karyawan',
     // kita pakai hasMany untuk history pekerjaan
     public function pekerjaan()
     {
@@ -81,7 +83,7 @@ class Karyawan extends Model
         return $this->hasOne(KpiAssessment::class, 'karyawan_id', 'id_karyawan');
     }
     /**
-     * Relasi ke KBI (Key Behavior Indicator / Perilaku)  
+     * Relasi ke KBI (Key Behavior Indicator / Perilaku)
      * Satu karyawan punya banyak history penilaian perilaku
      */
     public function kbiAssessment()
@@ -106,6 +108,10 @@ class Karyawan extends Model
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
+    public function positions()
+    {
+        return $this->belongsTo(Position::class, 'position_id', 'id');
+    }
 
     // Konversi kolom created_at dan updated_at ke format DateTime
     protected $casts = [

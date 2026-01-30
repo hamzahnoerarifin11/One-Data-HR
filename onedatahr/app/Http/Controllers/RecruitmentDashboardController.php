@@ -12,112 +12,166 @@ use App\Models\Pemberkasan;
 class RecruitmentDashboardController extends Controller
 {
     public function index(Request $request)
-{
-    // 1. Filter Posisi
-    $posisiId = $request->input('posisi_id');
-    $year     = $request->input('year', date('Y'));
-    $posisi = \App\Models\Posisi::all();
+    {
+        // 1. Filter Posisi dan Tahun
+        $posisiId = $request->input('posisi_id');
+        $year     = $request->input('year', date('Y'));
+        $posisi = \App\Models\Posisi::all();
 
-    // Ambil tahun-tahun yang ada di database kandidat untuk opsi filter
-    $availableYears = DB::table('kandidat')
-        ->select(DB::raw('YEAR(tanggal_melamar) as year'))
-        ->distinct()
-        ->orderBy('year', 'desc')
-        ->pluck('year');
-        
-    // Jika database kosong, sediakan minimal tahun sekarang
-    if ($availableYears->isEmpty()) {
-        $availableYears = [date('Y')];
+        // Ambil tahun-tahun yang ada di database kandidat untuk opsi filter
+        $availableYears = DB::table('kandidat')
+            ->select(DB::raw('YEAR(tanggal_melamar) as year'))
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->pluck('year');
+
+        // Jika database kosong, sediakan minimal tahun sekarang
+        if ($availableYears->isEmpty()) {
+            $availableYears = [date('Y')];
+        }
+
+        // 2. Base Query
+        $query = DB::table('kandidat');
+        if ($posisiId) {
+            $query->where('posisi_id', $posisiId);
+        }
+        // Terapkan Filter TAHUN (Berdasarkan tanggal melamar)
+        if (!empty($year)) {
+            $query->whereYear('tanggal_melamar', $year);
+        }
+
+        // --- HITUNGAN FUNNEL AKURAT ---
+        // Logika: SATU KANDIDAT = SATU PERHITUNGAN berdasarkan status_akhir mereka (tahap terakhir)
+        // Tidak berdasarkan tanggal agar tidak ada double counting
+
+        // A. Total Pelamar (status_akhir != 'Tidak Lolos')
+        $totalPelamar = (clone $query)
+            ->where('status_akhir', '!=', 'Tidak Lolos')
+            ->count();
+
+        // B. Lolos CV (status_akhir mulai dari CV Lolos ke atas)
+        $cvLolos = (clone $query)
+            ->whereIn('status_akhir', [
+                'CV Lolos',
+                'Psikotes Lolos',
+                'Tes Kompetensi Lolos',
+                'Interview HR Lolos',
+                'Interview User Lolos',
+                'Diterima'
+            ])
+            ->count();
+
+        // C. Lolos Psikotes (status_akhir dari Psikotes Lolos ke atas)
+        $psikotesLolos = (clone $query)
+            ->whereIn('status_akhir', [
+                'Psikotes Lolos',
+                'Tes Kompetensi Lolos',
+                'Interview HR Lolos',
+                'Interview User Lolos',
+                'Diterima'
+            ])
+            ->count();
+
+        // D. Lolos Kompetensi (status_akhir dari Tes Kompetensi Lolos ke atas)
+        $kompetensiLolos = (clone $query)
+            ->whereIn('status_akhir', [
+                'Tes Kompetensi Lolos',
+                'Interview HR Lolos',
+                'Interview User Lolos',
+                'Diterima'
+            ])
+            ->count();
+
+        // E. Lolos Interview HR (status_akhir dari Interview HR Lolos ke atas)
+        $hrLolos = (clone $query)
+            ->whereIn('status_akhir', [
+                'Interview HR Lolos',
+                'Interview User Lolos',
+                'Diterima'
+            ])
+            ->count();
+
+        // F. Lolos User (status_akhir dari Interview User Lolos ke atas)
+        $userLolos = (clone $query)
+            ->whereIn('status_akhir', [
+                'Interview User Lolos',
+                'Diterima'
+            ])
+            ->count();
+
+        // G. Hired / Diterima (status_akhir = 'Diterima')
+        $totalHired = (clone $query)
+            ->where('status_akhir', 'Diterima')
+            ->count();
+
+        // H. Ditolak (status_akhir = 'Tidak Lolos')
+        $rejected = (clone $query)
+            ->where('status_akhir', 'Tidak Lolos')
+            ->count();
+
+        // 3. Hitung conversion rate
+        $conversionRates = [
+            'cv' => $totalPelamar > 0 ? round(($cvLolos / $totalPelamar) * 100, 2) : 0,
+            'psikotes' => $cvLolos > 0 ? round(($psikotesLolos / $cvLolos) * 100, 2) : 0,
+            'kompetensi' => $psikotesLolos > 0 ? round(($kompetensiLolos / $psikotesLolos) * 100, 2) : 0,
+            'hr' => $kompetensiLolos > 0 ? round(($hrLolos / $kompetensiLolos) * 100, 2) : 0,
+            'user' => $hrLolos > 0 ? round(($userLolos / $hrLolos) * 100, 2) : 0,
+            'hired' => $userLolos > 0 ? round(($totalHired / $userLolos) * 100, 2) : 0,
+        ];
+
+        // 4. Statistik per posisi (jika belum filter posisi)
+        $statsByPosition = [];
+        if (!$posisiId) {
+            $statsByPosition = DB::table('kandidat')
+                ->join('posisi', 'kandidat.posisi_id', 'posisi.id_posisi')
+                ->whereYear('kandidat.tanggal_melamar', $year)
+                ->select(
+                    'posisi.id_posisi',
+                    'posisi.nama_posisi',
+                    DB::raw('COUNT(*) as total'),
+                    DB::raw('SUM(CASE WHEN status_akhir IN ("CV Lolos", "Psikotes Lolos", "Tes Kompetensi Lolos", "Interview HR Lolos", "Interview User Lolos", "Diterima") THEN 1 ELSE 0 END) as cv_lolos'),
+                    DB::raw('SUM(CASE WHEN status_akhir IN ("Psikotes Lolos", "Tes Kompetensi Lolos", "Interview HR Lolos", "Interview User Lolos", "Diterima") THEN 1 ELSE 0 END) as psikotes_lolos'),
+                    DB::raw('SUM(CASE WHEN status_akhir IN ("Tes Kompetensi Lolos", "Interview HR Lolos", "Interview User Lolos", "Diterima") THEN 1 ELSE 0 END) as kompetensi_lolos')
+                )
+                ->groupBy('posisi.id_posisi', 'posisi.nama_posisi')
+                ->orderBy('total', 'desc')
+                ->get();
+        }
+
+        // 5. Data bulanan
+        $monthlyData = DB::table('kandidat')
+            ->selectRaw('MONTH(tanggal_melamar) as month, COUNT(*) as total')
+            ->whereYear('tanggal_melamar', $year);
+        if ($posisiId) $monthlyData->where('posisi_id', $posisiId);
+        $monthlyData = $monthlyData->groupBy('month')
+            ->orderBy('month')
+            ->get();
+
+        // 6. Susun Data Funnel
+        $funnelData = [
+            'Total Pelamar'    => $totalPelamar,
+            'Lolos CV'         => $cvLolos,
+            'Lolos Psikotes'   => $psikotesLolos,
+            'Lolos Kompetensi' => $kompetensiLolos,
+            'Lolos Interview HR' => $hrLolos,
+            'Lolos User'       => $userLolos,
+            'Hired (Selesai)'  => $totalHired,
+            'Ditolak'          => $rejected
+        ];
+
+        // 7. Kirim ke View
+        return view('pages.rekrutmen.dashboard', [
+            'posisi' => $posisi,
+            'posisiId' => $posisiId,
+            'funnelData' => $funnelData,
+            'conversionRates' => $conversionRates,
+            'statsByPosition' => $statsByPosition,
+            'monthlyData' => $monthlyData,
+            'availableYears' => $availableYears,
+            'year' => $year,
+            'totalPelamar' => $totalPelamar
+        ]);
     }
-
-    // 2. Base Query
-    $query = DB::table('kandidat');
-    if ($posisiId) {
-        $query->where('posisi_id', $posisiId);
-    }
-    // Terapkan Filter TAHUN (Berdasarkan tanggal melamar)
-    if (!empty($year)) {
-        $query->whereYear('tanggal_melamar', $year);
-    }
-
-    // --- HITUNGAN FUNNEL KUMULATIF ---
-    // Konsep: Jika lolos tahap tinggi, otomatis lolos tahap bawahnya.
-
-    // A. Total Pelamar
-    $totalPelamar = (clone $query)->count();
-    // dd([
-    //     'Total Pelamar' => $totalPelamar,
-    //     'Posisi ID' => $posisiId,
-    //     'Contoh Data Kandidat' => DB::table('kandidat')->first()
-    // ]);
-
-    // B. Lolos User (Tahap Paling Tinggi di Data Anda)
-    // Cek: Apakah tgl_lolos_user terisi?
-    $userLolos = (clone $query)->whereNotNull('tgl_lolos_user')->count();
-
-    // C. Lolos HR
-    // Cek: tgl_lolos_hr terisi ATAU tgl_lolos_user terisi
-    $hrLolos = (clone $query)->where(function($q) {
-        $q->whereNotNull('tgl_lolos_hr')
-          ->orWhereNotNull('tgl_lolos_user');
-    })->count();
-
-    // D. Lolos Kompetensi (Asumsi tahap sebelum HR)
-    // Cek: tgl_lolos_kompetensi terisi ATAU sudah sampai HR/User
-    $kompetensiLolos = (clone $query)->where(function($q) {
-        $q->whereNotNull('tgl_lolos_kompetensi')
-          ->orWhereNotNull('tgl_lolos_hr')
-          ->orWhereNotNull('tgl_lolos_user');
-    })->count();
-
-    // E. Lolos Psikotes
-    // Cek: tgl_lolos_psikotes terisi ATAU sudah sampai Kompetensi/HR/User
-    $psikotesLolos = (clone $query)->where(function($q) {
-        $q->whereNotNull('tgl_lolos_psikotes')
-          ->orWhereNotNull('tgl_lolos_kompetensi')
-          ->orWhereNotNull('tgl_lolos_hr')
-          ->orWhereNotNull('tgl_lolos_user');
-    })->count();
-
-    // F. Lolos CV
-    // Cek: tgl_lolos_cv terisi ATAU sudah sampai tahap apapun di atasnya
-    $cvLolos = (clone $query)->where(function($q) {
-        $q->whereNotNull('tgl_lolos_cv')
-          ->orWhereNotNull('tgl_lolos_psikotes')
-          ->orWhereNotNull('tgl_lolos_kompetensi')
-          ->orWhereNotNull('tgl_lolos_hr')
-          ->orWhereNotNull('tgl_lolos_user');
-    })->count();
-
-    // G. Hired / Selesai
-    // Kita cek berdasarkan status_akhir yang mengandung kata "Hired" atau "Diterima"
-    // ATAU cek relasi ke tabel pemberkasan (jika ada)
-    $hired = DB::table('pemberkasan')
-        ->join('kandidat', 'pemberkasan.kandidat_id', 'kandidat.id_kandidat')
-        ->whereNotNull('selesai_recruitment');
-    if ($posisiId) $hired->where('kandidat.posisi_id', $posisiId);
-    $totalHired = $hired->count();
-
-    // 3. Susun Data
-    $data = [
-        'Total Kandidat'    => $totalPelamar,
-        'Lolos CV'          => $cvLolos,
-        'Lolos Psikotes'    => $psikotesLolos,
-        'Lolos Kompetensi'  => $kompetensiLolos,
-        'Lolos Interview HR'=> $hrLolos,
-        'Lolos User'        => $userLolos,
-        'Hired (Selesai)'   => $totalHired
-    ];
-
-    // 4. Kirim ke View (Gunakan variabel $pelamar untuk perhitungan persen di blade)
-    return view('pages.rekrutmen.dashboard', compact(
-        'posisi', 
-        'posisiId', 
-        'data',
-        'availableYears',
-        'year'
-    ))->with('pelamar', $totalPelamar);
-}
 
     public function candidatesByPositionMonth(Request $request)
     {
@@ -659,115 +713,91 @@ class RecruitmentDashboardController extends Controller
 
     public function dashboardStats(Request $request)
     {
-        // 1. Validasi Input (Reuse fungsi private yang sudah ada)
+        // 1. Validasi Input
         $this->validateFilters($request);
 
-        // 2. Helper Closure untuk Filter Posisi (agar tidak berulang)
-        // Kita gunakan join ke tabel kandidat karena posisi_id ada di sana
-        $applyPosisiFilter = function ($query) use ($request) {
-            if ($request->filled('posisi_id')) {
-                $query->where('kandidat.posisi_id', $request->posisi_id);
-            }
-        };
-
-        // --- A. TOTAL KANDIDAT ---
-        // Logic: Hitung tabel kandidat, filter by tanggal_melamar
-        $qKandidat = DB::table('kandidat');
+        // 2. Base Query untuk Kandidat (dengan filter tanggal_melamar)
+        $baseQuery = DB::table('kandidat');
         if ($request->filled('posisi_id')) {
-            $qKandidat->where('posisi_id', $request->posisi_id);
+            $baseQuery->where('posisi_id', $request->posisi_id);
         }
-
-        // HANYA filter tanggal jika user MEMANG memilih tanggal
         if ($request->filled('from')) {
-            $qKandidat->whereDate('tanggal_melamar', '>=', $request->from);
+            $baseQuery->whereDate('tanggal_melamar', '>=', $request->from);
         }
         if ($request->filled('to')) {
-            $qKandidat->whereDate('tanggal_melamar', '<=', $request->to);
+            $baseQuery->whereDate('tanggal_melamar', '<=', $request->to);
         }
 
-        $totalKandidat = $qKandidat->count();
+        // --- A. TOTAL KANDIDAT ---
+        $totalKandidat = (clone $baseQuery)->count();
 
+        // --- B. PERHITUNGAN PER TAHAPAN BERDASARKAN status_akhir ---
+        // SATU KANDIDAT = SATU PERHITUNGAN (tidak double counting)
 
-        // --- B. DATA DARI TABEL PROSES REKRUTMEN ---
-        // Helper untuk query proses rekrutmen dasar
-        $baseProses = DB::table('proses_rekrutmen')
-            ->join('kandidat', 'proses_rekrutmen.kandidat_id', 'kandidat.id_kandidat');
+        // 1. Lolos CV (status_akhir mulai dari CV Lolos ke atas)
+        $totalCv = (clone $baseQuery)
+            ->whereIn('status_akhir', [
+                'CV Lolos',
+                'Psikotes Lolos',
+                'Tes Kompetensi Lolos',
+                'Interview HR Lolos',
+                'Interview User Lolos',
+                'Diterima'
+            ])
+            ->count();
 
-        // 1. CV Lolos
-        // Logic: copy dari cvPassedByPositionMonth
-        $qCv = clone $baseProses;
-        $qCv->where('proses_rekrutmen.cv_lolos', 1);
-        $applyPosisiFilter($qCv);
-        if ($request->filled('from')) $qCv->whereDate('proses_rekrutmen.tanggal_cv', '>=', $request->from);
-        if ($request->filled('to')) $qCv->whereDate('proses_rekrutmen.tanggal_cv', '<=', $request->to);
-        $totalCv = $qCv->count();
+        // 2. Lolos Psikotes (status_akhir dari Psikotes Lolos ke atas)
+        $totalPsi = (clone $baseQuery)
+            ->whereIn('status_akhir', [
+                'Psikotes Lolos',
+                'Tes Kompetensi Lolos',
+                'Interview HR Lolos',
+                'Interview User Lolos',
+                'Diterima'
+            ])
+            ->count();
 
-        // 2. Psikotes Lolos
-        // Logic: copy dari psikotesPassedByPosition
-        $qPsi = clone $baseProses;
-        $qPsi->where('proses_rekrutmen.psikotes_lolos', 1);
-        $applyPosisiFilter($qPsi);
-        if ($request->filled('from')) $qPsi->whereDate('proses_rekrutmen.tanggal_psikotes', '>=', $request->from);
-        if ($request->filled('to')) $qPsi->whereDate('proses_rekrutmen.tanggal_psikotes', '<=', $request->to);
-        $totalPsi = $qPsi->count();
+        // 3. Lolos Kompetensi (status_akhir dari Tes Kompetensi Lolos ke atas)
+        $totalKomp = (clone $baseQuery)
+            ->whereIn('status_akhir', [
+                'Tes Kompetensi Lolos',
+                'Interview HR Lolos',
+                'Interview User Lolos',
+                'Diterima'
+            ])
+            ->count();
 
-        // 3. Kompetensi Lolos
-        // Logic: copy dari kompetensiPassedByPosition
-        $qKomp = clone $baseProses;
-        $qKomp->where('proses_rekrutmen.tes_kompetensi_lolos', 1);
-        $applyPosisiFilter($qKomp);
-        if ($request->filled('from')) $qKomp->whereDate('proses_rekrutmen.tanggal_tes_kompetensi', '>=', $request->from);
-        if ($request->filled('to')) $qKomp->whereDate('proses_rekrutmen.tanggal_tes_kompetensi', '<=', $request->to);
-        $totalKomp = $qKomp->count();
+        // 4. Lolos Interview HR (status_akhir dari Interview HR Lolos ke atas)
+        $totalHr = (clone $baseQuery)
+            ->whereIn('status_akhir', [
+                'Interview HR Lolos',
+                'Interview User Lolos',
+                'Diterima'
+            ])
+            ->count();
 
-        // 4. Interview HR Lolos
-        // Logic: copy dari interviewHrPassedByPositionMonth
-        $qHr = clone $baseProses;
-        $qHr->where('proses_rekrutmen.interview_hr_lolos', 1);
-        $applyPosisiFilter($qHr);
-        if ($request->filled('from')) $qHr->whereDate('proses_rekrutmen.tanggal_interview_hr', '>=', $request->from);
-        if ($request->filled('to')) $qHr->whereDate('proses_rekrutmen.tanggal_interview_hr', '<=', $request->to);
-        $totalHr = $qHr->count();
+        // 5. Lolos Interview User (status_akhir dari Interview User Lolos ke atas)
+        $totalUser = (clone $baseQuery)
+            ->whereIn('status_akhir', [
+                'Interview User Lolos',
+                'Diterima'
+            ])
+            ->count();
 
-        // 5. Interview User Lolos
-        // Logic: copy dari interviewUserPassedByPositionMonth
-        $qUser = clone $baseProses;
-        $qUser->where('proses_rekrutmen.interview_user_lolos', 1);
-        $applyPosisiFilter($qUser);
-        if ($request->filled('from')) $qUser->whereDate('proses_rekrutmen.tanggal_interview_user', '>=', $request->from);
-        if ($request->filled('to')) $qUser->whereDate('proses_rekrutmen.tanggal_interview_user', '<=', $request->to);
-        $totalUser = $qUser->count();
+        // --- C. PEMBERKASAN (HIRED) ---
+        // Hired = status_akhir = 'Diterima' (atau bisa juga cek pemberkasan.selesai_recruitment)
+        $totalPemberkasan = (clone $baseQuery)
+            ->where('status_akhir', 'Diterima')
+            ->count();
 
-        // 6. TOTAL POSISI (optional, jika diperlukan di dashboard)
+        // --- D. TOTAL POSISI ---
         $qPosisi = DB::table('posisi');
-    
         if ($request->filled('posisi_id')) {
             $qPosisi->where('id_posisi', $request->posisi_id);
         }
-        
-        // Opsional: Jika ingin menghitung hanya yang statusnya 'Aktif'
-        // $qPosisi->where('status', 'Aktif'); 
-
         $totalPosisi = $qPosisi->count();
 
-
-
-        // --- C. PEMBERKASAN (HIRED) ---
-        // Logic: copy dari pemberkasanProgress (menggunakan filter tanggal_melamar, bukan tanggal selesai)
-        $qPemberkasan = DB::table('pemberkasan')
-            ->join('kandidat', 'pemberkasan.kandidat_id', 'kandidat.id_kandidat');
-        
-        $applyPosisiFilter($qPemberkasan);
-        
-        // Filter tanggal mengikuti logic pemberkasanProgress Anda (filter tanggal_melamar)
-        if ($request->filled('from')) $qPemberkasan->whereDate('kandidat.tanggal_melamar', '>=', $request->from);
-        if ($request->filled('to')) $qPemberkasan->whereDate('kandidat.tanggal_melamar', '<=', $request->to);
-        
-        // Hitung yang selesai_recruitment-nya tidak NULL
-        $totalPemberkasan = $qPemberkasan->whereNotNull('pemberkasan.selesai_recruitment')->count();
-
-
-        // --- D. RETURN JSON ---
+        // --- E. RETURN JSON ---
         return response()->json([
             'success' => true,
             'data' => [

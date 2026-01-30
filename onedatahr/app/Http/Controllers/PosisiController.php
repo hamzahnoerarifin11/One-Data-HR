@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Posisi;
+use App\Models\Pekerjaan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\QueryException;
@@ -21,20 +22,24 @@ class PosisiController extends Controller
 
     public function manage()
     {
-    // Tambahkan withCount untuk menghitung jumlah kandidat per posisi
-    // Pastikan di model Posisi ada function kandidat() { return $this->hasMany(Kandidat::class, ...); }
-    $pos = Posisi::withCount('kandidat as total_pelamar')
-        ->orderBy('id_posisi', 'DESC')
-        ->get();
-        
-    // Jika Anda butuh 'progress_rekrutmen', kita bisa manipulasi collection
-    // Atau sementara kita samakan saja dengan status
-    $pos->transform(function($item) {
-        $item->progress_rekrutmen = $item->status == 'Aktif' ? 'Menerima Kandidat' : 'Tidak Menerima Kandidat';
-        return $item;
-    });
+        // Ambil semua posisi dengan total pelamar, sudah tersetting dengan progress_rekrutmen otomatis dari KandidatObserver
+        $pos = Posisi::withCount('kandidat as total_pelamar_view')
+            ->orderBy('id_posisi', 'DESC')
+            ->get();
 
-    return view('pages.rekrutmen.posisi.index', ['posisis' => $pos]);
+        // Get unique job titles from employee work data
+        $jobTitles = Pekerjaan::select('Jabatan')
+            ->whereNotNull('Jabatan')
+            ->where('Jabatan', '!=', '')
+            ->distinct()
+            ->orderBy('Jabatan')
+            ->pluck('Jabatan')
+            ->toArray();
+
+        return view('pages.rekrutmen.posisi.index', [
+            'posisis' => $pos,
+            'jobTitles' => $jobTitles
+        ]);
     }
 
     public function index()
@@ -108,15 +113,15 @@ class PosisiController extends Controller
 {
     try {
         $pos = Posisi::findOrFail($id);
-        
+
         // Opsi 1: Cek Manual (Lebih User Friendly)
         // Asumsi relasi di model Posisi bernama 'kandidats'
         // atau cek manual ke tabel kandidat
         $terpakai = DB::table('kandidat')->where('posisi_id', $id)->exists();
-        
+
         if ($terpakai) {
             return response()->json([
-                'success' => false, 
+                'success' => false,
                 'message' => 'Posisi tidak bisa dihapus karena sudah ada kandidat yang melamar di posisi ini. Silakan nonaktifkan saja statusnya.'
             ], 422);
         }

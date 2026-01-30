@@ -11,6 +11,7 @@ use App\Models\DataKeluarga;
 use App\Models\Bpjs;
 use App\Models\Perusahaan;
 use App\Models\StatusKaryawan;
+use App\Models\Level;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -25,27 +26,75 @@ class KaryawanController extends Controller
     //     // $this->middleware('role:admin|superadmin');
     // }
 
-    public function index()
+    public function index(Request $request)
     {
-        $karyawans = Karyawan::with(['pekerjaan.company', 'pekerjaan.division', 'pekerjaan.department', 'pekerjaan.unit', 'pekerjaan.position', 'pendidikan', 'kontrak', 'keluarga', 'bpjs', 'perusahaan', 'status'])
-            ->orderBy('id_karyawan', 'desc')
-            ->get();
+        $query = Karyawan::with(['pekerjaan.company', 'pekerjaan.division', 'pekerjaan.department', 'pekerjaan.unit', 'pekerjaan.level', 'pendidikan', 'kontrak', 'keluarga', 'bpjs', 'perusahaan', 'status']);
+
+        // Apply search filter
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('Nama_Sesuai_KTP', 'like', '%' . $search . '%')
+                  ->orWhere('NIK', 'like', '%' . $search . '%')
+                  ->orWhere('Nomor_Telepon_Aktif_Karyawan', 'like', '%' . $search . '%')
+                  ->orWhereHas('pekerjaan.level', function($subQ) use ($search) {
+                      $subQ->where('name', 'like', '%' . $search . '%');
+                  })
+                  ->orWhereHas('pekerjaan', function($subQ) use ($search) {
+                      $subQ->where('Lokasi_Kerja', 'like', '%' . $search . '%');
+                  })
+                  ->orWhereHas('pekerjaan.division', function($subQ) use ($search) {
+                      $subQ->where('name', 'like', '%' . $search . '%');
+                  })
+                  ->orWhereHas('pekerjaan.company', function($subQ) use ($search) {
+                      $subQ->where('name', 'like', '%' . $search . '%');
+                  });
+            });
+        }
+
+        $karyawans = $query->orderBy('id_karyawan', 'desc')->paginate(10)->appends($request->query());
 
         return view('pages.karyawan.index', compact('karyawans'));
     }
 
     public function batchDelete(Request $request)
     {
-        $ids = explode(',', $request->ids);
-        Karyawan::whereIn('id_karyawan', $ids)->delete();
-        return back()->with('success', count($ids) . ' karyawan berhasil dihapus.');
+        \Log::info('Batch delete request received', [
+            'method' => $request->method(),
+            'url' => $request->fullUrl(),
+            'all_data' => $request->all(),
+            'selected_karyawan' => $request->selected_karyawan,
+            'csrf_token' => $request->_token ?? 'no token'
+        ]);
+
+        $ids = $request->selected_karyawan;
+
+        if (!$ids || !is_array($ids) || count($ids) === 0) {
+            return back()->with('error', 'Tidak ada data yang dipilih untuk dihapus');
+        }
+
+        try {
+            $deletedCount = Karyawan::whereIn('id_karyawan', $ids)->delete();
+
+            if ($deletedCount > 0) {
+                return back()->with('success', $deletedCount . ' karyawan berhasil dihapus');
+            } else {
+                return back()->with('error', 'Tidak ada data yang berhasil dihapus');
+            }
+        } catch (\Exception $e) {
+            \Log::error('Batch delete error: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan saat menghapus data');
+        }
     }
+
 
     public function create()
     {
         $companies = \App\Models\Company::all();
+        $levels = Level::orderBy('level_order')->get();
         return view('pages.karyawan.create', [
             'companies' => $companies,
+            'levels' => $levels,
             'lokasikerjaOptions' => getlokasikerja('pekerjaan', 'Lokasi_Kerja'),
             'perusahaanOptions' => getperusahaan('perusahaan', 'Perusahaan'),
             'pendidikanOptions' => getpendidikan('pendidikan', 'Pendidikan_Terakhir'),
@@ -63,6 +112,7 @@ class KaryawanController extends Controller
             'Bulan' => 'nullable|integer|min:0',
             'Status_BPJS_KT' => 'nullable|in:Aktif,Tidak Aktif',
             'Status_BPJS_KS' => 'nullable|in:Aktif,Tidak Aktif',
+            'level_id' => 'required|exists:levels,id',
         ]);
 
         DB::beginTransaction();
@@ -117,7 +167,7 @@ class KaryawanController extends Controller
             DataKeluarga::create($keluargaData);
 
             // Pekerjaan
-            $pekerjaanData = $request->only(['position_id', 'Bagian', 'department_id', 'division_id', 'unit_id', 'company_id', 'Jenis_Kontrak', 'Perjanjian', 'Lokasi_Kerja']);
+            $pekerjaanData = $request->only(['Jabatan', 'department_id', 'division_id', 'unit_id', 'company_id', 'level_id', 'Jenis_Kontrak', 'Perjanjian', 'Lokasi_Kerja']);
             $pekerjaanData['id_karyawan'] = $karyawan->id_karyawan;
             Pekerjaan::create($pekerjaanData);
 
@@ -181,7 +231,25 @@ class KaryawanController extends Controller
                 'Status_BPJS_KS' => $request->Status_BPJS_KS,
             ]);
 
+            // Create User Account Otomatis
+            $level = Level::find($request->level_id);
+            $userResult = \App\Helpers\UserHelper::createUserForKaryawan($karyawan, $level);
+
             DB::commit();
+
+            // Jika user berhasil dibuat, tampilkan credentials
+            if ($userResult['success']) {
+                return redirect()->route('karyawan.index')
+                    ->with('success', 'Karyawan berhasil dibuat')
+                    ->with('user_created', true)
+                    ->with('user_credentials', [
+                        'name' => $karyawan->Nama_Sesuai_KTP,
+                        'email' => $userResult['email'],
+                        'password' => $userResult['password'],
+                        'roles' => $userResult['roles'],
+                    ]);
+            }
+
             return redirect()->route('karyawan.index')->with('success', 'Karyawan berhasil dibuat');
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -191,19 +259,20 @@ class KaryawanController extends Controller
 
     public function show($id)
     {
-        $karyawan = Karyawan::with(['pekerjaan.company', 'pekerjaan.division', 'pekerjaan.department', 'pekerjaan.unit', 'pekerjaan.position', 'pendidikan', 'kontrak', 'keluarga', 'bpjs', 'perusahaan', 'status'])->findOrFail($id);
+        $karyawan = Karyawan::with(['pekerjaan.company', 'pekerjaan.division', 'pekerjaan.department', 'pekerjaan.unit', 'pekerjaan.level', 'pendidikan', 'kontrak', 'keluarga', 'bpjs', 'perusahaan', 'status'])->findOrFail($id);
         return view('pages.karyawan.show', compact('karyawan'));
     }
 
     public function edit($id)
     {
-        $karyawan = Karyawan::with(['pekerjaan.company', 'pekerjaan.division', 'pekerjaan.department', 'pekerjaan.unit', 'pekerjaan.position', 'pendidikan', 'kontrak', 'keluarga', 'bpjs', 'perusahaan', 'status'])->findOrFail($id);
+        $karyawan = Karyawan::with(['pekerjaan.company', 'pekerjaan.division', 'pekerjaan.department', 'pekerjaan.unit', 'pekerjaan.level', 'pendidikan', 'kontrak', 'keluarga', 'bpjs', 'perusahaan', 'status'])->findOrFail($id);
         $companies = \App\Models\Company::all();
-        $positions = \App\Models\Position::all();
+        $levels = Level::ordered()->get();
+        // $positions = \App\Models\Position::all();
         $departments = \App\Models\Department::all();
         $divisions = \App\Models\Division::all();
         $units = \App\Models\Unit::all();
-        return view('pages.karyawan.edit', array_merge(compact('karyawan', 'companies', 'positions', 'departments', 'divisions', 'units'), [
+        return view('pages.karyawan.edit', array_merge(compact('karyawan', 'companies', 'levels', 'departments', 'divisions', 'units'), [
             'lokasikerjaOptions' => getlokasikerja('pekerjaan', 'Lokasi_Kerja'),
             'perusahaanOptions' => getperusahaan('perusahaan', 'Perusahaan'),
             'pendidikanOptions' => getpendidikan('pendidikan', 'Pendidikan_Terakhir'),
@@ -279,7 +348,7 @@ class KaryawanController extends Controller
             $dataBpjs = $request->only(['Status_BPJS_KT', 'Status_BPJS_KS']);
             $karyawan->bpjs ? $karyawan->bpjs->update($dataBpjs) : Bpjs::create(array_merge(['id_karyawan' => $id], $dataBpjs));
 
-            // 4. Update Status Karyawan (Bagian yang Anda tanyakan)
+            // 4. Update Status Karyawan (Jabatan yang Anda tanyakan)
             $dataStatus = $request->only(['Tanggal_Non_Aktif', 'Alasan_Non_Aktif', 'Ijazah_Dikembalikan', 'Bulan']);
             $karyawan->status ? $karyawan->status->update($dataStatus) : StatusKaryawan::create(array_merge(['id_karyawan' => $id], $dataStatus));
 
@@ -319,8 +388,25 @@ class KaryawanController extends Controller
             $karyawan->kontrak ? $karyawan->kontrak->update($dataKontrak) : Kontrak::create(array_merge(['id_karyawan' => $id], $dataKontrak));
 
             // 8. Update Pekerjaan
-            $dataKerja = $request->only(['position_id', 'Bagian', 'department_id', 'division_id', 'unit_id', 'company_id', 'Jenis_Kontrak', 'Perjanjian', 'Lokasi_Kerja']);
+            $dataKerja = $request->only(['Jabatan', 'department_id', 'division_id', 'unit_id', 'company_id', 'level_id', 'Jenis_Kontrak', 'Perjanjian', 'Lokasi_Kerja']);
             $karyawan->pekerjaan()->exists() ? $karyawan->pekerjaan()->first()->update($dataKerja) : Pekerjaan::create(array_merge(['id_karyawan' => $id], $dataKerja));
+
+            // 9. Update User Role jika level_id berubah
+            if ($request->filled('level_id')) {
+                $level = Level::find($request->level_id);
+                $user = User::where('nik', $karyawan->NIK)->first();
+
+                if ($user && $level) {
+                    // Update role berdasarkan level jabatan yang baru
+                    $roleNames = \App\Helpers\UserHelper::mapLevelToRole($level);
+                    $roles = Role::whereIn('name', $roleNames)->pluck('id')->toArray();
+
+                    // Detach old roles dan attach new roles
+                    if (!empty($roles)) {
+                        $user->roles()->sync($roles);
+                    }
+                }
+            }
 
             DB::commit();
             return redirect()->route('karyawan.show', $id)->with('success', 'Data karyawan berhasil diperbarui');

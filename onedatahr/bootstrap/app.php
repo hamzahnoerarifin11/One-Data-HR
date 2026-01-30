@@ -14,7 +14,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\EnsureRole::class,
         ]);
-        //
+
+        // Exclude CSRF for batch delete route
+        // $middleware->validateCsrfTokens(except: [
+        //     'karyawan/batch-delete',
+        // ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

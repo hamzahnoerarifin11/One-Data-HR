@@ -47,7 +47,7 @@
             <div class="flex justify-between items-center">
                 <div>
                     <p class="text-sm text-gray-500 dark:text-gray-400">Departemen</p>
-                    <h3 class="text-2xl font-bold text-gray-800 dark:text-white">{{ $totalDepartemen }}</h3>
+                    <h3 class="text-2xl font-bold text-gray-800 dark:text-white">{{ $totaldepartment_id }}</h3>
                 </div>
                 <div class="p-3 bg-orange-50 text-orange-600 rounded-full dark:bg-orange-900/30"><i class="fas fa-building"></i></div>
             </div>
@@ -132,25 +132,30 @@
 
     </div>
 
-    {{-- 3. Jabatan List (Scrollable) --}}
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <div class="p-4 border-b dark:border-gray-700">
-            <h4 class="font-bold text-gray-800 dark:text-white">Sebaran Jabatan</h4>
-        </div>
-        <div class="max-h-64 overflow-y-auto custom-scrollbar p-4">
-            <div class="flex flex-wrap gap-2">
-                @foreach($jabatanData as $jabatan => $count)
-                    <span class="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full border border-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600">
-                        {{ $jabatan }} <span class="ml-1 font-bold text-blue-600 dark:text-blue-400">({{ $count }})</span>
-                    </span>
-                @endforeach
-            </div>
+    {{-- 3. Statistik Jabatan --}}
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <h4 class="font-bold text-gray-800 dark:text-white mb-4 border-b pb-2 dark:border-gray-700">
+            Total Karyawan per Jabatan
+        </h4>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            @foreach($jabatanData as $jabatan => $count)
+                <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg border border-gray-100 dark:border-gray-600 hover:shadow transition">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                        {{ $jabatan }}
+                    </p>
+                    <p class="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1">
+                        {{ $count }}
+                    </p>
+                    <p class="text-xs text-gray-400">Karyawan</p>
+                </div>
+            @endforeach
         </div>
     </div>
     {{-- 4. Statistik Divisi --}}
     <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
         <h4 class="font-bold text-gray-800 dark:text-white mb-4 border-b pb-2 dark:border-gray-700">
-            Sebaran Divisi
+            Total Karyawan per Divisi
         </h4>
 
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -167,5 +172,101 @@
             @endforeach
         </div>
     </div>
+    {{-- 5. Statistik Perusahaan --}}
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <h4 class="font-bold text-gray-800 dark:text-white mb-4 border-b pb-2 dark:border-gray-700">
+            Total Karyawan per Perusahaan
+        </h4>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            @foreach($perusahaanData as $perusahaan => $count)
+                <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg border border-gray-100 dark:border-gray-600 hover:shadow transition">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                        {{ $perusahaan }}
+                    </p>
+                    <p class="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1">
+                        {{ $count }}
+                    </p>
+                    <p class="text-xs text-gray-400">Karyawan</p>
+                </div>
+            @endforeach
+        </div>
+    </div>
+
+    {{-- 6. Grafik Turnover --}}
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <h4 class="font-bold text-gray-800 dark:text-white mb-4 border-b pb-2 dark:border-gray-700">
+            Turnover Karyawan per Bulan ({{ date('Y') }})
+        </h4>
+        <div id="turnoverChart" class="w-full h-80"></div>
+    </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const turnoverData = @json($turnoverData);
+    const companies = Object.keys(turnoverData[1] || {});
+
+    const series = [];
+    companies.forEach(company => {
+        const masukData = [];
+        const keluarData = [];
+        for (let month = 1; month <= 12; month++) {
+            masukData.push(turnoverData[month]?.[company]?.masuk || 0);
+            keluarData.push(turnoverData[month]?.[company]?.keluar || 0);
+        }
+        series.push({
+            name: company + ' - Masuk',
+            data: masukData,
+            type: 'column'
+        });
+        series.push({
+            name: company + ' - Keluar',
+            data: keluarData,
+            type: 'column'
+        });
+    });
+
+    const options = {
+        series: series,
+        chart: {
+            type: 'line',
+            height: 320,
+            toolbar: { show: false }
+        },
+        stroke: {
+            width: [2, 2, 2, 2],
+            curve: 'smooth'
+        },
+        plotOptions: {
+            bar: {
+                columnWidth: '50%'
+            }
+        },
+        dataLabels: {
+            enabled: false
+        },
+        xaxis: {
+            categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            axisBorder: { show: false },
+            axisTicks: { show: false }
+        },
+        yaxis: {
+            title: { text: 'Jumlah Karyawan' }
+        },
+        colors: ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899'],
+        grid: {
+            borderColor: '#E5E7EB',
+            strokeDashArray: 3
+        },
+        legend: {
+            position: 'top',
+            horizontalAlign: 'left'
+        }
+    };
+
+    const chart = new ApexCharts(document.querySelector("#turnoverChart"), options);
+    chart.render();
+});
+</script>
 @endsection
