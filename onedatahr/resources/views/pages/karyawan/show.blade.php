@@ -219,7 +219,15 @@
 
             <div>
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Level Jabatan</p>
-                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaan->first()->position->name ?? '-' }}</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">
+                    @if ($karyawan->pekerjaan->first() && $karyawan->pekerjaan->first()->level)
+                        <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
+                            {{ $karyawan->pekerjaan->first()->level->name }}
+                        </span>
+                    @else
+                        <span class="text-gray-500">-</span>
+                    @endif
+                </p>
             </div>
 
             <div>

@@ -8,7 +8,7 @@ class Pekerjaan extends Model
     protected $primaryKey = 'id_pekerjaan';
     public $timestamps = false;
     protected $fillable = [
-        'id_karyawan','position_id','Bagian','department_id','division_id','unit_id','company_id','Jenis_Kontrak','Perjanjian','Lokasi_Kerja'
+        'id_karyawan','position_id','Jabatan','department_id','division_id','unit_id','company_id','level_id','Jenis_Kontrak','Perjanjian','Lokasi_Kerja'
     ];
     protected $touches = ['karyawan'];
 
@@ -41,6 +41,11 @@ class Pekerjaan extends Model
     {
         return $this->belongsTo(Position::class);
     }
+    public function level()
+    {
+        return $this->belongsTo(Level::class, 'level_id');
+    }
+
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',

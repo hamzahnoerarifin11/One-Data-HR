@@ -11,11 +11,11 @@ use Illuminate\Support\Facades\Auth;
 
 class PerformanceController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-        $this->middleware('role:admin|superadmin|manager|gm');
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware('auth');
+    //     $this->middleware('role:admin|superadmin|manager|senior_manager');
+    // }
 
     public function index(Request $request)
     {
@@ -48,8 +48,8 @@ class PerformanceController extends Controller
             });
         }
 
-        // B. Filter Role (Manager/GM hanya lihat bawahan)
-        if ($user->hasRole(['manager', 'gm'])) {
+        // B. Filter Role (Manager/senior_manager hanya lihat bawahan)
+        if ($user->hasRole(['manager', 'senior_manager'])) {
             // PERBAIKAN: Gunakan $me->id_karyawan (Aman karena sudah dicek diatas)
             // PERBAIKAN: Typo 'atasa_id' jadi 'atasan_id'
             $query->where('atasan_id', $me->id_karyawan);

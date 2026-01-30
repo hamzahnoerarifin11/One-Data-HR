@@ -33,7 +33,8 @@ class MenuHelper
                     ['name' => 'Divisi', 'path' => '/organization/division'],
                     ['name' => 'Departement', 'path' => '/organization/department'],
                     ['name' => 'Unit', 'path' => '/organization/unit'],
-                    ['name' => 'Level Jabatan', 'path' => '/organization/position'],
+                    // ['name' => 'Level Jabatan', 'path' => '/organization/position'],
+                    ['name' => 'Level Jabatan', 'path' => '/organization/level'],
                 ],
             ];
         }
@@ -123,7 +124,7 @@ class MenuHelper
         ];
 
         // Monitoring KBI (Khusus HRD memantau Staff)
-        if ($user->hasRole(['admin', 'superadmin', 'manager', 'gm'])) {
+        if ($user->hasRole(['admin', 'superadmin', 'manager', 'senior_manager'])) {
             // Tambahkan ke subItems Penilaian Karyawan
             $menu[count($menu) - 1]['subItems'][] = ['name' => 'Monitoring KBI', 'path' => '/kbi/monitoring'];
             $menu[count($menu) - 1]['subItems'][] = ['name' => 'Rekap Performance', 'path' => '/performance/rekap'];

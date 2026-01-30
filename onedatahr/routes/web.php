@@ -167,7 +167,7 @@ Route::middleware(['auth', 'role:admin|superadmin'])->group(function () {
         Route::resource('users', UserController::class);
         Route::delete('/users/batch-delete', [UserController::class, 'batchDelete'])->name('users.batchDelete');
     });
-    Route::middleware(['auth', 'role:admin|superadmin|manager|GM'])->group(function () {
+    Route::middleware(['auth', 'role:admin|superadmin|manager|senior_manager'])->group(function () {
         // User management resource
         // 7. monitoring
         Route::get('/kbi/monitoring', [App\Http\Controllers\KbiController::class, 'monitoring'])->name('kbi.monitoring');
@@ -295,4 +295,9 @@ Route::middleware(['auth', 'role:admin|superadmin'])->prefix('organization')->na
     Route::resource('position', \App\Http\Controllers\PositionController::class)->parameters([
         'position' => 'position'
     ]);
+    Route::resource('level', \App\Http\Controllers\LevelController::class)->parameters([
+        'level' => 'level'
+    ]);
+    // API endpoint untuk get levels
+    Route::get('level/api/get-levels', [\App\Http\Controllers\LevelController::class, 'getLevels'])->name('level.api');
 });

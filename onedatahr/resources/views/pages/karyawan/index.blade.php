@@ -33,6 +33,135 @@
         </div>
     @endif
 
+    <!-- USER CREDENTIALS MODAL -->
+    @if(session('user_created') && session('user_credentials'))
+        <div id="credentialsModal" class="fixed inset-0 z-50 flex items-center justify-center">
+            <div onclick="closeCredentialsModal()" class="absolute inset-0 bg-black/50 dark:bg-black/80"></div>
+
+            <div class="relative bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-md w-full mx-4 p-6">
+                <div class="mb-6">
+                    <div class="flex items-center justify-center w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/20 mb-4">
+                        <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">User Berhasil Dibuat!</h2>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Akun user telah otomatis dibuat untuk karyawan baru</p>
+                </div>
+
+                <div class="space-y-4 mb-6 bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+                    <div>
+                        <label class="text-xs font-semibold text-gray-600 dark:text-gray-400">NAMA</label>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white mt-1" id="credName">{{ session('user_credentials')['name'] ?? '' }}</p>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-semibold text-gray-600 dark:text-gray-400">EMAIL</label>
+                        <div class="flex items-center gap-2 mt-1">
+                            <p class="text-sm font-medium text-gray-900 dark:text-white flex-1 break-all" id="credEmail">{{ session('user_credentials')['email'] ?? '' }}</p>
+                            <button type="button" onclick="copyToClipboard('credEmail')" class="text-blue-600 hover:text-blue-700 dark:text-blue-400" title="Copy">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-semibold text-gray-600 dark:text-gray-400">PASSWORD SEMENTARA</label>
+                        <div class="flex items-center gap-2 mt-1">
+                            <input type="password" id="credPassword" value="{{ session('user_credentials')['password'] ?? '' }}" readonly class="text-sm font-medium bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 rounded px-2 py-1 flex-1" />
+                            <button type="button" onclick="togglePasswordVisibility()" class="text-gray-600 hover:text-gray-700 dark:text-gray-400" title="Toggle">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                            </button>
+                            <button type="button" onclick="copyToClipboard('credPassword')" class="text-blue-600 hover:text-blue-700 dark:text-blue-400" title="Copy">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-semibold text-gray-600 dark:text-gray-400">ROLE</label>
+                        <div class="flex gap-2 mt-1 flex-wrap">
+                            @foreach(session('user_credentials')['roles'] ?? [] as $role)
+                                <span class="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
+                                    {{ ucfirst($role) }}
+                                </span>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-6">
+                    <p class="text-xs text-blue-800 dark:text-blue-400">
+                        <strong>Catatan:</strong> Pastikan user segera mengubah password saat login pertama kali. Password sementara ini hanya berlaku sekali.
+                    </p>
+                </div>
+
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeCredentialsModal()" class="flex-1 rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 transition">
+                        Tutup
+                    </button>
+                    <button type="button" onclick="copyAllCredentials()" class="flex-1 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition">
+                        Salin Semua
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        function closeCredentialsModal() {
+            document.getElementById('credentialsModal').style.display = 'none';
+        }
+
+        function togglePasswordVisibility() {
+            const input = document.getElementById('credPassword');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent || element.value;
+
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = event.target.closest('button');
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>';
+
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                }, 2000);
+            });
+        }
+
+        function copyAllCredentials() {
+            const name = document.getElementById('credName').textContent;
+            const email = document.getElementById('credEmail').textContent;
+            const password = document.getElementById('credPassword').value;
+
+            const text = `
+Nama: ${name}
+Email: ${email}
+Password: ${password}
+            `.trim();
+
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Semua kredensial berhasil disalin!');
+            });
+        }
+
+        // Auto-close modal after 30 seconds
+        setTimeout(() => {
+            closeCredentialsModal();
+        }, 30000);
+        </script>
+    @endif
+
     <!-- ERROR ALERT -->
     @if(session('error'))
         <div class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-red-800 dark:border-red-900 dark:bg-red-900/20 dark:text-red-400">
@@ -157,7 +286,15 @@
                             </td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $karyawan->NIK ?? '-' }}</td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $karyawan->Nomor_Telepon_Aktif_Karyawan ?? '-' }}</td>
-                            <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $karyawan->pekerjaan->first()->position->name ?? '-' }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                                @if ($karyawan->pekerjaan->first() && $karyawan->pekerjaan->first()->level)
+                                    <span class="inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
+                                        {{ $karyawan->pekerjaan->first()->level->name }}
+                                    </span>
+                                @else
+                                    <span class="text-gray-500">-</span>
+                                @endif
+                            </td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $karyawan->pekerjaan->first()->Lokasi_Kerja ?? '-' }}</td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $karyawan->pekerjaan->first()->division->name ?? '-' }}</td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $karyawan->pekerjaan->first()->company->name ?? '-' }}</td>

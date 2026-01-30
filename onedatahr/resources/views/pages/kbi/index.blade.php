@@ -185,14 +185,14 @@
 
         {{-- KONTEN UTAMA: DAFTAR KARYAWAN --}}
         {{-- Tampilkan table hanya jika role bukan staff --}}
-        @if(auth()->user() && auth()->user()->hasRole(['admin', 'manager', 'gm', 'superadmin']))
+        @if(auth()->user() && auth()->user()->hasRole(['admin', 'manager', 'senior_manager', 'superadmin']))
         <div class="bg-white dark:bg-gray-800 p-5 sm:p-6 rounded-xl shadow border border-green-100 dark:border-gray-700">
 
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
                 <h3 class="font-bold text-lg text-green-800 dark:text-green-400 flex items-center gap-2">
                     {{-- Ganti Judul Agar Lebih Relevan untuk Manager --}}
                     <i class="fas fa-users"></i>
-                    @if(auth()->user()->hasRole(['manager', 'gm']))
+                    @if(auth()->user()->hasRole(['manager', 'senior_manager']))
                         @if($bawahanList->total() > 0)
                             Daftar Tim Saya ({{ $bawahanList->total() }})
                         @else
@@ -205,12 +205,12 @@
             </div>
 
             {{-- INFO BOX ATURAN PENILAIAN --}}
-            @if(isset($isGM) && $isGM)
+            @if(isset($issenior_manager) && $issenior_manager)
                 <div class="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-5">
                     <div class="flex items-start gap-3">
                         <i class="fas fa-info-circle text-blue-600 dark:text-blue-400 mt-0.5"></i>
                         <div class="flex-1">
-                            <h4 class="font-semibold text-blue-800 dark:text-blue-300 text-sm mb-1">Aturan Penilaian GM</h4>
+                            <h4 class="font-semibold text-blue-800 dark:text-blue-300 text-sm mb-1">Aturan Penilaian senior_manager</h4>
                             <p class="text-blue-700 dark:text-blue-400 text-sm">
                                 Sebagai General Manager, Anda dapat melihat <strong>semua staff</strong> dan hanya bisa menilai staff yang berada di <strong>divisi yang sama</strong> dengan satu level dibawah Anda.
                                 Pastikan penilaian dilakukan secara objektif dan sesuai dengan kompetensi masing-masing karyawan.
@@ -264,7 +264,7 @@
                             <th class="p-4 text-left">Nama</th>
                             <th class="p-4 text-center">NIK</th>
                             <th class="p-4 text-center hidden sm:table-cell">Jabatan</th>
-                            @if((isset($isGM) && $isGM) || (isset($isManager) && $isManager))
+                            @if((isset($issenior_manager) && $issenior_manager) || (isset($isManager) && $isManager))
                                 <th class="p-4 text-center">Keterangan</th>
                             @endif
                             <th class="p-4 text-center">Aksi</th>
@@ -277,7 +277,7 @@
             // 1. DEFINISI HIERARKI
             $jabatanHierarchy = [
                 'Direktur' => 1,
-                'General Manajer' => 2, 'GM' => 2,
+                'General Manajer' => 2, 'senior_manager' => 2,
                 'Manajer' => 3,
                 'Supervisor' => 4,
                 'Staff' => 5,
@@ -293,9 +293,9 @@
             $canAssess = false; // Default: Tidak bisa menilai
             $reason    = '';    // Alasan kenapa tidak bisa
 
-            // 3. LOGIKA UNTUK GM (General Manager)
-            // Rules: GM (Lvl 2) HANYA bisa menilai Manager (Lvl 3)
-            if(isset($isGM) && $isGM) {
+            // 3. LOGIKA UNTUK senior_manager (General Manager)
+            // Rules: senior_manager (Lvl 2) HANYA bisa menilai Manager (Lvl 3)
+            if(isset($issenior_manager) && $issenior_manager) {
                 if($staffLevel === 3) {
                     $canAssess = true;
                 } else {
@@ -336,7 +336,7 @@
             </td>
 
             {{-- KOLOM 4: KETERANGAN STATUS (Dapat Dinilai / Locked) --}}
-            @if((isset($isGM) && $isGM) || (isset($isManager) && $isManager))
+            @if((isset($issenior_manager) && $issenior_manager) || (isset($isManager) && $isManager))
                 <td class="p-4 text-center">
                     @if($canAssess)
                         <span class="inline-flex items-center gap-1 text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded text-xs font-medium">
@@ -376,11 +376,11 @@
         </tr>
     @empty
         <tr>
-            <td colspan="{{ (isset($isGM) && $isGM) || (isset($isManager) && $isManager) ? '5' : '4' }}" class="p-8 text-center text-gray-400 dark:text-gray-500">
+            <td colspan="{{ (isset($issenior_manager) && $issenior_manager) || (isset($isManager) && $isManager) ? '5' : '4' }}" class="p-8 text-center text-gray-400 dark:text-gray-500">
                 <div class="flex flex-col items-center justify-center">
                     <i class="fas fa-inbox text-4xl mb-3 opacity-30"></i>
                     <p class="text-sm">
-                        @if(auth()->user()->hasRole(['manager', 'gm']))
+                        @if(auth()->user()->hasRole(['manager', 'senior_manager']))
                             Belum ada anggota tim yang sesuai kriteria.
                         @else
                             Data tidak ditemukan

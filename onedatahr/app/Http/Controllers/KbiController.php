@@ -42,7 +42,7 @@ class KbiController extends Controller
         // Filter: Jangan tampilkan diri sendiri
         $query->where('id_karyawan', '!=', $karyawan->id_karyawan);
 
-        // --- [LOGIC BARU: FILTER KHUSUS MANAGER/GM] ---
+        // --- [LOGIC BARU: FILTER KHUSUS MANAGER/senior_manager] ---
         // Cek Jabatan User Login
         $userJabatan = $karyawan->pekerjaan->first()?->position?->name;
         $userDivisionId = $karyawan->pekerjaan->first()?->division_id;
@@ -51,7 +51,7 @@ class KbiController extends Controller
         $jabatanHierarchy = [
             'Direktur' => 1,
             'General Manager' => 2,
-            'GM' => 2,
+            'senior_manager' => 2,
             'Manager' => 3,
             'Supervisor' => 4,
             'Staff' => 5,
@@ -67,14 +67,14 @@ class KbiController extends Controller
             }
         }
 
-        $isGM = $userLevel == 2; // GM level 2
+        $issenior_manager = $userLevel == 2; // senior_manager level 2
         $isManager = $userLevel == 3; // Manager level 3
-        $hasManagerRole = $user->hasRole(['manager', 'gm']);
+        $hasManagerRole = $user->hasRole(['manager', 'senior_manager']);
 
-        // Hanya terapkan filter jika user memiliki role manager/gm DAN memiliki division_id
+        // Hanya terapkan filter jika user memiliki role manager/senior_manager DAN memiliki division_id
         if ($hasManagerRole && $userDivisionId) {
-            if ($isGM) {
-                // GM melihat SEMUA karyawan di divisi yang sama, kecuali GM sendiri
+            if ($issenior_manager) {
+                // senior_manager melihat SEMUA karyawan di divisi yang sama, kecuali senior_manager sendiri
                 $query->whereHas('pekerjaan', function ($q) use ($userDivisionId) {
                     $q->where('division_id', $userDivisionId);
                 });
@@ -83,7 +83,7 @@ class KbiController extends Controller
                 $query->whereHas('pekerjaan', function ($q) use ($userDivisionId, $jabatanHierarchy) {
                     $q->where('division_id', $userDivisionId)
                         ->where(function ($sq) use ($jabatanHierarchy) {
-                            // Kecualikan jabatan dengan level <= 3 (Direktur, GM, Manager)
+                            // Kecualikan jabatan dengan level <= 3 (Direktur, senior_manager, Manager)
                             foreach ($jabatanHierarchy as $jabatan => $level) {
                                 if ($level > 3) { // Hanya jabatan di bawah Manager (Supervisor, Staff, dll)
                                     $sq->orWhereHas('position', function ($posQ) use ($jabatan) {
@@ -94,19 +94,19 @@ class KbiController extends Controller
                         });
                 });
             } else {
-                // User memiliki role manager/gm tapi jabatannya tidak terdeteksi sebagai manager/GM
+                // User memiliki role manager/senior_manager tapi jabatannya tidak terdeteksi sebagai manager/senior_manager
                 // Mungkin jabatan custom, jadi tampilkan semua karyawan di divisi yang sama
                 $query->whereHas('pekerjaan', function ($q) use ($userDivisionId) {
                     $q->where('division_id', $userDivisionId);
                 });
-                \Log::warning('User dengan role manager/gm tapi jabatan tidak terdeteksi: ' . $userJabatan . ' - ' . $user->nik);
+                \Log::warning('User dengan role manager/senior_manager tapi jabatan tidak terdeteksi: ' . $userJabatan . ' - ' . $user->nik);
             }
         } elseif ($hasManagerRole && !$userDivisionId) {
-            // User memiliki role manager/gm tapi tidak memiliki division_id
+            // User memiliki role manager/senior_manager tapi tidak memiliki division_id
             $query->where('id_karyawan', null); // Tidak tampilkan data apa pun
-            \Log::warning('User dengan role manager/gm tapi tanpa division_id: ' . $userJabatan . ' - ' . $user->nik);
+            \Log::warning('User dengan role manager/senior_manager tapi tanpa division_id: ' . $userJabatan . ' - ' . $user->nik);
         }
-        // Jika user tidak memiliki role manager/gm, tidak ada filter khusus (untuk admin/superadmin)
+        // Jika user tidak memiliki role manager/senior_manager, tidak ada filter khusus (untuk admin/superadmin)
 
         // Filter Search (Tetap ada)
         if ($request->has('search') && $request->search != '') {
@@ -150,7 +150,7 @@ class KbiController extends Controller
         $jabatanHierarchy = [
             'Direktur' => 1,
             'General Manager' => 2,
-            'GM' => 2,
+            'senior_manager' => 2,
             'Manager' => 3,
             'Supervisor' => 4,
             'Staff' => 5,
@@ -175,14 +175,14 @@ class KbiController extends Controller
                 if ($level < $userLevel) $higherJabatan[] = $jabatan;
             }
 
-            // Untuk GM (level 2), hanya tampilkan jabatan level 1 (Direktur Utama)
+            // Untuk senior_manager (level 2), hanya tampilkan jabatan level 1 (Direktur Utama)
             if ($userLevel == 2) {
                 $higherJabatan = array_filter($higherJabatan, function ($jabatan) use ($jabatanHierarchy) {
                     return ($jabatanHierarchy[$jabatan] ?? 99) == 1;
                 });
             }
             // Ambil calon atasan dengan 2 kondisi:
-            // 1. Jika level 1-2 (Direktur/GM): Bisa dari divisi manapun
+            // 1. Jika level 1-2 (Direktur/senior_manager): Bisa dari divisi manapun
             // 2. Jika level > 2 (Manager+): Hanya dari divisi yang sama
             $listCalonAtasan = Karyawan::where('id_karyawan', '!=', $karyawan->id_karyawan)
                 ->whereHas('pekerjaan', function ($q) use ($userDivisionId, $higherJabatan, $userLevel) {
@@ -213,7 +213,7 @@ class KbiController extends Controller
             'sudahMenilaiAtasan',
             'listCalonAtasan',
             'tahun',
-            'isGM',
+            'issenior_manager',
             'isManager'
         ));
     }
@@ -425,8 +425,8 @@ class KbiController extends Controller
                     $jabatanUser = $karyawanUser->pekerjaan->first()?->position?->name ?? '';
                     $jabatanLower = strtolower($jabatanUser);
 
-                    // Jika GM atau General Manager, tampilkan semua karyawan di divisi yang sama
-                    if (strpos($jabatanLower, 'general manager') !== false || strpos($jabatanLower, 'gm') !== false) {
+                    // Jika senior_manager atau General Manager, tampilkan semua karyawan di divisi yang sama
+                    if (strpos($jabatanLower, 'general manager') !== false || strpos($jabatanLower, 'senior_manager') !== false) {
                         $divisiUser = $karyawanUser->pekerjaan->first()?->division?->name ?? '';
                         $query->whereHas('pekerjaan', function ($q) use ($divisiUser) {
                             $q->whereHas('division', function ($divQ) use ($divisiUser) {
