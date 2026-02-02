@@ -73,7 +73,7 @@ class DashboardController extends Controller
 
         $jabatanData = Pekerjaan::with('position')->whereHas('position')->groupBy('position_id')->select('position_id', DB::raw('count(*) as total'))->get()->pluck('total', 'position.name')->toArray();
 
-        $divisiData = Division::whereNotNull('name')->groupBy('name')->select('name', DB::raw('count(*) as total'))->pluck('total','name')->toArray();
+        $divisiData = Division::whereNotNull('name')->groupBy('name')->select('name', DB::raw('count(*) as total'))->pluck('total', 'name')->toArray();
 
         $pendidikanData = Pendidikan::whereNotNull('Pendidikan_Terakhir')->groupBy('Pendidikan_Terakhir')->select('Pendidikan_Terakhir', DB::raw('count(*) as total'))->pluck('total', 'Pendidikan_Terakhir')->toArray();
 
@@ -98,7 +98,7 @@ class DashboardController extends Controller
             else $ageCounts['> 50']++;
         }
 
-        $perusahaanData = Company::whereNotNull('name')->groupBy('name')->select('name', DB::raw('count(*) as total'))->pluck('total','name')->toArray();
+        $perusahaanData = Company::whereNotNull('name')->groupBy('name')->select('name', DB::raw('count(*) as total'))->pluck('total', 'name')->toArray();
 
         // --- Data Turnover (Keluar Masuk per Bulan per Perusahaan) ---
         $turnoverData = [];
@@ -128,60 +128,99 @@ class DashboardController extends Controller
 
         // View: pages/dashboard/admin.blade.php (atau dashboard.blade.php yang lama)
         return view('pages.dashboard', compact(
-            'totalKaryawan', 'karyawanAktif', 'totalKontrak', 'totaldepartment_id',
-            'genderData', 'jabatanData', 'divisiData', 'pendidikanData',
-            'tenureCounts', 'ageCounts', 'perusahaanData', 'turnoverData'
+            'totalKaryawan',
+            'karyawanAktif',
+            'totalKontrak',
+            'totaldepartment_id',
+            'genderData',
+            'jabatanData',
+            'divisiData',
+            'pendidikanData',
+            'tenureCounts',
+            'ageCounts',
+            'perusahaanData',
+            'turnoverData'
         ));
     }
 
     // =========================================================================
     // 2. DASHBOARD MANAGER (Monitoring Tim)
     // =========================================================================
-    private function managerDashboard($request, $manager, $tahun)
+    private function managerDashboard(Request $request, $manager, $tahun)
     {
-        // 1. Ambil ID Tim (Bawahan Langsung yang di divisi sama)
-        $listBawahanIds = Karyawan::where('atasan_id', $manager->id_karyawan)
-            ->whereHas('pekerjaan', function ($q) use ($manager) {
-                $q->where('division_id', $manager->pekerjaan->first()->division_id ?? null);
-            })
-            ->pluck('id_karyawan');
-        $totalTim       = $listBawahanIds->count();
+        // ===============================
+        // VALIDASI DATA MANAGER
+        // ===============================
+        $pekerjaanManager = $manager->pekerjaan()
+            ->orderByDesc('id_pekerjaan') // atau created_at
+            ->first();
 
-        // 2. KPI: Butuh Approval (Status: SUBMITTED)
-        $butuhApprovalKPI = KpiAssessment::whereIn('karyawan_id', $listBawahanIds)
-            ->where('tahun', $tahun)
-            ->whereIn('status', ['SUBMITTED']) // Manager hanya peduli yang sudah submit
-            ->count();
+        if (!$pekerjaanManager || !$pekerjaanManager->division_id) {
+            abort(403, 'Manager belum memiliki divisi.');
+        }
 
-        // 3. KBI: Belum Dinilai Manager
-        $sudahDinilaiKBI = KbiAssessment::whereIn('karyawan_id', $listBawahanIds)
-            ->where('tahun', $tahun)
-            ->where('penilai_id', Auth::id()) // Dinilai oleh User yang login
-            ->where('tipe_penilai', 'ATASAN')
-            ->count();
+        $divisionId = $pekerjaanManager->division_id;
 
-        $belumDinilaiKBI = $totalTim - $sudahDinilaiKBI;
+        // ===============================
+        // AMBIL SEMUA KARYAWAN DIVISI
+        // ===============================
+        $scopeIds = Karyawan::whereHas('pekerjaan', function ($q) use ($divisionId) {
+            $q->where('division_id', $divisionId);
+        })->pluck('id_karyawan')->toArray();
 
-        // 4. Tabel Monitoring (Pagination)
-        $teamMonitoring = Karyawan::where('atasan_id', $manager->id_karyawan)
-            ->whereHas('pekerjaan', function ($q) use ($manager) {
-                $q->where('division_id', $manager->pekerjaan->first()->division_id ?? null);
-            })
-            ->with([
-                'pekerjaan',
-                'kpiAssessment' => function ($q) use ($tahun) {
-                    $q->where('tahun', $tahun);
-                },
-                // Cek status KBI apakah sudah dinilai manager ini
-                'kbiAssessment' => function ($q) use ($tahun) {
-                    $q->where('tahun', $tahun)
-                        ->where('penilai_id', Auth::id())
-                        ->where('tipe_penilai', 'ATASAN');
-                }
-            ])
-            ->paginate(5); // Tampilkan 5 per halaman di dashboard
+        $totalTim = count($scopeIds);
 
-        // View: pages/dashboard/manager.blade.php
+        // ===============================
+        // KPI BUTUH APPROVAL
+        // ===============================
+        $butuhApprovalKPI = $totalTim > 0
+            ? KpiAssessment::whereIn('karyawan_id', $scopeIds)
+                ->where('tahun', $tahun)
+                ->where('status', 'SUBMITTED')
+                ->count()
+            : 0;
+
+        // ===============================
+        // KBI BELUM DINILAI
+        // ===============================
+        $sudahDinilaiKBI = $totalTim > 0
+            ? KbiAssessment::whereIn('karyawan_id', $scopeIds)
+                ->where('tahun', $tahun)
+                ->where('penilai_id', Auth::id())
+                ->where('tipe_penilai', 'ATASAN')
+                ->count()
+            : 0;
+
+        $belumDinilaiKBI = max($totalTim - $sudahDinilaiKBI, 0);
+
+        // ===============================
+        // TABLE MONITORING
+        // ===============================
+        if (empty($scopeIds)) {
+            $page = $request->input('page', 1);
+            $teamMonitoring = new \Illuminate\Pagination\LengthAwarePaginator(
+                [],
+                0,
+                5,
+                $page,
+                ['path' => request()->url()]
+            );
+        } else {
+            $teamMonitoring = Karyawan::whereIn('id_karyawan', $scopeIds)
+                ->with([
+                    'pekerjaan.division',
+                    'kpiAssessment' => function ($q) use ($tahun) {
+                        $q->where('tahun', $tahun);
+                    },
+                    'kbiAssessment' => function ($q) use ($tahun) {
+                        $q->where('tahun', $tahun)
+                          ->where('penilai_id', Auth::id())
+                          ->where('tipe_penilai', 'ATASAN');
+                    }
+                ])
+                ->paginate(5);
+        }
+
         return view('pages.dashboard.manager', compact(
             'manager',
             'tahun',

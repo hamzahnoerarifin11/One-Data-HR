@@ -22,10 +22,11 @@ class KpiAssessmentController extends Controller
         $user = Auth::user();
         $tahun = $request->input('tahun', date('Y'));
 
+
         // --- SKENARIO 1: ADMIN & SUPERADMIN (Lihat Semua Data) ---
         if ($user->hasRole(['superadmin', 'admin'])) {
 
-            $query = Karyawan::with(['pekerjaan.company', 'pekerjaan.position', 'kpiAssessment' => function ($q) use ($tahun) {
+            $query = Karyawan::with(['pekerjaan.company', 'pekerjaan.position', 'pekerjaan.division', 'pekerjaan.department', 'kpiAssessment' => function ($q) use ($tahun) {
                 $q->where('tahun', $tahun);
             }]);
 
@@ -81,13 +82,87 @@ class KpiAssessmentController extends Controller
             return view('pages.kpi.index', compact('karyawanList', 'tahun', 'stats', 'listJabatan', 'listCompanies'));
         }
 
-        // --- SKENARIO 2: STAFF & MANAGER (Redirect ke Punya Sendiri) ---
+        // --- SKENARIO 2: MANAGER (Dashboard Bawahan) ---
 
         $me = Karyawan::where('nik', $user->nik)->first();
 
         if (!$me) {
             return redirect()->back()->with('error', 'Profil karyawan tidak ditemukan. Hubungi HRD.');
         }
+
+        // Jika yang login adalah Manager / GM / Senior Manager: tampilkan dashboard bawahan
+        if ($user->hasRole(['manager', 'GM', 'senior_manager'])) {
+            // Ambil daftar bawahan langsung
+            $directIds = Karyawan::where('atasan_id', $me->id_karyawan)->pluck('id_karyawan')->toArray();
+            // Ambil juga bawahan tingkat 2 (bawahan dari bawahan)
+            $secondLevel = Karyawan::whereIn('atasan_id', $directIds)->pluck('id_karyawan')->toArray();
+
+            $scopeIds = array_unique(array_merge($directIds, $secondLevel));
+
+            $stats = [
+                'total_karyawan' => 0,
+                'sudah_final' => 0,
+                'draft' => 0,
+                'belum_ada' => 0,
+                'rata_rata' => 0,
+            ];
+
+            $listJabatan = \App\Models\Position::distinct()->orderBy('name')->pluck('name');
+            $listCompanies = \App\Models\Company::distinct()->orderBy('name')->pluck('name');
+
+            if (empty($scopeIds)) {
+                // 🔥 FALLBACK KE DIVISI
+                $pekerjaanManager = $me->pekerjaan()
+                    ->orderByDesc('id_pekerjaan')
+                    ->first();
+
+                if (!$pekerjaanManager || !$pekerjaanManager->division_id) {
+                    abort(403, 'Manager tidak memiliki divisi.');
+                }
+
+                $divisionId = $pekerjaanManager->division_id;
+
+                $query = Karyawan::with([
+                    'pekerjaan.company',
+                    'pekerjaan.position',
+                    'pekerjaan.division',
+                    'pekerjaan.department',
+                    'kpiAssessment' => function ($q) use ($tahun) {
+                        $q->where('tahun', $tahun);
+                    }
+                ])->whereHas('pekerjaan', function ($q) use ($divisionId) {
+                    $q->where('division_id', $divisionId);
+                });
+            } else {
+                // tetap pakai bawahan langsung jika ada
+                $query = Karyawan::with([
+                    'pekerjaan.company',
+                    'pekerjaan.position',
+                    'pekerjaan.division',
+                    'pekerjaan.department',
+                    'kpiAssessment' => function ($q) use ($tahun) {
+                        $q->where('tahun', $tahun);
+                    }
+                ])->whereIn('id_karyawan', $scopeIds);
+            }
+
+            // Bangun statistik berdasarkan query yang sudah dibuat
+            $allKaryawan = $query->get();
+            $stats = [
+                'total_karyawan' => $allKaryawan->count(),
+                'sudah_final' => $allKaryawan->filter(fn($k) => $k->kpiAssessment && $k->kpiAssessment->status == 'FINAL')->count(),
+                'draft' => $allKaryawan->filter(fn($k) => $k->kpiAssessment && $k->kpiAssessment->status != 'FINAL')->count(),
+                'belum_ada'  => $allKaryawan->filter(fn($k) => !$k->kpiAssessment)->count(),
+                'rata_rata' => $allKaryawan->filter(fn($k) => $k->kpiAssessment)->avg(fn($k) => $k->kpiAssessment->total_skor_akhir),
+            ];
+
+            // Paginasi untuk daftar karyawan (bisa dipakai di view ->links())
+            $karyawanList = $query->paginate(10)->appends($request->all());
+
+            return view('pages.kpi.index', compact('karyawanList', 'tahun', 'stats', 'listJabatan', 'listCompanies', 'me'));
+        }
+
+        // --- SKENARIO 3: STAFF (Redirect ke Punya Sendiri) ---
 
         // Cek apakah KPI tahun ini sudah ada?
         $existingKpi = KpiAssessment::where('karyawan_id', $me->id_karyawan)
@@ -133,9 +208,16 @@ class KpiAssessmentController extends Controller
         // Validasi Akses (Cegah Staff A mengintip Staff B)
         $user = Auth::user();
         if (!$user->hasRole(['admin', 'superadmin'])) {
-            // Jika bukan admin, pastikan dia melihat punya sendiri atau punya bawahannya
+            // Jika bukan admin, pastikan dia melihat punya sendiri atau punya bawahannya (direct atau level-2 untuk manager)
             $me = Karyawan::where('nik', $user->nik)->first();
-            if ($me->id_karyawan != $karyawanId && $karyawan->atasan_id != $me->id_karyawan) {
+
+            $allowed = false;
+            if ($me->id_karyawan == $karyawanId) $allowed = true; // melihat punya sendiri
+            if ($karyawan->atasan_id == $me->id_karyawan) $allowed = true; // direct subordinate
+            // cek jika saya adalah atasan dari atasan karyawan (level-2)
+            if ($karyawan->atasan && $karyawan->atasan->atasan_id == $me->id_karyawan) $allowed = true;
+
+            if (!$allowed) {
                 return abort(403, 'Anda tidak berhak melihat dokumen ini.');
             }
         }
@@ -152,7 +234,6 @@ class KpiAssessmentController extends Controller
                 'periode' => 'Tahunan',
                 'status' => 'DRAFT',
                 'total_skor_akhir' => 0,
-                'nama_periode' => "KPI Tahun {$tahun}",
             ]);
         }
 
@@ -187,7 +268,6 @@ class KpiAssessmentController extends Controller
             'periode' => 'Tahunan',
             'status' => 'DRAFT',
             'total_skor_akhir' => 0,
-            'nama_periode' => 'Tahunan',
         ]);
 
         return redirect()->route('kpi.show', ['karyawan_id' => $request->karyawan_id, 'tahun' => $request->tahun]);
@@ -202,12 +282,15 @@ class KpiAssessmentController extends Controller
     {
         $request->validate([
             'kpi_assessment_id'         => 'required',
-            'key_performance_indicator' => 'required',
+            'key_result_area'           => 'required|string',
+            'key_performance_indicator' => 'required|string',
             'bobot'                     => 'required|numeric',
-            'target'                    => 'required',
+            'polaritas'                 => 'required|string',
+            'perspektif'                => 'nullable|string',
         ]);
 
-        $cleanTarget = $this->cleanInput($request->target);
+        // default target 0 since form doesn't request target
+        $defaultTarget = 0;
 
         // 1. Simpan Item KPI
         $item = KpiItem::create([
@@ -215,21 +298,17 @@ class KpiAssessmentController extends Controller
             'perspektif'                => $request->perspektif,
             'key_result_area'           => $request->key_result_area,
             'key_performance_indicator' => $request->key_performance_indicator,
-            'units'                     => $request->units,
             'polaritas'                 => $request->polaritas,
             'bobot'                     => $request->bobot,
-            'target'                    => $cleanTarget,
+            'target'                    => $defaultTarget,
         ]);
 
-        // 2. Simpan Score (Disini Error 1364 Muncul)
+        // 2. Simpan Score
         KpiScore::create([
             'kpi_item_id'  => $item->id_kpi_item,
-            'target'       => $cleanTarget,
-            'target_smt1'  => $cleanTarget,
-
-            // PERBAIKAN DISINI: Jangan pakai $request->nama_periode
-            'nama_periode' => 'Semester 1', // <--- ISI MANUAL AGAR TIDAK EROR
-
+            'target'       => $defaultTarget,
+            'target_smt1'  => $defaultTarget,
+            'nama_periode' => 'Semester 1',
             'realisasi'    => 0
         ]);
 
@@ -354,13 +433,13 @@ class KpiAssessmentController extends Controller
             $statusSekarang = $assessment->status;
             $statusBaru = $statusSekarang; // Default tidak berubah
 
-            // SKENARIO 1: STAFF (Pemilik KPI) KLIK SIMPAN
-            // Jika yang login adalah Staff, otomatis jadi "SUBMITTED" (Menunggu Approval)
-            if ($user->hasRole('staff')) {
+            // SKENARIO 1: STAFF atau SUPERVISOR (Pemilik KPI / Supervisor) KLIK SIMPAN
+            // Jika yang login adalah Staff atau Supervisor, otomatis jadi "SUBMITTED" (Menunggu Approval dari Manager)
+            if ($user->hasRole('staff') || $user->hasRole('supervisor')) {
                 $statusBaru = 'SUBMITTED';
             }
 
-            // SKENARIO 2: MANAGER / ADMIN KLIK SIMPAN
+            // SKENARIO 2: MANAGER / ADMIN / SUPERADMIN KLIK SIMPAN
             // Jika Manager/Admin yang simpan, otomatis jadi "FINAL" (Approved)
             elseif ($user->hasRole(['manager', 'admin', 'superadmin'])) {
                 $statusBaru = 'FINAL';
@@ -492,7 +571,146 @@ class KpiAssessmentController extends Controller
     }
 
     // =================================================================
-    // 6. EXPORT FUNCTIONS
+    // 6. BULK ACTIONS (MANAGER)
+    // =================================================================
+
+    /**
+     * Bulk create KPI header for all karyawan in manager scope (direct & level-2)
+     */
+    public function bulkCreateForManager(Request $request)
+    {
+        // Backward-compatible simple action (header-only) kept for API/legacy use
+        $request->validate(['tahun' => 'required']);
+        $user = Auth::user();
+
+        if (!$user->hasRole(['manager', 'GM', 'senior_manager', 'admin', 'superadmin'])) {
+            return redirect()->back()->with('error', 'Akses ditolak.');
+        }
+
+        $scopeIds = Karyawan::pluck('id_karyawan')->toArray();
+
+        if (empty($scopeIds)) {
+            return redirect()->back()->with('error', 'Tidak ada karyawan untuk ditetapkan KPI.');
+        }
+
+        $tahun = $request->tahun;
+        $created = 0;
+
+        DB::beginTransaction();
+        try {
+            foreach ($scopeIds as $karyawanId) {
+                $exists = KpiAssessment::where('karyawan_id', $karyawanId)->where('tahun', $tahun)->first();
+                if ($exists) continue;
+
+                KpiAssessment::create([
+                    'karyawan_id' => $karyawanId,
+                    'tahun' => $tahun,
+                    'periode' => 'Tahunan',
+                    'status' => 'DRAFT',
+                    'total_skor_akhir' => 0,
+                    'penilai_id' => $user->id,
+                ]);
+
+                $created++;
+            }
+
+            DB::commit();
+            return redirect()->back()->with('success', "Berhasil membuat KPI untuk {$created} karyawan.");
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'Gagal membuat KPI: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Tampilkan form untuk manager mengisi template KPI yang akan diterapkan ke semua karyawan
+     */
+    public function bulkCreateForm(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user->hasRole(['manager', 'GM', 'senior_manager', 'admin', 'superadmin'])) {
+            return redirect()->back()->with('error', 'Akses ditolak.');
+        }
+
+        $tahun = $request->input('tahun', date('Y'));
+        return view('pages.kpi.bulk_create', compact('tahun'));
+    }
+
+    /**
+     * Simpan template KPI dan buatkan item untuk semua karyawan
+     */
+    public function bulkStoreWithItems(Request $request)
+    {
+        $request->validate([
+            'tahun' => 'required',
+            'items' => 'required|array|min:1',
+            'items.*.key_result_area' => 'required|string',
+            'items.*.key_performance_indicator' => 'required|string',
+            'items.*.bobot' => 'required|numeric',
+            'items.*.perspektif' => 'nullable|string',
+            'items.*.polaritas' => 'required|string',
+        ]);
+
+        $user = Auth::user();
+        if (!$user->hasRole(['manager', 'GM', 'senior_manager', 'admin', 'superadmin'])) {
+            return redirect()->back()->with('error', 'Akses ditolak.');
+        }
+
+        $tahun = $request->tahun;
+        $items = $request->items;
+        $createdHeaders = 0;
+        $createdItems = 0;
+
+        DB::beginTransaction();
+        try {
+            $scopeIds = Karyawan::pluck('id_karyawan')->toArray();
+
+            foreach ($scopeIds as $karyawanId) {
+                $kpi = KpiAssessment::firstOrCreate(
+                    ['karyawan_id' => $karyawanId, 'tahun' => $tahun],
+                    ['periode' => 'Tahunan', 'status' => 'DRAFT', 'total_skor_akhir' => 0, 'penilai_id' => $user->id]
+                );
+
+                if ($kpi->wasRecentlyCreated) $createdHeaders++;
+
+                // Hanya buat items jika belum ada item sama sekali (menghindari duplikasi)
+                $existsItem = \App\Models\KpiItem::where('kpi_assessment_id', $kpi->id_kpi_assessment)->exists();
+                if ($existsItem) continue;
+
+                foreach ($items as $it) {
+                    $item = \App\Models\KpiItem::create([
+                        'kpi_assessment_id' => $kpi->id_kpi_assessment,
+                        'perspektif' => $it['perspektif'] ?? null,
+                        'key_result_area' => $it['key_result_area'] ?? null,
+                        'key_performance_indicator' => $it['key_performance_indicator'],
+                        'polaritas' => $it['polaritas'] ?? 'MAX',
+                        'bobot' => $it['bobot'],
+                        // default target 0 because form no longer requests target
+                        'target' => 0,
+                    ]);
+
+                    \App\Models\KpiScore::create([
+                        'kpi_item_id' => $item->id_kpi_item,
+                        'target' => 0,
+                        'target_smt1' => 0,
+                        'nama_periode' => 'Semester 1',
+                        'realisasi' => 0,
+                    ]);
+
+                    $createdItems++;
+                }
+            }
+
+            DB::commit();
+            return redirect()->route('kpi.index')->with('success', "Template berhasil diterapkan. Header dibuat: {$createdHeaders}, item ditambahkan: {$createdItems}.");
+        } catch (\Exception $e) {
+            DB::rollback();
+            return redirect()->back()->with('error', 'Gagal menyimpan template: ' . $e->getMessage());
+        }
+    }
+
+    // =================================================================
+    // 7. EXPORT FUNCTIONS
     // =================================================================
 
     public function exportExcel(Request $request)

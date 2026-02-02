@@ -20,6 +20,8 @@ class KpiAssessment extends Model
         'periode',
         'status',
         'total_skor_akhir',
+        'nama_periode',
+        'penilai_id',
         'grade',         // <--- INI YANG PALING PENTING
         'created_by',    // Tambahkan jika ada kolom created_by/updated_by custom
         // Tambahkan kolom lain jika ada

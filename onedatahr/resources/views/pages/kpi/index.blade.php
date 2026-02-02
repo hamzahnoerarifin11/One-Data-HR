@@ -42,6 +42,18 @@
             <h2 class="text-3xl sm:text-2xl font-bold text-gray-800 dark:text-white">Performance Dashboard</h2>
             {{-- Menampilkan Tahun yang sedang dipilih --}}
             <p class="text-gray-500 dark:text-gray-400 text-sm">Monitoring Penilaian Kinerja Karyawan Tahun {{ $tahun ?? date('Y') }}</p>
+
+            @if(isset($me) && auth()->user()->hasRole(['manager','GM','senior_manager']))
+                <div class="mt-3 flex items-center justify-center gap-3">
+<a href="{{ route('kpi.bulk-create.form', ['tahun' => $tahun]) }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-bold shadow inline-flex items-center">
+                                    <i class="fas fa-layer-group mr-1"></i> Tetapkan KPI untuk Semua Karyawan
+                                </a>
+
+                    <a href="{{ route('kpi.show', ['karyawan_id' => $me->id_karyawan, 'tahun' => $tahun]) }}" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm font-bold shadow">
+                        <i class="fas fa-user-check mr-1"></i> Nilai Diri Sendiri
+                    </a>
+                </div>
+            @endif
         </div>
         {{-- FILTER AREA (CENTERED) --}}
         <div class="flex justify-center mb-8">
@@ -234,8 +246,9 @@
                                 <div>
                                     <div class="font-bold text-gray-200 dark:text-white text-base">{{ $kry->Nama_Lengkap_Sesuai_Ijazah }}</div>
                                     <div class="text-xs text-gray-500">{{ $kry->pekerjaan->first()?->position?->name ?? '-' }}</div>
+                                    <div class="text-xs text-gray-400">{{ $kry->pekerjaan->first()?->division?->name ?? '-' }}</div>
                                     <div class="text-xs text-gray-400">{{ $kry->pekerjaan->first()?->company?->name ?? '-' }}</div>
-                                    <div class="text-xs text-gray-400 mt-0.5">NIK: {{ $kry->NIK ?? '-' }}</div>
+                                    <div class="text-xs text-gray-400 mt-0.5">NIK: {{ $kry->NIK ?? '-' }}</div>\n
                                 </div>
                                 <div class="text-xs dark:text-white text-gray-400 font-mono">#{{ $index + 1 }}</div>
                             </div>
@@ -310,6 +323,7 @@
                             <th scope="col" class="px-6 py-4 w-16 text-center">No</th>
                             <th scope="col" class="px-6 py-4">Nama Karyawan</th>
                             <th scope="col" class="px-6 py-4">Jabatan</th>
+                            <th scope="col" class="px-6 py-4">Divisi</th>
                             <th scope="col" class="px-6 py-4">Perusahaan</th>
                             <th scope="col" class="px-6 py-4 text-center">Periode</th>
                             <th scope="col" class="px-6 py-4 text-center">Status</th>
@@ -329,6 +343,7 @@
                                 <div class="font-normal text-gray-500 text-xs">{{ $kry->NIK ?? '-' }}</div>
                             </td>
                             <td class="px-6 py-4">{{ $kry->pekerjaan->first()?->position?->name ?? '-' }}</td>
+                            <td class="px-6 py-4">{{ $kry->pekerjaan->first()?->division?->name ?? '-' }}</td>
                             <td class="px-6 py-4">{{ $kry->pekerjaan->first()?->company?->name ?? '-' }}</td>
                             {{-- Tampilkan Tahun sesuai filter --}}
                             <td class="px-6 py-4 text-center">{{ $tahun }}</td>
@@ -390,7 +405,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="8" class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
+                            <td colspan="9" class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
                                 <div class="flex flex-col items-center justify-center">
                                     <i class="fas fa-search text-4xl mb-3 text-gray-300"></i>
                                     <p>Tidak ada data karyawan ditemukan.</p>

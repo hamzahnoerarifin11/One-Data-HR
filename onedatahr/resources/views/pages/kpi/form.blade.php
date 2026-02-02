@@ -338,9 +338,7 @@
                 <div><label class="block text-sm font-medium text-gray-700">KRA</label><input type="text" name="key_result_area" class="border p-2 w-full rounded text-sm" required></div>
                 <div><label class="block text-sm font-medium text-gray-700">KPI</label><input type="text" name="key_performance_indicator" class="border p-2 w-full rounded text-sm" required></div>
                 <div><label class="block text-sm font-medium text-gray-700">Bobot (%)</label><input type="number" step="0.01" name="bobot" class="border p-2 w-full rounded text-sm" required></div>
-                <div><label class="block text-sm font-medium text-gray-700">Target</label><input type="text" name="target" class="border p-2 w-full rounded text-sm" required></div>
                 <div><label class="block text-sm font-medium text-gray-700">Perspektif</label><select name="perspektif" class="border p-2 w-full rounded text-sm"><option value="Financial">Financial</option><option value="Customer">Customer</option></select></div>
-                <div><label class="block text-sm font-medium text-gray-700">Units</label><input type="text" name="units" class="border p-2 w-full rounded text-sm" required></div>
                 <div><label class="block text-sm font-medium text-gray-700">Polaritas</label><select name="polaritas" class="border p-2 w-full rounded text-sm"><option value="Maximize">Positif</option><option value="Minimize">Negatif</option></select></div>
             </div>
             <div class="mt-6 flex justify-end gap-2">
@@ -371,20 +369,12 @@
                     <textarea id="edit_kpi" name="key_performance_indicator" class="w-full border rounded p-2 text-sm" rows="2" required></textarea>
                 </div>
                 <div>
-                    <label for="edit_units" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Units</label>
-                    <input type="text" id="edit_units" name="units" class="w-full border rounded p-2 text-sm" required>
-                </div>
-                <div>
                     <label for="edit_polaritas" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Polaritas</label>
                     <select id="edit_polaritas" name="polaritas" class="w-full border rounded p-2 text-sm"><option value="Maximize">Positif</option><option value="Minimize">Negatif</option></select>
                 </div>
                 <div>
                     <label for="edit_bobot" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bobot (%)</label>
                     <input type="number" step="0.01" id="edit_bobot" name="bobot" class="w-full border rounded p-2 text-sm" required>
-                </div>
-                <div>
-                    <label for="edit_target" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Target</label>
-                    <input type="text" id="edit_target" name="target" class="w-full border rounded p-2 text-sm" required>
                 </div>
             </div>
             <div class="mt-6 flex justify-end gap-3">
@@ -730,10 +720,9 @@
         document.getElementById('edit_perspektif').value = data.perspektif;
         document.getElementById('edit_kra').value = data.key_result_area || data.kra;
         document.getElementById('edit_kpi').value = data.key_performance_indicator || data.indikator;
-        document.getElementById('edit_units').value = data.units || data.satuan;
+        // Units & Target are not part of the simplified form
         document.getElementById('edit_polaritas').value = data.polaritas;
         document.getElementById('edit_bobot').value = data.bobot;
-        document.getElementById('edit_target').value = data.target || data.target_tahunan;
         const modal = document.getElementById('modalEditKPI');
         modal.classList.remove('hidden'); modal.classList.add('flex');
     }

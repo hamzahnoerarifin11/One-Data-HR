@@ -59,8 +59,7 @@ Route::get('karyawan/positions/{unitId}', [KaryawanController::class, 'getPositi
 
 Route::post('karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
 
-Route::middleware(['auth'])->group(function () {
-});
+Route::middleware(['auth'])->group(function () {});
 
 Route::middleware(['auth'])->group(function () {
     // other routes
@@ -69,13 +68,13 @@ Route::middleware(['auth'])->group(function () {
 Route::post('karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
 
 Route::middleware(['auth', 'role:admin|superadmin'])->group(function () {
-        // --- KARYAWAN MANAGEMENT ---
-        Route::resource('karyawan', KaryawanController::class);
-        // Route::post('karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
+    // --- KARYAWAN MANAGEMENT ---
+    Route::resource('karyawan', KaryawanController::class);
+    // Route::post('karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
     Route::middleware(['auth', 'role:superadmin'])->group(function () {
-    // User management resource
-    Route::resource('users', UserController::class);
-    Route::delete('/users/batch-delete', [UserController::class, 'batchDelete'])->name('users.batchDelete');
+        // User management resource
+        Route::resource('users', UserController::class);
+        Route::delete('/users/batch-delete', [UserController::class, 'batchDelete'])->name('users.batchDelete');
     });
 
     // --- REKRUTMEN MODULE ---
@@ -158,16 +157,16 @@ Route::middleware(['auth', 'role:admin|superadmin'])->group(function () {
         Route::get('/export-excel', [TurnoverController::class, 'exportExcel'])->name('export.excel');
         Route::get('/export-pdf', [TurnoverController::class, 'exportPdf'])->name('export.pdf');
     });
-    Route::middleware(['auth', 'role:admin|superadmin|manager|senior_manager'])->group(function () {
-        // User management resource
-        // 7. monitoring
-        Route::get('/kbi/monitoring', [App\Http\Controllers\KbiController::class, 'monitoring'])->name('kbi.monitoring');
-        // --- rekap PERFORMANCE ROUTES ---
-        Route::get('/performance/rekap', [App\Http\Controllers\PerformanceController::class, 'index'])->name('performance.rekap');
-    });
+    // Route::middleware(['auth', 'role:admin|superadmin|manager|senior_manager'])->group(function () {
+    //     // User management resource
+    //     // 7. monitoring
+    //     Route::get('/kbi/monitoring', [App\Http\Controllers\KbiController::class, 'monitoring'])->name('kbi.monitoring');
+    //     // --- rekap PERFORMANCE ROUTES ---
+    //     Route::get('/performance/rekap', [App\Http\Controllers\PerformanceController::class, 'index'])->name('performance.rekap');
+    // });
     // Route::resource('wig-rekrutmen', WigRekrutmenController::class);
 
-// Route::resource('karyawan', KaryawanController::class);
+    // Route::resource('karyawan', KaryawanController::class);
 });
 
 Route::middleware(['auth', 'role:superadmin'])->group(function () {
@@ -175,7 +174,7 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::resource('users', UserController::class);
     Route::delete('/users/batch-delete', [UserController::class, 'batchDelete'])->name('users.batchDelete');
 });
-Route::middleware(['auth', 'role:admin|superadmin|manager|GM'])->group(function () {
+Route::middleware(['auth', 'role:admin|superadmin|manager|GM|senior_manager'])->group(function () {
     // User management resource
     // 7. monitoring
     Route::get('/kbi/monitoring', [App\Http\Controllers\KbiController::class, 'monitoring'])->name('kbi.monitoring');
@@ -201,6 +200,12 @@ Route::delete('/kpi/delete/{id}', [KpiAssessmentController::class, 'destroy'])->
 
 // Generate KPI Baru
 Route::post('/kpi/store', [KpiAssessmentController::class, 'store'])->name('kpi.store');
+
+// Bulk create KPI for manager scope (simple header creation)
+Route::post('/kpi/bulk-create', [KpiAssessmentController::class, 'bulkCreateForManager'])->name('kpi.bulk-create');
+// Form-based bulk create (Manager fills template then submit)
+Route::get('/kpi/bulk-create/form', [KpiAssessmentController::class, 'bulkCreateForm'])->name('kpi.bulk-create.form');
+Route::post('/kpi/bulk-store', [KpiAssessmentController::class, 'bulkStoreWithItems'])->name('kpi.bulk-store');
 
 // KPI Assessment Routes
 // Contoh URL: /kpi/penilaian/5/2025 (Karyawan ID 5, Tahun 2025)

@@ -124,7 +124,7 @@ class MenuHelper
         ];
 
         // Monitoring KBI (Khusus HRD memantau Staff)
-        if ($user->hasRole(['admin', 'superadmin', 'manager', 'senior_manager'])) {
+        if ($user->hasRole(['admin', 'superadmin', 'manager', 'GM' ,'senior_manager'])) {
             // Tambahkan ke subItems Penilaian Karyawan
             $menu[count($menu) - 1]['subItems'][] = ['name' => 'Monitoring KBI', 'path' => '/kbi/monitoring'];
             $menu[count($menu) - 1]['subItems'][] = ['name' => 'Rekap Performance', 'path' => '/performance/rekap'];
