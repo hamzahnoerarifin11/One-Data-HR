@@ -25,9 +25,11 @@
                         <th class="p-2">#</th>
                         <th class="p-2">KRA</th>
                         <th class="p-2">KPI</th>
-                        <th class="p-2">Bobot (%)</th>
-                        <th class="p-2">Perspektif</th>
+                        <th class="p-2">Units</th>
                         <th class="p-2">Polaritas</th>
+                        <th class="p-2">Bobot (%)</th>
+                        <th class="p-2">Target</th>
+                        <th class="p-2">Perspektif</th>
                         <th class="p-2">Aksi</th>
                     </tr>
                 </thead>
@@ -36,14 +38,16 @@
                         <td class="p-2">1</td>
                         <td class="p-2"><input type="text" name="items[0][key_result_area]" class="w-full px-2 py-1 border rounded" required></td>
                         <td class="p-2"><input type="text" name="items[0][key_performance_indicator]" class="w-full px-2 py-1 border rounded" required></td>
-                        <td class="p-2"><input type="number" name="items[0][bobot]" class="w-20 px-2 py-1 border rounded" min="0" max="100" required></td>
-                        <td class="p-2"><input type="text" name="items[0][perspektif]" class="w-full px-2 py-1 border rounded" placeholder="Contoh: Keuangan"></td>
+                        <td class="p-2"><input type="text" name="items[0][units]" class="w-full px-2 py-1 border rounded" placeholder="Contoh: Presentase"></td>
                         <td class="p-2">
                             <select name="items[0][polaritas]" class="px-2 py-1 border rounded">
                                 <option value="MAX">Max</option>
                                 <option value="MIN">Min</option>
                             </select>
                         </td>
+                        <td class="p-2"><input type="number" name="items[0][bobot]" class="w-20 px-2 py-1 border rounded" min="0" max="100" required></td>
+                        <td class="p-2"><input type="number" name="items[0][target]" class="w-20 px-2 py-1 border rounded" min="0" max="100" required></td>
+                        <td class="p-2"><input type="text" name="items[0][perspektif]" class="w-full px-2 py-1 border rounded" placeholder="Contoh: Keuangan"></td>
                         <td class="p-2"><button type="button" class="remove-row bg-red-500 text-white px-2 py-1 rounded text-xs">Hapus</button></td>
                     </tr>
                 </tbody>

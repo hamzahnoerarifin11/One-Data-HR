@@ -287,6 +287,17 @@
                                        class="flex-1 text-center font-medium text-blue-600 dark:text-blue-500 border border-blue-500 px-3 py-2 rounded text-sm hover:bg-blue-50 dark:hover:bg-gray-700 transition">
                                         <i class="fas fa-edit"></i> Buka KPI
                                     </a>
+
+                                    {{-- Approve (Manager/Admin) --}}
+                                    @if(auth()->user()->hasRole(['manager','GM','senior_manager','admin','superadmin']) && $kpi && $kpi->status != 'FINAL')
+                                        <form action="{{ route('kpi.finalize', $kpi->id_kpi_assessment) }}" method="POST" onsubmit="return confirm('Setujui dan finalisasi KPI ini?');" class="">
+                                            @csrf
+                                            <button type="submit" class="ml-2 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm font-medium shadow">
+                                                <i class="fas fa-check"></i> Setujui
+                                            </button>
+                                        </form>
+                                    @endif
+
                                     <form action="{{ route('kpi.destroy', $kpi->id_kpi_assessment) }}" method="POST" onsubmit="return confirm('Hapus data KPI ini?');">
                                         @csrf @method('DELETE')
                                         <button type="submit" class="text-red-600 dark:text-red-400 p-2 border border-red-200 dark:border-red-900/50 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition">
@@ -304,7 +315,7 @@
                                         </button>
                                     </form>
                                 @endif
-                            </div>
+                            </div> 
                         </div>
                     @empty
                         <div class="p-8 text-center text-gray-500 dark:text-gray-400">
@@ -383,6 +394,17 @@
                                            class="font-medium text-blue-600 dark:text-blue-500 hover:underline border border-blue-500 px-3 py-1 rounded hover:bg-blue-50 dark:hover:bg-gray-700 transition text-xs">
                                             <i class="fas fa-edit"></i> Buka
                                         </a>
+
+                                        {{-- Approve (hanya jika belum FINAL) --}}
+                                        @if(auth()->user()->hasRole(['manager','GM','senior_manager','admin','superadmin']) && $kpi && $kpi->status != 'FINAL')
+                                            <form action="{{ route('kpi.finalize', $kpi->id_kpi_assessment) }}" method="POST" onsubmit="return confirm('Setujui dan finalisasi KPI ini?');">
+                                                @csrf
+                                                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-xs font-medium" title="Approve KPI">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            </form>
+                                        @endif
+
                                         <form action="{{ route('kpi.destroy', $kpi->id_kpi_assessment) }}" method="POST" onsubmit="return confirm('Yakin ingin mereset/menghapus data KPI ini?');">
                                             @csrf @method('DELETE')
                                             <button type="submit" class="text-red-600 hover:text-red-800 dark:text-red-400 p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition" title="Hapus Data">

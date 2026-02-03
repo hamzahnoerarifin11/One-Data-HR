@@ -174,7 +174,7 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::resource('users', UserController::class);
     Route::delete('/users/batch-delete', [UserController::class, 'batchDelete'])->name('users.batchDelete');
 });
-Route::middleware(['auth', 'role:admin|superadmin|manager|GM|senior_manager'])->group(function () {
+Route::middleware(['auth', 'role:admin|superadmin|manager|GM|senior_manager|Supervisor'])->group(function () {
     // User management resource
     // 7. monitoring
     Route::get('/kbi/monitoring', [App\Http\Controllers\KbiController::class, 'monitoring'])->name('kbi.monitoring');

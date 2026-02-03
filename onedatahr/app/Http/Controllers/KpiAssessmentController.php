@@ -24,7 +24,7 @@ class KpiAssessmentController extends Controller
 
 
         // --- SKENARIO 1: ADMIN & SUPERADMIN (Lihat Semua Data) ---
-        if ($user->hasRole(['superadmin', 'admin'])) {
+        if ($this->roleMatches($user, ['superadmin', 'admin'])) {
 
             $query = Karyawan::with(['pekerjaan.company', 'pekerjaan.position', 'pekerjaan.division', 'pekerjaan.department', 'kpiAssessment' => function ($q) use ($tahun) {
                 $q->where('tahun', $tahun);
@@ -91,7 +91,7 @@ class KpiAssessmentController extends Controller
         }
 
         // Jika yang login adalah Manager / GM / Senior Manager: tampilkan dashboard bawahan
-        if ($user->hasRole(['manager', 'GM', 'senior_manager'])) {
+        if ($this->roleMatches($user, ['manager', 'GM', 'senior_manager'])) {
             // Ambil daftar bawahan langsung
             $directIds = Karyawan::where('atasan_id', $me->id_karyawan)->pluck('id_karyawan')->toArray();
             // Ambil juga bawahan tingkat 2 (bawahan dari bawahan)
@@ -162,6 +162,54 @@ class KpiAssessmentController extends Controller
             return view('pages.kpi.index', compact('karyawanList', 'tahun', 'stats', 'listJabatan', 'listCompanies', 'me'));
         }
 
+        // =====================================================================
+        // SUPERVISOR: hanya bisa lihat karyawan di DIVISI yang sama dan level di bawah
+        // =====================================================================
+        if ($this->roleMatches($user, 'supervisor')) {
+            $pekerjaanSup = $me->pekerjaan()->orderByDesc('id_pekerjaan')->first();
+            if (!$pekerjaanSup || !$pekerjaanSup->division_id) {
+                abort(403, 'Supervisor tidak memiliki divisi.');
+            }
+
+            $divisionId = $pekerjaanSup->division_id;
+            $supLevelOrder = $pekerjaanSup->level->level_order ?? null;
+
+            $listJabatan = \App\Models\Position::distinct()->orderBy('name')->pluck('name');
+            $listCompanies = \App\Models\Company::distinct()->orderBy('name')->pluck('name');
+
+            $query = Karyawan::with([
+                'pekerjaan.company',
+                'pekerjaan.position',
+                'pekerjaan.division',
+                'pekerjaan.department',
+                'kpiAssessment' => function ($q) use ($tahun) {
+                    $q->where('tahun', $tahun);
+                }
+            ])->whereHas('pekerjaan', function ($q) use ($divisionId, $supLevelOrder) {
+                $q->where('division_id', $divisionId);
+                if ($supLevelOrder !== null) {
+                    // hanya yang level_order lebih besar (lebih rendah posisinya)
+                    $q->whereHas('level', function ($l) use ($supLevelOrder) {
+                        $l->where('level_order', '>', $supLevelOrder);
+                    });
+                }
+            });
+
+            // Statistik & pagination
+            $allKaryawan = $query->get();
+            $stats = [
+                'total_karyawan' => $allKaryawan->count(),
+                'sudah_final' => $allKaryawan->filter(fn($k) => $k->kpiAssessment && $k->kpiAssessment->status == 'FINAL')->count(),
+                'draft' => $allKaryawan->filter(fn($k) => $k->kpiAssessment && $k->kpiAssessment->status != 'FINAL')->count(),
+                'belum_ada'  => $allKaryawan->filter(fn($k) => !$k->kpiAssessment)->count(),
+                'rata_rata' => $allKaryawan->filter(fn($k) => $k->kpiAssessment)->avg(fn($k) => $k->kpiAssessment->total_skor_akhir),
+            ];
+
+            $karyawanList = $query->paginate(10)->appends($request->all());
+
+            return view('pages.kpi.index', compact('karyawanList', 'tahun', 'stats', 'listJabatan', 'listCompanies', 'me'));
+        }
+
         // --- SKENARIO 3: STAFF (Redirect ke Punya Sendiri) ---
 
         // Cek apakah KPI tahun ini sudah ada?
@@ -205,21 +253,66 @@ class KpiAssessmentController extends Controller
     {
         $karyawan = Karyawan::findOrFail($karyawanId);
 
-        // Validasi Akses (Cegah Staff A mengintip Staff B)
+        // Validasi Akses
         $user = Auth::user();
-        if (!$user->hasRole(['admin', 'superadmin'])) {
-            // Jika bukan admin, pastikan dia melihat punya sendiri atau punya bawahannya (direct atau level-2 untuk manager)
+
+        // 1) Admin / Superadmin => akses penuh
+        if ($this->roleMatches($user, ['admin', 'superadmin'])) {
+            // nothing to check
+        }
+        // 2) Manager / GM / Senior Manager => boleh lihat milik sendiri, bawahan langsung, atau bawahan level-2
+        elseif ($this->roleMatches($user, ['manager', 'GM', 'senior_manager'])) {
             $me = Karyawan::where('nik', $user->nik)->first();
-
             $allowed = false;
-            if ($me->id_karyawan == $karyawanId) $allowed = true; // melihat punya sendiri
-            if ($karyawan->atasan_id == $me->id_karyawan) $allowed = true; // direct subordinate
-            // cek jika saya adalah atasan dari atasan karyawan (level-2)
-            if ($karyawan->atasan && $karyawan->atasan->atasan_id == $me->id_karyawan) $allowed = true;
+            if ($me && $me->id_karyawan == $karyawanId) $allowed = true; // melihat punya sendiri
+            if ($karyawan->atasan_id == ($me->id_karyawan ?? null)) $allowed = true; // direct subordinate
+            if ($karyawan->atasan && $karyawan->atasan->atasan_id == ($me->id_karyawan ?? null)) $allowed = true; // level-2
 
-            if (!$allowed) {
-                return abort(403, 'Anda tidak berhak melihat dokumen ini.');
+            // Jika belum diizinkan oleh aturan direct/level-2, cek fallback DIVISI (skenario index: manager dengan no direct bawahan)
+            if (!$allowed && $me) {
+                $pekerjaanManager = $me->pekerjaan()->orderByDesc('id_pekerjaan')->first();
+                if ($pekerjaanManager && $pekerjaanManager->division_id) {
+                    $kryP = $karyawan->pekerjaan()->orderByDesc('id_pekerjaan')->first();
+                    if ($kryP && $kryP->division_id == $pekerjaanManager->division_id) {
+                        $allowed = true;
+                    }
+                }
             }
+
+            if (!$allowed) return abort(403, 'Anda tidak berhak melihat dokumen ini.');
+        }
+        // 3) Supervisor => hanya yang ada di DIVISI yang sama dan memiliki level di bawah supervisor (atau milik sendiri)
+        elseif ($this->roleMatches($user, 'supervisor')) {
+            $me = Karyawan::where('nik', $user->nik)->first();
+            $allowed = false;
+            if ($me && $me->id_karyawan == $karyawanId) $allowed = true; // melihat punya sendiri
+
+            $pekerjaanSup = $me?->pekerjaan()->orderByDesc('id_pekerjaan')->first();
+            if ($pekerjaanSup && $pekerjaanSup->division_id) {
+                $divisionId = $pekerjaanSup->division_id;
+                $supLevelOrder = $pekerjaanSup->level->level_order ?? null;
+
+                $kryP = $karyawan->pekerjaan()->orderByDesc('id_pekerjaan')->first();
+                if ($kryP && $kryP->division_id == $divisionId) {
+                    if ($supLevelOrder !== null && ($kryP->level->level_order ?? 9999) > $supLevelOrder) {
+                        $allowed = true;
+                    } else {
+                        // jika level supervisor tidak terdefinisi, berikan akses hanya untuk direct subordinate
+                        if ($karyawan->atasan_id == ($me->id_karyawan ?? null)) $allowed = true;
+                    }
+                }
+            }
+
+            if (!$allowed) return abort(403, 'Anda tidak berhak melihat dokumen ini.');
+        }
+        // 4) Lainnya (staff) => hanya milik sendiri atau fallback bawahan direct / level-2 jika diperlukan
+        else {
+            $me = Karyawan::where('nik', $user->nik)->first();
+            $allowed = false;
+            if ($me && $me->id_karyawan == $karyawanId) $allowed = true;
+            if ($karyawan->atasan_id == ($me->id_karyawan ?? null)) $allowed = true;
+            if ($karyawan->atasan && $karyawan->atasan->atasan_id == ($me->id_karyawan ?? null)) $allowed = true;
+            if (!$allowed) return abort(403, 'Anda tidak berhak melihat dokumen ini.');
         }
 
         $kpi = KpiAssessment::where('karyawan_id', $karyawanId)
@@ -342,10 +435,32 @@ class KpiAssessmentController extends Controller
                     // 1. AMBIL SEMUA INPUT (BERSIHKAN DARI KOMA/PERSEN)
                     // ====================================================
 
-                    // --- Semester 1 ---
-                    $target1 = $this->cleanInput($data['target_smt1'] ?? $item->target);
-                    $real1   = $this->cleanInput($data['real_smt1'] ?? 0);
-                    // Tangkap Adjustment Smt 1
+                    // --- Semester 1 (Januari - Juni) ---
+                    $t_jan = $this->cleanInput($data['target_jan'] ?? 0);
+                    $r_jan = $this->cleanInput($data['real_jan'] ?? 0);
+                    $t_feb = $this->cleanInput($data['target_feb'] ?? 0);
+                    $r_feb = $this->cleanInput($data['real_feb'] ?? 0);
+                    $t_mar = $this->cleanInput($data['target_mar'] ?? 0);
+                    $r_mar = $this->cleanInput($data['real_mar'] ?? 0);
+                    $t_apr = $this->cleanInput($data['target_apr'] ?? 0);
+                    $r_apr = $this->cleanInput($data['real_apr'] ?? 0);
+                    $t_mei = $this->cleanInput($data['target_mei'] ?? 0);
+                    $r_mei = $this->cleanInput($data['real_mei'] ?? 0);
+                    $t_jun = $this->cleanInput($data['target_jun'] ?? 0);
+                    $r_jun = $this->cleanInput($data['real_jun'] ?? 0);
+
+                    // Jumlahkan untuk menjadi Semester 1
+                    $target1 = $t_jan + $t_feb + $t_mar + $t_apr + $t_mei + $t_jun;
+                    $real1   = $r_jan + $r_feb + $r_mar + $r_apr + $r_mei + $r_jun;
+                    // Fallback bila bulan-bulan tidak diisi (compatibility)
+                    if ($target1 == 0) {
+                        $target1 = $this->cleanInput($data['target_smt1'] ?? $item->target);
+                    }
+                    if ($real1 == 0) {
+                        $real1 = $this->cleanInput($data['real_smt1'] ?? 0);
+                    }
+
+                    // Tangkap Adjustment Smt 1 (Tengah Tahun)
                     $adjReal1 = isset($data['adjustment_real_smt1']) ? $this->cleanInput($data['adjustment_real_smt1']) : null;
 
                     // --- Bulanan (Juli - Desember) ---
@@ -363,9 +478,16 @@ class KpiAssessmentController extends Controller
                     $t_des = $this->cleanInput($data['target_des'] ?? 0);
                     $r_des = $this->cleanInput($data['real_des'] ?? 0);
 
-                    // --- Semester 2 (Manual) ---
-                    $target2 = $this->cleanInput($data['total_target_smt2'] ?? 0);
-                    $real2   = $this->cleanInput($data['total_real_smt2'] ?? 0);
+                    // --- Semester 2 (Jul - Des) computed from monthly inputs ---
+                    $target2 = $t_jul + $t_aug + $t_sep + $t_okt + $t_nov + $t_des;
+                    $real2   = $r_jul + $r_aug + $r_sep + $r_okt + $r_nov + $r_des;
+                    // Fallback for backward compatibility (if manual totals provided)
+                    if (isset($data['total_target_smt2']) && $data['total_target_smt2'] !== "") {
+                        $target2 = $this->cleanInput($data['total_target_smt2']);
+                    }
+                    if (isset($data['total_real_smt2']) && $data['total_real_smt2'] !== "") {
+                        $real2 = $this->cleanInput($data['total_real_smt2']);
+                    }
                     // Tangkap Adjustment Smt 2
                     $adjReal2   = isset($data['adjustment_real_smt2']) ? $this->cleanInput($data['adjustment_real_smt2']) : null;
                     $adjTarget2 = isset($data['adjustment_target_smt2']) ? $this->cleanInput($data['adjustment_target_smt2']) : null;
@@ -398,7 +520,20 @@ class KpiAssessmentController extends Controller
                         'real_smt1'   => $real1,
                         'adjustment_real_smt1' => $adjReal1, // <--- Jangan Lupa Disimpan
 
-                        // Data Bulanan (AGAR TIDAK HILANG)
+                        // Data Bulanan (AGAR TIDAK HILANG) - JAN-JUN & JUL-DEC
+                        'target_jan' => $t_jan,
+                        'real_jan' => $r_jan,
+                        'target_feb' => $t_feb,
+                        'real_feb' => $r_feb,
+                        'target_mar' => $t_mar,
+                        'real_mar' => $r_mar,
+                        'target_apr' => $t_apr,
+                        'real_apr' => $r_apr,
+                        'target_mei' => $t_mei,
+                        'real_mei' => $r_mei,
+                        'target_jun' => $t_jun,
+                        'real_jun' => $r_jun,
+
                         'target_jul' => $t_jul,
                         'real_jul' => $r_jul,
                         'target_aug' => $t_aug,
@@ -411,6 +546,10 @@ class KpiAssessmentController extends Controller
                         'real_nov' => $r_nov,
                         'target_des' => $t_des,
                         'real_des' => $r_des,
+
+                        // Data Semester 1 (total dari Jan-Jun)
+                        'target_smt1' => $target1,
+                        'real_smt1' => $real1,
 
                         // Data Semester 2
                         'total_target_smt2' => $target2,
@@ -435,13 +574,13 @@ class KpiAssessmentController extends Controller
 
             // SKENARIO 1: STAFF atau SUPERVISOR (Pemilik KPI / Supervisor) KLIK SIMPAN
             // Jika yang login adalah Staff atau Supervisor, otomatis jadi "SUBMITTED" (Menunggu Approval dari Manager)
-            if ($user->hasRole('staff') || $user->hasRole('supervisor')) {
+            if ($this->roleMatches($user, 'staff') || $this->roleMatches($user, 'supervisor')) {
                 $statusBaru = 'SUBMITTED';
             }
 
             // SKENARIO 2: MANAGER / ADMIN / SUPERADMIN KLIK SIMPAN
             // Jika Manager/Admin yang simpan, otomatis jadi "FINAL" (Approved)
-            elseif ($user->hasRole(['manager', 'admin', 'superadmin'])) {
+            elseif ($this->roleMatches($user, ['manager', 'Manajer', 'admin', 'superadmin'])) {
                 $statusBaru = 'FINAL';
             }
 
@@ -557,7 +696,13 @@ class KpiAssessmentController extends Controller
             $score->update([
                 'target'      => $cleanTarget,
                 'target_smt1' => $cleanTarget,
-                // Reset target bulanan ke target baru
+                // Reset target bulanan ke target baru (setiap bulan ke nilai target master)
+                'target_jan'  => $cleanTarget,
+                'target_feb'  => $cleanTarget,
+                'target_mar'  => $cleanTarget,
+                'target_apr'  => $cleanTarget,
+                'target_mei'  => $cleanTarget,
+                'target_jun'  => $cleanTarget,
                 'target_jul'  => $cleanTarget,
                 'target_aug'  => $cleanTarget,
                 'target_sep'  => $cleanTarget,
@@ -583,7 +728,7 @@ class KpiAssessmentController extends Controller
         $request->validate(['tahun' => 'required']);
         $user = Auth::user();
 
-        if (!$user->hasRole(['manager', 'GM', 'senior_manager', 'admin', 'superadmin'])) {
+        if (!$this->roleMatches($user, ['manager', 'GM', 'senior_manager', 'admin', 'superadmin'])) {
             return redirect()->back()->with('error', 'Akses ditolak.');
         }
 
@@ -628,7 +773,7 @@ class KpiAssessmentController extends Controller
     public function bulkCreateForm(Request $request)
     {
         $user = Auth::user();
-        if (!$user->hasRole(['manager', 'GM', 'senior_manager', 'admin', 'superadmin'])) {
+        if (!$this->roleMatches($user, ['manager', 'GM', 'senior_manager', 'admin', 'superadmin'])) {
             return redirect()->back()->with('error', 'Akses ditolak.');
         }
 
@@ -652,7 +797,7 @@ class KpiAssessmentController extends Controller
         ]);
 
         $user = Auth::user();
-        if (!$user->hasRole(['manager', 'GM', 'senior_manager', 'admin', 'superadmin'])) {
+        if (!$this->roleMatches($user, ['manager', 'GM', 'senior_manager', 'admin', 'superadmin'])) {
             return redirect()->back()->with('error', 'Akses ditolak.');
         }
 
@@ -709,6 +854,62 @@ class KpiAssessmentController extends Controller
         }
     }
 
+    /**
+     * Finalize / Approve KPI by manager/admin
+     */
+    public function finalize(Request $request, $id)
+    {
+        $user = Auth::user();
+        if (!$this->roleMatches($user, ['manager', 'GM', 'senior_manager', 'admin', 'superadmin'])) {
+            return redirect()->back()->with('error', 'Akses ditolak.');
+        }
+
+        $kpi = KpiAssessment::find($id);
+        if (!$kpi) return redirect()->back()->with('error', 'KPI tidak ditemukan.');
+
+        // Additional scope check for managers (same rules as show())
+        if ($this->roleMatches($user, ['manager', 'GM', 'senior_manager'])) {
+            $me = Karyawan::where('nik', $user->nik)->first();
+            $allowed = false;
+            if ($me && $me->id_karyawan == $kpi->karyawan_id) $allowed = true;
+
+            $karyawan = Karyawan::find($kpi->karyawan_id);
+            if ($karyawan) {
+                if ($karyawan->atasan_id == ($me->id_karyawan ?? null)) $allowed = true;
+                if ($karyawan->atasan && $karyawan->atasan->atasan_id == ($me->id_karyawan ?? null)) $allowed = true;
+
+                if (!$allowed && $me) {
+                    $pekerjaanManager = $me->pekerjaan()->orderByDesc('id_pekerjaan')->first();
+                    if ($pekerjaanManager && $pekerjaanManager->division_id) {
+                        $kryP = $karyawan->pekerjaan()->orderByDesc('id_pekerjaan')->first();
+                        if ($kryP && $kryP->division_id == $pekerjaanManager->division_id) {
+                            $allowed = true;
+                        }
+                    }
+                }
+            }
+
+            if (!$allowed) return redirect()->back()->with('error', 'Anda tidak berhak melakukan approval ini.');
+        }
+
+        try {
+            // Recompute grand total from scores
+            $grandTotal = KpiScore::join('kpi_items', 'kpi_scores.kpi_item_id', '=', 'kpi_items.id_kpi_item')
+                ->where('kpi_items.kpi_assessment_id', $kpi->id_kpi_assessment)
+                ->sum('kpi_scores.skor_akhir');
+
+            $kpi->update([
+                'total_skor_akhir' => $grandTotal,
+                'grade' => $this->determineGrade($grandTotal),
+                'status' => 'FINAL'
+            ]);
+
+            return redirect()->back()->with('success', 'KPI berhasil di-approve dan difinalisasi.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal melakukan approval: ' . $e->getMessage());
+        }
+    }
+
     // =================================================================
     // 7. EXPORT FUNCTIONS
     // =================================================================
@@ -760,6 +961,46 @@ class KpiAssessmentController extends Controller
         $pdf = Pdf::loadView('pages.kpi.pdf', compact('karyawan', 'kpi', 'items', 'tahun'))->setPaper('a4', 'landscape');
 
         return $pdf->download($filename);
+    }
+
+    // Helper: gabungkan role dari manajemen user dan turunan pekerjaan (level/position/Jabatan)
+    private function roleMatches($user, $roles)
+    {
+        if (!$user) return false;
+
+        // Ambil role eksplisit dari tabel roles
+        $userRoleNames = [];
+        try {
+            $userRoleNames = $user->roles()->pluck('name')->map(function ($r) {
+                return strtolower($r);
+            })->toArray();
+        } catch (\Throwable $e) {
+            $userRoleNames = [];
+        }
+
+        // Turunkan role dari pekerjaan (level.name, position.name, Jabatan)
+        $derivedRoles = [];
+        $karyawan = Karyawan::where('user_id', $user->id)->first();
+        if (!$karyawan && !empty($user->nik)) {
+            $karyawan = Karyawan::where('nik', $user->nik)->first();
+        }
+        if ($karyawan) {
+            $pekerjaan = $karyawan->pekerjaanTerkini()->first() ?? $karyawan->pekerjaan()->first();
+            if ($pekerjaan) {
+                if (!empty($pekerjaan->level) && !empty($pekerjaan->level->name)) $derivedRoles[] = strtolower($pekerjaan->level->name);
+                if (!empty($pekerjaan->position) && !empty($pekerjaan->position->name)) $derivedRoles[] = strtolower($pekerjaan->position->name);
+                if (!empty($pekerjaan->Jabatan)) $derivedRoles[] = strtolower($pekerjaan->Jabatan);
+            }
+        }
+
+        if (is_string($roles)) $roles = [$roles];
+        $roles = array_map('strtolower', $roles);
+
+        foreach ($roles as $r) {
+            if (in_array($r, $userRoleNames)) return true;
+            if (in_array($r, $derivedRoles)) return true;
+        }
+        return false;
     }
 
     // =================================================================

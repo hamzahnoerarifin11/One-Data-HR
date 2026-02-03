@@ -7,16 +7,27 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script>tailwind.config = { darkMode: 'class' }</script>
     <style>
+        :root { color-scheme: light; }
         .custom-scrollbar::-webkit-scrollbar { height: 10px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 5px; border: 2px solid #f1f1f1; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        .kpi-card { background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); }
+        .kpi-gridline td, .kpi-gridline th { border-color: #e5e7eb; }
+        .kpi-chip { background: #eef2ff; color: #3730a3; border: 1px solid #c7d2fe; }
+        .kpi-input { background: #ffffff; border: 1px solid #e5e7eb; }
+        .kpi-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+        .kpi-sticky-shadow { box-shadow: 2px 0 10px rgba(15, 23, 42, 0.08); }
+        .kpi-gridline td:nth-child(4n+7),
+        .kpi-gridline th:nth-child(4n+7) { border-left: 2px solid #e2e8f0; }
+        .kpi-summary { background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%); }
+        .kpi-summary-card { background: #ffffff; border: 1px solid #e5e7eb; }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 p-2 md:p-6 font-sans">
+<body class="bg-slate-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 p-3 md:p-6 font-sans">
 
-<div class="w-full max-w-7xl mx-auto">
+<div class="w-full max-w-[1400px] mx-auto">
     {{-- ALERT --}}
     @if ($errors->any())
         <div class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded shadow-sm">
@@ -56,9 +67,13 @@
     @endphp
 
     {{-- HEADER --}}
-    <div class="mb-6 flex flex-col lg:flex justify-between items-start lg:items-center bg-white dark:bg-gray-800 p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 gap-4">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-800">Form Penilaian KPI</h1>
+    <div class="mb-6 grid grid-cols-1 xl:grid-cols-[1.3fr_1fr_auto] gap-4 p-4 md:p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 kpi-card">
+        <div class="space-y-1">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full kpi-chip text-xs font-semibold w-fit">
+                <i class="fas fa-chart-line"></i>
+                <span>Performance Review</span>
+            </div>
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-900">Form Penilaian KPI</h1>
             @if($isManager)
                 <p class="text-gray-600 dark:text-gray-400">Karyawan: <strong class="text-blue-600">{{ $karyawan->nama_karyawan }}</strong> ({{ $karyawan->nik }})</p>
             @endif
@@ -66,12 +81,12 @@
         </div>
 
         {{-- FILTER TAHUN KPI --}}
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-blue-50/70 dark:bg-blue-900/30 p-4 rounded-xl border border-blue-200 dark:border-blue-800">
             <div class="flex items-center gap-2 w-full sm:w-auto">
                 <label class="text-sm font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap">
                     <i class="fas fa-calendar-alt mr-1 text-blue-600"></i>Pilih Tahun:
                 </label>
-                <select id="yearFilterForm" onchange="changeKpiYear(this.value)" class="flex-1 sm:flex-none px-3 py-2 border border-blue-300 dark:border-blue-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm transition cursor-pointer">
+                <select id="yearFilterForm" onchange="changeKpiYear(this.value)" class="flex-1 sm:flex-none px-3 py-2.5 border border-blue-300 dark:border-blue-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm transition cursor-pointer">
                     @for($y = date('Y'); $y >= date('Y')-5; $y--)
                         <option value="{{ $y }}" {{ $tahun == $y ? 'selected' : '' }}>
                             Tahun {{ $y }}
@@ -84,23 +99,23 @@
             </div>
         </div>
 
-        <div class="flex flex-wrap gap-2 w-full lg:w-auto justify-start lg:justify-end items-center">
+        <div class="flex flex-wrap gap-2 w-full xl:w-auto justify-start xl:justify-end items-center">
             {{-- LOGIKA TOMBOL KEMBALI DINAMIS --}}
             @if(auth()->user()->hasRole(['superadmin', 'admin']))
                 {{-- 1. Jika ADMIN: Kembali ke Tabel List KPI --}}
-                <a href="{{ route('kpi.index') }}" class="px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition flex-1 lg:flex-none text-center text-gray-600 dark:text-gray-300">
+                <a href="{{ route('kpi.index') }}" class="px-3 py-2.5 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition flex-1 xl:flex-none text-center text-gray-600 dark:text-gray-300">
                     <i class="fas fa-arrow-left mr-1"></i> List Karyawan
                 </a>
             @else
                 {{-- 2. Jika MANAGER/STAFF: Kembali ke Dashboard Utama (Supaya tidak Looping) --}}
-                <a href="{{ url('/dashboard') }}" class="px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition flex-1 lg:flex-none text-center text-gray-600 dark:text-gray-300">
+                <a href="{{ url('/dashboard') }}" class="px-3 py-2.5 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition flex-1 xl:flex-none text-center text-gray-600 dark:text-gray-300">
                     <i class="fas fa-arrow-left mr-2"></i><i class="fas fa-home mr-1"></i> Dashboard
                 </a>
             @endif
 
             {{-- 2. [BARU] Tombol Export Dropdown --}}
             <div class="relative group">
-                <button type="button" class="px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition flex items-center gap-2 border border-gray-200 dark:border-gray-600">
+                <button type="button" class="px-3 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition flex items-center gap-2 border border-gray-200 dark:border-gray-600">
                     <i class="fas fa-download"></i>
                     <span class="hidden sm:inline font-medium">Export</span>
                     <i class="fas fa-chevron-down text-xs ml-1"></i>
@@ -123,7 +138,7 @@
             </div>
             {{-- 3. Tombol Simpan --}}
             <button id="btnSimpan" type="button" onclick="submitKpiForm()" disabled
-                class="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm transition shadow-lg flex items-center justify-center gap-2 flex-1 lg:flex-none opacity-50 cursor-not-allowed">
+                class="px-3 py-2.5 bg-blue-600 text-white rounded-lg text-sm transition shadow-lg flex items-center justify-center gap-2 flex-1 xl:flex-none opacity-50 cursor-not-allowed">
 
                 @if($isManager)
                     <i class="fas fa-check-double"></i> <span class="hidden sm:inline">Simpan & Approve</span>
@@ -132,19 +147,40 @@
                 @endif
             </button>
         </div>
-        {{-- BADGE PERINGATAN (Hanya muncul jika ada perubahan) --}}
-        <div id="unsaved-badge" class="hidden flex items-center gap-2 px-3 py-1.5 bg-yellow-100 text-yellow-700 text-md font-bold rounded-lg border border-yellow-300 shadow-sm animate-pulse transition-all">
-            <i class="fas fa-pen-nib"></i>
-            <span>Ada perubahan belum disimpan</span>
-        </div>
     </div>
 
     {{-- ACTION BAR --}}
-    <div class="mb-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-        <div id="total-bobot-alert" class="text-2xl font-bold w-full sm:w-auto text-center sm:text-left"></div>
-        <button type="button" onclick="document.getElementById('modalTambahKPI').classList.remove('hidden')" class="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-700 transition shadow flex items-center justify-center gap-2">
+    <div class="mb-4 grid grid-cols-1 lg:grid-cols-[1.2fr_1fr_auto] gap-2 items-center">
+        <div class="kpi-summary rounded-2xl p-4 border border-indigo-100 shadow-sm">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="kpi-summary-card rounded-xl p-3">
+                    <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Total KPI</div>
+                    <div class="mt-1 text-2xl font-bold text-gray-900" id="summary-total-kpi">0</div>
+                </div>
+                {{-- <div class="kpi-summary-card rounded-xl p-3">
+                    <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Kelengkapan</div>
+                    <div class="mt-1 flex items-baseline gap-2">
+                        <div class="text-2xl font-bold text-gray-900" id="summary-completion">0%</div>
+                        <div class="text-xs text-gray-500" id="summary-completion-text">0/0</div>
+                    </div>
+                </div> --}}
+                <div class="kpi-summary-card rounded-xl p-3">
+                    <div class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</div>
+                    <div class="mt-2 inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700 border border-yellow-200" id="summary-status">
+                        <i class="fas fa-pen"></i> Draft
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="total-bobot-alert" class="text-lg md:text-xl font-bold w-full text-center lg:text-left"></div>
+        <button type="button" onclick="document.getElementById('modalTambahKPI').classList.remove('hidden')" class="w-full lg:w-auto px-4 py-2.5 bg-green-600 text-white rounded-xl text-sm font-bold hover:bg-green-700 transition shadow flex items-center justify-center gap-2">
             <i class="fas fa-plus"></i> Tambah KPI Baru
         </button>
+        {{-- BADGE PERINGATAN (Hanya muncul jika ada perubahan) --}}
+        <div id="unsaved-badge" class="hidden flex items-center gap-2 px-3 py-1.5 bg-yellow-100 text-yellow-700 text-sm font-bold rounded-lg border border-red-300 shadow-sm animate-pulse transition-all">
+            <i class="fas fa-pen-nib"></i>
+            <span>Ada perubahan belum disimpan</span>
+        </div>
     </div>
 
     {{-- PESAN JIKA FORM KOSONG --}}
@@ -185,31 +221,29 @@
     <form id="kpiForm" action="{{ route('kpi.update', $kpi->id_kpi_assessment) }}" method="POST">
         @csrf
         @if(!$items->isEmpty())
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700 relative">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden border border-gray-200 dark:border-gray-700 relative">
             <div class="w-full overflow-x-auto custom-scrollbar">
                 <table
-                    class="w-full text-sm text-left min-w-[3000px] md:min-w-[4500px] border-collapse"
+                    class="w-full text-sm text-left min-w-[3200px] md:min-w-[4600px] border-collapse kpi-gridline"
                     style="--col-no:48px; --col-kra:220px;"
                     >
-                    <thead class="text-xs text-gray-700 uppercase bg-gray-100 sticky top-0 z-20 shadow-sm">
+                    <thead class="text-[11px] text-gray-700 uppercase bg-gray-100 sticky top-0 z-20 shadow-sm">
                         <tr>
-                            <th rowspan="2" class="sticky left-0 z-40 bg-gray-200 p-2 w-10 text-center border border-gray-300 shadow-sm">No</th>
-                            <th rowspan="2" class="sticky left-[48px] ml-4 bg-gray-200 z-40 p-2 w-40 border border-gray-300 shadow-sm">KRA</th>
+                            <th rowspan="2" class="sticky left-0 z-40 bg-gray-200 p-2 w-10 text-center border border-gray-300 shadow-sm kpi-sticky-shadow">No</th>
+                            <th rowspan="2" class="sticky left-[48px] ml-4 bg-gray-200 z-40 p-2 w-44 border border-gray-300 shadow-sm kpi-sticky-shadow">KRA</th>
                             <th rowspan="2" class="p-2 md:p-3 w-28 border border-gray-300 bg-gray-50">KPI</th>
                             <th rowspan="2" class="p-2 md:p-3 w-28 border border-gray-300 bg-gray-50">Perspektif</th>
                             <th rowspan="2" class="p-2 md:p-3 w-16 text-center border border-gray-300 bg-gray-50">Bobot</th>
                             <th rowspan="2" class="p-2 md:p-3 w-16 text-center border border-gray-300 bg-gray-50">Target</th>
-                            <th colspan="3" class="p-1 text-center border border-gray-300 bg-blue-50">Semester 1</th>
+                            @foreach(['Januari','Februari','Maret','April','Mei','Juni'] as $bulan) <th colspan="4" class="p-1 text-center border border-gray-300 bg-green-50">{{ $bulan }}</th> @endforeach
                             @foreach(['Juli','Agustus','September','Oktober','November','Desember'] as $bulan) <th colspan="4" class="p-1 text-center border border-gray-300 bg-green-50">{{ $bulan }}</th> @endforeach
-                            <th colspan="4" class="p-1 text-center border border-gray-300 bg-gray-100">Total Semester 2</th>
-                            <th colspan="3" class="p-1 text-center border border-gray-300 bg-orange-50">Adjustment S-I</th>
-                            <th colspan="4" class="p-1 text-center border border-gray-300 bg-orange-50">Adjustment S-II</th>
-                            <th rowspan="2" class="p-2 w-20 text-center border border-gray-300 bg-gray-200 font-bold">FINAL SCORE</th>
+                            <th colspan="3" class="p-1 text-center border border-gray-300 bg-orange-50">Adjustment Tengah Tahun</th>
+                            <th colspan="4" class="p-1 text-center border border-gray-300 bg-orange-50">Adjustment Akhir Tahun</th>
+                            <th rowspan="2" class="p-2 w-24 text-center border border-gray-300 bg-gray-200 font-bold">FINAL SCORE</th>
                         </tr>
                         <tr>
-                            <th class="p-1 border w-14">Real</th><th class="p-1 border w-14">Skor</th><th class="p-1 border w-16 bg-blue-100">Nilai</th>
+                            @foreach(['jan','feb','mar','apr','mei','jun'] as $bln) <th class="p-1 border w-14">Tgt</th><th class="p-1 border w-14">Real</th><th class="p-1 border w-14">Skor</th><th class="p-1 border w-14">Nilai</th> @endforeach
                             @foreach(['jul','aug','sep','okt','nov','des'] as $bln) <th class="p-1 border w-14">Tgt</th><th class="p-1 border w-14">Real</th><th class="p-1 border w-14">Skor</th><th class="p-1 border w-14">Nilai</th> @endforeach
-                            <th class="p-1 border w-14">Tgt</th><th class="p-1 border w-14">Real</th><th class="p-1 border w-14">Skor</th><th class="p-1 border w-16 bg-gray-200">Nilai</th>
                             <th class="p-1 border w-14">Real</th><th class="p-1 border w-14">Skor</th><th class="p-1 border w-16 bg-orange-100">Nilai</th>
                             <th class="p-1 border w-14">Tgt</th><th class="p-1 border w-14">Real</th><th class="p-1 border w-14">Skor</th><th class="p-1 border w-16 bg-orange-100">Nilai</th>
                         </tr>
@@ -217,22 +251,22 @@
                     <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                         @foreach($items as $index => $item)
                         @php $score = $item->scores->first(); @endphp
-                        <tr class="row-kpi hover:bg-gray-50 dark:hover:bg-gray-600 transition group text-xs md:text-sm">
+                        <tr class="row-kpi hover:bg-slate-50 dark:hover:bg-gray-600 transition group text-xs md:text-sm">
                             {{-- IDENTITAS --}}
-                            <td class="sticky left-0 bg-white z-10 p-2 md:p-3 text-center border-r font-medium">{{ $items->firstItem() + $index }}</td>
-                            <td class="sticky left-10 bg-white z-10 p-2 md:p-3 border-r align-top shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
+                            <td class="sticky left-0 bg-white z-10 p-2 md:p-3 text-center border-r font-medium kpi-sticky-shadow">{{ $items->firstItem() + $index }}</td>
+                            <td class="sticky left-10 bg-white z-10 p-2 md:p-3 border-r align-top kpi-sticky-shadow">
                                 <div class="flex flex-col sm:flex-row justify-between items-start gap-2">
                                     <div class="font-semibold text-gray-900 leading-snug group-hover:text-blue-600">{{ $item->key_result_area ?? $item->indikator }}</div>
                                     {{-- <div class="font-semibold text-gray-900 leading-snug"></div> --}}
 
                                     <div class="flex gap-1 shrink-0">
-                                        <button type="button" onclick="openEditModal({{ json_encode($item) }}, '{{ route('kpi.update-item', $item->id_kpi_item) }}')" class="text-gray-400 hover:text-yellow-600 p-1"><i class="fas fa-pencil-alt text-[10px]"></i></button>
-                                        <button type="button" onclick="confirmDelete('{{ route('kpi.delete-item', $item->id_kpi_item) }}')" class="text-gray-400 hover:text-red-600 p-1"><i class="fas fa-trash-alt text-[10px]"></i></button>
+                                        <button type="button" onclick="openEditModal({{ json_encode($item) }}, '{{ route('kpi.update-item', $item->id_kpi_item) }}')" class="text-gray-400 hover:text-yellow-600 p-1.5 rounded hover:bg-yellow-50"><i class="fas fa-pencil-alt text-[10px]"></i></button>
+                                        <button type="button" onclick="confirmDelete('{{ route('kpi.delete-item', $item->id_kpi_item) }}')" class="text-gray-400 hover:text-red-600 p-1.5 rounded hover:bg-red-50"><i class="fas fa-trash-alt text-[10px]"></i></button>
                                     </div>
                                 </div>
 
                                 {{-- <div class="text-[15px] text-gray-500 mt-1">{{ $item->key_performance_indicator ?? $item->indikator }}</div> --}}
-                                <div class="text-[15px] text-gray-500 mt-1">{{ $item->units ?? $item->satuan }} | {{ $item->polaritas }}</div>
+                                <div class="text-[12px] text-gray-500 mt-1">{{ $item->units ?? $item->satuan }} | {{ $item->polaritas }}</div>
                                 <input type="hidden" class="input-bobot" value="{{ $item->bobot }}">
                                 <input type="hidden" class="input-polaritas" value="{{ $item->polaritas }}">
                             </td>
@@ -245,34 +279,24 @@
                                 <input type="hidden" class="input-target-smt1" name="kpi[{{ $item->id_kpi_item }}][target_smt1]" value="{{ $item->target }}">
                             </td>
 
-                            {{-- SEMESTER 1 --}}
-                            @php $bln = 'smt1'; @endphp
-                            <td class="p-1 border-r align-center">
-                                <input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][real_{{ $bln }}]" value="{{ $score->{'real_'.$bln} }}" class="input-real-smt1 w-full h-8 px-1 border rounded text-center" placeholder="0"></td>
-                            <td class="p-1 border-r align-center text-center bg-gray-50">
-                                <div class="py-1.5 font-medium text-gray-600"><span class="span-skor-smt1"></span>%</div>
-                            </td>
-                            <td class="p-1 border-r-2 align-center text-center bg-blue-50/20">
-                                <div class="py-1.5 font-bold text-blue-700"><span class="span-nilai-smt1"></span>%</div>
-                            </td>
-
-                            {{-- BULANAN --}}
-                            @foreach(['jul','aug','sep','okt','nov','des'] as $bln)
-                                <td class="p-1 border-r align center"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][target_{{ $bln }}]" value="{{ $score->{'target_'.$bln} }}" class="input-target-{{ $bln }} w-full h-8 px-1 border rounded text-center" placeholder="0"></td>
-                                <td class="p-1 border-r align center"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][real_{{ $bln }}]" value="{{ $score->{'real_'.$bln} }}" class="input-real-{{ $bln }} w-full h-8 px-1 border rounded text-center" placeholder="0"></td>
+                            {{-- BULANAN JANUARI - JUNI (Semester 1) --}}
+                            @foreach(['jan','feb','mar','apr','mei','jun'] as $bln)
+                                <td class="p-1 border-r align center"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][target_{{ $bln }}]" value="{{ $score->{'target_'.$bln} ?? '' }}" class="input-target-{{ $bln }} kpi-input w-full h-8 px-1.5 rounded text-center" placeholder="0"></td>
+                                <td class="p-1 border-r align center"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][real_{{ $bln }}]" value="{{ $score->{'real_'.$bln} ?? '' }}" class="input-real-{{ $bln }} kpi-input w-full h-8 px-1.5 rounded text-center" placeholder="0"></td>
                                 <td class="p-1 border-r align center text-center bg-gray-50"><div class="py-1.5 font-medium text-gray-600"><span class="span-skor-{{ $bln }}"></span>%</div></td>
                                 <td class="p-1 border-r-2 align center text-center bg-blue-50/20"><div class="py-1.5 font-bold text-blue-700"><span class="span-nilai-{{ $bln }}"></span>%</div></td>
                             @endforeach
 
-                            {{-- TOTAL SEMESTER 2 --}}
-                            <td class="p-1 text-center border-r bg-gray-50 align-center">
-                                <input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][total_target_smt2]" value="{{ old('kpi.'.$item->id_kpi_item.'.total_target_smt2', $score->total_target_smt2) }}" class="input-total-target-smt2 w-full h-8 px-1 bg-white border rounded text-center focus:border-blue-500 outline-none placeholder-gray-400" placeholder="0">
-                            </td>
-                            <td class="p-1 text-center  border-r bg-gray-50 align-center">
-                                <input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][total_real_smt2]" value="{{ old('kpi.'.$item->id_kpi_item.'.total_real_smt2', $score->total_real_smt2) }}" class="input-total-real-smt2 w-full h-8 px-1 bg-white border rounded text-center focus:border-green-500 outline-none placeholder-gray-400" placeholder="0">
-                            </td>
-                            <td class="p-2 text-center border-r bg-gray-50 text-gray-500"><span class="span-total-skor-smt2"></span>%</td>
-                            <td class="p-2 text-center border-r bg-gray-100 font-bold text-gray-700"><span class="span-total-nilai-smt2"></span>%</td>
+
+                            {{-- BULANAN --}}
+                            @foreach(['jul','aug','sep','okt','nov','des'] as $bln)
+                                <td class="p-1 border-r align center"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][target_{{ $bln }}]" value="{{ $score->{'target_'.$bln} }}" class="input-target-{{ $bln }} kpi-input w-full h-8 px-1.5 rounded text-center" placeholder="0"></td>
+                                <td class="p-1 border-r align center"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][real_{{ $bln }}]" value="{{ $score->{'real_'.$bln} }}" class="input-real-{{ $bln }} kpi-input w-full h-8 px-1.5 rounded text-center" placeholder="0"></td>
+                                <td class="p-1 border-r align center text-center bg-gray-50"><div class="py-1.5 font-medium text-gray-600"><span class="span-skor-{{ $bln }}"></span>%</div></td>
+                                <td class="p-1 border-r-2 align center text-center bg-blue-50/20"><div class="py-1.5 font-bold text-blue-700"><span class="span-nilai-{{ $bln }}"></span>%</div></td>
+                            @endforeach
+
+
 
                             {{-- ADJ S-I --}}
                             <td class="p-1 text-center border-r bg-orange-50/30 align-center">
@@ -281,11 +305,11 @@
                                 name="kpi[{{ $item->id_kpi_item }}][adjustment_real_smt1]"
                                 value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_real_smt1', $score->adjustment_real_smt1 ?? '') }}"
                                 {{ !$canAdjust ? 'readonly' : '' }}
-                                step="0.01" class="input-adj-real-smt1 w-full h-8 px-1 bg-transparent text-center border-b border-orange-200 outline-none" placeholder="Real"></td>
+                                step="0.01" class="input-adj-real-smt1 kpi-input w-full h-8 px-1.5 text-center border-orange-200" placeholder="Real"></td>
                             <td class="p-1 border-r bg-orange-50/30 align-center text-center pt-2">
                                 <span class="span-adj-skor-smt1 font-bold text-orange-600"></span>%</td>
                             <td class="p-1 text-center border-r bg-orange-50/30 align-center">
-                                <input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][adjustment_smt1]" value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_smt1', $score->adjustment_smt1 ?? '') }}" class="input-adj-nilai-smt1 w-full h-8 px-1 bg-transparent text-center font-bold text-orange-600 border-b border-orange-200 outline-none" placeholder="Nilai" readonly></td>
+                                <input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][adjustment_smt1]" value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_smt1', $score->adjustment_smt1 ?? '') }}" class="input-adj-nilai-smt1 kpi-input w-full h-8 px-1.5 text-center font-bold text-orange-600 border-orange-200" placeholder="Nilai" readonly></td>
 
                             {{-- ADJ S-II --}}
                             <td class="p-1 border-r bg-orange-50/30 align-center">
@@ -293,15 +317,15 @@
                                 name="kpi[{{ $item->id_kpi_item }}][adjustment_target_smt2]"
                                 value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_target_smt2', $score->adjustment_target_smt2 ?? '') }}"
                                 {{ !$canAdjust ? 'readonly' : '' }}
-                                step="0.01" class="input-adj-target-smt2 w-full h-8 px-1 bg-transparent text-center border-b border-orange-200 outline-none" placeholder="Tgt"></td>
+                                step="0.01" class="input-adj-target-smt2 kpi-input w-full h-8 px-1.5 text-center border-orange-200" placeholder="Tgt"></td>
                             <td class="p-1 border-r bg-orange-50/30 align-center">
                                 <input type="number"
                                 name="kpi[{{ $item->id_kpi_item }}][adjustment_real_smt2]"
                                 value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_real_smt2', $score->adjustment_real_smt2 ?? '') }}"
                                 {{ !$canAdjust ? 'readonly' : '' }}
-                                step="0.01" class="input-adj-real-smt2 w-full h-8 px-1 bg-transparent text-center border-b border-orange-200 outline-none" placeholder="Real"></td>
+                                step="0.01" class="input-adj-real-smt2 kpi-input w-full h-8 px-1.5 text-center border-orange-200" placeholder="Real"></td>
                             <td class="p-1 border-r bg-orange-50/30 align-center text-center pt-2"><span class="span-adj-skor-smt2 font-bold text-orange-600"></span>%</td>
-                            <td class="p-1 border-r bg-orange-50/30 align-center"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][adjustment_smt2]" value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_smt2', $score->adjustment_smt2 ?? '') }}" class="input-adj-nilai-smt2 w-full h-8 px-1 bg-transparent text-center font-bold text-orange-600 border-b border-orange-200 outline-none" placeholder="Nilai" readonly></td>
+                            <td class="p-1 border-r bg-orange-50/30 align-center"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][adjustment_smt2]" value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_smt2', $score->adjustment_smt2 ?? '') }}" class="input-adj-nilai-smt2 kpi-input w-full h-8 px-1.5 text-center font-bold text-orange-600 border-orange-200" placeholder="Nilai" readonly></td>
 
                             {{-- FINAL --}}
                             <td class="p-2 md:p-3 text-center border-r bg-gray-100 font-bold text-blue-800"><span class="span-final-score"></span>%</td>
@@ -309,17 +333,52 @@
                         @endforeach
                     </tbody>
                     <tfoot class="bg-white border-t-4 border-gray-300 sticky bottom-0 z-40 text-xs md:text-sm">
-                        <tr class="bg-gray-50 border-b border-gray-200">
-                            <td colspan="2" class="sticky left-0 bg-gray-100 p-2 font-bold uppercase border-r">Total Skor Akhir :</td>
-                            <td colspan="4" class="border-r bg-gray-50"></td>
-                            <td colspan="2" class="border-r"></td><td class="p-2 text-center font-bold text-blue-800 border-r-2"><span id="footer-total-smt1"></span>%</td>
-                            @foreach(['jul','aug','sep','okt','nov','des'] as $bln) <td colspan="3" class="border-r"></td><td class="p-2 text-center font-bold text-blue-800 border-r-2"><span id="footer-total-{{ $bln }}"></span>%</td> @endforeach
-                            <td colspan="3" class="border-r"></td><td class="p-2 text-center font-bold text-gray-700 border-r"><span id="footer-total-sem"></span>%</td>
-                            <td colspan="2" class="border-r bg-orange-50"></td><td class="p-2 border-r bg-orange-50 font-bold text-orange-800 text-center"><span id="footer-adj-smt1"></span>%</td>
-                            <td colspan="3" class="border-r bg-orange-50"></td><td class="p-2 border-r bg-orange-50 font-bold text-orange-800 text-center"><span id="footer-adj-smt2"></span>%</td>
-                            <td class="p-2 text-center font-extrabold text-blue-900 bg-gray-200"><span id="footer-grand-total"></span>%</td>
-                        </tr>
-                    </tfoot>
+<tr class="bg-gray-50 border-b border-gray-200">
+
+    <!-- LABEL -->
+    <td colspan="2" class="sticky left-0 bg-gray-100 p-2 font-bold uppercase border-r kpi-sticky-shadow">
+        Total Skor Akhir :
+    </td>
+
+    <!-- KPI + Perspektif + Bobot + Target -->
+    <td colspan="4" class="border-r bg-gray-50"></td>
+
+    <!-- JAN–JUN -->
+    @foreach(['jan','feb','mar','apr','mei','jun'] as $bln)
+        <td colspan="3" class="border-r"></td>
+        <td class="p-2 text-center font-bold text-blue-800 border-r-2">
+            <span id="footer-total-{{ $bln }}"></span>%
+        </td>
+    @endforeach
+
+    <!-- JUL–DES -->
+    @foreach(['jul','aug','sep','okt','nov','des'] as $bln)
+        <td colspan="3" class="border-r"></td>
+        <td class="p-2 text-center font-bold text-blue-800 border-r-2">
+            <span id="footer-total-{{ $bln }}"></span>%
+        </td>
+    @endforeach
+
+    <!-- ADJ SMT 1 -->
+    <td colspan="2" class="border-r bg-orange-50"></td>
+    <td class="p-2 border-r bg-orange-50 font-bold text-orange-800 text-center">
+        <span id="footer-adj-smt1"></span>%
+    </td>
+
+    <!-- ADJ SMT 2 -->
+    <td colspan="3" class="border-r bg-orange-50"></td>
+    <td class="p-2 border-r bg-orange-50 font-bold text-orange-800 text-center">
+        <span id="footer-adj-smt2"></span>%
+    </td>
+
+    <!-- FINAL -->
+    <td class="p-2 text-center font-extrabold text-blue-900 bg-gray-200">
+        <span id="footer-grand-total"></span>%
+    </td>
+
+</tr>
+</tfoot>
+
                 </table>
             </div>
         </div>
@@ -330,16 +389,17 @@
 {{-- MODALS --}}
 {{-- 1. MODAL TAMBAH --}}
 <div id="modalTambahKPI" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden z-50 flex justify-center items-center p-4">
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl p-6 relative max-h-[90vh] overflow-y-auto">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-2xl p-6 relative max-h-[90vh] overflow-y-auto">
         <h2 class="text-xl font-bold mb-4 dark:text-white">Tambah KPI</h2>
         <form action="{{ route('kpi.store-item') }}" method="POST">
             @csrf <input type="hidden" name="kpi_assessment_id" value="{{ $kpi->id_kpi_assessment }}">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div><label class="block text-sm font-medium text-gray-700">KRA</label><input type="text" name="key_result_area" class="border p-2 w-full rounded text-sm" required></div>
-                <div><label class="block text-sm font-medium text-gray-700">KPI</label><input type="text" name="key_performance_indicator" class="border p-2 w-full rounded text-sm" required></div>
-                <div><label class="block text-sm font-medium text-gray-700">Bobot (%)</label><input type="number" step="0.01" name="bobot" class="border p-2 w-full rounded text-sm" required></div>
-                <div><label class="block text-sm font-medium text-gray-700">Perspektif</label><select name="perspektif" class="border p-2 w-full rounded text-sm"><option value="Financial">Financial</option><option value="Customer">Customer</option></select></div>
-                <div><label class="block text-sm font-medium text-gray-700">Polaritas</label><select name="polaritas" class="border p-2 w-full rounded text-sm"><option value="Maximize">Positif</option><option value="Minimize">Negatif</option></select></div>
+                <div><label class="block text-sm font-medium text-gray-700">KRA</label><input type="text" name="key_result_area" class="border p-2.5 w-full rounded text-sm kpi-input" required></div>
+                <div><label class="block text-sm font-medium text-gray-700">KPI</label><input type="text" name="key_performance_indicator" class="border p-2.5 w-full rounded text-sm kpi-input" required></div>
+                <div><label class="block text-sm font-medium text-gray-700">Perspektif</label><select name="perspektif" class="border p-2.5 w-full rounded text-sm kpi-input"><option value="Financial">Financial</option><option value="Customer">Customer</option></select></div>
+                <div><label class="block text-sm font-medium text-gray-700">Bobot (%)</label><input type="number" step="0.01" name="bobot" class="border p-2.5 w-full rounded text-sm kpi-input" required></div>
+                <div><label class="block text-sm font-medium text-gray-700">Units</label><input type="text" name="units" class="border p-2.5 w-full rounded text-sm kpi-input" required></div>
+                <div><label class="block text-sm font-medium text-gray-700">Polaritas</label><select name="polaritas" class="border p-2.5 w-full rounded text-sm kpi-input"><option value="Maximize">Positif</option><option value="Minimize">Negatif</option></select></div>
             </div>
             <div class="mt-6 flex justify-end gap-2">
                 <button type="button" onclick="document.getElementById('modalTambahKPI').classList.add('hidden')" class="px-4 py-2 border rounded">Batal</button>
@@ -351,30 +411,38 @@
 
 {{-- 2. MODAL EDIT --}}
 <div id="modalEditKPI" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden z-50 justify-center items-center p-4">
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl p-4 md:p-6 relative max-h-[90vh] overflow-y-auto">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-2xl p-4 md:p-6 relative max-h-[90vh] overflow-y-auto">
         <h2 class="text-lg md:text-xl font-bold mb-4 text-gray-800 dark:text-white">Edit Indikator Kinerja</h2>
         <form id="formEditKPI" method="POST">
             @csrf @method('PUT')
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                 <div>
                     <label for="edit_perspektif" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Perspektif</label>
-                    <select id="edit_perspektif" name="perspektif" class="w-full border rounded p-2 text-sm"><option value="Financial">Financial</option><option value="Customer">Customer</option></select>
+                    <select id="edit_perspektif" name="perspektif" class="w-full border rounded p-2.5 text-sm kpi-input"><option value="Financial">Financial</option><option value="Customer">Customer</option></select>
                 </div>
                 <div>
                     <label for="edit_kra" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">KRA</label>
-                    <input type="text" id="edit_kra" name="key_result_area" class="w-full border rounded p-2 text-sm" required>
+                    <input type="text" id="edit_kra" name="key_result_area" class="w-full border rounded p-2.5 text-sm kpi-input" required>
                 </div>
                 <div class="md:col-span-2">
                     <label for="edit_kpi" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Key Performance Indicator</label>
-                    <textarea id="edit_kpi" name="key_performance_indicator" class="w-full border rounded p-2 text-sm" rows="2" required></textarea>
+                    <textarea id="edit_kpi" name="key_performance_indicator" class="w-full border rounded p-2.5 text-sm kpi-input" rows="2" required></textarea>
                 </div>
                 <div>
                     <label for="edit_polaritas" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Polaritas</label>
-                    <select id="edit_polaritas" name="polaritas" class="w-full border rounded p-2 text-sm"><option value="Maximize">Positif</option><option value="Minimize">Negatif</option></select>
+                    <select id="edit_polaritas" name="polaritas" class="w-full border rounded p-2.5 text-sm kpi-input"><option value="Maximize">Positif</option><option value="Minimize">Negatif</option></select>
                 </div>
                 <div>
                     <label for="edit_bobot" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bobot (%)</label>
-                    <input type="number" step="0.01" id="edit_bobot" name="bobot" class="w-full border rounded p-2 text-sm" required>
+                    <input type="number" step="0.01" id="edit_bobot" name="bobot" class="w-full border rounded p-2.5 text-sm kpi-input" required>
+                </div>
+                <div>
+                    <label for="edit_units" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Units</label>
+                    <input type="text" id="edit_units" name="units" class="w-full border rounded p-2.5 text-sm kpi-input" required>
+                </div>
+                <div>
+                    <label for="edit_target" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Target</label>
+                    <input type="number" step="0.01" id="edit_target" name="target" class="w-full border rounded p-2.5 text-sm kpi-input" required>
                 </div>
             </div>
             <div class="mt-6 flex justify-end gap-3">
@@ -421,8 +489,8 @@
     }
 
     // --- LOGIC UTAMA (LOAD) ---
-    document.addEventListener('DOMContentLoaded', function() {
-
+    console.log("KPI script loaded: initializing form handlers...");
+    function initKpiForm() {
         // 1. Matikan Tombol Simpan saat awal load
         toggleSaveButton(false);
 
@@ -459,7 +527,24 @@
                 });
             });
         });
-    });
+
+        // Delegated listener (fallback if inputs change dynamically)
+        const formEl = document.getElementById('kpiForm');
+        if (formEl) {
+            formEl.addEventListener('input', function(e) {
+                if (e.target && e.target.tagName === 'INPUT') {
+                    calculateAll();
+                }
+            });
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initKpiForm);
+    } else {
+        // DOMContentLoaded has already fired — run init immediately
+        initKpiForm();
+    }
 
     // --- FUNGSI PUSAT KONTROL STATUS ---
     function updateSystemState() {
@@ -588,118 +673,164 @@
 
     // --- MATEMATIKA KPI (TETAP SAMA) ---
     const rows = document.querySelectorAll('.row-kpi');
+    const monthsSmt1 = ['jan','feb','mar','apr','mei','jun'];
     const monthsSmt2 = ['jul', 'aug', 'sep', 'okt', 'nov', 'des'];
+    const monthsAll = [...monthsSmt1, ...monthsSmt2];
 
     function parseNumber(val) { if (!val || val === '') return 0; return parseFloat(val.toString().replace(',', '.')) || 0; }
-    function formatNumber(num) { return num.toFixed(2).replace(/\.00$/, ''); }
+    function formatNumber(num) { return Number(num).toFixed(2).replace(/\.00$/, ''); }
 
     function calculateSingleScore(target, real, polaritas) {
         if (target === 0) return 0;
         let score = 0;
-        const p = polaritas ? polaritas.toLowerCase() : '';
-        if (p.includes('positif') || p.includes('maximize')) score = (real / target) * 100;
-        else if (p.includes('negatif') || p.includes('minimize')) score = (real === 0) ? 100 : (target / real) * 100;
-        else if (p.includes('yes') || p.includes('no')) score = (real >= target) ? 100 : 0;
+        const p = (polaritas || '').toLowerCase();
+
+        // Accept various historical/abbreviated polaritas values (e.g. "I MAX", "MAX", "Min", "Minimize")
+        if (p.includes('posit') || p.includes('max') || p.includes('maximize')) {
+            score = (real / target) * 100;
+        } else if (p.includes('neg') || p.includes('min') || p.includes('minimize')) {
+            score = (real === 0) ? 100 : (target / real) * 100;
+        } else if (p.includes('yes') || p.includes('no')) {
+            score = (real >= target) ? 100 : 0;
+        } else {
+            // Fallback: assume maximizing (positive) to avoid silent zero scores for unknown labels
+            score = (real / target) * 100;
+        }
+
         return Math.max(0, score);
     }
 
     function calculateAll() {
-        let footerSmt1 = 0; let footerSmt2 = 0; let footerGrandTotal = 0;
-        let footerAdjSmt1 = 0; let footerAdjSmt2 = 0;
-        let footerMonthly = { jul:0, aug:0, sep:0, okt:0, nov:0, des:0 };
+        try {
+            let footerSmt1 = 0; let footerSmt2 = 0; let footerGrandTotal = 0;
+            let footerAdjSmt1 = 0; let footerAdjSmt2 = 0;
+            let footerMonthly = { jan:0, feb:0, mar:0, apr:0, mei:0, jun:0, jul:0, aug:0, sep:0, okt:0, nov:0, des:0 };
 
-        rows.forEach(row => {
-            const bobotInput = row.querySelector('.input-bobot');
-            const polaritasInput = row.querySelector('.input-polaritas');
-            if (!bobotInput || !polaritasInput) return;
+            rows.forEach(row => {
+                const bobotInput = row.querySelector('.input-bobot');
+                const polaritasInput = row.querySelector('.input-polaritas');
+                if (!bobotInput || !polaritasInput) return;
 
-            const bobot = parseNumber(bobotInput.value);
-            const polaritas = polaritasInput.value;
-            const targetTahunan = parseNumber(row.querySelector('.input-target-smt1').value);
+                const bobot = parseNumber(bobotInput.value);
+                const polaritas = polaritasInput.value;
 
-            // SMT 1
-            const rSmt1 = parseNumber(row.querySelector('.input-real-smt1').value);
-            let skorSmt1 = calculateSingleScore(targetTahunan, rSmt1, polaritas);
-            let nilaiSmt1 = (skorSmt1 * bobot) / 100;
-            row.querySelector('.span-skor-smt1').textContent = formatNumber(skorSmt1);
-            row.querySelector('.span-nilai-smt1').textContent = formatNumber(nilaiSmt1);
+                // SMT 1 (Januari - Juni)
+                let totalTargetSmt1 = 0; let totalRealSmt1 = 0;
+                monthsSmt1.forEach(bln => {
+                    const inputTgt = row.querySelector(`.input-target-${bln}`);
+                    const inputReal = row.querySelector(`.input-real-${bln}`);
+                    let t = 0; let r = 0;
+                    if (inputTgt) t = parseNumber(inputTgt.value);
+                    if (inputReal) r = parseNumber(inputReal.value);
+                    totalTargetSmt1 += t;
+                    totalRealSmt1 += r;
 
-            // BULANAN
-            monthsSmt2.forEach(bln => {
-                const inputTgt = row.querySelector(`.input-target-${bln}`);
-                const inputReal = row.querySelector(`.input-real-${bln}`);
-                if(inputTgt && inputReal) {
-                    const t = parseNumber(inputTgt.value);
-                    const r = parseNumber(inputReal.value);
-                    let skor = (t !== 0) ? calculateSingleScore(t, r, polaritas) : 0;
-                    let nilai = (skor * bobot) / 100;
-                    const spanSkor = row.querySelector(`.span-skor-${bln}`);
-                    const spanNilai = row.querySelector(`.span-nilai-${bln}`);
-                    if(spanSkor) spanSkor.textContent = formatNumber(skor);
-                    if(spanNilai) spanNilai.textContent = formatNumber(nilai);
-                    footerMonthly[bln] += nilai;
+                    // compute per-month if target exists (real may be zero)
+                    if (inputTgt) {
+                        let skor = (t !== 0) ? calculateSingleScore(t, r, polaritas) : 0;
+                        let nilai = (skor * bobot) / 100;
+                        const spanSkor = row.querySelector(`.span-skor-${bln}`);
+                        const spanNilai = row.querySelector(`.span-nilai-${bln}`);
+                        if (spanSkor) spanSkor.textContent = formatNumber(skor);
+                        if (spanNilai) spanNilai.textContent = formatNumber(nilai);
+                        footerMonthly[bln] += nilai;
+
+                        // Debug: if user has entered non-zero values but UI not updating
+                        if (t !== 0 || r !== 0) {
+                            console.log(`KPI row #${row.querySelector('td')?.textContent?.trim() || 'unknown'} - month ${bln}: target=${t}, real=${r}, skor=${skor}, nilai=${nilai}`);
+                        }
+                    }
+                });
+
+                // Total Semester 1 (computed from Jan-Jun)
+                let skorTotalSmt1 = (totalTargetSmt1 !== 0) ? calculateSingleScore(totalTargetSmt1, totalRealSmt1, polaritas) : 0;
+                let nilaiTotalSmt1 = (skorTotalSmt1 * bobot) / 100;
+
+                // BULANAN SMT2 (Juli - Desember)
+                monthsSmt2.forEach(bln => {
+                    const inputTgt = row.querySelector(`.input-target-${bln}`);
+                    const inputReal = row.querySelector(`.input-real-${bln}`);
+                    if(inputTgt) {
+                        const t = parseNumber(inputTgt.value);
+                        const r = parseNumber(inputReal?.value);
+                        let skor = (t !== 0) ? calculateSingleScore(t, r, polaritas) : 0;
+                        let nilai = (skor * bobot) / 100;
+                        const spanSkor = row.querySelector(`.span-skor-${bln}`);
+                        const spanNilai = row.querySelector(`.span-nilai-${bln}`);
+                        if(spanSkor) spanSkor.textContent = formatNumber(skor);
+                        if(spanNilai) spanNilai.textContent = formatNumber(nilai);
+                        footerMonthly[bln] += nilai;
+
+                        if (t !== 0 || r !== 0) {
+                            console.log(`KPI row #${row.querySelector('td')?.textContent?.trim() || 'unknown'} - month ${bln}: target=${t}, real=${r}, skor=${skor}, nilai=${nilai}`);
+                        }
+                    }
+                });
+
+                // Total Semester 2 computed from Jul-Dec
+                let totalTargetSmt2 = 0; let totalRealSmt2 = 0;
+                monthsSmt2.forEach(bln => {
+                    const it = row.querySelector(`.input-target-${bln}`);
+                    const ir = row.querySelector(`.input-real-${bln}`);
+                    if (it) totalTargetSmt2 += parseNumber(it.value);
+                    if (ir) totalRealSmt2 += parseNumber(ir.value);
+                });
+                let skorTotalSmt2 = (totalTargetSmt2 !== 0) ? calculateSingleScore(totalTargetSmt2, totalRealSmt2, polaritas) : 0;
+                let nilaiTotalSmt2 = (skorTotalSmt2 * bobot) / 100;
+
+                // ADJ SMT 1 (Tengah Tahun)
+                const adjReal1Input = row.querySelector('.input-adj-real-smt1');
+                const adjNilaiInput1 = row.querySelector('.input-adj-nilai-smt1');
+                let finalSmt1 = nilaiTotalSmt1;
+                if (adjReal1Input && adjReal1Input.value !== "") {
+                    let adjSkor1 = calculateSingleScore(totalTargetSmt1, parseNumber(adjReal1Input.value), polaritas);
+                    let adjNilai1 = (adjSkor1 * bobot) / 100;
+                    if (row.querySelector('.span-adj-skor-smt1')) row.querySelector('.span-adj-skor-smt1').textContent = formatNumber(adjSkor1);
+                    if (adjNilaiInput1) adjNilaiInput1.value = formatNumber(adjNilai1);
+                    finalSmt1 = adjNilai1;
+                } else {
+                    if (row.querySelector('.span-adj-skor-smt1')) row.querySelector('.span-adj-skor-smt1').textContent = '0';
+                    if (adjNilaiInput1) adjNilaiInput1.value = '';
                 }
+
+                // ADJ SMT 2 (Akhir Tahun)
+                const adjTarget2Input = row.querySelector('.input-adj-target-smt2');
+                const adjReal2Input = row.querySelector('.input-adj-real-smt2');
+                const adjNilaiInput2 = row.querySelector('.input-adj-nilai-smt2');
+                let finalSmt2 = nilaiTotalSmt2;
+                if (adjTarget2Input && adjReal2Input && adjTarget2Input.value !== "" && adjReal2Input.value !== "") {
+                    let adjSkor2 = calculateSingleScore(parseNumber(adjTarget2Input.value), parseNumber(adjReal2Input.value), polaritas);
+                    let adjNilai2 = (adjSkor2 * bobot) / 100;
+                    if (row.querySelector('.span-adj-skor-smt2')) row.querySelector('.span-adj-skor-smt2').textContent = formatNumber(adjSkor2);
+                    if (adjNilaiInput2) adjNilaiInput2.value = formatNumber(adjNilai2);
+                    finalSmt2 = adjNilai2;
+                } else {
+                    if (row.querySelector('.span-adj-skor-smt2')) row.querySelector('.span-adj-skor-smt2').textContent = '0';
+                    if (adjNilaiInput2) adjNilaiInput2.value = '';
+                }
+
+                // TOTALS
+                footerSmt1 += nilaiTotalSmt1;
+                footerSmt2 += nilaiTotalSmt2;
+                footerAdjSmt1 += (adjReal1Input && adjReal1Input.value !== "") ? finalSmt1 : nilaiTotalSmt1;
+                footerAdjSmt2 += (adjTarget2Input && adjReal2Input && adjTarget2Input.value !== "" && adjReal2Input.value !== "") ? finalSmt2 : nilaiTotalSmt2;
+                let grandFinal = (finalSmt1 + finalSmt2) / 2;
+                if (row.querySelector('.span-final-score')) row.querySelector('.span-final-score').textContent = formatNumber(grandFinal);
+                footerGrandTotal += grandFinal;
             });
 
-            // SMT 2
-            const inputTotalTgt2 = row.querySelector('.input-total-target-smt2');
-            const inputTotalReal2 = row.querySelector('.input-total-real-smt2');
-            const tSmt2 = parseNumber(inputTotalTgt2.value);
-            const rSmt2 = parseNumber(inputTotalReal2.value);
-            let skorTotalSmt2 = calculateSingleScore(tSmt2, rSmt2, polaritas);
-            let nilaiTotalSmt2 = (skorTotalSmt2 * bobot) / 100;
-            row.querySelector('.span-total-skor-smt2').textContent = formatNumber(skorTotalSmt2);
-            row.querySelector('.span-total-nilai-smt2').textContent = formatNumber(nilaiTotalSmt2);
-
-            // ADJ SMT 1
-            const adjReal1Input = row.querySelector('.input-adj-real-smt1');
-            const adjNilaiInput1 = row.querySelector('.input-adj-nilai-smt1');
-            let finalSmt1 = nilaiSmt1;
-            if (adjReal1Input && adjReal1Input.value !== "") {
-                let adjSkor1 = calculateSingleScore(targetTahunan, parseNumber(adjReal1Input.value), polaritas);
-                let adjNilai1 = (adjSkor1 * bobot) / 100;
-                row.querySelector('.span-adj-skor-smt1').textContent = formatNumber(adjSkor1);
-                adjNilaiInput1.value = formatNumber(adjNilai1);
-                finalSmt1 = adjNilai1;
-            } else {
-                row.querySelector('.span-adj-skor-smt1').textContent = '0';
-                adjNilaiInput1.value = '';
-            }
-
-            // ADJ SMT 2
-            const adjTarget2Input = row.querySelector('.input-adj-target-smt2');
-            const adjReal2Input = row.querySelector('.input-adj-real-smt2');
-            const adjNilaiInput2 = row.querySelector('.input-adj-nilai-smt2');
-            let finalSmt2 = nilaiTotalSmt2;
-            if (adjTarget2Input && adjReal2Input && adjTarget2Input.value !== "" && adjReal2Input.value !== "") {
-                let adjSkor2 = calculateSingleScore(parseNumber(adjTarget2Input.value), parseNumber(adjReal2Input.value), polaritas);
-                let adjNilai2 = (adjSkor2 * bobot) / 100;
-                row.querySelector('.span-adj-skor-smt2').textContent = formatNumber(adjSkor2);
-                adjNilaiInput2.value = formatNumber(adjNilai2);
-                finalSmt2 = adjNilai2;
-            } else {
-                row.querySelector('.span-adj-skor-smt2').textContent = '0';
-                adjNilaiInput2.value = '';
-            }
-
-            // TOTALS
-            footerSmt1 += nilaiSmt1;
-            footerSmt2 += nilaiTotalSmt2;
-            footerAdjSmt1 += (adjReal1Input && adjReal1Input.value !== "") ? finalSmt1 : nilaiSmt1;
-            footerAdjSmt2 += (adjTarget2Input && adjReal2Input.value !== "") ? finalSmt2 : nilaiTotalSmt2;
-            let grandFinal = (finalSmt1 + finalSmt2) / 2;
-            row.querySelector('.span-final-score').textContent = formatNumber(grandFinal);
-            footerGrandTotal += grandFinal;
-        });
-
-        const setFooterText = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = formatNumber(val); };
-        setFooterText('footer-total-smt1', footerSmt1);
-        setFooterText('footer-total-sem', footerSmt2);
-        setFooterText('footer-grand-total', footerGrandTotal);
-        monthsSmt2.forEach(bln => setFooterText(`footer-total-${bln}`, footerMonthly[bln]));
-        if(document.getElementById('footer-adj-smt1')) document.getElementById('footer-adj-smt1').textContent = formatNumber(footerAdjSmt1);
-        if(document.getElementById('footer-adj-smt2')) document.getElementById('footer-adj-smt2').textContent = formatNumber(footerAdjSmt2);
-        checkBobot();
+            const setFooterText = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = formatNumber(val); };
+            setFooterText('footer-total-smt1', footerSmt1);
+            setFooterText('footer-total-smt2', footerSmt2);
+            setFooterText('footer-grand-total', footerGrandTotal);
+            monthsAll.forEach(bln => setFooterText(`footer-total-${bln}`, footerMonthly[bln]));
+            if(document.getElementById('footer-adj-smt1')) document.getElementById('footer-adj-smt1').textContent = formatNumber(footerAdjSmt1);
+            if(document.getElementById('footer-adj-smt2')) document.getElementById('footer-adj-smt2').textContent = formatNumber(footerAdjSmt2);
+            checkBobot();
+            updateSummary();
+        } catch (e) {
+            console.error('Error in calculateAll: ', e);
+        }
     }
 
     function checkBobot() {
@@ -714,6 +845,39 @@
         }
     }
 
+    function updateSummary() {
+        const totalKpiEl = document.getElementById('summary-total-kpi');
+        const completionEl = document.getElementById('summary-completion');
+        const completionTextEl = document.getElementById('summary-completion-text');
+        const statusEl = document.getElementById('summary-status');
+
+        const rowsCount = document.querySelectorAll('.row-kpi').length;
+        const inputs = Array.from(document.querySelectorAll('#kpiForm input[type="number"]'))
+            .filter(input => !input.hasAttribute('readonly') && input.type === 'number');
+        const filled = inputs.filter(input => input.value !== '').length;
+        const total = inputs.length;
+        const completion = total > 0 ? Math.round((filled / total) * 100) : 0;
+
+        if (totalKpiEl) totalKpiEl.textContent = rowsCount.toString();
+        if (completionEl) completionEl.textContent = `${completion}%`;
+        if (completionTextEl) completionTextEl.textContent = `${filled}/${total}`;
+
+        if (statusEl) {
+            const isReady = completion >= 80 && !document.getElementById('total-bobot-alert')?.innerText.includes('Harus 100%');
+            const isEmpty = rowsCount === 0;
+            if (isEmpty) {
+                statusEl.className = 'mt-2 inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 border border-gray-200';
+                statusEl.innerHTML = '<i class="fas fa-inbox"></i> Kosong';
+            } else if (isReady) {
+                statusEl.className = 'mt-2 inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 border border-green-200';
+                statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Siap Disimpan';
+            } else {
+                statusEl.className = 'mt-2 inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700 border border-yellow-200';
+                statusEl.innerHTML = '<i class="fas fa-pen"></i> Draft';
+            }
+        }
+    }
+
     // Modal Helper
     function openEditModal(data, updateUrl) {
         document.getElementById('formEditKPI').action = updateUrl;
@@ -723,6 +887,7 @@
         // Units & Target are not part of the simplified form
         document.getElementById('edit_polaritas').value = data.polaritas;
         document.getElementById('edit_bobot').value = data.bobot;
+        document.getElementById('edit_units').value = data.units;
         const modal = document.getElementById('modalEditKPI');
         modal.classList.remove('hidden'); modal.classList.add('flex');
     }

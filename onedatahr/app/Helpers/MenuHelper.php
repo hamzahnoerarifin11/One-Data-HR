@@ -8,8 +8,48 @@ class MenuHelper
 {
     public static function getMainNavItems()
     {
-        $user = Auth::user();
+        $auth = Auth::user();
+        $user = $auth; // backwards-compat for existing checks
         $menu = [];
+
+        // Prepare role matching **only for the KPI menu**: combine explicit user roles
+        // and derived roles from pekerjaan (level, position, Jabatan)
+        $userRoleNames = [];
+        $derivedRoles = [];
+        if ($auth) {
+            try {
+                $userRoleNames = $auth->roles()->pluck('name')->map(function ($r) {
+                    return strtolower($r);
+                })->toArray();
+            } catch (\Throwable $e) {
+                $userRoleNames = [];
+            }
+
+            // Find related Karyawan (by user_id or by nik)
+            $karyawan = \App\Models\Karyawan::where('user_id', $auth->id)->first();
+            if (!$karyawan && !empty($auth->nik)) {
+                $karyawan = \App\Models\Karyawan::where('nik', $auth->nik)->first();
+            }
+
+            if ($karyawan) {
+                $pekerjaan = $karyawan->pekerjaanTerkini()->first() ?? $karyawan->pekerjaan()->first();
+                if ($pekerjaan) {
+                    if (!empty($pekerjaan->level) && !empty($pekerjaan->level->name)) $derivedRoles[] = strtolower($pekerjaan->level->name);
+                    if (!empty($pekerjaan->position) && !empty($pekerjaan->position->name)) $derivedRoles[] = strtolower($pekerjaan->position->name);
+                    if (!empty($pekerjaan->Jabatan)) $derivedRoles[] = strtolower($pekerjaan->Jabatan);
+                }
+            }
+        }
+
+        $roleMatches = function ($roles) use ($userRoleNames, $derivedRoles) {
+            if (is_string($roles)) $roles = [$roles];
+            $roles = array_map('strtolower', $roles);
+            foreach ($roles as $r) {
+                if (in_array($r, $userRoleNames)) return true;
+                if (in_array($r, $derivedRoles)) return true;
+            }
+            return false;
+        };
 
         // =============================================================
         // 1. MENU UMUM
@@ -124,8 +164,8 @@ class MenuHelper
         ];
 
         // Monitoring KBI (Khusus HRD memantau Staff)
-        if ($user->hasRole(['admin', 'superadmin', 'manager', 'GM' ,'senior_manager'])) {
-            // Tambahkan ke subItems Penilaian Karyawan
+        if ($roleMatches(['admin', 'superadmin', 'manager', 'GM', 'senior_manager','supervisor'])) {
+            // Tambahkan ke subItems Penilaian Karyawan (roleMatches memperhitungkan role manajemen + role turunan dari pekerjaan)
             $menu[count($menu) - 1]['subItems'][] = ['name' => 'Monitoring KBI', 'path' => '/kbi/monitoring'];
             $menu[count($menu) - 1]['subItems'][] = ['name' => 'Rekap Performance', 'path' => '/performance/rekap'];
         }
