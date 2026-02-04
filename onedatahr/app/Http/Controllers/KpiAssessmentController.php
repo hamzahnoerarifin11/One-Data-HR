@@ -7,6 +7,7 @@ use App\Models\KpiAssessment;
 use App\Models\Karyawan;
 use App\Models\KpiItem;
 use App\Models\KpiScore;
+use App\Models\KpiPerspective;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -14,6 +15,11 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class KpiAssessmentController extends Controller
 {
+    public function getPerspektifAktif(){
+        return KpiPerspective::where('is_active', true)
+            ->orderBy('name')
+            ->pluck('name');
+    }
     // =================================================================
     // 1. INDEX: PENGATUR LALU LINTAS (TRAFFIC CONTROL)
     // =================================================================
@@ -30,36 +36,7 @@ class KpiAssessmentController extends Controller
                 $q->where('tahun', $tahun);
             }]);
 
-            // Filter Search
-            if ($request->has('search') && $request->search != '') {
-                $search = $request->search;
-                $query->where('Nama_Lengkap_Sesuai_Ijazah', 'LIKE', "%{$search}%")
-                    ->orWhere('NIK', 'LIKE', "%{$search}%");
-            }
-
-            // Filter Jabatan
-            if ($request->has('filter_jabatan') && $request->filter_jabatan != '') {
-                $query->whereHas('pekerjaan', function ($q) use ($request) {
-                    $q->where('jabatan', $request->filter_jabatan);
-                });
-            }
-
-            // Filter Status
-            if ($request->has('filter_status') && $request->filter_status != '') {
-                if ($request->filter_status == 'BELUM_ADA') {
-                    $query->whereDoesntHave('kpiAssessment', fn($q) => $q->where('tahun', $tahun));
-                } else {
-                    $query->whereHas('kpiAssessment', fn($q) => $q->where('tahun', $tahun)->where('status', $request->filter_status));
-                }
-            }
-            // Filter companies
-            if ($request->has('filter_company') && $request->filter_company != '') {
-                $query->whereHas('pekerjaan', function ($q) use ($request) {
-                    $q->whereHas('company', function ($companyQ) use ($request) {
-                        $companyQ->where('name', $request->filter_company);
-                    });
-                });
-            }
+            $this->applyIndexFilters($query, $request, $tahun);
 
             // Statistik Sederhana
             $allKaryawan = $query->get(); // Clone query untuk statistik berat, disini pakai simple count saja
@@ -72,7 +49,7 @@ class KpiAssessmentController extends Controller
             ];
 
             // List Jabatan Dropdown
-            $listJabatan = \App\Models\Position::distinct()->orderBy('name')->pluck('name');
+            $listJabatan = \App\Models\Level::distinct()->orderBy('name')->pluck('name');
 
             // List Companies Dropdown
             $listCompanies = \App\Models\Company::distinct()->orderBy('name')->pluck('name');
@@ -107,7 +84,7 @@ class KpiAssessmentController extends Controller
                 'rata_rata' => 0,
             ];
 
-            $listJabatan = \App\Models\Position::distinct()->orderBy('name')->pluck('name');
+            $listJabatan = \App\Models\Level::distinct()->orderBy('name')->pluck('name');
             $listCompanies = \App\Models\Company::distinct()->orderBy('name')->pluck('name');
 
             if (empty($scopeIds)) {
@@ -146,6 +123,8 @@ class KpiAssessmentController extends Controller
                 ])->whereIn('id_karyawan', $scopeIds);
             }
 
+            $this->applyIndexFilters($query, $request, $tahun);
+
             // Bangun statistik berdasarkan query yang sudah dibuat
             $allKaryawan = $query->get();
             $stats = [
@@ -174,7 +153,7 @@ class KpiAssessmentController extends Controller
             $divisionId = $pekerjaanSup->division_id;
             $supLevelOrder = $pekerjaanSup->level->level_order ?? null;
 
-            $listJabatan = \App\Models\Position::distinct()->orderBy('name')->pluck('name');
+            $listJabatan = \App\Models\Level::distinct()->orderBy('name')->pluck('name');
             $listCompanies = \App\Models\Company::distinct()->orderBy('name')->pluck('name');
 
             $query = Karyawan::with([
@@ -194,6 +173,8 @@ class KpiAssessmentController extends Controller
                     });
                 }
             });
+
+            $this->applyIndexFilters($query, $request, $tahun);
 
             // Statistik & pagination
             $allKaryawan = $query->get();
@@ -334,7 +315,9 @@ class KpiAssessmentController extends Controller
             ->with('scores')
             ->paginate(10); // Pagination untuk item
 
-        return view('pages.kpi.form', compact('karyawan', 'kpi', 'items', 'tahun'));
+        $perspektifList = $this->getPerspektifAktif();
+
+        return view('pages.kpi.form', compact('karyawan', 'kpi', 'items', 'tahun', 'perspektifList'));
     }
 
 
@@ -613,6 +596,42 @@ class KpiAssessmentController extends Controller
     // =================================================================
     // 5. HELPER FUNCTION
     // =================================================================
+    private function applyIndexFilters($query, Request $request, $tahun)
+    {
+        // Filter Search (grouped to avoid breaking other filters)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('Nama_Lengkap_Sesuai_Ijazah', 'LIKE', "%{$search}%")
+                    ->orWhere('NIK', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // Filter Jabatan
+        if ($request->filled('filter_jabatan')) {
+            $query->whereHas('pekerjaan', function ($q) use ($request) {
+                $q->where('Jabatan', $request->filter_jabatan);
+            });
+        }
+
+        // Filter Status
+        if ($request->filled('filter_status')) {
+            if ($request->filter_status === 'BELUM_ADA') {
+                $query->whereDoesntHave('kpiAssessment', fn($q) => $q->where('tahun', $tahun));
+            } else {
+                $query->whereHas('kpiAssessment', fn($q) => $q->where('tahun', $tahun)->where('status', $request->filter_status));
+            }
+        }
+
+        // Filter Company
+        if ($request->filled('filter_company')) {
+            $query->whereHas('pekerjaan', function ($q) use ($request) {
+                $q->whereHas('company', function ($companyQ) use ($request) {
+                    $companyQ->where('name', $request->filter_company);
+                });
+            });
+        }
+    }
 
     private function cleanInput($value)
     {
@@ -733,11 +752,11 @@ class KpiAssessmentController extends Controller
         }
 
         $scopeIds = Karyawan::pluck('id_karyawan')->toArray();
-
+        
         if (empty($scopeIds)) {
             return redirect()->back()->with('error', 'Tidak ada karyawan untuk ditetapkan KPI.');
-        }
-
+            }
+            
         $tahun = $request->tahun;
         $created = 0;
 
@@ -778,7 +797,8 @@ class KpiAssessmentController extends Controller
         }
 
         $tahun = $request->input('tahun', date('Y'));
-        return view('pages.kpi.bulk_create', compact('tahun'));
+        $perspektifList = $this->getPerspektifAktif();
+        return view('pages.kpi.bulk_create', compact('tahun', 'perspektifList'));
     }
 
     /**
@@ -792,7 +812,7 @@ class KpiAssessmentController extends Controller
             'items.*.key_result_area' => 'required|string',
             'items.*.key_performance_indicator' => 'required|string',
             'items.*.bobot' => 'required|numeric',
-            'items.*.perspektif' => 'nullable|string',
+            'items.*.perspektif' => 'required|string',
             'items.*.polaritas' => 'required|string',
         ]);
 
@@ -803,6 +823,7 @@ class KpiAssessmentController extends Controller
 
         $tahun = $request->tahun;
         $items = $request->items;
+        // $perspektifList = $this->getPerspektifAktif();
         $createdHeaders = 0;
         $createdItems = 0;
 
@@ -825,7 +846,7 @@ class KpiAssessmentController extends Controller
                 foreach ($items as $it) {
                     $item = \App\Models\KpiItem::create([
                         'kpi_assessment_id' => $kpi->id_kpi_assessment,
-                        'perspektif' => $it['perspektif'] ?? null,
+                        'perspektif' => $it['perspektif'],
                         'key_result_area' => $it['key_result_area'] ?? null,
                         'key_performance_indicator' => $it['key_performance_indicator'],
                         'polaritas' => $it['polaritas'] ?? 'MAX',

@@ -47,7 +47,17 @@
                         </td>
                         <td class="p-2"><input type="number" name="items[0][bobot]" class="w-20 px-2 py-1 border rounded" min="0" max="100" required></td>
                         <td class="p-2"><input type="number" name="items[0][target]" class="w-20 px-2 py-1 border rounded" min="0" max="100" required></td>
-                        <td class="p-2"><input type="text" name="items[0][perspektif]" class="w-full px-2 py-1 border rounded" placeholder="Contoh: Keuangan"></td>
+                        <td class="p-2">
+                            <select name="perspektif" class="border p-2.5 w-full rounded text-sm kpi-input" {{ $perspektifList->isEmpty() ? 'disabled' : '' }}>
+                            @if($perspektifList->isEmpty())
+                                <option value="">Belum ada perspektif aktif</option>
+                            @else
+                                @foreach($perspektifList as $perspektif)
+                                    <option value="{{ $perspektif }}">{{ $perspektif }}</option>
+                                @endforeach
+                            @endif
+                            </select>
+                        </td>
                         <td class="p-2"><button type="button" class="remove-row bg-red-500 text-white px-2 py-1 rounded text-xs">Hapus</button></td>
                     </tr>
                 </tbody>

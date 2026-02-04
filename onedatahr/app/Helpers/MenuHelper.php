@@ -163,6 +163,13 @@ class MenuHelper
             ],
         ];
 
+        if ($user && $user->hasRole(['admin', 'superadmin'])) {
+            $menu[count($menu) - 1]['subItems'][] = [
+                'name' => 'Master Perspektif KPI',
+                'path' => '/kpi/perspectives',
+            ];
+        }
+
         // Monitoring KBI (Khusus HRD memantau Staff)
         if ($roleMatches(['admin', 'superadmin', 'manager', 'GM', 'senior_manager','supervisor'])) {
             // Tambahkan ke subItems Penilaian Karyawan (roleMatches memperhitungkan role manajemen + role turunan dari pekerjaan)

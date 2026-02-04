@@ -353,7 +353,7 @@
                                 <div class="text-base font-semibold">{{ $kry->Nama_Lengkap_Sesuai_Ijazah }}</div>
                                 <div class="font-normal text-gray-500 text-xs">{{ $kry->NIK ?? '-' }}</div>
                             </td>
-                            <td class="px-6 py-4">{{ $kry->pekerjaan->first()?->position?->name ?? '-' }}</td>
+                            <td class="px-6 py-4">{{ $kry->pekerjaan->first()?->level?->name ?? '-' }}</td>
                             <td class="px-6 py-4">{{ $kry->pekerjaan->first()?->division?->name ?? '-' }}</td>
                             <td class="px-6 py-4">{{ $kry->pekerjaan->first()?->company?->name ?? '-' }}</td>
                             {{-- Tampilkan Tahun sesuai filter --}}

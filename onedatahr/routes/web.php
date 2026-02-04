@@ -21,6 +21,7 @@ use App\Http\Controllers\TrainingController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OnboardingKaryawanController;
 use App\Http\Controllers\TurnoverController;
+use App\Http\Controllers\KpiPerspectiveController;
 
 
 
@@ -167,6 +168,13 @@ Route::middleware(['auth', 'role:admin|superadmin'])->group(function () {
     // Route::resource('wig-rekrutmen', WigRekrutmenController::class);
 
     // Route::resource('karyawan', KaryawanController::class);
+});
+
+Route::middleware(['auth', 'role:admin|superadmin'])->prefix('kpi')->name('kpi.')->group(function () {
+    Route::get('perspectives', [KpiPerspectiveController::class, 'index'])->name('perspectives.index');
+    Route::post('perspectives', [KpiPerspectiveController::class, 'store'])->name('perspectives.store');
+    Route::put('perspectives/{perspective}', [KpiPerspectiveController::class, 'update'])->name('perspectives.update');
+    Route::post('perspectives/{perspective}/toggle', [KpiPerspectiveController::class, 'toggleStatus'])->name('perspectives.toggle');
 });
 
 Route::middleware(['auth', 'role:superadmin'])->group(function () {

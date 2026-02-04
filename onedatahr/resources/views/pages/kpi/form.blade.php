@@ -26,7 +26,16 @@
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 p-3 md:p-6 font-sans">
+@php
+    // Cek apakah user yang login berhak melakukan adjustment?
+    // Staff TIDAK BOLEH (False), Manager TIDAK BOLEH kecuali senior_manager (superadmin)
+    $isStaff = auth()->user()->hasRole('staff');
+    $canAdjust = auth()->user()->hasRole(['superadmin', 'senior_manager']); // senior_manager dan superadmin yang bisa adjust
+    $canManageKpi = !$isStaff;
 
+    // Class CSS untuk input yang dikunci (Abu-abu & tidak bisa diklik)
+    $readonlyClass = $isStaff ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-transparent text-orange-700 font-bold border-b border-orange-300';
+@endphp
 <div class="w-full max-w-[1400px] mx-auto">
     {{-- ALERT --}}
     @if ($errors->any())
@@ -173,9 +182,11 @@
             </div>
         </div>
         <div id="total-bobot-alert" class="text-lg md:text-xl font-bold w-full text-center lg:text-left"></div>
+        @if ($canManageKpi)
         <button type="button" onclick="document.getElementById('modalTambahKPI').classList.remove('hidden')" class="w-full lg:w-auto px-4 py-2.5 bg-green-600 text-white rounded-xl text-sm font-bold hover:bg-green-700 transition shadow flex items-center justify-center gap-2">
             <i class="fas fa-plus"></i> Tambah KPI Baru
         </button>
+        @endif
         {{-- BADGE PERINGATAN (Hanya muncul jika ada perubahan) --}}
         <div id="unsaved-badge" class="hidden flex items-center gap-2 px-3 py-1.5 bg-yellow-100 text-yellow-700 text-sm font-bold rounded-lg border border-red-300 shadow-sm animate-pulse transition-all">
             <i class="fas fa-pen-nib"></i>
@@ -207,15 +218,7 @@
     </div>
     @endif
 
-    @php
-    // Cek apakah user yang login berhak melakukan adjustment?
-    // Staff TIDAK BOLEH (False), Manager TIDAK BOLEH kecuali senior_manager (superadmin)
-    $isStaff = auth()->user()->hasRole(['staff']);
-    $canAdjust = auth()->user()->hasRole(['superadmin', 'senior_manager']); // senior_manager dan superadmin yang bisa adjust
-
-    // Class CSS untuk input yang dikunci (Abu-abu & tidak bisa diklik)
-    $readonlyClass = $isStaff ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-transparent text-orange-700 font-bold border-b border-orange-300';
-    @endphp
+    
 
     {{-- FORM UTAMA --}}
     <form id="kpiForm" action="{{ route('kpi.update', $kpi->id_kpi_assessment) }}" method="POST">
@@ -259,10 +262,12 @@
                                     <div class="font-semibold text-gray-900 leading-snug group-hover:text-blue-600">{{ $item->key_result_area ?? $item->indikator }}</div>
                                     {{-- <div class="font-semibold text-gray-900 leading-snug"></div> --}}
 
+                                    @if ($canManageKpi)
                                     <div class="flex gap-1 shrink-0">
                                         <button type="button" onclick="openEditModal({{ json_encode($item) }}, '{{ route('kpi.update-item', $item->id_kpi_item) }}')" class="text-gray-400 hover:text-yellow-600 p-1.5 rounded hover:bg-yellow-50"><i class="fas fa-pencil-alt text-[10px]"></i></button>
                                         <button type="button" onclick="confirmDelete('{{ route('kpi.delete-item', $item->id_kpi_item) }}')" class="text-gray-400 hover:text-red-600 p-1.5 rounded hover:bg-red-50"><i class="fas fa-trash-alt text-[10px]"></i></button>
                                     </div>
+                                    @endif
                                 </div>
 
                                 {{-- <div class="text-[15px] text-gray-500 mt-1">{{ $item->key_performance_indicator ?? $item->indikator }}</div> --}}
@@ -281,7 +286,7 @@
 
                             {{-- BULANAN JANUARI - JUNI (Semester 1) --}}
                             @foreach(['jan','feb','mar','apr','mei','jun'] as $bln)
-                                <td class="p-1 border-r align center"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][target_{{ $bln }}]" value="{{ $score->{'target_'.$bln} ?? '' }}" class="input-target-{{ $bln }} kpi-input w-full h-8 px-1.5 rounded text-center" placeholder="0"></td>
+                                <td class="p-1 border-r align center"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][target_{{ $bln }}]" value="{{ $score->{'target_'.$bln} ?? '' }}" class="input-target-{{ $bln }} kpi-input w-full h-8 px-1.5 rounded text-center {{ $isStaff ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : '' }}" placeholder="0" {{ $isStaff ? 'readonly' : '' }}></td>
                                 <td class="p-1 border-r align center"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][real_{{ $bln }}]" value="{{ $score->{'real_'.$bln} ?? '' }}" class="input-real-{{ $bln }} kpi-input w-full h-8 px-1.5 rounded text-center" placeholder="0"></td>
                                 <td class="p-1 border-r align center text-center bg-gray-50"><div class="py-1.5 font-medium text-gray-600"><span class="span-skor-{{ $bln }}"></span>%</div></td>
                                 <td class="p-1 border-r-2 align center text-center bg-blue-50/20"><div class="py-1.5 font-bold text-blue-700"><span class="span-nilai-{{ $bln }}"></span>%</div></td>
@@ -290,7 +295,7 @@
 
                             {{-- BULANAN --}}
                             @foreach(['jul','aug','sep','okt','nov','des'] as $bln)
-                                <td class="p-1 border-r align center"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][target_{{ $bln }}]" value="{{ $score->{'target_'.$bln} }}" class="input-target-{{ $bln }} kpi-input w-full h-8 px-1.5 rounded text-center" placeholder="0"></td>
+                                <td class="p-1 border-r align center"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][target_{{ $bln }}]" value="{{ $score->{'target_'.$bln} }}" class="input-target-{{ $bln }} kpi-input w-full h-8 px-1.5 rounded text-center {{ $isStaff ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : '' }}" placeholder="0" {{ $isStaff ? 'readonly' : '' }}></td>
                                 <td class="p-1 border-r align center"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][real_{{ $bln }}]" value="{{ $score->{'real_'.$bln} }}" class="input-real-{{ $bln }} kpi-input w-full h-8 px-1.5 rounded text-center" placeholder="0"></td>
                                 <td class="p-1 border-r align center text-center bg-gray-50"><div class="py-1.5 font-medium text-gray-600"><span class="span-skor-{{ $bln }}"></span>%</div></td>
                                 <td class="p-1 border-r-2 align center text-center bg-blue-50/20"><div class="py-1.5 font-bold text-blue-700"><span class="span-nilai-{{ $bln }}"></span>%</div></td>
@@ -396,14 +401,27 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div><label class="block text-sm font-medium text-gray-700">KRA</label><input type="text" name="key_result_area" class="border p-2.5 w-full rounded text-sm kpi-input" required></div>
                 <div><label class="block text-sm font-medium text-gray-700">KPI</label><input type="text" name="key_performance_indicator" class="border p-2.5 w-full rounded text-sm kpi-input" required></div>
-                <div><label class="block text-sm font-medium text-gray-700">Perspektif</label><select name="perspektif" class="border p-2.5 w-full rounded text-sm kpi-input"><option value="Financial">Financial</option><option value="Customer">Customer</option></select></div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Perspektif</label>
+                    <select name="perspektif" class="border p-2.5 w-full rounded text-sm kpi-input" {{ $perspektifList->isEmpty() ? 'disabled' : '' }}>
+                        @if($perspektifList->isEmpty())
+                            <option value="">Belum ada perspektif aktif</option>
+                        @else
+                            @foreach($perspektifList as $perspektif)
+                                <option value="{{ $perspektif }}">{{ $perspektif }}</option>
+                            @endforeach
+                        @endif
+                    </select>
+                </div>
                 <div><label class="block text-sm font-medium text-gray-700">Bobot (%)</label><input type="number" step="0.01" name="bobot" class="border p-2.5 w-full rounded text-sm kpi-input" required></div>
                 <div><label class="block text-sm font-medium text-gray-700">Units</label><input type="text" name="units" class="border p-2.5 w-full rounded text-sm kpi-input" required></div>
                 <div><label class="block text-sm font-medium text-gray-700">Polaritas</label><select name="polaritas" class="border p-2.5 w-full rounded text-sm kpi-input"><option value="Maximize">Positif</option><option value="Minimize">Negatif</option></select></div>
             </div>
             <div class="mt-6 flex justify-end gap-2">
                 <button type="button" onclick="document.getElementById('modalTambahKPI').classList.add('hidden')" class="px-4 py-2 border rounded">Batal</button>
+                @if ($canManageKpi)
                 <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Simpan</button>
+                @endif
             </div>
         </form>
     </div>
@@ -418,7 +436,15 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                 <div>
                     <label for="edit_perspektif" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Perspektif</label>
-                    <select id="edit_perspektif" name="perspektif" class="w-full border rounded p-2.5 text-sm kpi-input"><option value="Financial">Financial</option><option value="Customer">Customer</option></select>
+                    <select id="edit_perspektif" name="perspektif" class="w-full border rounded p-2.5 text-sm kpi-input" {{ $perspektifList->isEmpty() ? 'disabled' : '' }}>
+                        @if($perspektifList->isEmpty())
+                            <option value="">Belum ada perspektif aktif</option>
+                        @else
+                            @foreach($perspektifList as $perspektif)
+                                <option value="{{ $perspektif }}">{{ $perspektif }}</option>
+                            @endforeach
+                        @endif
+                    </select>
                 </div>
                 <div>
                     <label for="edit_kra" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">KRA</label>
@@ -442,12 +468,14 @@
                 </div>
                 <div>
                     <label for="edit_target" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Target</label>
-                    <input type="number" step="0.01" id="edit_target" name="target" class="w-full border rounded p-2.5 text-sm kpi-input" required>
+                    <input type="number" step="0.01" id="edit_target" name="target" class="w-full border rounded p-2.5 text-sm kpi-input {{ $isStaff ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : '' }}" required {{ $isStaff ? 'readonly' : '' }}>
                 </div>
             </div>
             <div class="mt-6 flex justify-end gap-3">
                 <button type="button" onclick="closeEditModal()" class="px-4 py-2 border rounded text-gray-600 hover:bg-gray-100 text-sm">Batal</button>
+                @if ($canManageKpi)
                 <button type="submit" class="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 text-sm">Update KPI</button>
+                @endif
             </div>
         </form>
     </div>
@@ -470,8 +498,11 @@
 @endif
 
 {{-- FORM DELETE GLOBAL --}}
-
-<form id="globalDeleteForm" method="POST" class="hidden">@csrf @method('DELETE')</form>
+@if ($canManageKpi)
+    <form id="globalDeleteForm" method="POST" class="hidden">
+        @csrf @method('DELETE')
+    </form>
+@endif
 
 {{-- SCRIPT--}}
 <script>
@@ -480,6 +511,15 @@
     let targetUrl = null;
     let isSubmitting = false;
     let isMonitoring = false;
+    function ensurePerspektifOption(selectEl, value) {
+        if (!selectEl || !value) return;
+        const exists = Array.from(selectEl.options).some(opt => opt.value === value);
+        if (!exists) {
+            const opt = new Option(`${value} (Tidak aktif)`, value, true, true);
+            opt.dataset.inactive = '1';
+            selectEl.add(opt, 0);
+        }
+    }
 
     // --- HELPER DATA FORM ---
     function getFormDataString() {
@@ -881,7 +921,14 @@
     // Modal Helper
     function openEditModal(data, updateUrl) {
         document.getElementById('formEditKPI').action = updateUrl;
-        document.getElementById('edit_perspektif').value = data.perspektif;
+        const perspektifSelect = document.getElementById('edit_perspektif');
+        if (perspektifSelect) {
+            Array.from(perspektifSelect.options).forEach(opt => {
+                if (opt.dataset.inactive === '1') opt.remove();
+            });
+            ensurePerspektifOption(perspektifSelect, data.perspektif);
+            perspektifSelect.value = data.perspektif || '';
+        }
         document.getElementById('edit_kra').value = data.key_result_area || data.kra;
         document.getElementById('edit_kpi').value = data.key_performance_indicator || data.indikator;
         // Units & Target are not part of the simplified form
