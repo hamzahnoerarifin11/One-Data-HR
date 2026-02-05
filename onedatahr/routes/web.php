@@ -175,6 +175,7 @@ Route::middleware(['auth', 'role:admin|superadmin'])->prefix('kpi')->name('kpi.'
     Route::post('perspectives', [KpiPerspectiveController::class, 'store'])->name('perspectives.store');
     Route::put('perspectives/{perspective}', [KpiPerspectiveController::class, 'update'])->name('perspectives.update');
     Route::post('perspectives/{perspective}/toggle', [KpiPerspectiveController::class, 'toggleStatus'])->name('perspectives.toggle');
+    Route::post('perspectives/bulk-delete', [KpiPerspectiveController::class, 'bulkDelete'])->name('perspectives.bulk-delete');
 });
 
 Route::middleware(['auth', 'role:superadmin'])->group(function () {
@@ -214,6 +215,7 @@ Route::post('/kpi/bulk-create', [KpiAssessmentController::class, 'bulkCreateForM
 // Form-based bulk create (Manager fills template then submit)
 Route::get('/kpi/bulk-create/form', [KpiAssessmentController::class, 'bulkCreateForm'])->name('kpi.bulk-create.form');
 Route::post('/kpi/bulk-store', [KpiAssessmentController::class, 'bulkStoreWithItems'])->name('kpi.bulk-store');
+Route::post('/kpi/bulk-delete-assessments', [KpiAssessmentController::class, 'bulkDelete'])->name('kpi.bulk-delete-assessments');
 
 // KPI Assessment Routes
 // Contoh URL: /kpi/penilaian/5/2025 (Karyawan ID 5, Tahun 2025)
@@ -279,6 +281,7 @@ Route::post('/kpi/items/store', [KpiAssessmentController::class, 'storeItem'])->
 Route::delete('/kpi/items/{id}', [KpiAssessmentController::class, 'destroyItem'])->name('kpi.delete-item');
 // Route untuk Update Item KPI
 Route::put('/kpi/items/{id}', [KpiAssessmentController::class, 'updateItem'])->name('kpi.update-item');
+Route::post('/kpi/items/bulk-delete', [KpiAssessmentController::class, 'bulkDestroyItems'])->name('kpi.items.bulk-delete');
 
 
 // Routes untuk TEMPA

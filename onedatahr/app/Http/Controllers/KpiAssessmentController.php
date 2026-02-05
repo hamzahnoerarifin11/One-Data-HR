@@ -361,6 +361,7 @@ class KpiAssessmentController extends Controller
             'key_result_area'           => 'required|string',
             'key_performance_indicator' => 'required|string',
             'bobot'                     => 'required|numeric',
+            'target'                    => 'required|numeric',
             'polaritas'                 => 'required|string',
             'perspektif'                => 'nullable|string',
         ]);
@@ -812,6 +813,7 @@ class KpiAssessmentController extends Controller
             'items.*.key_result_area' => 'required|string',
             'items.*.key_performance_indicator' => 'required|string',
             'items.*.bobot' => 'required|numeric',
+            'items.*.target' => 'required|numeric',
             'items.*.perspektif' => 'required|string',
             'items.*.polaritas' => 'required|string',
         ]);
@@ -851,8 +853,7 @@ class KpiAssessmentController extends Controller
                         'key_performance_indicator' => $it['key_performance_indicator'],
                         'polaritas' => $it['polaritas'] ?? 'MAX',
                         'bobot' => $it['bobot'],
-                        // default target 0 because form no longer requests target
-                        'target' => 0,
+                        'target' => $it['target'],
                     ]);
 
                     \App\Models\KpiScore::create([
@@ -1046,6 +1047,64 @@ class KpiAssessmentController extends Controller
             return redirect()->back()->with('success', 'Data KPI berhasil dihapus.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal menghapus data KPI: ' . $e->getMessage());
+        }
+    }
+    public function bulkDestroyItems(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:kpi_items,id_kpi_item',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            // Hapus skor terkait dulu
+            KpiScore::whereIn('kpi_item_id', $request->ids)->delete();
+            
+            // Hapus itemnya
+            KpiItem::whereIn('id_kpi_item', $request->ids)->delete();
+
+            DB::commit();
+
+            return response()->json(['success' => true, 'message' => 'Item KPI terpilih berhasil dihapus.']);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json(['success' => false, 'message' => 'Gagal menghapus item: ' . $e->getMessage()], 500);
+        }
+    }
+    /**
+     * Bulk Delete KPI Assessments
+     */
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:kpi_assessments,id_kpi_assessment'
+        ]);
+
+        $user = Auth::user();
+
+        // Security check: Only Manager, Admin, Superadmin can bulk delete
+        if (!$this->roleMatches($user, ['manager', 'GM', 'senior_manager', 'admin', 'superadmin'])) {
+            return response()->json(['success' => false, 'message' => 'Akses ditolak.'], 403);
+        }
+
+        DB::beginTransaction();
+        try {
+            $deletedCount = KpiAssessment::whereIn('id_kpi_assessment', $request->ids)->delete();
+            
+            DB::commit();
+            
+            return response()->json([
+                'success' => true, 
+                'message' => "Berhasil menghapus {$deletedCount} data KPI."
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'success' => false, 
+                'message' => 'Gagal menghapus data: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

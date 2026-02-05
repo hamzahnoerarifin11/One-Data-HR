@@ -31,8 +31,11 @@
                         hover:bg-gray-50 dark:hover:bg-gray-700
                         transition text-sm font-medium shadow-sm">
                     
-                    <i id="theme-toggle-light-icon" class="fas fa-sun hidden"></i>
-                    <i id="theme-toggle-dark-icon" class="fas fa-moon hidden"></i>
+                    {{-- <i  class="fas fa-sun hidden"></i> --}}
+                    <svg id="theme-toggle-light-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun-icon lucide-sun hidden"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+
+                    {{-- <i class="fas fa-moon hidden"></i> --}}
+                    <svg id="theme-toggle-dark-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-moon-icon lucide-moon hidden"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
                     <span>Switch Theme</span>
                 </button>
             </div>
@@ -236,10 +239,30 @@
                 <h3 class="font-bold text-gray-700 dark:text-gray-200">Daftar Status Karyawan ({{ $tahun ?? date('Y') }})</h3>
             </div>
 
-            {{-- TAMPILAN MOBILE (Tetap sama) --}}
-            <div class="block md:hidden">
+                <div class="mb-4 flex justify-between items-center hidden" id="bulkActionContainer">
+                    <div class="text-sm text-slate-600">
+                        <span id="selectedCount" class="font-bold">0</span> data dipilih
+                    </div>
+                    <button type="button" onclick="confirmBulkDelete()" class="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-bold hover:bg-red-700 transition shadow-sm flex items-center gap-2">
+                        <i class="fas fa-trash-alt"></i> Hapus Terpilih
+                    </button>
+                </div>
+
+                <div class="mb-4 flex justify-between items-center hidden" id="bulkActionContainer">
+                    <div class="text-sm text-slate-600">
+                        <span id="selectedCount" class="font-bold">0</span> data dipilih
+                    </div>
+                    <button type="button" onclick="confirmBulkDelete()" class="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-bold hover:bg-red-700 transition shadow-sm flex items-center gap-2">
+                        <i class="fas fa-trash-alt"></i> Hapus Terpilih
+                    </button>
+                </div>
+
+                {{-- TAMPILAN MOBILE --}}
+                <div class="block md:hidden">
                 <div class="divide-y divide-gray-200 dark:divide-gray-700">
+                    @php $mobileRowNum = $karyawanList->firstItem(); @endphp
                     @forelse($karyawanList as $index => $kry)
+                        @if(isset($me) && $kry->id_karyawan == $me->id_karyawan) @continue @endif
                         @php $kpi = $kry->kpiAssessment; @endphp
                         <div class="p-4 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                             <div class="flex justify-between items-start mb-3">
@@ -248,9 +271,9 @@
                                     <div class="text-xs text-gray-500">{{ $kry->pekerjaan->first()?->position?->name ?? '-' }}</div>
                                     <div class="text-xs text-gray-400">{{ $kry->pekerjaan->first()?->division?->name ?? '-' }}</div>
                                     <div class="text-xs text-gray-400">{{ $kry->pekerjaan->first()?->company?->name ?? '-' }}</div>
-                                    <div class="text-xs text-gray-400 mt-0.5">NIK: {{ $kry->NIK ?? '-' }}</div>\n
+                                    <div class="text-xs text-gray-400 mt-0.5">NIK: {{ $kry->NIK ?? '-' }}</div>
                                 </div>
-                                <div class="text-xs dark:text-white text-gray-400 font-mono">#{{ $index + 1 }}</div>
+                                <div class="text-xs dark:text-white text-gray-400 font-mono">#{{ $mobileRowNum++ }}</div>
                             </div>
 
                             <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-900/50 p-3 rounded-lg mb-3">
@@ -326,12 +349,14 @@
                 </div>
             </div>
 
-            {{-- TAMPILAN DESKTOP (Tetap sama, hanya penyesuaian variabel $tahun) --}}
             <div class="hidden md:block overflow-x-auto">
                 <table class="w-full text-left text-sm text-gray-500 dark:text-gray-400">
                     <thead class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 uppercase text-xs">
                         <tr>
-                            <th scope="col" class="px-6 py-4 w-16 text-center">No</th>
+                            <th scope="col" class="px-6 py-4 w-10 text-center">
+                                <input type="checkbox" id="selectAll" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            </th>
+                            <th scope="col" class="px-2 py-4 w-12 text-center">No</th>
                             <th scope="col" class="px-6 py-4">Nama Karyawan</th>
                             <th scope="col" class="px-6 py-4">Jabatan</th>
                             <th scope="col" class="px-6 py-4">Divisi</th>
@@ -343,11 +368,20 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                        @php $rowNum = $karyawanList->firstItem(); @endphp
                         @forelse($karyawanList as $index => $kry)
+                        @if(isset($me) && $kry->id_karyawan == $me->id_karyawan) @continue @endif
                         @php $kpi = $kry->kpiAssessment; @endphp
                         <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-200">
-                                {{ $karyawanList->firstItem() + $index }}
+                            <td class="px-6 py-4 text-center">
+                                @if($kpi)
+                                    <input type="checkbox" class="kpi-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500" value="{{ $kpi->id_kpi_assessment }}">
+                                @else
+                                    <input type="checkbox" disabled class="rounded border-gray-200 text-gray-300 cursor-not-allowed bg-gray-100">
+                                @endif
+                            </td>
+                            <td class="px-2 py-4 text-center whitespace-nowrap text-sm font-medium text-gray-500 dark:text-gray-400">
+                                {{ $rowNum++ }}
                             </td>
                             <td class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
                                 <div class="text-base font-semibold">{{ $kry->Nama_Lengkap_Sesuai_Ijazah }}</div>
@@ -443,6 +477,83 @@
             </div>
         </div>
     </div>
+    <script>
+
+        // BULK DELETE SCRIPT
+        const selectAll = document.getElementById('selectAll');
+        const checkboxes = document.querySelectorAll('.kpi-checkbox');
+        const bulkActionContainer = document.getElementById('bulkActionContainer');
+        const selectedCountSpan = document.getElementById('selectedCount');
+
+        function updateBulkUI() {
+            const checkedBoxes = document.querySelectorAll('.kpi-checkbox:checked');
+            const count = checkedBoxes.length;
+            selectedCountSpan.innerText = count;
+
+            if (count > 0) {
+                bulkActionContainer.classList.remove('hidden');
+                bulkActionContainer.classList.add('flex');
+            } else {
+                bulkActionContainer.classList.add('hidden');
+                bulkActionContainer.classList.remove('flex');
+            }
+        }
+
+        if(selectAll){
+            selectAll.addEventListener('change', function() {
+                checkboxes.forEach(cb => {
+                    if(!cb.disabled) cb.checked = this.checked;
+                });
+                updateBulkUI();
+            });
+        }
+
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', updateBulkUI);
+        });
+
+        function confirmBulkDelete() {
+            const checkedBoxes = document.querySelectorAll('.kpi-checkbox:checked');
+            if (checkedBoxes.length === 0) return;
+
+            if (!confirm('Apakah Anda yakin ingin menghapus ' + checkedBoxes.length + ' data KPI yang dipilih? Data yang dihapus tidak dapat dikembalikan.')) {
+                return;
+            }
+
+            const ids = Array.from(checkedBoxes).map(cb => cb.value);
+
+            // Show Loading
+            const originalText = document.querySelector('#bulkActionContainer button').innerHTML;
+            document.querySelector('#bulkActionContainer button').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menghapus...';
+            document.querySelector('#bulkActionContainer button').disabled = true;
+
+            fetch('{{ route("kpi.bulk-delete-assessments") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ ids: ids })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    window.location.reload();
+                } else {
+                    alert('Gagal: ' + data.message);
+                    document.querySelector('#bulkActionContainer button').innerHTML = originalText;
+                    document.querySelector('#bulkActionContainer button').disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan saat menghapus data.');
+                document.querySelector('#bulkActionContainer button').innerHTML = originalText;
+                document.querySelector('#bulkActionContainer button').disabled = false;
+            });
+        }
+    </script>
 
     {{-- SCRIPT DARK MODE (Tetap sama) --}}
     <script>

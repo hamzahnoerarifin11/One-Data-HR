@@ -58,4 +58,40 @@ class KpiPerspectiveController extends Controller
 
         return redirect()->back()->with('success', 'Status perspektif berhasil diperbarui.');
     }
+
+    public function bulkDelete(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:kpi_perspectives,id'
+        ]);
+
+        $ids = $request->ids;
+        $perspectives = KpiPerspective::whereIn('id', $ids)->get();
+        $deleted = 0;
+        $skipped = 0;
+
+        foreach ($perspectives as $p) {
+            // Check usage by NAME since KpiItem stores the string name
+            $isUsed = KpiItem::where('perspektif', $p->name)->exists();
+            
+            if ($isUsed) {
+                $skipped++;
+                continue;
+            }
+            
+            $p->delete();
+            $deleted++;
+        }
+
+        $message = "Berhasil menghapus {$deleted} perspektif.";
+        if ($skipped > 0) {
+            $message .= " {$skipped} data dilewati karena sedang digunakan oleh KPI.";
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => $message
+        ]);
+    }
 }
