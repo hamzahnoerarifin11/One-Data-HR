@@ -46,7 +46,7 @@
             {{-- Menampilkan Tahun yang sedang dipilih --}}
             <p class="text-gray-500 dark:text-gray-400 text-sm">Monitoring Penilaian Kinerja Karyawan Tahun {{ $tahun ?? date('Y') }}</p>
 
-            @if(isset($me) && auth()->user()->hasRole(['manager','GM','senior_manager']))
+            @if(isset($me) && auth()->user()->hasRole(['manager','GM','senior_manager','direktur']))
                 <div class="mt-3 flex items-center justify-center gap-3">
 <a href="{{ route('kpi.bulk-create.form', ['tahun' => $tahun]) }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-bold shadow inline-flex items-center">
                                     <i class="fas fa-layer-group mr-1"></i> Tetapkan KPI untuk Semua Karyawan

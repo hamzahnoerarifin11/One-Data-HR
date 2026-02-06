@@ -13,6 +13,53 @@
         @csrf
         <input type="hidden" name="tahun" value="{{ $tahun }}">
 
+        <!-- Employee Selection Card -->
+        <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
+                <div>
+                    <h2 class="text-lg font-bold text-gray-800 dark:text-white">Pilih Karyawan</h2>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Pilih karyawan yang akan diberikan KPI ini.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" id="select-all" class="w-4 h-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500 dark:bg-gray-800 dark:border-gray-600">
+                    <label for="select-all" class="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">Pilih Semua</label>
+                </div>
+            </div>
+
+            <!-- Search -->
+            <div class="mb-4 relative">
+                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+                <input type="text" id="employee-search" placeholder="Cari nama atau jabatan..." 
+                    class="block w-full rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:bg-white focus:ring-2 focus:ring-brand-500/20 outline-none transition dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500">
+            </div>
+
+            <!-- List -->
+            <div class="max-h-[300px] overflow-y-auto border border-gray-100 rounded-xl p-2 space-y-1 custom-scrollbar dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50">
+                @if(isset($employees) && count($employees) > 0)
+                    @foreach($employees as $emp)
+                        <label class="flex items-center p-3 rounded-lg hover:bg-white border border-transparent hover:border-gray-100 hover:shadow-sm dark:hover:bg-gray-800 dark:hover:border-gray-700 cursor-pointer transition-all employee-item">
+                            <input type="checkbox" name="employee_ids[]" value="{{ $emp->id_karyawan }}" class="w-4 h-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500 dark:bg-gray-800 dark:border-gray-600 employee-checkbox">
+                            <div class="ml-3 select-none">
+                                <p class="text-sm font-semibold text-gray-800 dark:text-white employee-name">{{ $emp->Nama_Lengkap_Sesuai_Ijazah }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 employee-role">{{ $emp->pekerjaan->first()->Jabatan ?? ($emp->pekerjaan->first()->position->name ?? 'Tidak ada jabatan') }}</p>
+                            </div>
+                        </label>
+                    @endforeach
+                @else
+                    <div class="p-8 text-center text-gray-500 dark:text-gray-400 flex flex-col items-center">
+                        <svg class="w-12 h-12 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                        <p>Tidak ada karyawan yang tersedia dalam lingkup Anda.</p>
+                    </div>
+                @endif
+            </div>
+            <div class="mt-3 flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
+                <span>* Hanya karyawan yang belum memiliki KPI tahun {{ $tahun }} yang akan dibuatkan.</span>
+                <span>Terpilih: <span id="selected-count" class="font-bold text-brand-600 dark:text-brand-400">0</span> karyawan</span>
+            </div>
+        </div>
+
         <!-- Template Info Card -->
         <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
             <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4">Informasi Template</h2>
@@ -242,6 +289,63 @@
                 }
             }
         });
+
+        // --- EMPLOYEE SELECTION LOGIC ---
+        const selectAllCheckbox = document.getElementById('select-all');
+        const employeeCheckboxes = document.querySelectorAll('.employee-checkbox');
+        const searchInput = document.getElementById('employee-search');
+        const employeeItems = document.querySelectorAll('.employee-item');
+        const selectedCountSpan = document.getElementById('selected-count');
+
+        function updateCount() {
+            const count = document.querySelectorAll('.employee-checkbox:checked').length;
+            selectedCountSpan.innerText = count;
+            
+            // Update Select All state
+            const allVisible = Array.from(employeeCheckboxes).filter(cb => !cb.closest('.employee-item').classList.contains('hidden'));
+            if(allVisible.length > 0) {
+                 selectAllCheckbox.checked = allVisible.every(cb => cb.checked);
+                 selectAllCheckbox.indeterminate = count > 0 && count < allVisible.length;
+            }
+        }
+
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', function() {
+                const isChecked = this.checked;
+                // Only toggle visible items if search is active
+                employeeCheckboxes.forEach(cb => {
+                    const item = cb.closest('.employee-item');
+                    if (!item.classList.contains('hidden')) {
+                        cb.checked = isChecked;
+                    }
+                });
+                updateCount();
+            });
+        }
+
+        if (employeeCheckboxes) {
+            employeeCheckboxes.forEach(cb => {
+                cb.addEventListener('change', updateCount);
+            });
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                const term = e.target.value.toLowerCase();
+                employeeItems.forEach(item => {
+                    const name = item.querySelector('.employee-name').innerText.toLowerCase();
+                    const role = item.querySelector('.employee-role').innerText.toLowerCase();
+                    
+                    if (name.includes(term) || role.includes(term)) {
+                        item.classList.remove('hidden');
+                        item.classList.add('flex');
+                    } else {
+                        item.classList.add('hidden');
+                        item.classList.remove('flex');
+                    }
+                });
+            });
+        }
     })();
 </script>
 @endsection

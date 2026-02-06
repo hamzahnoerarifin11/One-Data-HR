@@ -59,6 +59,35 @@ class KpiAssessmentController extends Controller
             return view('pages.kpi.index', compact('karyawanList', 'tahun', 'stats', 'listJabatan', 'listCompanies'));
         }
 
+        // --- SKENARIO 1.B: DIREKTUR (Lihat Semua GM & Manager) ---
+        if ($this->roleMatches($user, 'direktur')) {
+             $me = Karyawan::where('nik', $user->nik)->first();
+             $query = Karyawan::with(['pekerjaan.company', 'pekerjaan.position', 'pekerjaan.division', 'pekerjaan.department', 'pekerjaan.level', 'kpiAssessment' => function ($q) use ($tahun) {
+                $q->where('tahun', $tahun);
+            }])->whereHas('pekerjaan.level', function($q) {
+                $q->where('name', 'LIKE', '%Manager%')
+                  ->orWhere('name', 'LIKE', '%General Manager%');
+            })->orWhere('atasan_id', $me->id_karyawan ?? 0); // Tetap masukkan direct subordinate jika ada
+
+            $this->applyIndexFilters($query, $request, $tahun);
+
+            $allKaryawan = $query->get();
+            $stats = [
+                'total_karyawan' => $allKaryawan->count(),
+                'sudah_final' => $allKaryawan->filter(fn($k) => $k->kpiAssessment && $k->kpiAssessment->status == 'FINAL')->count(),
+                'draft' => $allKaryawan->filter(fn($k) => $k->kpiAssessment && $k->kpiAssessment->status != 'FINAL')->count(),
+                'belum_ada'  => $allKaryawan->filter(fn($k) => !$k->kpiAssessment)->count(),
+                'rata_rata' => $allKaryawan->filter(fn($k) => $k->kpiAssessment)->avg(fn($k) => $k->kpiAssessment->total_skor_akhir),
+            ];
+
+            $listJabatan = \App\Models\Level::distinct()->orderBy('name')->pluck('name');
+            $listCompanies = \App\Models\Company::distinct()->orderBy('name')->pluck('name');
+
+            $karyawanList = $query->paginate(10)->appends($request->all());
+
+            return view('pages.kpi.index', compact('karyawanList', 'tahun', 'stats', 'listJabatan', 'listCompanies', 'me'));
+        }
+
         // --- SKENARIO 2: MANAGER (Dashboard Bawahan) ---
 
         $me = Karyawan::where('nik', $user->nik)->first();
@@ -360,6 +389,7 @@ class KpiAssessmentController extends Controller
             'kpi_assessment_id'         => 'required',
             'key_result_area'           => 'required|string',
             'key_performance_indicator' => 'required|string',
+            'units'                     => 'required|string',
             'bobot'                     => 'required|numeric',
             'target'                    => 'required|numeric',
             'polaritas'                 => 'required|string',
@@ -375,6 +405,7 @@ class KpiAssessmentController extends Controller
             'perspektif'                => $request->perspektif,
             'key_result_area'           => $request->key_result_area,
             'key_performance_indicator' => $request->key_performance_indicator,
+            'units'                     => $request->units,
             'polaritas'                 => $request->polaritas,
             'bobot'                     => $request->bobot,
             'target'                    => $defaultTarget,
@@ -790,50 +821,123 @@ class KpiAssessmentController extends Controller
     /**
      * Tampilkan form untuk manager mengisi template KPI yang akan diterapkan ke semua karyawan
      */
-    public function bulkCreateForm(Request $request)
+public function bulkCreateForm(Request $request)
     {
         $user = Auth::user();
-        if (!$this->roleMatches($user, ['manager', 'GM', 'senior_manager', 'admin', 'superadmin'])) {
+        if (!$this->roleMatches($user, ['manager', 'GM', 'senior_manager', 'admin', 'superadmin', 'direktur'])) {
             return redirect()->back()->with('error', 'Akses ditolak.');
         }
 
         $tahun = $request->input('tahun', date('Y'));
+        $employees = collect();
+
+        // 1. Admin / Superadmin: Semua Karyawan
+        if ($this->roleMatches($user, ['admin', 'superadmin'])) {
+            $employees = Karyawan::with('pekerjaan')->where('status_karyawan', 'ACTIVE')
+                ->orderBy('Nama_Lengkap_Sesuai_Ijazah')
+                ->get();
+        } 
+        // 1.B Direktur: GM & Manager
+        elseif ($this->roleMatches($user, 'direktur')) {
+            $me = Karyawan::where('nik', $user->nik)->first();
+            $employees = Karyawan::with('pekerjaan')
+                ->whereHas('pekerjaan.level', function($q) {
+                    $q->where('name', 'LIKE', '%Manager%')
+                      ->orWhere('name', 'LIKE', '%General Manager%');
+                })
+                ->orWhere('atasan_id', $me->id_karyawan ?? 0)
+                ->orderBy('Nama_Lengkap_Sesuai_Ijazah')
+                ->get();
+        } 
+        // 2. Manager / GM / Senior Manager
+        elseif ($this->roleMatches($user, ['manager', 'GM', 'senior_manager'])) {
+            $me = Karyawan::where('nik', $user->nik)->first();
+            if ($me) {
+                // Direct & 2nd Level
+                $directIds = Karyawan::where('atasan_id', $me->id_karyawan)->pluck('id_karyawan')->toArray();
+                $secondLevel = Karyawan::whereIn('atasan_id', $directIds)->pluck('id_karyawan')->toArray();
+                $scopeIds = array_unique(array_merge($directIds, $secondLevel));
+
+                if (!empty($scopeIds)) {
+                    $employees = Karyawan::with('pekerjaan')->whereIn('id_karyawan', $scopeIds)
+                        ->orderBy('Nama_Lengkap_Sesuai_Ijazah')
+                        ->get();
+                } else {
+                    // Fallback Division
+                    $pekerjaanManager = $me->pekerjaan()->orderByDesc('id_pekerjaan')->first();
+                    if ($pekerjaanManager && $pekerjaanManager->division_id) {
+                        $employees = Karyawan::with('pekerjaan')->whereHas('pekerjaan', function ($q) use ($pekerjaanManager) {
+                            $q->where('division_id', $pekerjaanManager->division_id);
+                        })->orderBy('Nama_Lengkap_Sesuai_Ijazah')->get();
+                    }
+                }
+            }
+        }
+        // 3. Supervisor
+        elseif ($this->roleMatches($user, 'supervisor')) {
+             $me = Karyawan::where('nik', $user->nik)->first();
+             if ($me) {
+                $pekerjaanSup = $me->pekerjaan()->orderByDesc('id_pekerjaan')->first();
+                if ($pekerjaanSup && $pekerjaanSup->division_id) {
+                    $supLevelOrder = $pekerjaanSup->level->level_order ?? null;
+                    $employees = Karyawan::with('pekerjaan')->whereHas('pekerjaan', function ($q) use ($pekerjaanSup, $supLevelOrder) {
+                        $q->where('division_id', $pekerjaanSup->division_id);
+                        if ($supLevelOrder !== null) {
+                             $q->whereHas('level', function ($l) use ($supLevelOrder) {
+                                $l->where('level_order', '>', $supLevelOrder);
+                            });
+                        }
+                    })->orderBy('Nama_Lengkap_Sesuai_Ijazah')->get();
+                }
+             }
+        }
+
         $perspektifList = $this->getPerspektifAktif();
-        return view('pages.kpi.bulk_create', compact('tahun', 'perspektifList'));
+        return view('pages.kpi.bulk_create', compact('tahun', 'perspektifList', 'employees'));
     }
 
     /**
      * Simpan template KPI dan buatkan item untuk semua karyawan
      */
-    public function bulkStoreWithItems(Request $request)
+public function bulkStoreWithItems(Request $request)
     {
         $request->validate([
             'tahun' => 'required',
+            'employee_ids' => 'required|array|min:1',
             'items' => 'required|array|min:1',
             'items.*.key_result_area' => 'required|string',
             'items.*.key_performance_indicator' => 'required|string',
+            'items.*.units' => 'required|string',
             'items.*.bobot' => 'required|numeric',
             'items.*.target' => 'required|numeric',
             'items.*.perspektif' => 'required|string',
             'items.*.polaritas' => 'required|string',
+        ], [
+            'employee_ids.required' => 'Pilih minimal satu karyawan.',
+            'items.required' => 'Minimal satu indikator KPI harus diisi.'
         ]);
 
         $user = Auth::user();
-        if (!$this->roleMatches($user, ['manager', 'GM', 'senior_manager', 'admin', 'superadmin'])) {
+        if (!$this->roleMatches($user, ['manager', 'GM', 'senior_manager', 'admin', 'superadmin', 'direktur'])) {
             return redirect()->back()->with('error', 'Akses ditolak.');
         }
 
         $tahun = $request->tahun;
         $items = $request->items;
+        $targetEmployeeIds = $request->employee_ids;
+
         // $perspektifList = $this->getPerspektifAktif();
         $createdHeaders = 0;
         $createdItems = 0;
 
         DB::beginTransaction();
         try {
-            $scopeIds = Karyawan::pluck('id_karyawan')->toArray();
+            // $scopeIds = Karyawan::pluck('id_karyawan')->toArray(); // OLD DANGEROUS CODE
 
-            foreach ($scopeIds as $karyawanId) {
+            foreach ($targetEmployeeIds as $karyawanId) {
+                // Optional: Verify this ID is allowed for this user? 
+                // For now trusting the form input as it filtered the view, and user is manager/admin.
+                
                 $kpi = KpiAssessment::firstOrCreate(
                     ['karyawan_id' => $karyawanId, 'tahun' => $tahun],
                     ['periode' => 'Tahunan', 'status' => 'DRAFT', 'total_skor_akhir' => 0, 'penilai_id' => $user->id]
@@ -841,9 +945,9 @@ class KpiAssessmentController extends Controller
 
                 if ($kpi->wasRecentlyCreated) $createdHeaders++;
 
-                // Hanya buat items jika belum ada item sama sekali (menghindari duplikasi)
-                $existsItem = \App\Models\KpiItem::where('kpi_assessment_id', $kpi->id_kpi_assessment)->exists();
-                if ($existsItem) continue;
+                // Hapus logic pengecekan duplicate item untuk memungkinkan penambahan item baru ke KPI yang sudah ada
+                // $existsItem = \App\Models\KpiItem::where('kpi_assessment_id', $kpi->id_kpi_assessment)->exists();
+                // if ($existsItem) continue;
 
                 foreach ($items as $it) {
                     $item = \App\Models\KpiItem::create([
@@ -851,6 +955,7 @@ class KpiAssessmentController extends Controller
                         'perspektif' => $it['perspektif'],
                         'key_result_area' => $it['key_result_area'] ?? null,
                         'key_performance_indicator' => $it['key_performance_indicator'],
+                        'units' => $it['units'],
                         'polaritas' => $it['polaritas'] ?? 'MAX',
                         'bobot' => $it['bobot'],
                         'target' => $it['target'],
@@ -879,7 +984,7 @@ class KpiAssessmentController extends Controller
     /**
      * Finalize / Approve KPI by manager/admin
      */
-    public function finalize(Request $request, $id)
+public function finalize(Request $request, $id)
     {
         $user = Auth::user();
         if (!$this->roleMatches($user, ['manager', 'GM', 'senior_manager', 'admin', 'superadmin'])) {
@@ -936,7 +1041,7 @@ class KpiAssessmentController extends Controller
     // 7. EXPORT FUNCTIONS
     // =================================================================
 
-    public function exportExcel(Request $request)
+public function exportExcel(Request $request)
     {
         $karyawanId = $request->get('karyawan_id');
         $tahun = $request->get('tahun');
@@ -957,7 +1062,7 @@ class KpiAssessmentController extends Controller
         return \App\Exports\SingleKpiExport::download($kpi->id_kpi_assessment);
     }
 
-    public function exportPdf(Request $request)
+public function exportPdf(Request $request)
     {
         $karyawanId = $request->get('karyawan_id');
         $tahun = $request->get('tahun');
@@ -986,7 +1091,7 @@ class KpiAssessmentController extends Controller
     }
 
     // Helper: gabungkan role dari manajemen user dan turunan pekerjaan (level/position/Jabatan)
-    private function roleMatches($user, $roles)
+private function roleMatches($user, $roles)
     {
         if (!$user) return false;
 

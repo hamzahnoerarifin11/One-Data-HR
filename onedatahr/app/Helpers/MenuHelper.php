@@ -171,7 +171,7 @@ class MenuHelper
         }
 
         // Monitoring KBI (Khusus HRD memantau Staff)
-        if ($roleMatches(['admin', 'superadmin', 'manager', 'GM', 'senior_manager','supervisor'])) {
+        if ($roleMatches(['admin', 'superadmin','direktur', 'manager', 'GM', 'senior_manager','supervisor'])) {
             // Tambahkan ke subItems Penilaian Karyawan (roleMatches memperhitungkan role manajemen + role turunan dari pekerjaan)
             $menu[count($menu) - 1]['subItems'][] = ['name' => 'Monitoring KBI', 'path' => '/kbi/monitoring'];
             $menu[count($menu) - 1]['subItems'][] = ['name' => 'Rekap Performance', 'path' => '/performance/rekap'];
