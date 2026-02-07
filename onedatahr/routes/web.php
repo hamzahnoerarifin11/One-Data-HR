@@ -21,6 +21,7 @@ use App\Http\Controllers\TrainingController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OnboardingKaryawanController;
 use App\Http\Controllers\TurnoverController;
+use App\Http\Controllers\ProfileController;
 
 
 
@@ -43,6 +44,10 @@ Route::post('/signout', [AuthController::class, 'logout'])->name('signout');
 // Dashboard home (require auth)
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+
+    // Profile pages
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
     // Karyawan resource
     // Route::middleware(['auth','role:superadmin,admin'])->group(function () {
@@ -93,6 +98,7 @@ Route::middleware(['auth', 'role:admin|superadmin'])->group(function () {
             Route::get('posisi-manage', [PosisiController::class, 'manage'])->name('posisi.index');
             Route::put('posisi/{id}', [PosisiController::class, 'update'])->name('posisi.update');
             Route::delete('posisi/{id}', [PosisiController::class, 'destroy'])->name('posisi.destroy');
+            Route::get('posisi/{id}/download-fpk', [PosisiController::class, 'downloadFpk'])->name('posisi.download-fpk');
 
 
         // Pelamar & Tahapan
@@ -280,18 +286,34 @@ Route::middleware(['auth', 'role:admin|superadmin|ketua_tempa'])->prefix('tempa'
 
 // Routes untuk Struktur Pekerjaan
 Route::middleware(['auth', 'role:admin|superadmin'])->prefix('organization')->name('organization.')->group(function () {
+    Route::resource('subsidiary', \App\Http\Controllers\SubsidiaryController::class)->parameters([
+        'subsidiary' => 'subsidiary'
+    ]);
     Route::resource('company', \App\Http\Controllers\CompanyController::class)->parameters([
         'company' => 'company'
+    ]);
+    Route::resource('holding', \App\Http\Controllers\HoldingController::class)->parameters([
+        'holding' => 'holding'
     ]);
     Route::resource('division', \App\Http\Controllers\DivisionController::class)->parameters([
         'division' => 'division'
     ]);
+    Route::get('division/parents/{holdingId}', [\App\Http\Controllers\DivisionController::class, 'parentsByHolding'])->name('division.parentsByHolding');
+    Route::get('division/by-company/{companyId}', [\App\Http\Controllers\DivisionController::class, 'listByCompany'])->name('division.byCompany');
+    Route::get('division/by-holding/{holdingId}', [\App\Http\Controllers\DivisionController::class, 'listByHolding'])->name('division.byHolding');
+
     Route::resource('department', \App\Http\Controllers\DepartmentController::class)->parameters([
         'department' => 'department'
     ]);
+    Route::get('department/parents/{holdingId}', [\App\Http\Controllers\DepartmentController::class, 'parentsByHolding'])->name('department.parentsByHolding');
+    Route::get('department/by-division/{divisionId}', [\App\Http\Controllers\DepartmentController::class, 'listByDivision'])->name('department.byDivision');
+    Route::get('department/by-holding/{holdingId}', [\App\Http\Controllers\DepartmentController::class, 'listByHolding'])->name('department.byHolding');
+
     Route::resource('unit', \App\Http\Controllers\UnitController::class)->parameters([
         'unit' => 'unit'
     ]);
+    Route::get('unit/parents/{holdingId}', [\App\Http\Controllers\UnitController::class, 'parentsByHolding'])->name('unit.parentsByHolding');
+    Route::get('unit/by-department/{departmentId}', [\App\Http\Controllers\UnitController::class, 'listByDepartment'])->name('unit.byDepartment');
     Route::resource('position', \App\Http\Controllers\PositionController::class)->parameters([
         'position' => 'position'
     ]);

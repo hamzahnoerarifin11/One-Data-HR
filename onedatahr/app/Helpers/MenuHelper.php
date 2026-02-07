@@ -29,7 +29,9 @@ class MenuHelper
                 'icon' => 'ai-building',
                 'name' => 'Struktur Pekerjaan',
                 'subItems' => [
+                    ['name' => 'Holding', 'path' => '/organization/holding'],
                     ['name' => 'Perusahaan', 'path' => '/organization/company'],
+                    ['name' => 'Anak Perusahaan', 'path' => '/organization/subsidiary'],
                     ['name' => 'Divisi', 'path' => '/organization/division'],
                     ['name' => 'Departement', 'path' => '/organization/department'],
                     ['name' => 'Unit', 'path' => '/organization/unit'],
@@ -144,7 +146,24 @@ class MenuHelper
 
     public static function getOthersItems()
     {
-        return [];
+        $user = Auth::user();
+        $items = [];
+
+        // Profile link
+        $items[] = [
+            'icon' => 'user-profile',
+            'name' => 'Profile',
+            'path' => '/profile',
+        ];
+
+        // Sign out action (rendered as a button that submits a POST logout form)
+        $items[] = [
+            'icon' => 'authentication',
+            'name' => 'Sign Out',
+            'action' => 'logout',
+        ];
+
+        return $items;
     }
 
     public static function getMenuGroups()

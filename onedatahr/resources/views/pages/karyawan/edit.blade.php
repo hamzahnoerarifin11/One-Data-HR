@@ -46,7 +46,22 @@
 
 
 
-        <form action="{{ route('karyawan.update', $karyawan->id_karyawan) }}" method="POST" x-data="karyawanForm()" @submit.prevent="submit">
+            window.karyawanEditData = {
+                companies: @json($companies),
+                levels: @json($levels),
+                divisions: @json($divisions),
+                departments: @json($departments),
+                units: @json($units),
+                current: {
+                    company_id: @json(old('company_id', optional($karyawan->pekerjaan->first())->company_id)),
+                    division_id: @json(old('division_id', optional($karyawan->pekerjaan->first())->division_id)),
+                    department_id: @json(old('department_id', optional($karyawan->pekerjaan->first())->department_id)),
+                    unit_id: @json(old('unit_id', optional($karyawan->pekerjaan->first())->unit_id)),
+                    level_id: @json(old('level_id', optional($karyawan->pekerjaan->first())->level_id))
+                }
+            };
+        </script>
+        <form action="{{ route('karyawan.update', $karyawan->id_karyawan) }}" method="POST" x-data="karyawanForm(window.karyawanEditData)" @submit.prevent="submit">
             @csrf
             @method('PUT')
 
@@ -797,124 +812,57 @@
 
                     <!-- PERUSAHAAN -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Perusahaan
-                        </label>
-
-                        <div class="relative z-20">
-                            <select id="company" name="company_id"
-                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 px-4 pr-11 text-sm
-                                    shadow-theme-xs bg-transparent
-                                    focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
-                                    dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-
-                                <option value="">-- Pilih Perusahaan --</option>
-
-                                @foreach ($companies as $company)
-                                    <option value="{{ $company->id }}"
-                                        {{ old('company_id', optional($karyawan->pekerjaan->first())->company_id) == $company->id ? 'selected' : '' }}>
-                                        {{ $company->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-
-                            <!-- Arrow -->
-                            <span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-gray-500">
-                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                    <path d="M4.8 7.4L10 12.6L15.2 7.4"
-                                        stroke-width="1.5"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"/>
-                                </svg>
-                            </span>
-                        </div>
+                        <x-searchable-select
+                            id="company"
+                            name="company_id"
+                            label="Perusahaan"
+                            :options="$companies"
+                            x-model="selectedCompany"
+                            @change="updateDivisions($event.detail)"
+                            placeholder="-- Pilih Perusahaan --"
+                        />
                     </div>
 
                     <!-- DIVISI -->
-                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Divisi
-                        </label>
-
-                        <div class="relative z-20">
-                            <select id="division" name="division_id"
-                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 px-4 pr-11 text-sm
-                                    shadow-theme-xs bg-transparent
-                                    focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
-                                    dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-
-                                <option value="">-- Pilih Divisi --</option>
-                            </select>
-
-                            <!-- Arrow -->
-                            <span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-gray-500">
-                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                    <path d="M4.8 7.4L10 12.6L15.2 7.4"
-                                        stroke-width="1.5"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"/>
-                                </svg>
-                            </span>
-                        </div>
+                    <div>
+                        <x-searchable-select
+                            id="division"
+                            name="division_id"
+                            label="Divisi"
+                            x-effect="dynamicOptionsRaw = divisions"
+                            x-model="selectedDivision"
+                            @change="updateDepartments($event.detail)"
+                            placeholder="-- Pilih Divisi --"
+                        />
                     </div>
 
                     <!-- DEPARTEMENT -->
-                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Departement
-                        </label>
-
-                        <div class="relative z-20">
-                            <select id="department" name="department_id"
-                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 px-4 pr-11 text-sm
-                                    shadow-theme-xs bg-transparent
-                                    focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
-                                    dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-
-                                <option value="">-- Pilih Departement --</option>
-                            </select>
-
-                            <!-- Arrow -->
-                            <span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-gray-500">
-                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                    <path d="M4.8 7.4L10 12.6L15.2 7.4"
-                                        stroke-width="1.5"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"/>
-                                </svg>
-                            </span>
-                        </div>
+                    <div>
+                        <x-searchable-select
+                            id="department"
+                            name="department_id"
+                            label="Departement"
+                            x-effect="dynamicOptionsRaw = departments"
+                            x-model="selectedDepartment"
+                            @change="updateUnits($event.detail)"
+                            placeholder="-- Pilih Departement --"
+                        />
                     </div>
 
                     <!-- UNIT -->
-                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Unit
-                        </label>
-
-                        <div class="relative z-20">
-                            <select id="unit" name="unit_id"
-                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 px-4 pr-11 text-sm
-                                    shadow-theme-xs bg-transparent
-                                    focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
-                                    dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-
-                                <option value="">-- Pilih Unit --</option>
-                            </select>
-
-                            <!-- Arrow -->
-                            <span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-gray-500">
-                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                    <path d="M4.8 7.4L10 12.6L15.2 7.4"
-                                        stroke-width="1.5"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"/>
-                                </svg>
-                            </span>
-                        </div>
+                    <div>
+                        <x-searchable-select
+                            id="unit"
+                            name="unit_id"
+                            label="Unit"
+                            x-effect="dynamicOptionsRaw = units"
+                            x-model="selectedUnit"
+                            @change="updateLevels($event.detail)"
+                            placeholder="-- Pilih Unit --"
+                        />
                     </div>
 
-                    <!-- JABATAN -->
+                    <!-- LEVEL JABATAN -->
                     <div>
                         <div class="flex items-center justify-between mb-2">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
@@ -930,30 +878,14 @@
                             </button>
                         </div>
 
-                        <div class="relative z-20">
-                            <select name="level_id" required id="levelSelect"
-                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 px-4 pr-11 text-sm
-                                    shadow-theme-xs bg-transparent
-                                    focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
-                                    dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-
-                                <option value="">-- Pilih Level --</option>
-                                @foreach ($levels as $level)
-                                    <option value="{{ $level->id }}" {{ old('level_id', optional($karyawan->pekerjaan->first())->level_id) == $level->id ? 'selected' : '' }}>
-                                        {{ $level->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <!-- Arrow -->
-                            <span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-gray-500">
-                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                    <path d="M4.8 7.4L10 12.6L15.2 7.4"
-                                        stroke-width="1.5"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"/>
-                                </svg>
-                            </span>
-                        </div>
+                        <x-searchable-select
+                            id="levelSelect"
+                            name="level_id"
+                            required
+                            x-effect="dynamicOptionsRaw = levels"
+                            x-model="selectedLevel"
+                            placeholder="-- Pilih Level --"
+                        />
                     </div>
 
 
@@ -1556,24 +1488,120 @@
 
 @push('scripts')
 <script>
-function karyawanForm() {
+function karyawanForm(initData = {}) {
     return {
         steps: ['Data Karyawan','Data Keluarga','Pekerjaan','Pendidikan','Kontrak','Status Non Aktif','BPJS'],
         currentStep: 0,
-        // pendidikan: [{Pendidikan_Terakhir:'', Nama_Lengkap_Tempat_Pendidikan_Terakhir:'', Jurusan:''}],
-        // kontrak: [{Tanggal_Mulai_Tugas:'', PKWT_berakhir:'', Tanggal_Diangkat_Menjadi_Karyawan_Tetap:'', Riwayat_Penempatan:'', Tanggal_Riwayat_Penempatan:'',
-        //             Mutasi_Promosi_Demosi:'', Tanggal_Mutasi_Promosi_Demosi:'', Masa_Kerja:'', NO_PKWT_PERTAMA:'', NO_SK_PERTAMA:'',}],
+        
+        // Organization Data
+        companies: initData.companies || [],
+        divisions: initData.divisions || [],
+        departments: initData.departments || [],
+        units: initData.units || [],
+        levels: initData.levels || [],
+
+        // Organization Selection
+        selectedCompany: initData.old?.company_id || initData.current?.company_id || '',
+        selectedDivision: initData.old?.division_id || initData.current?.division_id || '',
+        selectedDepartment: initData.old?.department_id || initData.current?.department_id || '',
+        selectedUnit: initData.old?.unit_id || initData.current?.unit_id || '',
+        selectedLevel: initData.old?.level_id || initData.current?.level_id || '',
+
+        init() {
+            if (this.selectedCompany) this.fetchDivisions(this.selectedCompany, true);
+        },
+
+        fetchDivisions(companyId, chain = false) {
+            if (!companyId) return;
+            fetch(`/karyawan/divisions/${companyId}`)
+                .then(r => r.json())
+                .then(data => {
+                    this.divisions = data;
+                    if (chain && this.selectedDivision) {
+                        this.fetchDepartments(this.selectedDivision, true);
+                    }
+                });
+        },
+
+        fetchDepartments(divisionId, chain = false) {
+            if (!divisionId) return;
+            fetch(`/karyawan/departments/${divisionId}`)
+                .then(r => r.json())
+                .then(data => {
+                    this.departments = data;
+                    if (chain && this.selectedDepartment) {
+                        this.fetchUnits(this.selectedDepartment, true);
+                    }
+                });
+        },
+
+        fetchUnits(departmentId, chain = false) {
+            if (!departmentId) return;
+            fetch(`/karyawan/units/${departmentId}`)
+                .then(r => r.json())
+                .then(data => {
+                     this.units = data;
+                     if (chain && this.selectedUnit) {
+                         this.fetchLevels(this.selectedUnit);
+                     }
+                });
+        },
+
+        fetchLevels(unitId) {
+            if (!unitId) return;
+            fetch(`/karyawan/positions/${unitId}`)
+                 .then(r => r.json())
+                 .then(data => this.levels = data);
+        },
+
+        updateDivisions(val) {
+            this.selectedDivision = '';
+            this.selectedDepartment = '';
+            this.selectedUnit = '';
+            this.selectedLevel = '';
+            this.divisions = [];
+            this.departments = [];
+            this.units = [];
+            this.levels = [];
+            
+            if (val) this.fetchDivisions(val);
+        },
+
+        updateDepartments(val) {
+            this.selectedDepartment = '';
+            this.selectedUnit = '';
+            this.selectedLevel = '';
+            this.departments = [];
+            this.units = [];
+            this.levels = [];
+
+            if (val) this.fetchDepartments(val);
+        },
+
+        updateUnits(val) {
+            this.selectedUnit = '';
+            this.selectedLevel = '';
+            this.units = [];
+            this.levels = [];
+
+            if (val) this.fetchUnits(val);
+        },
+
+        updateLevels(val) {
+            this.selectedLevel = '';
+            this.levels = [];
+
+            if (val) this.fetchLevels(val);
+        },
+
         go(i){ this.currentStep = i; window.scrollTo(0,0); },
         next(){ if(this.currentStep < this.steps.length-1) this.currentStep++; window.scrollTo(0,0); },
         prev(){ if(this.currentStep > 0) this.currentStep--; window.scrollTo(0,0); },
-        // addPendidikan(){ this.pendidikan.push({Pendidikan_Terakhir:'', Nama_Lengkap_Tempat_Pendidikan_Terakhir:'', Jurusan:''}); },
-        // removePendidikan(i){ this.pendidikan.splice(i,1); },
-        // addKontrak(){ this.kontrak.push({Tanggal_Mulai_Tugas:'', PKWT_berakhir:'', Tanggal_Diangkat_Menjadi_Karyawan_Tetap:'', Riwayat_Penempatan:'', Tanggal_Riwayat_Penempatan:'',
-        //             Mutasi_Promosi_Demosi:'', Tanggal_Mutasi_Promosi_Demosi:'', Masa_Kerja:'', NO_PKWT_PERTAMA:'', NO_SK_PERTAMA:'',}); },
-        // removeKontrak(i){ this.kontrak.splice(i,1); },
+        
         calculateMasaKerja(idx) {
+            if (!this.kontrak || !this.kontrak[idx]) return;
+            
             const start = this.kontrak[idx].Tanggal_Mulai_Tugas;
-            console.log('calculateMasaKerja called for idx', idx, 'start=', start);
             if (!start) {
                 this.kontrak[idx].Masa_Kerja = '';
                 return;
@@ -1586,13 +1614,11 @@ function karyawanForm() {
             let months = today.getMonth() - startDate.getMonth();
             let days = today.getDate() - startDate.getDate();
 
-            // Koreksi bulan negatif
             if (months < 0) {
                 years--;
                 months += 12;
             }
 
-            // Koreksi hari negatif
             if (days < 0) {
                 months--;
                 const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0).getDate();
@@ -1607,7 +1633,6 @@ function karyawanForm() {
             this.kontrak[idx].Masa_Kerja = `${years} Tahun ${months} Bulan ${days} Hari`;
         },
         submit(e){
-            // submit native form
             $el = document.querySelector('form[x-data]');
             $el.submit();
         }
@@ -1991,154 +2016,7 @@ function kontrakForm() {
   };
 }
 </script> -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const companySelect = document.getElementById('company');
-    const divisionSelect = document.getElementById('division');
-    const departmentSelect = document.getElementById('department');
-    const unitSelect = document.getElementById('unit');
-    const positionSelect = document.getElementById('position');
 
-    // Function to populate select options
-    function populateSelect(selectElement, data, placeholder) {
-        console.log('Populating', selectElement.id, 'with data:', data);
-        selectElement.innerHTML = `<option value="">${placeholder}</option>`;
-        data.forEach(item => {
-            const option = document.createElement('option');
-            option.value = item.id;
-            option.textContent = item.name;
-            selectElement.appendChild(option);
-        });
-    }
-
-    // Company change event
-    companySelect.addEventListener('change', function() {
-        const companyId = this.value;
-        console.log('Company changed to:', companyId);
-        if (companyId) {
-            console.log('Fetching divisions for company:', companyId);
-            fetch(`/karyawan/divisions/${companyId}`)
-                .then(response => {
-                    console.log('Response status:', response.status);
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Fetched divisions data:', data);
-                    populateSelect(divisionSelect, data, '-- Pilih Divisi --');
-                    // Reset dependent selects
-                    departmentSelect.innerHTML = '<option value="">-- Pilih Departement --</option>';
-                    unitSelect.innerHTML = '<option value="">-- Pilih Unit --</option>';
-                    positionSelect.innerHTML = '<option value="">-- Pilih Level Jabatan --</option>';
-                })
-                .catch(error => console.error('Error fetching divisions:', error));
-        } else {
-            divisionSelect.innerHTML = '<option value="">-- Pilih Divisi --</option>';
-            departmentSelect.innerHTML = '<option value="">-- Pilih Departement --</option>';
-            unitSelect.innerHTML = '<option value="">-- Pilih Unit --</option>';
-            positionSelect.innerHTML = '<option value="">-- Pilih Level Jabatan --</option>';
-        }
-    });
-
-    // Division change event
-    divisionSelect.addEventListener('change', function() {
-        const divisionId = this.value;
-        if (divisionId) {
-            fetch(`/karyawan/departments/${divisionId}`)
-                .then(response => response.json())
-                .then(data => {
-                    populateSelect(departmentSelect, data, '-- Pilih Departement --');
-                    // Reset dependent selects
-                    unitSelect.innerHTML = '<option value="">-- Pilih Unit --</option>';
-                    positionSelect.innerHTML = '<option value="">-- Pilih Level Jabatan --</option>';
-                });
-        } else {
-            departmentSelect.innerHTML = '<option value="">-- Pilih Departement --</option>';
-            unitSelect.innerHTML = '<option value="">-- Pilih Unit --</option>';
-            positionSelect.innerHTML = '<option value="">-- Pilih Level Jabatan --</option>';
-        }
-    });
-
-    // Department change event
-    departmentSelect.addEventListener('change', function() {
-        const departmentId = this.value;
-        if (departmentId) {
-            fetch(`/karyawan/units/${departmentId}`)
-                .then(response => response.json())
-                .then(data => {
-                    populateSelect(unitSelect, data, '-- Pilih Unit --');
-                    // Reset dependent select
-                    positionSelect.innerHTML = '<option value="">-- Pilih Level Jabatan --</option>';
-                });
-        } else {
-            unitSelect.innerHTML = '<option value="">-- Pilih Unit --</option>';
-            positionSelect.innerHTML = '<option value="">-- Pilih Level Jabatan --</option>';
-        }
-    });
-
-    // Unit change event
-    unitSelect.addEventListener('change', function() {
-        const unitId = this.value;
-        if (unitId) {
-            fetch(`/karyawan/positions/${unitId}`)
-                .then(response => response.json())
-                .then(data => {
-                    populateSelect(positionSelect, data, '-- Pilih Level Jabatan --');
-                });
-        } else {
-            positionSelect.innerHTML = '<option value="">-- Pilih Level Jabatan --</option>';
-        }
-    });
-
-    // Load initial data on page load
-    const initialCompanyId = companySelect.value;
-    const initialDivisionId = '{{ optional($karyawan->pekerjaan->first())->division_id }}';
-    const initialDepartmentId = '{{ optional($karyawan->pekerjaan->first())->department_id }}';
-    const initialUnitId = '{{ optional($karyawan->pekerjaan->first())->unit_id }}';
-    const initialLevelId = '{{ optional($karyawan->pekerjaan->first())->level_id }}';
-
-    if (initialCompanyId) {
-        fetch(`/karyawan/divisions/${initialCompanyId}`)
-            .then(response => response.json())
-            .then(data => {
-                populateSelect(divisionSelect, data, '-- Pilih Divisi --');
-                // Set selected division
-                if (initialDivisionId) {
-                    divisionSelect.value = initialDivisionId;
-
-                    // Load departments for selected division
-                    fetch(`/karyawan/departments/${initialDivisionId}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            populateSelect(departmentSelect, data, '-- Pilih Departement --');
-                            if (initialDepartmentId) {
-                                departmentSelect.value = initialDepartmentId;
-
-                                // Load units for selected department
-                                fetch(`/karyawan/units/${initialDepartmentId}`)
-                                    .then(response => response.json())
-                                    .then(data => {
-                                        populateSelect(unitSelect, data, '-- Pilih Unit --');
-                                        if (initialUnitId) {
-                                            unitSelect.value = initialUnitId;
-
-                                            // Load positions for selected unit
-                                            fetch(`/karyawan/positions/${initialUnitId}`)
-                                                .then(response => response.json())
-                                                .then(data => {
-                                                    populateSelect(positionSelect, data, '-- Pilih Level Jabatan --');
-                                                    if (initialPositionId) {
-                                                        positionSelect.value = initialPositionId;
-                                                    }
-                                                });
-                                        }
-                                    });
-                            }
-                        });
-                }
-            });
-    }
-});
-</script>
 
 @include('pages.karyawan.partials.level-modal')
 

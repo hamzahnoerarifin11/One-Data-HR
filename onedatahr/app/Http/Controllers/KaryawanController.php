@@ -14,7 +14,12 @@ use App\Models\StatusKaryawan;
 use App\Models\Level;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\Company;
+use App\Models\Division;
+use App\Models\Department;
+use App\Models\Unit;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class KaryawanController extends Controller
@@ -29,6 +34,46 @@ class KaryawanController extends Controller
     public function index(Request $request)
     {
         $query = Karyawan::with(['pekerjaan.company', 'pekerjaan.division', 'pekerjaan.department', 'pekerjaan.unit', 'pekerjaan.level', 'pendidikan', 'kontrak', 'keluarga', 'bpjs', 'perusahaan', 'status']);
+
+        // Apply organization scope filter
+        $user = Auth::user();
+        if ($user && !$user->hasUnrestrictedAccess()) {
+            $scope = $user->org_scope ?? 'all';
+            
+            switch ($scope) {
+                case 'holding':
+                    // Filter by companies under this holding
+                    $companyIds = Company::where('holding_id', $user->holding_id)->pluck('id')->toArray();
+                    $query->whereHas('pekerjaan', function($q) use ($companyIds) {
+                        $q->whereIn('company_id', $companyIds);
+                    });
+                    break;
+                    
+                case 'company':
+                    $query->whereHas('pekerjaan', function($q) use ($user) {
+                        $q->where('company_id', $user->company_id);
+                    });
+                    break;
+                    
+                case 'division':
+                    $query->whereHas('pekerjaan', function($q) use ($user) {
+                        $q->where('division_id', $user->division_id);
+                    });
+                    break;
+                    
+                case 'department':
+                    $query->whereHas('pekerjaan', function($q) use ($user) {
+                        $q->where('department_id', $user->department_id);
+                    });
+                    break;
+                    
+                case 'unit':
+                    $query->whereHas('pekerjaan', function($q) use ($user) {
+                        $q->where('unit_id', $user->unit_id);
+                    });
+                    break;
+            }
+        }
 
         // Apply search filter
         if ($request->filled('search')) {

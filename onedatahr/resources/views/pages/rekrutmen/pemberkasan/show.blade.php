@@ -59,7 +59,7 @@
             <div class="col-span-1 md:col-span-2">
                 <label class="text-sm text-gray-500">Follow Up</label>
                 <div class="mt-1 font-semibold text-blue-600 dark:text-blue-400">
-                    {{ $pemberkasan->follow_up ? \Carbon\Carbon::parse($pemberkasan->follow_up)->translatedFormat('d M Y') : '-' }}
+                    {{ $pemberkasan->follow_up ? \Carbon\Carbon::parse($pemberkasan->follow_up)->translatedFormat('d F Y') : '-' }}
                 </div>
             </div>
         </div>
@@ -129,6 +129,25 @@
                 </div>
             </div>
 
+            <div class="p-4 rounded-lg bg-gray-50 dark:bg-white/[0.03] border border-gray-200 dark:border-gray-800 md:col-span-2">
+                <label class="text-sm text-gray-500">Keterangan</label>
+                <div class="mt-1 font-semibold text-gray-900 dark:text-white whitespace-pre-line">
+                    {{ $pemberkasan->keterangan ?? '-' }}
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mt-6">
+            <h3 class="mb-3 text-md font-semibold text-gray-800 dark:text-white">Estimasi Durasi Antar Tahapan</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                @foreach($pemberkasan->timelineDurations as $label => $value)
+                    <div class="p-3 rounded-lg bg-gray-50 dark:bg-white/[0.03] border border-gray-200 dark:border-gray-800">
+                        <div class="text-sm text-gray-500">{{ $label }}</div>
+                        <div class="mt-1 font-semibold text-gray-900 dark:text-white">{{ $value }}</div>
+                    </div>
+                @endforeach
+            </div>
         </div>
 
         <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center text-xs text-gray-500">

@@ -104,7 +104,9 @@
                 'kondisi_perizinan' => 'Kondisi Perizinan',
                 'tata_tertib' => 'Tata Tertib',
                 'bpjs' => 'BPJS',
-                'k3' => 'K3'
+                'k3' => 'K3',
+                'jobdesk' => 'Jobdesk',
+                'ojt' => 'OJT'
             ] as $field => $label)
                 <div class="flex items-center gap-2">
                     <span class="w-3 h-3 rounded-full {{ $onboarding->$field ? 'bg-green-500' : 'bg-gray-400' }}"></span>

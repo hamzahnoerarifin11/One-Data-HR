@@ -9,11 +9,26 @@ class Division extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['company_id', 'name'];
+    protected $fillable = ['company_id', 'holding_id', 'based_on', 'parent_id', 'name'];
 
     public function company()
     {
         return $this->belongsTo(Company::class);
+    }
+
+    public function holding()
+    {
+        return $this->belongsTo(\App\Models\Holding::class);
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(\App\Models\Division::class, 'parent_id');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(\App\Models\Division::class, 'parent_id');
     }
 
     public function departments()

@@ -54,6 +54,8 @@ class OnboardingKaryawan extends Model
         'tata_tertib',
         'bpjs',
         'k3',
+        'jobdesk',
+        'ojt',
         'tanggal_induction',
 
         'evaluasi',
@@ -68,6 +70,8 @@ class OnboardingKaryawan extends Model
         'tata_tertib' => 'boolean',
         'bpjs' => 'boolean',
         'k3' => 'boolean',
+        'jobdesk' => 'boolean',
+        'ojt' => 'boolean',
     ];
 
     /* ================= HELPER ================= */

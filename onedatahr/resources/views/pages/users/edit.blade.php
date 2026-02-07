@@ -103,6 +103,176 @@
                                text-sm text-gray-800 dark:border-gray-700
                                dark:bg-gray-900 dark:text-white/90">
                 </div>
+            </div>
+
+            {{-- Organization Scope Section --}}
+            <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
+                Scope Akses Data
+            </h3>
+            <p class="mb-4 text-sm text-gray-600 dark:text-gray-400">
+                Tentukan tingkat hierarki organisasi yang dapat diakses oleh user ini.
+            </p>
+
+            <div x-data="{
+                orgScope: '{{ old('org_scope', $user->org_scope ?? 'all') }}',
+                holdingId: '{{ old('holding_id', $user->holding_id ?? '') }}',
+                companyId: '{{ old('company_id', $user->company_id ?? '') }}',
+                divisionId: '{{ old('division_id', $user->division_id ?? '') }}',
+                departmentId: '{{ old('department_id', $user->department_id ?? '') }}',
+                unitId: '{{ old('unit_id', $user->unit_id ?? '') }}',
+                companies: @json($companies),
+                divisions: @json($divisions),
+                departments: @json($departments),
+                units: @json($units),
+                get filteredCompanies() {
+                    if (!this.holdingId) return [];
+                    return this.companies.filter(c => c.holding_id == this.holdingId);
+                },
+                get filteredDivisions() {
+                    if (this.orgScope === 'holding' && this.holdingId) {
+                        return this.divisions.filter(d => d.holding_id == this.holdingId || 
+                            (d.company_id && this.companies.find(c => c.id == d.company_id && c.holding_id == this.holdingId)));
+                    }
+                    if (this.companyId) {
+                        return this.divisions.filter(d => d.company_id == this.companyId);
+                    }
+                    return [];
+                },
+                get filteredDepartments() {
+                    if (this.divisionId) {
+                        return this.departments.filter(d => d.division_id == this.divisionId);
+                    }
+                    return [];
+                },
+                get filteredUnits() {
+                    if (this.departmentId) {
+                        return this.units.filter(u => u.department_id == this.departmentId);
+                    }
+                    return [];
+                }
+            }" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+
+                {{-- Organization Scope --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-2">
+                        Scope Akses <span class="text-red-500">*</span>
+                    </label>
+                    <select name="org_scope" x-model="orgScope" required
+                        @change="holdingId=''; companyId=''; divisionId=''; departmentId=''; unitId='';"
+                        class="dark:bg-dark-900 shadow-theme-xs h-11 w-full rounded-lg
+                               border border-gray-300 bg-transparent px-4 py-2.5
+                               text-sm text-gray-800 dark:border-gray-700
+                               dark:bg-gray-900 dark:text-white/90">
+                        <option value="all" :selected="orgScope === 'all'">Semua Data (Superadmin/Admin)</option>
+                        <option value="holding" :selected="orgScope === 'holding'">Holding</option>
+                        <option value="company" :selected="orgScope === 'company'">Perusahaan</option>
+                        <option value="division" :selected="orgScope === 'division'">Divisi</option>
+                        <option value="department" :selected="orgScope === 'department'">Departemen</option>
+                        <option value="unit" :selected="orgScope === 'unit'">Unit</option>
+                    </select>
+                </div>
+
+                {{-- Holding --}}
+                <div x-show="orgScope !== 'all'" x-cloak>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-2">
+                        Holding <span x-show="orgScope !== 'all'" class="text-red-500">*</span>
+                    </label>
+                    <select name="holding_id" x-model="holdingId"
+                        @change="companyId=''; divisionId=''; departmentId=''; unitId='';"
+                        :required="orgScope !== 'all'"
+                        class="dark:bg-dark-900 shadow-theme-xs h-11 w-full rounded-lg
+                               border border-gray-300 bg-transparent px-4 py-2.5
+                               text-sm text-gray-800 dark:border-gray-700
+                               dark:bg-gray-900 dark:text-white/90">
+                        <option value="">-- Pilih Holding --</option>
+                        @foreach($holdings as $holding)
+                            <option value="{{ $holding->id }}" :selected="holdingId == '{{ $holding->id }}'">{{ $holding->name }} ({{ $holding->type }})</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- Company --}}
+                <div x-show="['company','division','department','unit'].includes(orgScope)" x-cloak>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-2">
+                        Perusahaan <span class="text-red-500">*</span>
+                    </label>
+                    <select name="company_id" x-model="companyId"
+                        @change="divisionId=''; departmentId=''; unitId='';"
+                        :required="['company','division','department','unit'].includes(orgScope)"
+                        class="dark:bg-dark-900 shadow-theme-xs h-11 w-full rounded-lg
+                               border border-gray-300 bg-transparent px-4 py-2.5
+                               text-sm text-gray-800 dark:border-gray-700
+                               dark:bg-gray-900 dark:text-white/90">
+                        <option value="">-- Pilih Perusahaan --</option>
+                        <template x-for="company in filteredCompanies" :key="company.id">
+                            <option :value="company.id" x-text="company.name" :selected="companyId == company.id"></option>
+                        </template>
+                    </select>
+                </div>
+
+                {{-- Division --}}
+                <div x-show="['division','department','unit'].includes(orgScope)" x-cloak>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-2">
+                        Divisi <span class="text-red-500">*</span>
+                    </label>
+                    <select name="division_id" x-model="divisionId"
+                        @change="departmentId=''; unitId='';"
+                        :required="['division','department','unit'].includes(orgScope)"
+                        class="dark:bg-dark-900 shadow-theme-xs h-11 w-full rounded-lg
+                               border border-gray-300 bg-transparent px-4 py-2.5
+                               text-sm text-gray-800 dark:border-gray-700
+                               dark:bg-gray-900 dark:text-white/90">
+                        <option value="">-- Pilih Divisi --</option>
+                        <template x-for="division in filteredDivisions" :key="division.id">
+                            <option :value="division.id" x-text="division.name" :selected="divisionId == division.id"></option>
+                        </template>
+                    </select>
+                </div>
+
+                {{-- Department --}}
+                <div x-show="['department','unit'].includes(orgScope)" x-cloak>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-2">
+                        Departemen <span class="text-red-500">*</span>
+                    </label>
+                    <select name="department_id" x-model="departmentId"
+                        @change="unitId='';"
+                        :required="['department','unit'].includes(orgScope)"
+                        class="dark:bg-dark-900 shadow-theme-xs h-11 w-full rounded-lg
+                               border border-gray-300 bg-transparent px-4 py-2.5
+                               text-sm text-gray-800 dark:border-gray-700
+                               dark:bg-gray-900 dark:text-white/90">
+                        <option value="">-- Pilih Departemen --</option>
+                        <template x-for="department in filteredDepartments" :key="department.id">
+                            <option :value="department.id" x-text="department.name" :selected="departmentId == department.id"></option>
+                        </template>
+                    </select>
+                </div>
+
+                {{-- Unit --}}
+                <div x-show="orgScope === 'unit'" x-cloak>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-2">
+                        Unit <span class="text-red-500">*</span>
+                    </label>
+                    <select name="unit_id" x-model="unitId"
+                        :required="orgScope === 'unit'"
+                        class="dark:bg-dark-900 shadow-theme-xs h-11 w-full rounded-lg
+                               border border-gray-300 bg-transparent px-4 py-2.5
+                               text-sm text-gray-800 dark:border-gray-700
+                               dark:bg-gray-900 dark:text-white/90">
+                        <option value="">-- Pilih Unit --</option>
+                        <template x-for="unit in filteredUnits" :key="unit.id">
+                            <option :value="unit.id" x-text="unit.name" :selected="unitId == unit.id"></option>
+                        </template>
+                    </select>
+                </div>
+            </div>
+
+            {{-- Role & Password Section --}}
+            <h3 class="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
+                Role & Password
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
 
                 {{-- Role --}}
                 <div>
@@ -125,27 +295,6 @@
                         @endforeach
                     </div>
                 </div>
-                <!-- <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        Role
-                    </label>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        @foreach($roles as $role)
-                            <label class="flex items-center gap-2 text-sm dark:text-gray-400">
-                                <input
-                                    type="checkbox"
-                                    name="roles[]"
-                                    value="{{ $role->id }}"
-                                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                    @checked($user->roles->contains($role->id))
-                                >
-                                {{ ucfirst($role->name) }}
-                            </label>
-                        @endforeach
-                    </div>
-                </div> -->
-
 
                 {{-- Password --}}
                 <div>
@@ -166,7 +315,6 @@
                                 <path fill-rule="evenodd" clip-rule="evenodd"
                                     d="M10.0002 13.8619C7.23361 13.8619 4.86803 12.1372 3.92328 9.70241C4.86804 7.26761 7.23361 5.54297 10.0002 5.54297C12.7667 5.54297 15.1323 7.26762 16.0771 9.70243C15.1323 12.1372 12.7667 13.8619 10.0002 13.8619ZM10.0002 4.04297C6.48191 4.04297 3.49489 6.30917 2.4155 9.4593C2.3615 9.61687 2.3615 9.78794 2.41549 9.94552C3.49488 13.0957 6.48191 15.3619 10.0002 15.3619C13.5184 15.3619 16.5055 13.0957 17.5849 9.94555C17.6389 9.78797 17.6389 9.6169 17.5849 9.45932C16.5055 6.30919 13.5184 4.04297 10.0002 4.04297ZM9.99151 7.84413C8.96527 7.84413 8.13333 8.67606 8.13333 9.70231C8.13333 10.7286 8.96527 11.5605 9.99151 11.5605H10.0064C11.0326 11.5605 11.8646 10.7286 11.8646 9.70231C11.8646 8.67606 11.0326 7.84413 10.0064 7.84413H9.99151Z" />
                             </svg>
-
                             <svg x-show="showPassword" class="fill-gray-500 dark:fill-gray-400" width="20" height="20"
                                 viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path fill-rule="evenodd" clip-rule="evenodd"
@@ -194,7 +342,6 @@
                                     <path fill-rule="evenodd" clip-rule="evenodd"
                                         d="M10.0002 13.8619C7.23361 13.8619 4.86803 12.1372 3.92328 9.70241C4.86804 7.26761 7.23361 5.54297 10.0002 5.54297C12.7667 5.54297 15.1323 7.26762 16.0771 9.70243C15.1323 12.1372 12.7667 13.8619 10.0002 13.8619ZM10.0002 4.04297C6.48191 4.04297 3.49489 6.30917 2.4155 9.4593C2.3615 9.61687 2.3615 9.78794 2.41549 9.94552C3.49488 13.0957 6.48191 15.3619 10.0002 15.3619C13.5184 15.3619 16.5055 13.0957 17.5849 9.94555C17.6389 9.78797 17.6389 9.6169 17.5849 9.45932C16.5055 6.30919 13.5184 4.04297 10.0002 4.04297ZM9.99151 7.84413C8.96527 7.84413 8.13333 8.67606 8.13333 9.70231C8.13333 10.7286 8.96527 11.5605 9.99151 11.5605H10.0064C11.0326 11.5605 11.8646 10.7286 11.8646 9.70231C11.8646 8.67606 11.0326 7.84413 10.0064 7.84413H9.99151Z" />
                                 </svg>
-
                                 <svg x-show="showPassword" class="fill-gray-500 dark:fill-gray-400" width="20" height="20"
                                     viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path fill-rule="evenodd" clip-rule="evenodd"
@@ -204,9 +351,6 @@
                         </div>
                     </div>
                 </div>
-
-
-
             </div>
 
             {{-- Action --}}

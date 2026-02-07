@@ -161,25 +161,43 @@
                                         </div>
                                     @else
                                         {{-- SINGLE MENU --}}
-                                        <a href="{{ $item['path'] }}" class="menu-item group"
-                                            :class="[
-                                                isActive('{{ $item['path'] }}') ? 'menu-item-active' : 'menu-item-inactive',
-                                                (!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen) ?
-                                                'xl:justify-center' : 'justify-start'
-                                            ]">
+                                        @if(isset($item['action']) && $item['action'] === 'signout')
+                                            <button type="button" onclick="document.getElementById('sidebar-signout-form').submit();" class="menu-item group"
+                                                :class="[
+                                                    'menu-item-inactive',
+                                                    (!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen) ? 'xl:justify-center' : 'justify-start'
+                                                ]">
 
-                                            <span :class="isActive('{{ $item['path'] }}') ? 'menu-item-icon-active' : 'menu-item-icon-inactive'">
-                                                {!! MenuHelper::getIconSvg($item['icon']) !!}
-                                            </span>
+                                                <span class="menu-item-icon-inactive">
+                                                    {!! MenuHelper::getIconSvg($item['icon']) !!}
+                                                </span>
 
-                                            <span x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
-                                                class="menu-item-text flex items-center gap-2">
-                                                {{ $item['name'] }}
-                                                @if (!empty($item['new']))
-                                                    <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-brand-500 text-white">new</span>
-                                                @endif
-                                            </span>
-                                        </a>
+                                                <span x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
+                                                    class="menu-item-text flex items-center gap-2">
+                                                    {{ $item['name'] }}
+                                                </span>
+                                            </button>
+                                        @else
+                                            <a href="{{ $item['path'] ?? '#' }}" class="menu-item group"
+                                                :class="[
+                                                    isActive('{{ $item['path'] ?? '' }}') ? 'menu-item-active' : 'menu-item-inactive',
+                                                    (!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen) ?
+                                                    'xl:justify-center' : 'justify-start'
+                                                ]">
+
+                                                <span :class="isActive('{{ $item['path'] ?? '' }}') ? 'menu-item-icon-active' : 'menu-item-icon-inactive'">
+                                                    {!! MenuHelper::getIconSvg($item['icon']) !!}
+                                                </span>
+
+                                                <span x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
+                                                    class="menu-item-text flex items-center gap-2">
+                                                    {{ $item['name'] }}
+                                                    @if (!empty($item['new']))
+                                                        <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-brand-500 text-white">new</span>
+                                                    @endif
+                                                </span>
+                                            </a>
+                                        @endif
                                     @endif
                                 </li>
                             @endforeach
@@ -189,6 +207,11 @@
 
             </div>
         </nav>
+
+        <!-- Hidden signout form for sidebar actions -->
+        <form id="sidebar-signout-form" method="POST" action="{{ route('signout') }}" style="display:none;">
+            @csrf
+        </form>
 
         <div x-data x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen" x-transition class="mt-auto">
             @include('layouts.sidebar-widget')

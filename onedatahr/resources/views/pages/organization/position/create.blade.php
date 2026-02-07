@@ -56,141 +56,49 @@
 
             <!-- Perusahaan -->
             <div>
-                <label for="company_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Perusahaan <span class="text-red-500">*</span>
-                </label>
-                <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
-
-                <select
+                <x-searchable-select
                     name="company_id"
-                    id="company_id"
+                    label="Perusahaan"
+                    :options="$companies"
                     x-model="selectedCompany"
                     @change="updateDivisions()"
-                    class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
-                                :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true">
                     required
-                >
-                    <option value="">Pilih Perusahaan</option>
-                    @foreach($companies as $company)
-                        <option value="{{ $company->id }}" {{ old('company_id') == $company->id ? 'selected' : '' }}>{{ $company->name }}</option>
-                    @endforeach
-                </select>
-                <span
-                                class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
-                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5"
-                                        stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                            </span>
-                </div>
-                @error('company_id')
-                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                @enderror
+                />
             </div>
 
             <!-- Divisi -->
             <div>
-                <label for="division_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Divisi <span class="text-red-500">*</span>
-                </label>
-                <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
-
-                <select
+                 <x-searchable-select
                     name="division_id"
-                    id="division_id"
+                    label="Divisi"
+                    x-effect="dynamicOptionsRaw = filteredDivisions"
                     x-model="selectedDivision"
                     @change="updateDepartments()"
-                    class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
-                                :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true">
                     required
-                >
-                    <option value="">Pilih Divisi</option>
-                    <template x-for="division in filteredDivisions" :key="division.id">
-                        <option :value="division.id" x-text="division.name"></option>
-                    </template>
-                </select>
-                 <span
-                                class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
-                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5"
-                                        stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                            </span>
-                </div>
-                @error('division_id')
-                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                @enderror
+                />
             </div>
 
             <!-- Departemen -->
             <div>
-                <label for="department_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Departemen <span class="text-red-500">*</span>
-                </label>
-                <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
-
-                <select
+                 <x-searchable-select
                     name="department_id"
-                    id="department_id"
+                    label="Departemen"
+                    x-effect="dynamicOptionsRaw = filteredDepartments"
                     x-model="selectedDepartment"
                     @change="updateUnits()"
-                    class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
-                                :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true">
                     required
-                >
-                    <option value="">Pilih Departemen</option>
-                    <template x-for="department in filteredDepartments" :key="department.id">
-                        <option :value="department.id" x-text="department.name"></option>
-                    </template>
-                </select>
-                 <span
-                                class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
-                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5"
-                                        stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                            </span>
-                </div>
-                @error('department_id')
-                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                @enderror
+                />
             </div>
 
             <!-- Unit -->
             <div>
-                <label for="unit_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Unit <span class="text-red-500">*</span>
-                </label>
-                <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
-
-                <select
+                 <x-searchable-select
                     name="unit_id"
-                    id="unit_id"
+                    label="Unit"
+                    x-effect="dynamicOptionsRaw = filteredUnits"
                     x-model="selectedUnit"
-                    class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
-                                :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true">
                     required
-                >
-                    <option value="">Pilih Unit</option>
-                    <template x-for="unit in filteredUnits" :key="unit.id">
-                        <option :value="unit.id" x-text="unit.name"></option>
-                    </template>
-                </select>
-                <span
-                                class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
-                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke="" stroke-width="1.5"
-                                        stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                            </span>
-                </div>
-                @error('unit_id')
-                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                @enderror
+                />
             </div>
 
             <!-- Nama Level Jabatan -->

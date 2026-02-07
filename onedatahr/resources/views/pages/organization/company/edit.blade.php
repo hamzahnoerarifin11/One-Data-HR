@@ -4,7 +4,6 @@
 
 <div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
 
-    <!-- BREADCRUMB -->
     <nav class="mb-6">
         <ol class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <li>
@@ -25,37 +24,38 @@
         </ol>
     </nav>
 
-    <!-- HEADER -->
     <div class="mb-6">
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
             Edit Perusahaan
         </h1>
         <p class="mt-1 text-gray-600 dark:text-gray-400">
-            Edit data perusahaan
+            Perbarui data perusahaan <strong>{{ $company->name }}</strong>
         </p>
     </div>
 
-    <!-- SUCCESS ALERT -->
-    @if(session('success'))
-        <div class="mb-6 rounded-lg border border-green-200 bg-green-50 p-4 text-green-800 dark:border-green-900 dark:bg-green-900/20 dark:text-green-400">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    <!-- ERROR ALERT -->
     @if(session('error'))
         <div class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-red-800 dark:border-red-900 dark:bg-red-900/20 dark:text-red-400">
             {{ session('error') }}
         </div>
     @endif
 
-    <!-- FORM -->
-    <div class="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-6">
-        <form action="{{ route('organization.company.update', $company) }}" method="POST" class="space-y-6">
+    <div class="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-6" x-data="{ holding_id: '{{ old('holding_id', $company->holding_id) }}' }">
+        <form action="{{ route('organization.company.update', $company->id) }}" method="POST" class="space-y-6">
             @csrf
             @method('PUT')
 
-            <!-- Nama Perusahaan -->
+            <div>
+                <x-searchable-select
+                    name="holding_id"
+                    label="Holding"
+                    :options="$holdings"
+                    x-model="holding_id"
+                    required
+                />
+            </div>
+
+
+
             <div>
                 <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Nama Perusahaan <span class="text-red-500">*</span>
@@ -74,7 +74,6 @@
                 @enderror
             </div>
 
-            <!-- BUTTONS -->
             <div class="flex items-center gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <a href="{{ route('organization.company.index') }}"
                    class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow hover:bg-gray-50 transition dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
@@ -89,7 +88,7 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                     </svg>
-                    Update
+                    Simpan Perubahan
                 </button>
             </div>
         </form>
