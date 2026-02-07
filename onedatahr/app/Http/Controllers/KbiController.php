@@ -12,6 +12,48 @@ use Illuminate\Pagination\LengthAwarePaginator;
 class KbiController extends Controller
 {
     // ==========================================================
+    // HELPER: HIERARKI JABATAN
+    // ==========================================================
+    private function getJabatanHierarchy()
+    {
+        // URUTKAN DARI YANG TERPANJANG UNTUK MENGHINDARI PARTIAL MATCH YANG SALAH
+        // Contoh: "Senior Manager" harus dicek sebelum "Manager"
+        return [
+            'Direktur' => 1,
+            'General Manager' => 2,
+            'Senior Manager' => 2,
+            'senior_manager' => 2,
+            'Head' => 3,
+            'Manajer' => 3,
+            'Manager' => 3,
+            'Supervisor' => 4,
+            'Spv' => 4,
+            'Staff' => 5,
+            'Staf' => 5,
+            'Officer' => 6,
+            'Assistant' => 7,
+        ];
+    }
+
+    private function getLevel($jabatan)
+    {
+        $hierarchy = $this->getJabatanHierarchy();
+        $level = 99; // Default Level (Unknown/Lowest)
+        if (!$jabatan) return $level;
+
+        foreach ($hierarchy as $key => $lvl) {
+            if (stripos($jabatan, $key) !== false) {
+                // Return immediately on first match because we sorted by length/priority
+                // OR Keep logic to find lowest number (highest rank)
+                if ($lvl < $level) {
+                    $level = $lvl;
+                }
+            }
+        }
+        return $level;
+    }
+
+    // ==========================================================
     // 1. HALAMAN UTAMA (INDEX) - DENGAN SEARCH & PAGINATION
     // ==========================================================
     public function index(Request $request)
@@ -25,7 +67,10 @@ class KbiController extends Controller
         }
 
         // B. Cari Data Karyawan (Diri Sendiri)
-        $karyawan = Karyawan::with(['atasan', 'pekerjaan'])->where('nik', $user->nik)->first();
+        // Eager load necessary relations
+        $karyawan = Karyawan::with(['atasan', 'pekerjaan.position', 'pekerjaan.company', 'pekerjaan.division'])
+            ->where('nik', $user->nik)->first();
+
         if (!$karyawan) {
             return redirect()->back()->with('error', 'Data Karyawan tidak ditemukan.');
         }
@@ -36,100 +81,104 @@ class KbiController extends Controller
             ->where('tahun', $tahun)
             ->first();
 
-        // D. Logic Daftar Karyawan (Tabel Kanan / Bawahan)
-        $query = Karyawan::with(['pekerjaan.position', 'pekerjaan.company']);
+        // --- [LOGIC BARU: FILTER LIST TIM] ---
+        // 1. Tentukan Level User
+        $userPekerjaan = $karyawan->pekerjaan->first();
+        // Fallback: Position Name -> Jabatan Column -> Empty String
+        $userJabatan = $userPekerjaan?->level?->name ?? '';
+        $userDivisionId = $userPekerjaan?->division_id;
 
-        // Filter: Jangan tampilkan diri sendiri
-        $query->where('id_karyawan', '!=', $karyawan->id_karyawan);
+        // Calculate Level safely
+        $userLevel = $this->getLevel($userJabatan);
 
-        // --- [LOGIC BARU: FILTER KHUSUS MANAGER/senior_manager] ---
-        // Cek Jabatan User Login
-        $userJabatan = $karyawan->pekerjaan->first()?->position?->name;
-        $userDivisionId = $karyawan->pekerjaan->first()?->division_id;
+        // 2. Ambil Semua Karyawan di Divisi yang Sama (Kecuali Diri Sendiri)
+        $karyawanCollection = collect();
 
-        // Tentukan level jabatan user
-        $jabatanHierarchy = [
-            'Direktur' => 1,
-            'General Manager' => 2,
-            'senior_manager' => 2,
-            'Manager' => 3,
-            'Manajer' => 3,
-            'Supervisor' => 4,
-            'Staff' => 5,
-            'Officer' => 6,
-            'Assistant' => 7,
-        ];
-        $userLevel = 99;
-        foreach ($jabatanHierarchy as $key => $level) {
-            if (stripos($userJabatan, $key) !== false) {
-                if ($level < $userLevel) {
-                    $userLevel = $level;
-                }
-            }
-        }
-
-        $issenior_manager = $userLevel == 2; // senior_manager level 2
-        $isManager = $userLevel == 3; // Manager level 3
-        $hasManagerRole = $user->hasRole(['manager', 'senior_manager']);
-
-        // Hanya terapkan filter jika user memiliki role manager/senior_manager DAN memiliki division_id
-        if ($hasManagerRole && $userDivisionId) {
-            if ($issenior_manager) {
-                // senior_manager melihat SEMUA karyawan di divisi yang sama, kecuali senior_manager sendiri
-                $query->whereHas('pekerjaan', function ($q) use ($userDivisionId) {
+        if ($userDivisionId) {
+            $query = Karyawan::with(['pekerjaan.position', 'pekerjaan.company', 'pekerjaan.division'])
+                ->where('id_karyawan', '!=', $karyawan->id_karyawan)
+                ->whereHas('pekerjaan', function ($q) use ($userDivisionId) {
                     $q->where('division_id', $userDivisionId);
                 });
-            } elseif ($isManager) {
-                // PERUBAHAN LOGIKA: Manager hanya melihat karyawan yang telah memilihnya sebagai atasan.
-                $query->where('atasan_id', $karyawan->id_karyawan);
-            } else {
-                // User memiliki role manager/senior_manager tapi jabatannya tidak terdeteksi sebagai manager/senior_manager
-                // Mungkin jabatan custom, jadi tampilkan semua karyawan di divisi yang sama
-                $query->whereHas('pekerjaan', function ($q) use ($userDivisionId) {
-                    $q->where('division_id', $userDivisionId);
-                });
-                \Log::warning('User dengan role manager/senior_manager tapi jabatan tidak terdeteksi: ' . $userJabatan . ' - ' . $user->nik);
-            }
-        } elseif ($hasManagerRole && !$userDivisionId) {
-            // User memiliki role manager/senior_manager tapi tidak memiliki division_id
-            $query->where('id_karyawan', null); // Tidak tampilkan data apa pun
-            \Log::warning('User dengan role manager/senior_manager tapi tanpa division_id: ' . $userJabatan . ' - ' . $user->nik);
-        }
-        // Jika user tidak memiliki role manager/senior_manager, tidak ada filter khusus (untuk admin/superadmin)
 
-        // Filter Search (Tetap ada)
-        if ($request->has('search') && $request->search != '') {
-            $keyword = $request->search;
-            $query->where(function ($q) use ($keyword) {
-                $q->where('Nama_Lengkap_Sesuai_Ijazah', 'LIKE', '%' . $keyword . '%')
-                    ->orWhere('Nama_Sesuai_KTP', 'LIKE', '%' . $keyword . '%')
-                    ->orWhere('NIK', 'LIKE', '%' . $keyword . '%');
+            // Filter Search
+            if ($request->has('search') && $request->search != '') {
+                $keyword = $request->search;
+                $query->where(function ($q) use ($keyword) {
+                    $q->where('Nama_Lengkap_Sesuai_Ijazah', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('Nama_Sesuai_KTP', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('NIK', 'LIKE', '%' . $keyword . '%');
+                });
+            }
+
+            // Filter Company
+            if ($request->has('filter_company') && $request->filter_company != '') {
+                $query->whereHas('pekerjaan', function ($q) use ($request) {
+                    $q->whereHas('company', function ($companyQ) use ($request) {
+                        $companyQ->where('name', $request->filter_company);
+                    });
+                });
+            }
+
+            $rawList = $query->get();
+
+            // 3. Filter Level: User tidak boleh melihat atasan (Level < UserLevel)
+            $karyawanCollection = $rawList->filter(function ($staff) use ($userLevel) {
+                // Robust fetch job title
+                $staffJab = $staff->pekerjaan->first()?->position?->name ?? $staff->pekerjaan->first()?->Jabatan ?? '';
+                $staffLvl = $this->getLevel($staffJab);
+                // StaffLevel >= UserLevel (Bawahan atau setara) - Angka besar = Level rendah
+                return $staffLvl >= $userLevel;
             });
         }
 
-        // Filter Company
-        if ($request->has('filter_company') && $request->filter_company != '') {
-            $query->whereHas('pekerjaan', function ($q) use ($request) {
-                $q->whereHas('company', function ($companyQ) use ($request) {
-                    $companyQ->where('name', $request->filter_company);
-                });
-            });
-        }
+        // 4. Pagination Manual
+        $page = LengthAwarePaginator::resolveCurrentPage();
+        $perPage = 10;
+        $results = $karyawanCollection->slice(($page - 1) * $perPage, $perPage)->values();
 
-        // Eksekusi Pagination
-        $bawahanList = $query->paginate(10)->onEachSide(1)->appends(['tahun' => $tahun]);
+        $bawahanList = new LengthAwarePaginator($results, $karyawanCollection->count(), $perPage, $page, [
+            'path' => LengthAwarePaginator::resolveCurrentPath(),
+            'query' => $request->query(),
+        ]);
 
-        // Cek Status Penilaian (Looping)
-        $bawahanList->through(function ($staff) use ($tahun, $user) {
+        // 5. Cek Status Penilaian DAN Inject Logic Assessment
+        $bawahanList->through(function ($staff) use ($tahun, $user, $userLevel) {
+            // A. Status Penilaian
             $staff->sudah_dinilai = KbiAssessment::where('karyawan_id', $staff->id_karyawan)
                 ->where('penilai_id', $user->id)
-                ->where('tipe_penilai', 'ATASAN') // Manager menilai Bawahan
+                ->where('tipe_penilai', 'ATASAN')
                 ->where('tahun', $tahun)
                 ->exists();
+
+            // B. Logic Can Assess (Bisa Menilai?)
+            $staffJab = $staff->pekerjaan->first()?->position?->name ?? $staff->pekerjaan->first()?->Jabatan ?? '';
+            $staffLevel = $this->getLevel($staffJab);
+
+            $staff->calculated_level = $staffLevel;
+            $staff->can_assess = false;
+            $staff->lock_reason = '';
+
+            if ($userLevel != 99) {
+                // Rule: Hanya bisa menilai 1 level di bawahnya (UserLevel + 1)
+                if ($staffLevel == $userLevel + 1) {
+                    $staff->can_assess = true;
+                } else {
+                    $staff->can_assess = false;
+                    if ($staffLevel <= $userLevel) {
+                        $staff->lock_reason = 'Level setara/lebih tinggi';
+                    } else {
+                        $staff->lock_reason = 'Hanya bisa menilai 1 level di bawah';
+                    }
+                }
+            } else {
+                $staff->lock_reason = 'Level user tidak dikenali';
+            }
+
             return $staff;
         });
 
-        // E. Ambil Data Atasan (Kotak Kiri Bawah - Tetap Sama)
+        // E. Ambil Data Atasan (Kotak Kiri Bawah)
         $atasan = $karyawan->atasan;
         $sudahMenilaiAtasan = false;
         if ($atasan) {
@@ -140,60 +189,32 @@ class KbiController extends Controller
                 ->exists();
         }
 
-        // F. Logic Dropdown Pilih Atasan
-        if ($userLevel <= 1) { // Direktur tidak memilih atasan.
-            $listCalonAtasan = collect();
-        } else {
-            // Tentukan jabatan apa saja yang levelnya di atas user.
-            $higherJabatan = [];
-            foreach ($jabatanHierarchy as $jabatan => $level) {
-                if ($level < $userLevel) {
-                    $higherJabatan[] = $jabatan;
-                }
-            }
+        // F. Logic Dropdown Pilih Atasan (TEPAT 1 LEVEL DI ATAS USER)
+        $listCalonAtasan = collect();
+        if ($userLevel > 1) {
+            // Target level: tepat 1 level di atas user
+            $targetLevel = $userLevel - 1;
 
-            // Aturan Khusus: senior_manager (level 2) hanya bisa memilih level 1 (Direktur).
-            if ($userLevel == 2) {
-                $higherJabatan = array_filter($higherJabatan, function($j) use ($jabatanHierarchy){
-                    return ($jabatanHierarchy[$j] ?? 99) == 1;
+            // Ambil kandidat dasar: bukan diri sendiri, ambil pekerjaan & posisi
+            $queryAtasan = Karyawan::with(['pekerjaan.position', 'pekerjaan.division'])
+                ->where('id_karyawan', '!=', $karyawan->id_karyawan);
+
+            // Jika user bukan top-level (level > 2), batasi pencarian ke divisi yang sama
+            if ($userLevel > 2 && $userDivisionId) {
+                $queryAtasan->whereHas('pekerjaan', function ($q) use ($userDivisionId) {
+                    $q->where('division_id', $userDivisionId);
                 });
             }
 
-            $listCalonAtasan = Karyawan::with(['pekerjaan.position', 'pekerjaan.division'])
-                ->where('id_karyawan', '!=', $karyawan->id_karyawan)
-                ->whereHas('pekerjaan', function ($q) use ($userDivisionId, $higherJabatan, $userLevel) {
-                    // Aturan Divisi:
-                    // - Karyawan level > 2 (Manager ke bawah) hanya bisa memilih atasan dari DIVISI YANG SAMA.
-                    // - Karyawan level 2 (senior_manager) bisa memilih atasan dari divisi manapun (karena atasan mereka adalah Direktur).
-                    if ($userLevel > 2) {
-                        if(empty($userDivisionId)) {
-                            // Jika user login tidak punya info divisi, jangan tampilkan calon atasan sama sekali.
-                            $q->whereRaw('1=0');
-                            return;
-                        }
-                        $q->where('division_id', $userDivisionId);
-                    }
+            // Ambil kandidat, lalu lakukan penyaringan yang ketat di PHP berdasarkan level
+            $candidates = $queryAtasan->orderBy('Nama_Lengkap_Sesuai_Ijazah', 'ASC')->get();
 
-                    // Pastikan ada daftar jabatan yang dicari. Jika tidak, jangan return apa-apa.
-                    if (empty($higherJabatan)) {
-                        $q->whereRaw('1=0');
-                        return;
-                    }
-
-                    // Filter berdasarkan nama posisi yang cocok dengan hierarki di atasnya.
-                    $q->whereHas('position', function ($posQ) use ($higherJabatan) {
-                        $posQ->where(function ($subQ) use ($higherJabatan) {
-                            foreach ($higherJabatan as $jab) {
-                                $subQ->orWhere('name', 'LIKE', '%' . $jab . '%');
-                            }
-                        });
-                    });
-
-                })
-                ->orderBy('Nama_Lengkap_Sesuai_Ijazah', 'ASC')
-                ->get();
+            $listCalonAtasan = $candidates->filter(function ($calon) use ($targetLevel) {
+                $calonJab = $calon->pekerjaan->first()?->position?->name ?? $calon->pekerjaan->first()?->Jabatan ?? '';
+                $calonLvl = $this->getLevel($calonJab);
+                return $calonLvl === $targetLevel;
+            })->values();
         }
-        // -----------------------------------------------------------------------------------------
 
         // List Companies Dropdown
         $listCompanies = \App\Models\Company::distinct()->orderBy('name')->pluck('name');
@@ -206,10 +227,9 @@ class KbiController extends Controller
             'sudahMenilaiAtasan',
             'listCalonAtasan',
             'tahun',
-            'issenior_manager',
-            'isManager',
-            'listCompanies'
-
+            'listCompanies',
+            'userLevel',
+            'userJabatan'
         ));
     }
 
@@ -442,7 +462,7 @@ class KbiController extends Controller
             $keyword = $request->search;
             $query->where(function ($q) use ($keyword) {
                 $q->where('Nama_Lengkap_Sesuai_Ijazah', 'LIKE', '%' . $keyword . '%')
-                    ->orWhere('NIK', 'LIKE', '%' . $keyword . '%');
+                    ->orWhere('Nama_Sesuai_KTP', 'LIKE', '%' . $keyword . '%');
             });
         }
 
