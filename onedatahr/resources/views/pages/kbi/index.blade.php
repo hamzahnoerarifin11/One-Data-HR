@@ -140,7 +140,7 @@
                                 {{ $atasan->Nama_Lengkap_Sesuai_Ijazah ?? $atasan->Nama_Sesuai_KTP }}
                             </h4>
                             <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
-                                {{ $atasan->pekerjaan->first()?->position->name ?? 'Atasan Langsung' }}
+                                {{ $atasan->pekerjaan->first()?->Jabatan ?? 'Atasan Langsung' }}
                             </p>
                         </div>
                     </div>
@@ -178,7 +178,7 @@
                                     @foreach($listCalonAtasan as $calon)
                                         <option value="{{ $calon->id_karyawan }}">
                                             {{ $calon->Nama_Lengkap_Sesuai_Ijazah }}
-                                            ({{ $calon->pekerjaan->first()?->position->name ?? '-' }})
+                                            ({{ $calon->pekerjaan->first()?->level->name ?? '-' }})
                                         </option>
                                     @endforeach
                                 </select>

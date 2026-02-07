@@ -152,7 +152,7 @@ class KbiController extends Controller
                 ->exists();
 
             // B. Logic Can Assess (Bisa Menilai?)
-            $staffJab = $staff->pekerjaan->first()?->position?->name ?? $staff->pekerjaan->first()?->Jabatan ?? '';
+            $staffJab = $staff->pekerjaan->first()?->level?->name ?? '';
             $staffLevel = $this->getLevel($staffJab);
 
             $staff->calculated_level = $staffLevel;
@@ -195,12 +195,24 @@ class KbiController extends Controller
             // Target level: tepat 1 level di atas user
             $targetLevel = $userLevel - 1;
 
+            // --- [MODIFICATION] KHUSUS MANAGER & SENIOR MANAGER ---
+            // Rule: Langsung munculkan irektur Utama (Level 1) & Tidak Terikat Divisi
+            $jabatanLower = strtolower($userLevel);
+            $isManagerOrSenior = (strpos($jabatanLower, 'manager') !== false || strpos($jabatanLower, 'manajer') !== false);
+            
+            // Berlaku jika user adalah Level 2 (Senior Manager/GM) atau Level 3 (Manager)
+            // Note: Assistant Manager (Level 7) tidak termasuk karena level > 3
+            if (($userLevel == 2 || $userLevel == 3) && $isManagerOrSenior) {
+                $targetLevel = 1; // Paksa target ke Level 1 (Direktur)
+            }
+
             // Ambil kandidat dasar: bukan diri sendiri, ambil pekerjaan & posisi
             $queryAtasan = Karyawan::with(['pekerjaan.position', 'pekerjaan.division'])
                 ->where('id_karyawan', '!=', $karyawan->id_karyawan);
 
             // Jika user bukan top-level (level > 2), batasi pencarian ke divisi yang sama
-            if ($userLevel > 2 && $userDivisionId) {
+            // KECUALI jika special case (Manager/Senior Manager -> Global Direktur)
+            if ($userLevel > 2 && $userDivisionId && !(($userLevel == 3) && $isManagerOrSenior)) {
                 $queryAtasan->whereHas('pekerjaan', function ($q) use ($userDivisionId) {
                     $q->where('division_id', $userDivisionId);
                 });
