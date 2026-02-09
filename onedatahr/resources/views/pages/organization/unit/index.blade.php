@@ -106,9 +106,9 @@
                             </div>
                         </th>
 
-                        <th class="px-5 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400">
+                        <!-- <th class="px-5 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400">
                             Parent
-                        </th>
+                        </th> -->
 
                         <th @click="sortBy('created_at')" class="px-5 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400 cursor-pointer hover:text-blue-600">
                             <div class="flex items-center gap-1">
@@ -129,7 +129,7 @@
                             <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400" x-text="row.department_name"></td>
                             <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400" x-text="row.division_name"></td>
                             <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400" x-text="row.company_name"></td>
-                            <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400" x-text="row.parent_name"></td>
+                            <!-- <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400" x-text="row.parent_name"></td> -->
                             <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400" x-text="row.created_at"></td>
                             <td class="px-5 py-4 text-center">
                                 <div class="flex items-center justify-center gap-2">

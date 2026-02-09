@@ -66,7 +66,7 @@
                     <!-- Option: Company -->
                     <label class="relative cursor-pointer group">
                         <input type="radio" name="based_on" value="company" x-model="basedOn" class="peer sr-only">
-                        <div class="p-5 rounded-xl border-2 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-white/[0.02]"
+                        <div class="p-5 rounded-xl border-2 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-blue-900/40"
                              :class="basedOn == 'company' ? 'border-blue-500 bg-blue-50/50 dark:border-blue-500 dark:bg-blue-500/10' : 'border-gray-200 dark:border-gray-700'">
                             <div class="flex items-start gap-4">
                                 <div class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center"
@@ -93,7 +93,7 @@
                     <!-- Option: Holding -->
                     <label class="relative cursor-pointer group">
                         <input type="radio" name="based_on" value="holding" x-model="basedOn" class="peer sr-only">
-                        <div class="p-5 rounded-xl border-2 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-white/[0.02]"
+                        <div class="p-5 rounded-xl border-2 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-blue-900/40"
                              :class="basedOn == 'holding' ? 'border-purple-500 bg-purple-50/50 dark:border-purple-500 dark:bg-purple-500/10' : 'border-gray-200 dark:border-gray-700'">
                             <div class="flex items-start gap-4">
                                 <div class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center"

@@ -65,7 +65,7 @@
                     <!-- Option: Company -->
                     <label class="relative cursor-pointer group">
                         <input type="radio" name="based_on" value="company" x-model="basedOn" class="peer sr-only">
-                        <div class="p-5 rounded-xl border-2 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-white/[0.02]"
+                        <div class="p-5 rounded-xl border-2 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-blue-900/40"
                              :class="basedOn == 'company' ? 'border-blue-500 bg-blue-50/50 dark:border-blue-500 dark:bg-blue-500/10' : 'border-gray-200 dark:border-gray-700'">
                             <div class="flex items-start gap-4">
                                 <div class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center"
@@ -92,7 +92,7 @@
                     <!-- Option: Holding -->
                     <label class="relative cursor-pointer group">
                         <input type="radio" name="based_on" value="holding" x-model="basedOn" class="peer sr-only">
-                        <div class="p-5 rounded-xl border-2 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-white/[0.02]"
+                        <div class="p-5 rounded-xl border-2 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-blue-900/40"
                              :class="basedOn == 'holding' ? 'border-purple-500 bg-purple-50/50 dark:border-purple-500 dark:bg-purple-500/10' : 'border-gray-200 dark:border-gray-700'">
                             <div class="flex items-start gap-4">
                                 <div class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center"
@@ -143,7 +143,7 @@
                             ])"
                             detail-key="detail_html"
                             x-model="selectedCompany"
-                            @change="updateDivisions()"
+                            @change="updateDivisions($event.detail)"
                             required
                         />
                     </div>
@@ -170,7 +170,7 @@
                         label="Pilih Divisi"
                         x-effect="dynamicOptionsRaw = divisions"
                         x-model="selectedDivision"
-                        @change="updateDepartments()"
+                        @change="updateDepartments($event.detail)"
                         required
                     />
                     <div x-show="loadingDivisions" class="text-xs text-blue-500 animate-pulse mt-1">Sedang memuat data divisi...</div>
@@ -236,7 +236,11 @@
 
             get filteredDivisions() { return this.divisions; },
 
-            updateDivisions() {
+            updateDivisions(companyId = null) {
+                // Use passed companyId or fallback to x-model value
+                const targetCompanyId = companyId || this.selectedCompany;
+                const targetHoldingId = this.selectedHolding;
+                
                 const oldDivision = this.selectedDivision;
                 this.selectedDivision = '';
                 this.selectedDepartment = '';
@@ -246,10 +250,10 @@
                 this.loadingDivisions = true;
 
                 const targetUrl = this.basedOn === 'company' 
-                    ? "{{ url('organization/division/by-company') }}/" + this.selectedCompany
-                    : "{{ url('organization/division/by-holding') }}/" + this.selectedHolding;
+                    ? "{{ url('organization/division/by-company') }}/" + targetCompanyId
+                    : "{{ url('organization/division/by-holding') }}/" + targetHoldingId;
                     
-                const idToCheck = this.basedOn === 'company' ? this.selectedCompany : this.selectedHolding;
+                const idToCheck = this.basedOn === 'company' ? targetCompanyId : targetHoldingId;
 
                 if (!idToCheck) {
                     this.loadingDivisions = false;
@@ -268,18 +272,21 @@
                     .finally(() => { this.loadingDivisions = false; });
             },
 
-            updateDepartments() {
+            updateDepartments(divisionId = null) {
+                // Use passed divisionId or fallback to x-model value
+                const targetDivisionId = divisionId || this.selectedDivision;
+                
                 const oldDepartment = this.selectedDepartment;
                 this.selectedDepartment = '';
                 this.departments = [];
                 this.loadingDepartments = true;
 
-                if (!this.selectedDivision) {
+                if (!targetDivisionId) {
                     this.loadingDepartments = false;
                     return Promise.resolve();
                 }
 
-                return fetch("{{ url('organization/department/by-division') }}/" + this.selectedDivision)
+                return fetch("{{ url('organization/department/by-division') }}/" + targetDivisionId)
                     .then(res => res.json())
                     .then(data => { 
                         this.departments = data; 

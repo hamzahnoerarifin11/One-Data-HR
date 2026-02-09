@@ -74,8 +74,9 @@
             <ul class="overflow-y-auto flex-1 p-1 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
                 <template x-for="option in filteredOptions" :key="option.value">
                     <li @click.stop="select(option)" 
-                        class="cursor-pointer rounded-md px-3 py-2 text-sm hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                        class="cursor-pointer rounded-md px-3 py-2 text-sm transition-colors hover:bg-blue-50 dark:hover:bg-blue-900/40"
                         :class="{'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300': value == option.value, 'text-gray-900 dark:text-gray-200': value != option.value}">
+                        
                         <div class="flex flex-col">
                             <span class="font-medium" x-text="option.label"></span>
                             <span x-show="option.detail" x-html="option.detail" class="text-xs text-gray-500 dark:text-gray-400 mt-0.5"></span>

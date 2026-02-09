@@ -64,7 +64,7 @@
                     <!-- Option: Company -->
                     <label class="relative cursor-pointer group">
                         <input type="radio" name="based_on" value="company" x-model="basedOn" class="peer sr-only">
-                        <div class="p-5 rounded-xl border-2 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-white/[0.02]"
+                        <div class="p-5 rounded-xl border-2 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-blue-900/40"
                              :class="basedOn == 'company' ? 'border-blue-500 bg-blue-50/50 dark:border-blue-500 dark:bg-blue-500/10' : 'border-gray-200 dark:border-gray-700'">
                             <div class="flex items-start gap-4">
                                 <div class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center"
@@ -91,7 +91,7 @@
                     <!-- Option: Holding -->
                     <label class="relative cursor-pointer group">
                         <input type="radio" name="based_on" value="holding" x-model="basedOn" class="peer sr-only">
-                        <div class="p-5 rounded-xl border-2 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-white/[0.02]"
+                        <div class="p-5 rounded-xl border-2 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-blue-900/40"
                              :class="basedOn == 'holding' ? 'border-purple-500 bg-purple-50/50 dark:border-purple-500 dark:bg-purple-500/10' : 'border-gray-200 dark:border-gray-700'">
                             <div class="flex items-start gap-4">
                                 <div class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center"
@@ -151,14 +151,14 @@
                     />
 
                     <!-- Select Parent (Optional) -->
-                    <div class="rounded-lg border border-blue-100 bg-blue-50 p-4 dark:border-blue-900/30 dark:bg-blue-900/10">
+                    <div class="rounded-lg border border-blue-100 bg-blue-50 p-4 dark:border-blue-500 dark:bg-gray-800">
                         <div class="flex items-start gap-3">
                             <svg class="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                             <div class="flex-1 space-y-3">
                                 <div>
-                                    <label class="block text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
+                                    <label class="block text-sm font-medium text-blue-900 dark:text-blue-500 mb-1">
                                         Induk Divisi (Opsional)
                                     </label>
                                     <p class="text-xs text-blue-700 dark:text-blue-300 mb-2" x-text="parentHelpText || 'Pilih perusahaan terlebih dahulu.'"></p>

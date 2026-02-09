@@ -104,47 +104,201 @@ class KaryawanController extends Controller
 
     public function batchDelete(Request $request)
     {
-        \Log::info('Batch delete request received', [
-            'method' => $request->method(),
-            'url' => $request->fullUrl(),
-            'all_data' => $request->all(),
-            'selected_karyawan' => $request->selected_karyawan,
-            'csrf_token' => $request->_token ?? 'no token'
-        ]);
-
         $ids = $request->selected_karyawan;
 
         if (!$ids || !is_array($ids) || count($ids) === 0) {
             return back()->with('error', 'Tidak ada data yang dipilih untuk dihapus');
         }
 
+        DB::beginTransaction();
         try {
-            $deletedCount = Karyawan::whereIn('id_karyawan', $ids)->delete();
+            $count = 0;
+            foreach ($ids as $id) {
+                $karyawan = Karyawan::findOrFail($id);
 
-            if ($deletedCount > 0) {
-                return back()->with('success', $deletedCount . ' karyawan berhasil dihapus');
-            } else {
-                return back()->with('error', 'Tidak ada data yang berhasil dihapus');
+                // Hapus User Account jika ada
+                $user = User::where('nik', $karyawan->NIK)->first();
+                if ($user) {
+                    $user->delete();
+                }
+
+                // Hapus Data Relasi
+                $karyawan->pekerjaan()->delete();
+                $karyawan->pendidikan()->delete();
+                $karyawan->kontrak()->delete();
+                $karyawan->keluarga()->delete();
+                $karyawan->bpjs()->delete();
+                $karyawan->perusahaan()->delete();
+                $karyawan->status()->delete();
+                
+                // Hapus Karyawan
+                $karyawan->delete();
+                $count++;
             }
+
+            DB::commit();
+            return back()->with('success', $count . ' karyawan berhasil dihapus');
+
         } catch (\Exception $e) {
+            DB::rollBack();
             \Log::error('Batch delete error: ' . $e->getMessage());
-            return back()->with('error', 'Terjadi kesalahan saat menghapus data');
+            return back()->with('error', 'Terjadi kesalahan saat menghapus data: ' . $e->getMessage());
         }
+    }
+
+    public function export(Request $request)
+    {
+        $type = $request->query('type', 'csv');
+        $karyawans = Karyawan::with(['pekerjaan.company', 'pekerjaan.division', 'pekerjaan.department', 'pekerjaan.unit', 'pekerjaan.level'])->get();
+
+        if ($type === 'pdf') {
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pages.karyawan.pdf', compact('karyawans'));
+            return $pdf->download('data_karyawan.pdf');
+        }
+
+        if ($type === 'excel') {
+            return $this->exportExcel($karyawans);
+        }
+
+        // Default CSV
+        return $this->exportCsv($karyawans);
+    }
+
+    private function exportCsv($karyawans)
+    {
+        $fileName = 'data_karyawan.csv';
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $columns = array('Nama', 'NIK', 'Email', 'No Telepon', 'Jabatan', 'Divisi', 'Perusahaan');
+
+        $callback = function() use($karyawans, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($karyawans as $karyawan) {
+                $row['Nama']  = $karyawan->Nama_Sesuai_KTP;
+                $row['NIK']    = $karyawan->NIK;
+                $row['Email']    = $karyawan->Email;
+                $row['No Telepon']  = $karyawan->Nomor_Telepon_Aktif_Karyawan;
+                $row['Jabatan']  = $karyawan->pekerjaan->first()->level->name ?? '-';
+                $row['Divisi']  = $karyawan->pekerjaan->first()->division->name ?? '-';
+                $row['Perusahaan']  = $karyawan->pekerjaan->first()->company->name ?? '-';
+
+                fputcsv($file, array($row['Nama'], $row['NIK'], $row['Email'], $row['No Telepon'], $row['Jabatan'], $row['Divisi'], $row['Perusahaan']));
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    private function exportExcel($karyawans)
+    {
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        
+        // Headers
+        $sheet->setCellValue('A1', 'Nama');
+        $sheet->setCellValue('B1', 'NIK');
+        $sheet->setCellValue('C1', 'Email');
+        $sheet->setCellValue('D1', 'No Telepon');
+        $sheet->setCellValue('E1', 'Jabatan');
+        $sheet->setCellValue('F1', 'Divisi');
+        $sheet->setCellValue('G1', 'Perusahaan');
+
+        $row = 2;
+        foreach ($karyawans as $karyawan) {
+            $sheet->setCellValue('A' . $row, $karyawan->Nama_Sesuai_KTP);
+            $sheet->setCellValue('B' . $row, $karyawan->NIK);
+            $sheet->setCellValue('C' . $row, $karyawan->Email);
+            $sheet->setCellValue('D' . $row, $karyawan->Nomor_Telepon_Aktif_Karyawan);
+            $sheet->setCellValue('E' . $row, $karyawan->pekerjaan->first()->level->name ?? '-');
+            $sheet->setCellValue('F' . $row, $karyawan->pekerjaan->first()->division->name ?? '-');
+            $sheet->setCellValue('G' . $row, $karyawan->pekerjaan->first()->company->name ?? '-');
+            $row++;
+        }
+
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        
+        $fileName = 'data_karyawan.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="'. urlencode($fileName).'"');
+        $writer->save('php://output');
+        exit;
     }
 
 
     public function create()
     {
-        $companies = \App\Models\Company::all();
+        // Get all entities for company selection with grouping
+        $holdings = \App\Models\Holding::all()->map(function($h) {
+            return [
+                'id' => 'holding_' . $h->id, 
+                'name' => $h->name, 
+                'type' => 'holding',
+                'detail_html' => '<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">Holding</span>'
+            ];
+        });
+
+        $allCompanies = \App\Models\Company::with('holding')->orderBy('name')->get();
+        
+        $parentCompanies = $allCompanies->whereNull('parent_id')->map(function($c) {
+            return [
+                'id' => $c->id, 
+                'name' => $c->name, 
+                'type' => 'company', 
+                'holding_id' => $c->holding_id,
+                'detail_html' => '<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">Perusahaan</span>'
+            ];
+        });
+        
+        $subsidiaries = $allCompanies->whereNotNull('parent_id')->map(function($c) {
+            $parentName = $c->parent ? $c->parent->name : '';
+            return [
+                'id' => $c->id, 
+                'name' => $c->name, 
+                'type' => 'subsidiary', 
+                'holding_id' => $c->holding_id, 
+                'parent_id' => $c->parent_id,
+                'detail_html' => '<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Anak Perusahaan</span>' . ($parentName ? ' <span class="text-gray-400 text-xs">dari ' . $parentName . '</span>' : '')
+            ];
+        });
+        
+        // Build grouped entities for dropdown
+        $companies = collect();
+        
+        // Add Holdings
+        if ($holdings->count() > 0) {
+            $companies = $companies->merge($holdings);
+        }
+        
+        // Add Parent Companies
+        if ($parentCompanies->count() > 0) {
+            $companies = $companies->merge($parentCompanies);
+        }
+        
+        // Add Subsidiaries
+        if ($subsidiaries->count() > 0) {
+            $companies = $companies->merge($subsidiaries);
+        }
+
         $levels = Level::orderBy('level_order')->get();
         return view('pages.karyawan.create', [
-            'companies' => $companies,
+            'companies' => $companies->values(),
             'levels' => $levels,
             'lokasikerjaOptions' => getlokasikerja('pekerjaan', 'Lokasi_Kerja'),
             'perusahaanOptions' => getperusahaan('perusahaan', 'Perusahaan'),
             'pendidikanOptions' => getpendidikan('pendidikan', 'Pendidikan_Terakhir'),
         ]);
     }
+
 
     public function store(Request $request)
     {
@@ -311,13 +465,65 @@ class KaryawanController extends Controller
     public function edit($id)
     {
         $karyawan = Karyawan::with(['pekerjaan.company', 'pekerjaan.division', 'pekerjaan.department', 'pekerjaan.unit', 'pekerjaan.level', 'pendidikan', 'kontrak', 'keluarga', 'bpjs', 'perusahaan', 'status'])->findOrFail($id);
-        $companies = \App\Models\Company::all();
+        
+        // Get all entities for company selection with grouping
+        $holdings = \App\Models\Holding::all()->map(function($h) {
+            return [
+                'id' => 'holding_' . $h->id, 
+                'name' => $h->name, 
+                'type' => 'holding',
+                'detail_html' => '<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300">Holding</span>'
+            ];
+        });
+
+        $allCompanies = \App\Models\Company::with(['holding', 'parent'])->orderBy('name')->get();
+        
+        $parentCompanies = $allCompanies->whereNull('parent_id')->map(function($c) {
+            return [
+                'id' => $c->id, 
+                'name' => $c->name, 
+                'type' => 'company', 
+                'holding_id' => $c->holding_id,
+                'detail_html' => '<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">Perusahaan</span>'
+            ];
+        });
+        
+        $subsidiaries = $allCompanies->whereNotNull('parent_id')->map(function($c) {
+            $parentName = $c->parent ? $c->parent->name : '';
+            return [
+                'id' => $c->id, 
+                'name' => $c->name, 
+                'type' => 'subsidiary', 
+                'holding_id' => $c->holding_id, 
+                'parent_id' => $c->parent_id,
+                'detail_html' => '<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">Anak Perusahaan</span>' . ($parentName ? ' <span class="text-gray-400 text-xs">dari ' . $parentName . '</span>' : '')
+            ];
+        });
+        
+        // Build grouped entities for dropdown
+        $companies = collect();
+        
+        // Add Holdings
+        if ($holdings->count() > 0) {
+            $companies = $companies->merge($holdings);
+        }
+        
+        // Add Parent Companies
+        if ($parentCompanies->count() > 0) {
+            $companies = $companies->merge($parentCompanies);
+        }
+        
+        // Add Subsidiaries
+        if ($subsidiaries->count() > 0) {
+            $companies = $companies->merge($subsidiaries);
+        }
+
         $levels = Level::ordered()->get();
-        // $positions = \App\Models\Position::all();
         $departments = \App\Models\Department::all();
         $divisions = \App\Models\Division::all();
         $units = \App\Models\Unit::all();
-        return view('pages.karyawan.edit', array_merge(compact('karyawan', 'companies', 'levels', 'departments', 'divisions', 'units'), [
+        return view('pages.karyawan.edit', array_merge(compact('karyawan', 'levels', 'departments', 'divisions', 'units'), [
+            'companies' => $companies->values(),
             'lokasikerjaOptions' => getlokasikerja('pekerjaan', 'Lokasi_Kerja'),
             'perusahaanOptions' => getperusahaan('perusahaan', 'Perusahaan'),
             'pendidikanOptions' => getpendidikan('pendidikan', 'Pendidikan_Terakhir'),
@@ -326,6 +532,7 @@ class KaryawanController extends Controller
             'unitOptions' => getunit('pekerjaan', 'Unit'),
         ]));
     }
+
 
     public function update(Request $request, $id)
     {

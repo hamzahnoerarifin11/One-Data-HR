@@ -62,21 +62,13 @@ Route::get('karyawan/departments/{divisionId}', [KaryawanController::class, 'get
 Route::get('karyawan/units/{departmentId}', [KaryawanController::class, 'getUnits'])->name('karyawan.units');
 Route::get('karyawan/positions/{unitId}', [KaryawanController::class, 'getPositions'])->name('karyawan.positions');
 
-Route::post('karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
-
-Route::middleware(['auth'])->group(function () {
-});
-
-Route::middleware(['auth'])->group(function () {
-    // other routes
-});
-
-Route::post('karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
-
 Route::middleware(['auth', 'role:admin|superadmin'])->group(function () {
         // --- KARYAWAN MANAGEMENT ---
+        // Custom routes MUST be defined BEFORE resource route to avoid conflict with {karyawan} wildcard
+        Route::post('karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
+        Route::get('karyawan/export', [KaryawanController::class, 'export'])->name('karyawan.export');
         Route::resource('karyawan', KaryawanController::class);
-        // Route::post('karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
+
     Route::middleware(['auth', 'role:superadmin'])->group(function () {
     // User management resource
     Route::resource('users', UserController::class);
