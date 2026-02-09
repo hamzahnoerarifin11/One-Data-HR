@@ -777,17 +777,20 @@
             <div x-show="currentStep===2" x-transition class="space-y-6">
                 <div class="grid grid-cols-2 gap-4">
 
-                    <!-- PERUSAHAAN -->
+                    <!-- PERUSAHAAN / HOLDING -->
                     <div>
                         <x-searchable-select
                             id="company"
-                            name="company_id"
+                            name="entity_selection"
                             label="Perusahaan"
                             :options="$companies"
                             x-model="selectedCompany"
-                            @change="updateDivisions($event.detail)"
+                            @change="updateEntity($event.detail)"
                             placeholder="-- Pilih Perusahaan --"
                         />
+                        <!-- Hidden fields for actual company_id and holding_id -->
+                        <input type="hidden" name="company_id" :value="actualCompanyId">
+                        <input type="hidden" name="holding_id" :value="actualHoldingId">
                     </div>
 
                     <!-- DIVISI -->
@@ -824,7 +827,6 @@
                             label="Unit"
                             x-effect="dynamicOptionsRaw = units"
                             x-model="selectedUnit"
-                            @change="updateLevels($event.detail)"
                             placeholder="-- Pilih Unit --"
                         />
                     </div>
@@ -849,7 +851,7 @@
                             id="levelSelect"
                             name="level_id"
                             required
-                            x-effect="dynamicOptionsRaw = levels"
+                            :options="$levels->map(fn($l) => ['id' => $l->id, 'name' => $l->name])"
                             x-model="selectedLevel"
                             placeholder="-- Pilih Level --"
                         />
@@ -1480,19 +1482,54 @@ function karyawanForm(initData = {}) {
         levels: initData.levels || [],
 
         // Organization Selection
-        selectedCompany: initData.old?.company_id || '',
+        selectedCompany: initData.old?.company_id || initData.old?.holding_id ? `holding_${initData.old?.holding_id}` : '' || '',
         selectedDivision: initData.old?.division_id || '',
         selectedDepartment: initData.old?.department_id || '',
         selectedUnit: initData.old?.unit_id || '',
         selectedLevel: initData.old?.level_id || '',
+        
+        // Actual IDs for form submission (parsed from selectedCompany)
+        actualCompanyId: initData.old?.company_id || '',
+        actualHoldingId: initData.old?.holding_id || '',
 
         init() {
-            if (this.selectedCompany) this.fetchDivisions(this.selectedCompany, true);
+            // Parse initial selection to set actual IDs
+            if (this.selectedCompany) {
+                this.parseEntitySelection(this.selectedCompany);
+                this.fetchDivisions(this.selectedCompany, true);
+            }
+        },
+        
+        // Parse entity selection to set actualCompanyId or actualHoldingId
+        parseEntitySelection(val) {
+            if (String(val).startsWith('holding_')) {
+                this.actualHoldingId = String(val).replace('holding_', '');
+                this.actualCompanyId = '';
+            } else {
+                this.actualCompanyId = val;
+                this.actualHoldingId = '';
+            }
+        },
+        
+        // Called when entity (company/holding) is selected
+        updateEntity(val) {
+            this.parseEntitySelection(val);
+            this.updateDivisions(val);
         },
 
-        fetchDivisions(companyId, chain = false) {
-            if (!companyId) return;
-            fetch(`/karyawan/divisions/${companyId}`)
+        fetchDivisions(entityId, chain = false) {
+            if (!entityId) return;
+            
+            // Detect if this is a Holding ID (prefixed with 'holding_')
+            let url;
+            if (String(entityId).startsWith('holding_')) {
+                const holdingId = String(entityId).replace('holding_', '');
+                url = `/organization/division/by-holding/${holdingId}`;
+            } else {
+                url = `/karyawan/divisions/${entityId}`;
+            }
+            
+            fetch(url)
                 .then(r => r.json())
                 .then(data => {
                     this.divisions = data;
@@ -1537,11 +1574,10 @@ function karyawanForm(initData = {}) {
             this.selectedDivision = '';
             this.selectedDepartment = '';
             this.selectedUnit = '';
-            this.selectedLevel = '';
             this.divisions = [];
             this.departments = [];
             this.units = [];
-            this.levels = [];
+            // Note: levels are global and should not be reset
             
             if (val) this.fetchDivisions(val);
         },
@@ -1549,19 +1585,17 @@ function karyawanForm(initData = {}) {
         updateDepartments(val) {
             this.selectedDepartment = '';
             this.selectedUnit = '';
-            this.selectedLevel = '';
             this.departments = [];
             this.units = [];
-            this.levels = [];
+            // Note: levels are global and should not be reset
 
             if (val) this.fetchDepartments(val);
         },
 
         updateUnits(val) {
             this.selectedUnit = '';
-            this.selectedLevel = '';
             this.units = [];
-            this.levels = [];
+            // Note: levels are global and should not be reset
 
             if (val) this.fetchUnits(val);
         },

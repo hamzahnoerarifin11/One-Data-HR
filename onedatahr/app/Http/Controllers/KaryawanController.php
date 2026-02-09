@@ -366,15 +366,20 @@ class KaryawanController extends Controller
             DataKeluarga::create($keluargaData);
 
             // Pekerjaan
-            $pekerjaanData = $request->only(['Jabatan', 'department_id', 'division_id', 'unit_id', 'company_id', 'level_id', 'Jenis_Kontrak', 'Perjanjian', 'Lokasi_Kerja']);
+            $pekerjaanData = $request->only(['Jabatan', 'department_id', 'division_id', 'unit_id', 'company_id', 'holding_id', 'level_id', 'Jenis_Kontrak', 'Perjanjian', 'Lokasi_Kerja']);
             $pekerjaanData['id_karyawan'] = $karyawan->id_karyawan;
             Pekerjaan::create($pekerjaanData);
 
             // Perusahaan
             $perusahaanName = $request->input('Perusahaan');
-            if (!$perusahaanName && $request->filled('id_perusahaan')) {
-                $pModel = Perusahaan::find($request->input('id_perusahaan'));
-                $perusahaanName = $pModel ? $pModel->Perusahaan : null;
+            if (!$perusahaanName) {
+                if ($request->filled('company_id')) {
+                    $cModel = \App\Models\Company::find($request->company_id);
+                    $perusahaanName = $cModel ? $cModel->name : null;
+                } elseif ($request->filled('holding_id')) {
+                    $hModel = \App\Models\Holding::find($request->holding_id);
+                    $perusahaanName = $hModel ? $hModel->name : null;
+                }
             }
             Perusahaan::create(['id_karyawan' => $karyawan->id_karyawan, 'Perusahaan' => $perusahaanName]);
 
@@ -605,7 +610,17 @@ class KaryawanController extends Controller
             $karyawan->status ? $karyawan->status->update($dataStatus) : StatusKaryawan::create(array_merge(['id_karyawan' => $id], $dataStatus));
 
             // 5. Update Perusahaan
-            $dataPerush = $request->only(['Perusahaan']);
+            $perusahaanName = $request->input('Perusahaan');
+            if (!$perusahaanName) {
+                if ($request->filled('company_id')) {
+                    $cModel = \App\Models\Company::find($request->company_id);
+                    $perusahaanName = $cModel ? $cModel->name : null;
+                } elseif ($request->filled('holding_id')) {
+                    $hModel = \App\Models\Holding::find($request->holding_id);
+                    $perusahaanName = $hModel ? $hModel->name : null;
+                }
+            }
+            $dataPerush = ['Perusahaan' => $perusahaanName];
             $karyawan->perusahaan ? $karyawan->perusahaan->update($dataPerush) : Perusahaan::create(array_merge(['id_karyawan' => $id], $dataPerush));
 
             // 6. Update Pendidikan
@@ -640,7 +655,7 @@ class KaryawanController extends Controller
             $karyawan->kontrak ? $karyawan->kontrak->update($dataKontrak) : Kontrak::create(array_merge(['id_karyawan' => $id], $dataKontrak));
 
             // 8. Update Pekerjaan
-            $dataKerja = $request->only(['Jabatan', 'department_id', 'division_id', 'unit_id', 'company_id', 'level_id', 'Jenis_Kontrak', 'Perjanjian', 'Lokasi_Kerja']);
+            $dataKerja = $request->only(['Jabatan', 'department_id', 'division_id', 'unit_id', 'company_id', 'holding_id', 'level_id', 'Jenis_Kontrak', 'Perjanjian', 'Lokasi_Kerja']);
             $karyawan->pekerjaan()->exists() ? $karyawan->pekerjaan()->first()->update($dataKerja) : Pekerjaan::create(array_merge(['id_karyawan' => $id], $dataKerja));
 
             // 9. Update User Role jika level_id berubah

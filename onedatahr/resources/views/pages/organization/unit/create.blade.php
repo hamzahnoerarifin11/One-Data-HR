@@ -157,7 +157,7 @@
                             label="Pilih Holding"
                             :options="$holdings"
                             x-model="selectedHolding"
-                            @change="updateDivisions()"
+                            @change="updateDivisions($event.detail)"
                             x-bind:disabled="basedOn !== 'holding'"
                         />
                     </div>
@@ -236,10 +236,10 @@
 
             get filteredDivisions() { return this.divisions; },
 
-            updateDivisions(companyId = null) {
-                // Use passed companyId or fallback to x-model value
-                const targetCompanyId = companyId || this.selectedCompany;
-                const targetHoldingId = this.selectedHolding;
+            updateDivisions(entityId = null) {
+                // Use passed entityId for both company and holding cases
+                const targetCompanyId = this.basedOn === 'company' ? (entityId || this.selectedCompany) : this.selectedCompany;
+                const targetHoldingId = this.basedOn === 'holding' ? (entityId || this.selectedHolding) : this.selectedHolding;
                 
                 const oldDivision = this.selectedDivision;
                 this.selectedDivision = '';

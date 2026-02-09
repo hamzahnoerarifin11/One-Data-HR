@@ -102,11 +102,16 @@ if (!function_exists('getperusahaan')) {
             return [];
         }
 
-        preg_match("/^enum\((.*)\)$/", $result->Type, $matches);
+        // Check if column is enum
+        if (preg_match("/^enum\((.*)\)$/", $result->Type, $matches)) {
+             return collect(explode(',', $matches[1]))
+                ->map(fn ($value) => trim($value, "'"))
+                ->toArray();
+        }
 
-        return collect(explode(',', $matches[1]))
-            ->map(fn ($value) => trim($value, "'"))
-            ->toArray();
+        // If not enum (e.g. varchar), return empty array or distinct values if needed.
+        // For now, empty array is safe as the dropdowns use dynamic company list.
+        return [];
     }
 }
 if (!function_exists('getpendidikan')) {

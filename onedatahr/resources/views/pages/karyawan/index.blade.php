@@ -186,7 +186,7 @@ Password: ${password}
                 <!-- <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Pencarian Karyawan</label> -->
                 <div class="relative">
                     <input type="text" name="search" id="search" value="{{ request('search') }}" placeholder="Cari nama, NIK, jabatan, lokasi kerja, divisi, perusahaan..."
-                           class="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-4 pr-10 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400">
+                           class="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-4 pr-10 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-3">
                         <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -226,6 +226,32 @@ Password: ${password}
             <div class="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
                 <div class="flex items-center gap-3">
                     <span class="text-sm text-gray-500 dark:text-gray-400">Menampilkan {{ $karyawans->firstItem() ?? 0 }} sampai {{ $karyawans->lastItem() ?? 0 }} dari {{ $karyawans->total() }} data</span>
+                </div>
+                <div class="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
+                <div class="flex items-center gap-3">
+                    <span class="text-sm text-gray-500 dark:text-gray-400">Show</span>
+                    <div class="relative z-20">
+                        <select x-model.number="perPage" @change="resetPage"
+                            class="h-11 w-20 appearance-none rounded-lg border
+                                border-gray-300 bg-transparent px-4 py-2.5 pr-8
+                                text-sm text-gray-800 outline-none
+                                focus:border-blue-600 focus:ring-1 focus:ring-blue-600
+                                dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                        </select>
+                        <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">
+                            <svg class="fill-current" width="18" height="18" viewBox="0 0 20 20">
+                                <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293
+                                        a1 1 0 111.414 1.414l-4 4a1 1 0
+                                        01-1.414 0l-4-4a1 1 0 010-1.414z"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <span class="text-sm text-gray-500 dark:text-gray-400">entries</span>
+                </div>
                 </div>
 
                 <div class="flex items-center gap-2">

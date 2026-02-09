@@ -810,17 +810,20 @@
             <div x-show="currentStep===2" x-transition class="space-y-6">
                 <div class="grid grid-cols-2 gap-4">
 
-                    <!-- PERUSAHAAN -->
+                    <!-- PERUSAHAAN / HOLDING -->
                     <div>
                         <x-searchable-select
                             id="company"
-                            name="company_id"
+                            name="entity_selection"
                             label="Perusahaan"
                             :options="$companies"
                             x-model="selectedCompany"
-                            @change="updateDivisions($event.detail)"
+                            @change="updateEntity($event.detail)"
                             placeholder="-- Pilih Perusahaan --"
                         />
+                        <!-- Hidden fields for actual company_id and holding_id -->
+                        <input type="hidden" name="company_id" :value="actualCompanyId">
+                        <input type="hidden" name="holding_id" :value="actualHoldingId">
                     </div>
 
                     <!-- DIVISI -->
@@ -855,9 +858,8 @@
                             id="unit"
                             name="unit_id"
                             label="Unit"
-                            x-effect="dynamicOptionsRaw = units"
+                            :options="$units"
                             x-model="selectedUnit"
-                            @change="updateLevels($event.detail)"
                             placeholder="-- Pilih Unit --"
                         />
                     </div>
@@ -882,7 +884,7 @@
                             id="levelSelect"
                             name="level_id"
                             required
-                            x-effect="dynamicOptionsRaw = levels"
+                            :options="$levels->map(fn($l) => ['id' => $l->id, 'name' => $l->name])"
                             x-model="selectedLevel"
                             placeholder="-- Pilih Level --"
                         />
@@ -1505,22 +1507,61 @@ function karyawanForm(initData = {}) {
         selectedDivision: initData.old?.division_id || initData.current?.division_id || '',
         selectedDepartment: initData.old?.department_id || initData.current?.department_id || '',
         selectedUnit: initData.old?.unit_id || initData.current?.unit_id || '',
-        selectedLevel: initData.old?.level_id || initData.current?.level_id || '',
+        // Organization Selection
+        selectedCompany: initData.current?.company_id || initData.current?.holding_id ? `holding_${initData.current?.holding_id}` : '' || '',
+        selectedDivision: initData.current?.division_id || '',
+        selectedDepartment: initData.current?.department_id || '',
+        selectedUnit: initData.current?.unit_id || '',
+        selectedLevel: initData.current?.level_id || '',
+
+        // Actual IDs for form submission (parsed from selectedCompany)
+        actualCompanyId: initData.current?.company_id || '',
+        actualHoldingId: initData.current?.holding_id || '',
 
         init() {
-            if (this.selectedCompany) this.fetchDivisions(this.selectedCompany, true);
+             // Parse initial selection
+            if (this.selectedCompany) {
+                this.parseEntitySelection(this.selectedCompany);
+            }
+            
+            // Watchers for dependent dropdowns
+            this.$watch('selectedCompany', (val) => {
+                if(val) this.updateEntity(val);
+            });
+        },
+        
+        // Parse entity selection to set actualCompanyId or actualHoldingId
+        parseEntitySelection(val) {
+            if (String(val).startsWith('holding_')) {
+                this.actualHoldingId = String(val).replace('holding_', '');
+                this.actualCompanyId = '';
+            } else {
+                this.actualCompanyId = val;
+                this.actualHoldingId = '';
+            }
+        },
+        
+        // Called when entity (company/holding) is selected
+        updateEntity(val) {
+            this.parseEntitySelection(val);
+            this.updateDivisions(val);
         },
 
-        fetchDivisions(companyId, chain = false) {
-            if (!companyId) return;
-            fetch(`/karyawan/divisions/${companyId}`)
+        fetchDivisions(entityId) {
+            if (!entityId) return;
+            
+            // Detect if this is a Holding ID (prefixed with 'holding_')
+            let url;
+            if (String(entityId).startsWith('holding_')) {
+                const holdingId = String(entityId).replace('holding_', '');
+                url = `/organization/division/by-holding/${holdingId}`;
+            } else {
+                url = `/karyawan/divisions/${entityId}`;
+            }
+            
+            fetch(url)
                 .then(r => r.json())
-                .then(data => {
-                    this.divisions = data;
-                    if (chain && this.selectedDivision) {
-                        this.fetchDepartments(this.selectedDivision, true);
-                    }
-                });
+                .then(data => this.divisions = data);
         },
 
         fetchDepartments(divisionId, chain = false) {
@@ -1558,11 +1599,10 @@ function karyawanForm(initData = {}) {
             this.selectedDivision = '';
             this.selectedDepartment = '';
             this.selectedUnit = '';
-            this.selectedLevel = '';
             this.divisions = [];
             this.departments = [];
             this.units = [];
-            this.levels = [];
+            // Note: levels are global and should not be reset
             
             if (val) this.fetchDivisions(val);
         },
@@ -1570,28 +1610,19 @@ function karyawanForm(initData = {}) {
         updateDepartments(val) {
             this.selectedDepartment = '';
             this.selectedUnit = '';
-            this.selectedLevel = '';
             this.departments = [];
             this.units = [];
-            this.levels = [];
+            // Note: levels are global and should not be reset
 
             if (val) this.fetchDepartments(val);
         },
 
         updateUnits(val) {
             this.selectedUnit = '';
-            this.selectedLevel = '';
             this.units = [];
-            this.levels = [];
+            // Note: levels are global and should not be reset
 
             if (val) this.fetchUnits(val);
-        },
-
-        updateLevels(val) {
-            this.selectedLevel = '';
-            this.levels = [];
-
-            if (val) this.fetchLevels(val);
         },
 
         go(i){ this.currentStep = i; window.scrollTo(0,0); },
