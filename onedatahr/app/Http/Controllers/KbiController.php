@@ -20,6 +20,7 @@ class KbiController extends Controller
         // Contoh: "Senior Manager" harus dicek sebelum "Manager"
         return [
             'Direktur' => 1,
+            'Director' => 1,
             'General Manager' => 2,
             'Senior Manager' => 2,
             'senior_manager' => 2,
@@ -120,12 +121,19 @@ class KbiController extends Controller
                 });
             }
 
-            $rawList = $query->get();
+            $rawList = $query->orderBy('Nama_Lengkap_Sesuai_Ijazah', 'ASC')->get();
+            // $candidates = $queryAtasan->orderBy('Nama_Lengkap_Sesuai_Ijazah', 'ASC')->get();
 
             // 3. Filter Level: User tidak boleh melihat atasan (Level < UserLevel)
             $karyawanCollection = $rawList->filter(function ($staff) use ($userLevel) {
-                // Robust fetch job title
-                $staffJab = $staff->pekerjaan->first()?->position?->name ?? $staff->pekerjaan->first()?->Jabatan ?? '';
+                // Robust fetch job title: PRIORITASKAN LEVEL RESMI DARI DATABASE!
+                $staffJab = $staff->pekerjaan->first()?->level?->name 
+                    ?? $staff->pekerjaan->first()?->position?->name 
+                    ?? $staff->pekerjaan->first()?->Jabatan 
+                    ?? '';
+
+                if (empty($staffJab)) return false; // Safety check
+
                 $staffLvl = $this->getLevel($staffJab);
                 // StaffLevel >= UserLevel (Bawahan atau setara) - Angka besar = Level rendah
                 return $staffLvl >= $userLevel;
@@ -192,37 +200,37 @@ class KbiController extends Controller
         // F. Logic Dropdown Pilih Atasan (TEPAT 1 LEVEL DI ATAS USER)
         $listCalonAtasan = collect();
         if ($userLevel > 1) {
-            // Target level: tepat 1 level di atas user
+            // Default target: 1 level diatasuser
             $targetLevel = $userLevel - 1;
-
-            // --- [MODIFICATION] KHUSUS MANAGER & SENIOR MANAGER ---
-            // Rule: Langsung munculkan irektur Utama (Level 1) & Tidak Terikat Divisi
-            $jabatanLower = strtolower($userLevel);
-            $isManagerOrSenior = (strpos($jabatanLower, 'manager') !== false || strpos($jabatanLower, 'manajer') !== false);
             
-            // Berlaku jika user adalah Level 2 (Senior Manager/GM) atau Level 3 (Manager)
-            // Note: Assistant Manager (Level 7) tidak termasuk karena level > 3
-            if (($userLevel == 2 || $userLevel == 3) && $isManagerOrSenior) {
-                $targetLevel = 1; // Paksa target ke Level 1 (Direktur)
-            }
-
-            // Ambil kandidat dasar: bukan diri sendiri, ambil pekerjaan & posisi
+            // Query dasar
             $queryAtasan = Karyawan::with(['pekerjaan.position', 'pekerjaan.division'])
                 ->where('id_karyawan', '!=', $karyawan->id_karyawan);
 
-            // Jika user bukan top-level (level > 2), batasi pencarian ke divisi yang sama
-            // KECUALI jika special case (Manager/Senior Manager -> Global Direktur)
-            if ($userLevel > 2 && $userDivisionId && !(($userLevel == 3) && $isManagerOrSenior)) {
-                $queryAtasan->whereHas('pekerjaan', function ($q) use ($userDivisionId) {
-                    $q->where('division_id', $userDivisionId);
-                });
+            // LOGIC KHUSUS: MANAGER (Level 3) & GM/SENIOR MANAGER (Level 2)
+            // Atasan mereka adalah Direktur (Level 1) & Tidak dibatasi Divisi
+            if ($userLevel == 2 || $userLevel == 3) {
+                $targetLevel = 1;
+                // Tidak ada filter divisi (Global)
+            } else {
+                // Selain itu (Staff, SPV, dll), harus dalam satu divisi
+                if ($userDivisionId) {
+                    $queryAtasan->whereHas('pekerjaan', function ($q) use ($userDivisionId) {
+                        $q->where('division_id', $userDivisionId);
+                    });
+                }
             }
 
             // Ambil kandidat, lalu lakukan penyaringan yang ketat di PHP berdasarkan level
             $candidates = $queryAtasan->orderBy('Nama_Lengkap_Sesuai_Ijazah', 'ASC')->get();
 
             $listCalonAtasan = $candidates->filter(function ($calon) use ($targetLevel) {
-                $calonJab = $calon->pekerjaan->first()?->position?->name ?? $calon->pekerjaan->first()?->Jabatan ?? '';
+                // PRIORITAS UTAMA: Ambil Level Name resmi dari tabel levels (agar 'Staff' di jabatan manual tidak override 'Supervisor' di level)
+                $calonJab = $calon->pekerjaan->first()?->level?->name 
+                    ?? $calon->pekerjaan->first()?->position?->name 
+                    ?? $calon->pekerjaan->first()?->Jabatan 
+                    ?? '';
+                
                 $calonLvl = $this->getLevel($calonJab);
                 return $calonLvl === $targetLevel;
             })->values();

@@ -53,7 +53,8 @@
         </form>
     </div>
 
-    @if(auth()->user()->hasRole(['superadmin', 'admin', 'manager', 'senior_manager', 'supervisor']))
+    {{-- DEBUG: Tampilkan hanya untuk Level 1-5 (Direktur s.d. Staff) --}}
+    @if(in_array($userLevel, [1, 2, 3, 4, 5]))
     <div class="mb-4 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative">
         <strong class="font-bold">DEBUG:</strong>
         <span class="block sm:inline">
@@ -273,8 +274,8 @@
                     <thead class="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-600 text-gray-700 dark:text-gray-300 uppercase text-xs font-semibold">
                         <tr>
                             <th class="p-4 text-left">Nama</th>
-                            <th class="p-4 text-center">NIK</th>
-                            <th class="p-4 text-center hidden sm:table-cell">Jabatan</th>
+                            <th class="p-4 text-center">Perusahaan</th>
+                            <th class="p-4 text-center ">Jabatan</th>
                             <th class="p-4 text-center">Keterangan</th>
                             <th class="p-4 text-center">Aksi</th>
                         </tr>
@@ -295,20 +296,20 @@
                         {{ $staff->Nama_Lengkap_Sesuai_Ijazah ?? $staff->Nama_Sesuai_KTP }}
                     </div>
                     <div class="text-xs text-gray-500 dark:text-gray-400">
-                        {{ $staff->pekerjaan->first()?->company?->name ?? 'N/A' }}
+                        {{ $staff->NIK }}
                     </div>
                 </div>
             </div>
         </td>
         {{-- KOLOM 2: NIK --}}
         <td class="p-4 text-center text-gray-700 dark:text-gray-300">
-            {{ $staff->NIK }}
+            {{ $staff->pekerjaan->first()?->company?->name ?? 'N/A'}}
         </td>
         {{-- KOLOM 3: JABATAN --}}
-        <td class="p-4 text-center text-gray-700 dark:text-gray-300 hidden sm:table-cell">
-            {{ $staff->pekerjaan->first()?->position?->name ?? 'N/A' }} 
+        <td class="p-4 text-center text-gray-700 dark:text-gray-300">
+            {{ $staff->pekerjaan->first()?->level?->name ?? 'N/A' }} 
             <br>
-            <span class="text-xs text-gray-500">(Level: {{ $staff->calculated_level }})</span>
+            <!-- <span class="text-xs text-gray-500">(Level: {{ $staff->calculated_level }})</span> -->
         </td>
         
         {{-- KOLOM 4: KETERANGAN STATUS --}}
