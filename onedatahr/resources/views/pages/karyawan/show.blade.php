@@ -192,11 +192,11 @@
     <div class="mb-6 rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-800 dark:bg-white/[0.03] p-6">
         <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Informasi Pekerjaan</h2>
 
-        @if($karyawan->pekerjaan->first()->company)
+        @if($karyawan->pekerjaan->first() && ($karyawan->pekerjaan->first()->company || $karyawan->pekerjaan->first()->holding))
         <div class="mb-4 p-4 rounded-lg border border-gray-100 dark:border-gray-700">
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Perusahaan</p>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Perusahaan / Holding</p>
             <p class="text-base font-semibold text-gray-900 dark:text-white mt-1">
-                {{ $karyawan->pekerjaan->first()->company->name ?? '-' }}
+                {{ $karyawan->pekerjaan->first()->company->name ?? $karyawan->pekerjaan->first()->holding->name ?? '-' }}
             </p>
         </div>
         @endif

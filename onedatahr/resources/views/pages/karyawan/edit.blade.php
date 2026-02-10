@@ -44,23 +44,6 @@
             </div>
         @endif
 
-
-
-            window.karyawanEditData = {
-                companies: @json($companies),
-                levels: @json($levels),
-                divisions: @json($divisions),
-                departments: @json($departments),
-                units: @json($units),
-                current: {
-                    company_id: @json(old('company_id', optional($karyawan->pekerjaan->first())->company_id)),
-                    division_id: @json(old('division_id', optional($karyawan->pekerjaan->first())->division_id)),
-                    department_id: @json(old('department_id', optional($karyawan->pekerjaan->first())->department_id)),
-                    unit_id: @json(old('unit_id', optional($karyawan->pekerjaan->first())->unit_id)),
-                    level_id: @json(old('level_id', optional($karyawan->pekerjaan->first())->level_id))
-                }
-            };
-        </script>
         <form action="{{ route('karyawan.update', $karyawan->id_karyawan) }}" method="POST" x-data="karyawanForm(window.karyawanEditData)" @submit.prevent="submit">
             @csrf
             @method('PUT')
@@ -858,7 +841,7 @@
                             id="unit"
                             name="unit_id"
                             label="Unit"
-                            :options="$units"
+                            x-effect="dynamicOptionsRaw = units"
                             x-model="selectedUnit"
                             placeholder="-- Pilih Unit --"
                         />
@@ -1503,12 +1486,15 @@ function karyawanForm(initData = {}) {
         levels: initData.levels || [],
 
         // Organization Selection
-        selectedCompany: initData.old?.company_id || initData.current?.company_id || '',
-        selectedDivision: initData.old?.division_id || initData.current?.division_id || '',
-        selectedDepartment: initData.old?.department_id || initData.current?.department_id || '',
-        selectedUnit: initData.old?.unit_id || initData.current?.unit_id || '',
-        // Organization Selection
-        selectedCompany: initData.current?.company_id || initData.current?.holding_id ? `holding_${initData.current?.holding_id}` : '' || '',
+        selectedCompany: function() {
+            let cid = initData.current?.company_id;
+            let hid = initData.current?.holding_id;
+            
+            if (cid) return cid;
+            if (hid) return `holding_${hid}`;
+            return '';
+        }(),
+
         selectedDivision: initData.current?.division_id || '',
         selectedDepartment: initData.current?.department_id || '',
         selectedUnit: initData.current?.unit_id || '',
@@ -1959,6 +1945,24 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 });
+</script>
+<script>
+ window.karyawanEditData = {
+
+                companies: @json($companies),
+                levels: @json($levels),
+                divisions: @json($divisions),
+                departments: @json($departments),
+                units: @json($units),
+                current: {
+                    company_id: @json(old('company_id', optional($karyawan->pekerjaan->first())->company_id)),
+                    holding_id: @json(old('holding_id', optional($karyawan->pekerjaan->first())->holding_id)),
+                    division_id: @json(old('division_id', optional($karyawan->pekerjaan->first())->division_id)),
+                    department_id: @json(old('department_id', optional($karyawan->pekerjaan->first())->department_id)),
+                    unit_id: @json(old('unit_id', optional($karyawan->pekerjaan->first())->unit_id)),
+                    level_id: @json(old('level_id', optional($karyawan->pekerjaan->first())->level_id))
+                }
+            };
 </script>
 <!-- <script>
 function kontrakForm() {

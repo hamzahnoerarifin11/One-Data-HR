@@ -42,6 +42,7 @@
                 levels: @json($levels),
                 old: {
                     company_id: @json(old('company_id')),
+                    holding_id: @json(old('holding_id')),
                     division_id: @json(old('division_id')),
                     department_id: @json(old('department_id')),
                     unit_id: @json(old('unit_id')),

@@ -46,7 +46,7 @@
                     <td>{{ $karyawan->Nomor_Telepon_Aktif_Karyawan }}</td>
                     <td>{{ $karyawan->pekerjaan->first()->level->name ?? '-' }}</td>
                     <td>{{ $karyawan->pekerjaan->first()->division->name ?? '-' }}</td>
-                    <td>{{ $karyawan->pekerjaan->first()->company->name ?? '-' }}</td>
+                    <td>{{ $karyawan->pekerjaan->first()?->company->name ?? $karyawan->pekerjaan->first()?->holding->name ?? '-' }}</td>
                 </tr>
             @endforeach
         </tbody>
