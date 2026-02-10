@@ -99,6 +99,11 @@
                                 <svg :class="sortCol === 'company_name' ? (sortDir === 'asc' ? 'rotate-0' : 'rotate-180') : 'opacity-20'" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
                             </div>
                         </th>
+
+                        <!-- <th class="px-5 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400">
+                            Parent
+                        </th> -->
+
                         <th @click="sortBy('created_at')" class="px-5 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400 cursor-pointer hover:text-blue-600">
                             <div class="flex items-center gap-1">
                                 Tanggal Dibuat
@@ -117,6 +122,7 @@
                             <td class="px-5 py-4 text-sm font-medium text-gray-900 dark:text-white" x-text="row.name"></td>
                             <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400" x-text="row.division_name"></td>
                             <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400" x-text="row.company_name"></td>
+                            <!-- <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400" x-text="row.parent_name"></td> -->
                             <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400" x-text="row.created_at"></td>
                             <td class="px-5 py-4 text-center">
                                 <div class="flex items-center justify-center gap-2">
@@ -145,7 +151,7 @@
                     </template>
                     <template x-if="filtered.length === 0">
                         <tr>
-                            <td colspan="6" class="px-5 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
+                            <td colspan="7" class="px-5 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
                                 Belum ada data departemen ditemukan.
                             </td>
                         </tr>

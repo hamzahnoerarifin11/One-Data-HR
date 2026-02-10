@@ -286,7 +286,9 @@
                     'kondisi_perizinan' => 'Kondisi Perizinan',
                     'tata_tertib' => 'Tata Tertib',
                     'bpjs' => 'BPJS Kesehatan/TK',
-                    'k3' => 'K3 Umum'
+                    'k3' => 'K3 Umum',
+                    'jobdesk' => 'Jobdesk',
+                    'ojt' => 'OJT'
                 ] as $f => $label)
 
                     {{-- Hidden agar unchecked tetap terkirim --}}

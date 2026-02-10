@@ -48,9 +48,13 @@
 
             @if(isset($me) && auth()->user()->hasRole(['manager','GM','senior_manager','direktur']))
                 <div class="mt-3 flex items-center justify-center gap-3">
-<a href="{{ route('kpi.bulk-create.form', ['tahun' => $tahun]) }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-bold shadow inline-flex items-center">
-                                    <i class="fas fa-layer-group mr-1"></i> Tetapkan KPI untuk Semua Karyawan
-                                </a>
+                    <a href="{{ route('kpi.bulk-create.form', ['tahun' => $tahun]) }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-bold shadow inline-flex items-center">
+                        <i class="fas fa-layer-group mr-1"></i> Tetapkan KPI untuk Semua Karyawan
+                    </a>
+
+                    <button onclick="openImportModal()" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded text-sm font-bold shadow inline-flex items-center">
+                        <i class="fas fa-file-import mr-1"></i> Import Excel
+                    </button>
 
                     <a href="{{ route('kpi.show', ['karyawan_id' => $me->id_karyawan, 'tahun' => $tahun]) }}" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm font-bold shadow">
                         <i class="fas fa-user-check mr-1"></i> Nilai Diri Sendiri
@@ -334,7 +338,7 @@
                                         {{-- Pastikan tahun yang dikirim adalah tahun yang dipilih di filter --}}
                                         <input type="hidden" name="tahun" value="{{ $tahun }}">
                                         <button type="submit" class="w-full justify-center font-medium text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-sm flex items-center gap-2 transition shadow">
-                                            <i class="fas fa-plus-circle"></i> Buat KPI Baru
+                                            <i class="fas fa-plus-circle"></i> Buat aw Baru
                                         </button>
                                     </form>
                                 @endif
@@ -477,7 +481,68 @@
             </div>
         </div>
     </div>
+    </div>
+
+    {{-- IMPORT MODAL --}}
+    <div id="importModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeImportModal()"></div>
+
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+                <form action="{{ route('kpi.import') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div class="sm:flex sm:items-start">
+                            <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-teal-100 dark:bg-teal-900 sm:mx-0 sm:h-10 sm:w-10">
+                                <i class="fas fa-file-import text-teal-600 dark:text-teal-300"></i>
+                            </div>
+                            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white" id="modal-title">
+                                    Import KPI dari Excel
+                                </h3>
+                                <div class="mt-2">
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                                        Unduh template, isi data KPI karyawan, lalu upload kembali. Pastikan NIK Karyawan benar.
+                                    </p>
+                                    
+                                    <a href="{{ route('kpi.import.template') }}" class="text-blue-600 hover:text-blue-800 text-sm font-bold underline mb-4 inline-block">
+                                        <i class="fas fa-download mr-1"></i> Download Template Excel
+                                    </a>
+
+                                    <div class="mt-2">
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                            Upload File Excel (.xlsx)
+                                        </label>
+                                        <input type="file" name="file" accept=".xlsx, .xls" required
+                                            class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 dark:file:bg-teal-900 dark:file:text-teal-300"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-teal-600 text-base font-medium text-white hover:bg-teal-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                            Import
+                        </button>
+                        <button type="button" onclick="closeImportModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
+                            Batal
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
+        function openImportModal() {
+            document.getElementById('importModal').classList.remove('hidden');
+        }
+        function closeImportModal() {
+            document.getElementById('importModal').classList.add('hidden');
+        }
 
         // BULK DELETE SCRIPT
         const selectAll = document.getElementById('selectAll');

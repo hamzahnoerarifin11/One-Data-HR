@@ -6,7 +6,7 @@
     <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-                Data Perusahaan
+                {{ $title ?? 'Data Perusahaan' }}
             </h1>
             <p class="mt-1 text-gray-600 dark:text-gray-400">
                 Kelola data perusahaan yang terdaftar
@@ -89,6 +89,12 @@
                         </th>
                         <th @click="sortBy('created_at')" class="px-5 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400 cursor-pointer hover:text-blue-600">
                             <div class="flex items-center gap-1">
+                                Holding
+                            </div>
+                        </th>
+
+                        <th @click="sortBy('created_at')" class="px-5 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400 cursor-pointer hover:text-blue-600">
+                            <div class="flex items-center gap-1">
                                 Tanggal Dibuat
                                 <svg :class="sortCol === 'created_at' ? (sortDir === 'asc' ? 'rotate-0' : 'rotate-180') : 'opacity-20'" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
                             </div>
@@ -103,9 +109,14 @@
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/20 transition">
                             <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400" x-text="startItem + index"></td>
                             <td class="px-5 py-4 text-sm font-medium text-gray-900 dark:text-white" x-text="row.name"></td>
+                            <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400" x-text="row.holding_label"></td>
                             <td class="px-5 py-4 text-sm text-gray-500 dark:text-gray-400" x-text="row.created_at"></td>
                             <td class="px-5 py-4 text-center">
                                 <div class="flex items-center justify-center gap-2">
+                                    <a :href="'{{ url('organization/company') }}/' + row.id" class="inline-flex items-center justify-center rounded-lg bg-blue-50 p-2 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/40 transition mr-1" title="Lihat">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                    </a>
+
                                     <a :href="'{{ url('organization/company') }}/' + row.id + '/edit'"
                                     class="inline-flex items-center justify-center rounded-lg bg-yellow-50 p-2 text-yellow-600 hover:bg-yellow-100 dark:bg-yellow-900/20 dark:text-yellow-400 dark:hover:bg-yellow-900/40 transition" title="Edit">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -188,7 +199,7 @@ function companyTable() {
             if (this.search) {
                 const q = this.search.toLowerCase();
                 filteredData = filteredData.filter(d =>
-                    d.name.toLowerCase().includes(q)
+                    d.name.toLowerCase().includes(q) || (d.holding_label && d.holding_label.toLowerCase().includes(q))
                 );
             }
             return filteredData.sort((a, b) => {

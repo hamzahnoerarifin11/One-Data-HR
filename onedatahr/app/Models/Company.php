@@ -4,16 +4,32 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Holding;
 
 class Company extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'holding_id', 'parent_id'];
+
+    public function parent()
+    {
+        return $this->belongsTo(Company::class, 'parent_id');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(Company::class, 'parent_id');
+    }
 
     public function divisions()
     {
         return $this->hasMany(Division::class);
+    }
+
+    public function holding()
+    {
+        return $this->belongsTo(Holding::class);
     }
 
     public function departments()

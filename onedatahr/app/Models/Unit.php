@@ -9,11 +9,26 @@ class Unit extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['company_id', 'division_id', 'department_id', 'name'];
+    protected $fillable = ['company_id', 'holding_id', 'based_on', 'parent_id', 'division_id', 'department_id', 'name'];
 
     public function company()
     {
         return $this->belongsTo(Company::class);
+    }
+
+    public function holding()
+    {
+        return $this->belongsTo(\App\Models\Holding::class);
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(\App\Models\Unit::class, 'parent_id');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(\App\Models\Unit::class, 'parent_id');
     }
 
     public function division()

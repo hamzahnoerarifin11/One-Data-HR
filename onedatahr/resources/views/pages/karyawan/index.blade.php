@@ -242,10 +242,22 @@ Password: ${password}
                         Hapus Terpilih
                     </button>
 
-                    <button class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2v6m0 0l-2-2m2 2l2-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        Download
-                    </button>
+                    <div class="relative" x-data="{ open: false }">
+                        <button type="button" @click="open = !open" @click.away="open = false" class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 hover:bg-gray-50 focus:outline-none">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            Export
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div x-show="open" class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-50 border border-gray-200 dark:border-gray-700" style="display: none;">
+                            <a href="{{ route('karyawan.export', ['type' => 'csv']) }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Export CSV</a>
+                            <a href="{{ route('karyawan.export', ['type' => 'excel']) }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Export Excel</a>
+                            <a href="{{ route('karyawan.export', ['type' => 'pdf']) }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Export PDF</a>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -361,7 +373,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const selectAll = document.getElementById('select-all');
     const checkboxes = document.querySelectorAll('input[name="selected_karyawan[]"]');
     const deleteBtn = document.getElementById('batch-delete-btn');
-    const form = document.getElementById('batch-delete-form');
 
     function updateButton() {
         const checked = document.querySelectorAll('input[name="selected_karyawan[]"]:checked');
@@ -398,7 +409,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initialize button state
     updateButton();
 
-    // Global batch delete function
+    // Global batch delete function - using fetch API
     window.batchDelete = function () {
         const checked = document.querySelectorAll('input[name="selected_karyawan[]"]:checked');
 
@@ -407,9 +418,51 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        if (confirm(`Yakin ingin menghapus ${checked.length} karyawan terpilih?`)) {
-            form.submit();
+        if (!confirm(`Yakin ingin menghapus ${checked.length} karyawan terpilih?`)) {
+            return;
         }
+
+        // Get selected IDs
+        const selectedIds = Array.from(checked).map(cb => cb.value);
+        
+        // Create form data
+        const formData = new FormData();
+        formData.append('_token', '{{ csrf_token() }}');
+        selectedIds.forEach(id => {
+            formData.append('selected_karyawan[]', id);
+        });
+
+        // Show loading state
+        deleteBtn.disabled = true;
+        deleteBtn.innerHTML = `
+            <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Menghapus...
+        `;
+
+        // Send request
+        fetch('{{ route("karyawan.batchDelete") }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (response.redirected) {
+                window.location.href = response.url;
+            } else {
+                window.location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Terjadi kesalahan saat menghapus data');
+            deleteBtn.disabled = false;
+            updateButton();
+        });
     };
 });
 </script>

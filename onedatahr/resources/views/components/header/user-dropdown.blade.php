@@ -7,6 +7,7 @@
         this.dropdownOpen = false;
     }
 }" @click.away="closeDropdown()">
+    @auth
     <!-- User Button -->
     <button
         class="flex items-center text-gray-700 dark:text-gray-400"
@@ -14,10 +15,21 @@
         type="button"
     >
         <span class="mr-3 overflow-hidden rounded-full h-11 w-11">
-            <img src="/images/user/owner.png" alt="User" />
+            <img class="h-full w-full object-cover" src="{{ auth()->user() && auth()->user()->photo ? asset('storage/'.auth()->user()->photo) : asset('/images/user/owner.png') }}" alt="{{ auth()->user()->name ?? 'User' }}" />
         </span>
 
-       <span class="block mr-1 font-medium text-theme-sm">Musharof</span>
+        <div class="flex flex-col">
+            <span class="block font-medium text-theme-sm">
+                {{ auth()->user()->name ?? 'Guest' }}
+            </span>
+
+            @if(auth()->check() && auth()->user()->roles->count())
+                <span class="mt-1 inline-block w-fit rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                    {{ ucwords(str_replace('_',' ', auth()->user()->roles->pluck('name')->first())) }}
+                </span>
+            @endif
+        </div>
+
 
         <!-- Chevron Icon -->
         <svg
@@ -44,9 +56,13 @@
         style="display: none;"
     >
         <!-- User Info -->
+        @php
+            $roles = auth()->check() ? auth()->user()->roles->pluck('name')->map(function($r){ return ucwords(str_replace('_',' ',$r)); })->join(', ') : null;
+        @endphp
         <div>
-            <span class="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">Musharof Chowdhury</span>
-            <span class="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">randomuser@pimjo.com</span>
+            <span class="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">{{ auth()->user()->name ?? 'Guest' }}</span>
+            <span class="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">{{ auth()->user()->email ?? '' }}</span>
+            <span class="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">{{ $roles ?? '—' }}</span>
         </div>
 
         <!-- Menu Items -->
@@ -63,7 +79,7 @@
                                 fill="currentColor"
                             />
                         </svg>',
-                        'path' => 'profile',
+                        'path' => route('profile.index'),
                     ],
                     [
                         'text' => 'Account settings',
@@ -75,7 +91,7 @@
                             fill="currentColor"
                         />
                         </svg>',
-                        'path' => 'chat'
+                        'path' => route('profile.index')
                     ],
                     [
                         'text' => 'Support',
@@ -87,15 +103,17 @@
                             fill="currentColor"
                           />
                         </svg>',
-                        'path' => 'profile'
+                        'path' => (\Illuminate\Support\Facades\Route::has('users.edit') && auth()->check() ? route('users.edit', auth()->id()) : '#')
                     ],
                 ];
             @endphp
 
             @foreach ($menuItems as $item)
                 <li>
+                    @php $isProfileAction = in_array($item['text'], ['Edit profile', 'Account settings']); @endphp
                     <a
                         href="{{ $item['path'] }}"
+                        @if($isProfileAction && request()->routeIs('profile.index')) @click.prevent="closeDropdown(); $dispatch('open-profile-info-modal')" @endif
                         class="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
                     >
                         <span class="text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300">
@@ -110,19 +128,25 @@
         <!-- Sign Out -->
         {{-- <form method="POST" action="#">
             @csrf --}}
-            <a
-                href="/signin"
-                class="flex items-center w-full gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
-                @click="closeDropdown()"
-            >
-                <span class="text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                    </svg>
-                </span>
-                Sign out
-            </a>
+            <form method="POST" action="{{ route('signout') }}" class="mt-3">
+                @csrf
+                <button
+                    type="submit"
+                    class="flex items-center w-full gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
+                    @click="closeDropdown()"
+                >
+                    <span class="text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>
+                    </span>
+                    Sign out
+                </button>
+            </form>
         {{-- </form> --}}
     </div>
     <!-- Dropdown End -->
+    @else
+        <a href="{{ route('signin') }}" class="text-theme-sm text-gray-700">Sign in</a>
+    @endauth
 </div>

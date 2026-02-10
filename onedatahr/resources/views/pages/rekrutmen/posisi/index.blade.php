@@ -104,6 +104,17 @@
                             <td class="px-6 py-4 text-md text-gray-500 dark:text-gray-400" x-text="startItem + index"></td>
                             <td class="px-6 py-4">
                                 <div class="text-md font-medium text-gray-900 dark:text-white" x-text="row.nama_posisi"></div>
+                                <template x-if="row.fpk_file_url">
+                                    <div class="mt-1">
+                                        <a :href="`/rekrutmen/posisi/${row.id_posisi}/download-fpk`" target="_blank" class="inline-flex items-center gap-1 text-xs text-green-600 hover:underline">
+                                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 3v12m0 0l-4-4m4 4l4-4M4 17h16" />
+                                            </svg>
+                                            Download Surat FPK
+                                        </a>
+                                    </div>
+                                </template>
                             </td>
                             <td class="px-6 py-4 text-md">
                                 <span :class="row.status === 'Aktif' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'"
@@ -166,7 +177,7 @@
 </div>
 
 <x-modal id="add-posisi" title="Tambah Posisi Baru" :showFooter="false">
-    <div class="p-6">
+    <form id="form-add-posisi" class="p-6" enctype="multipart/form-data">
         <div class="space-y-4">
             <div>
                 <label class="mb-2.5 block text-sm font-medium text-gray-900 dark:text-white">Nama Posisi</label>
@@ -203,6 +214,12 @@
                         </span>
                 </div>
             </div>
+            <div>
+                <label class="mb-2.5 block text-sm font-medium text-gray-900 dark:text-white">Upload Surat FPK</label>
+                <input type="file" id="add-fpk_file" name="fpk_file" accept=".pdf,.doc,.docx" class="focus:border-ring-brand-300 shadow-theme-xs focus:file:ring-brand-300 h-11 w-full overflow-hidden rounded-lg border border-gray-300 bg-transparent text-sm text-gray-500 transition-colors file:mr-5 file:border-collapse file:cursor-pointer file:rounded-l-lg file:border-0 file:border-r file:border-solid file:border-gray-200 file:bg-gray-50 file:py-3 file:pr-3 file:pl-3.5 file:text-sm file:text-gray-700 placeholder:text-gray-400 hover:file:bg-gray-100 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:text-white/90 dark:file:border-gray-800 dark:file:bg-white/[0.03] dark:file:text-gray-400 dark:placeholder:text-gray-400"/>
+                <span class="text-xs text-gray-400">File PDF, atau dokumen. Maksimal 2MB.</span>
+                <div id="add-fpk-preview" class="mt-1 text-xs text-blue-600"></div>
+            </div>
         </div>
         <div class="flex justify-end gap-3 mt-8">
             <button
@@ -211,13 +228,13 @@
                 class="rounded-lg border border-gray-300 px-5 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400">
                 Batal
             </button>
-            <button id="save-add" class="rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700">Simpan</button>
+            <button id="save-add" type="submit" class="rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700">Simpan</button>
         </div>
-    </div>
+    </form>
 </x-modal>
 
 <x-modal id="edit-posisi" title="Update Posisi" :showFooter="false">
-    <div class="p-6">
+    <form id="form-edit-posisi" class="p-6" enctype="multipart/form-data">
         <input type="hidden" id="edit-id">
         <div class="space-y-4">
             <div>
@@ -255,6 +272,13 @@
                         </span>
                 </div>
             </div>
+            <div>
+                <label class="mb-2.5 block text-sm font-medium text-gray-900 dark:text-white">Upload Surat FPK</label>
+                <input type="file" id="edit-fpk_file" name="fpk_file" accept=".pdf,.doc,.docx"
+                    class="focus:border-ring-brand-300 shadow-theme-xs focus:file:ring-brand-300 h-11 w-full overflow-hidden rounded-lg border border-gray-300 bg-transparent text-sm text-gray-500 transition-colors file:mr-5 file:border-collapse file:cursor-pointer file:rounded-l-lg file:border-0 file:border-r file:border-solid file:border-gray-200 file:bg-gray-50 file:py-3 file:pr-3 file:pl-3.5 file:text-sm file:text-gray-700 placeholder:text-gray-400 hover:file:bg-gray-100 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:text-white/90 dark:file:border-gray-800 dark:file:bg-white/[0.03] dark:file:text-gray-400 dark:placeholder:text-gray-400"/>
+                <span class="text-xs text-gray-400">File PDF, atau dokumen. Maksimal 2MB.</span>
+                <div id="edit-fpk-preview" class="mt-1 text-xs text-blue-600"></div>
+            </div>
         </div>
         <div class="flex justify-end gap-3 mt-8">
            <button
@@ -264,9 +288,9 @@
             >
                 Batal
             </button>
-            <button id="save-edit" class="rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700">Simpan Perubahan</button>
+            <button id="save-edit" type="submit" class="rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white hover:bg-blue-700">Simpan Perubahan</button>
         </div>
-    </div>
+    </form>
 </x-modal>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -340,8 +364,28 @@ function posisiTable() {
             document.getElementById('edit-id').value = row.id_posisi;
             document.getElementById('edit-nama_posisi').value = row.nama_posisi;
             document.getElementById('edit-status').value = row.status;
-            window.dispatchEvent(new CustomEvent('open-modal', { detail: { id: 'edit-posisi' } }));
+            // Reset file input dan event listener
+            const fileInput = document.getElementById('edit-fpk_file');
+            const newInput = fileInput.cloneNode(true);
+            fileInput.parentNode.replaceChild(newInput, fileInput);
+            newInput.value = '';
+            newInput.addEventListener('change', function () {
+                const preview = document.getElementById('edit-fpk-preview');
+                preview.textContent = this.files[0]
+                    ? 'File dipilih: ' + this.files[0].name
+                    : '';
+            });
+            const preview = document.getElementById('edit-fpk-preview');
+            if (row.fpk_file_url) {
+                preview.innerHTML = `<a href="/rekrutmen/posisi/${row.id_posisi}/download-fpk" target="_blank">File Surat FPK</a>`;
+            } else {
+                preview.innerHTML = '<span class="text-gray-400">Belum ada file</span>';
+            }
+            window.dispatchEvent(new CustomEvent('open-modal', {
+                detail: { id: 'edit-posisi' }
+            }));
         },
+
 
         confirmDelete(row) {
             const token = document.querySelector('meta[name="csrf-token"]').content;
@@ -373,28 +417,38 @@ function posisiTable() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+        // Preview nama file di tambah posisi (khusus PDF/DOC/DOCX)
+        document.getElementById('add-fpk_file').addEventListener('change', function() {
+            const preview = document.getElementById('add-fpk-preview');
+            if (this.files && this.files[0]) {
+                preview.textContent = 'File dipilih (PDF/DOC): ' + this.files[0].name;
+            } else {
+                preview.textContent = '';
+            }
+        });
     const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
     /* ================= TAMBAH POSISI ================= */
-    document.getElementById('save-add').onclick = async () => {
-        const payload = {
-            nama_posisi: document.getElementById('add-nama_posisi').value,
-            status: document.getElementById('add-status').value
-        };
-
+    document.getElementById('form-add-posisi').onsubmit = async (e) => {
+        e.preventDefault();
+        const form = document.getElementById('form-add-posisi');
+        const formData = new FormData(form);
+        formData.append('nama_posisi', document.getElementById('add-nama_posisi').value);
+        formData.append('status', document.getElementById('add-status').value);
+        const fileInput = document.getElementById('add-fpk_file');
+        if (fileInput.files[0]) {
+            formData.append('fpk_file', fileInput.files[0]);
+        }
         try {
             const res = await fetch("{{ route('rekrutmen.posisi.store') }}", {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': token,
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify(payload)
+                body: formData
             });
-
             const result = await res.json();
-
             if (res.ok) {
                 Swal.fire('Berhasil', 'Posisi berhasil ditambahkan', 'success')
                     .then(() => location.reload());
@@ -407,26 +461,27 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     /* ================= EDIT POSISI ================= */
-    document.getElementById('save-edit').onclick = async () => {
+    document.getElementById('form-edit-posisi').onsubmit = async (e) => {
+        e.preventDefault();
         const id = document.getElementById('edit-id').value;
-        const payload = {
-            nama_posisi: document.getElementById('edit-nama_posisi').value,
-            status: document.getElementById('edit-status').value
-        };
-
+        const form = document.getElementById('form-edit-posisi');
+        const formData = new FormData(form);
+        formData.append('nama_posisi', document.getElementById('edit-nama_posisi').value);
+        formData.append('status', document.getElementById('edit-status').value);
+        const fileInput = document.getElementById('edit-fpk_file');
+        if (fileInput.files[0]) {
+            formData.append('fpk_file', fileInput.files[0]);
+        }
         try {
             const res = await fetch(`/rekrutmen/posisi/${id}`, {
-                method: 'PUT',
+                method: 'POST', // Laravel expects POST for file upload, with _method=PUT
                 headers: {
-                    'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': token,
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify(payload)
+                body: (() => { formData.append('_method', 'PUT'); return formData; })()
             });
-
             const result = await res.json();
-
             if (res.ok) {
                 Swal.fire('Berhasil', 'Data posisi diperbarui', 'success')
                     .then(() => location.reload());

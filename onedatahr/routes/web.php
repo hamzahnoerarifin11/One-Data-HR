@@ -21,7 +21,7 @@ use App\Http\Controllers\TrainingController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OnboardingKaryawanController;
 use App\Http\Controllers\TurnoverController;
-use App\Http\Controllers\KpiPerspectiveController;
+use App\Http\Controllers\ProfileController;
 
 
 
@@ -45,6 +45,10 @@ Route::post('/signout', [AuthController::class, 'logout'])->name('signout');
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 
+    // Profile pages
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
     // Karyawan resource
     // Route::middleware(['auth','role:superadmin,admin'])->group(function () {
     //     Route::resource('karyawan', KaryawanController::class);
@@ -58,20 +62,13 @@ Route::get('karyawan/departments/{divisionId}', [KaryawanController::class, 'get
 Route::get('karyawan/units/{departmentId}', [KaryawanController::class, 'getUnits'])->name('karyawan.units');
 Route::get('karyawan/positions/{unitId}', [KaryawanController::class, 'getPositions'])->name('karyawan.positions');
 
-Route::post('karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
-
-Route::middleware(['auth'])->group(function () {});
-
-Route::middleware(['auth'])->group(function () {
-    // other routes
-});
-
-Route::post('karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
-
 Route::middleware(['auth', 'role:admin|superadmin'])->group(function () {
-    // --- KARYAWAN MANAGEMENT ---
-    Route::resource('karyawan', KaryawanController::class);
-    // Route::post('karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
+        // --- KARYAWAN MANAGEMENT ---
+        // Custom routes MUST be defined BEFORE resource route to avoid conflict with {karyawan} wildcard
+        Route::post('karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
+        Route::get('karyawan/export', [KaryawanController::class, 'export'])->name('karyawan.export');
+        Route::resource('karyawan', KaryawanController::class);
+
     Route::middleware(['auth', 'role:superadmin'])->group(function () {
         // User management resource
         Route::resource('users', UserController::class);
@@ -85,14 +82,15 @@ Route::middleware(['auth', 'role:admin|superadmin'])->group(function () {
         Route::get('/', [RecruitmentDashboardController::class, 'index'])->name('dashboard');
         Route::get('calendar', [RecruitmentDashboardController::class, 'calendarPage'])->name('calendar');
 
-        // WIG & Positions
-        Route::get('wig', [WigRekrutmenController::class, 'index'])->name('wig.index');
-        Route::put('wig/{posisiId}', [WigRekrutmenController::class, 'update'])->name('wig.update');
-        Route::get('posisi/list', [PosisiController::class, 'index'])->name('posisi.list');
-        Route::post('posisi', [PosisiController::class, 'store'])->name('posisi.store');
-        Route::get('posisi-manage', [PosisiController::class, 'manage'])->name('posisi.index');
-        Route::put('posisi/{id}', [PosisiController::class, 'update'])->name('posisi.update');
-        Route::delete('posisi/{id}', [PosisiController::class, 'destroy'])->name('posisi.destroy');
+            // WIG & Positions
+            Route::get('wig', [WigRekrutmenController::class, 'index'])->name('wig.index');
+            Route::put('wig/{posisiId}', [WigRekrutmenController::class, 'update'])->name('wig.update');
+            Route::get('posisi/list', [PosisiController::class, 'index'])->name('posisi.list');
+            Route::post('posisi', [PosisiController::class, 'store'])->name('posisi.store');
+            Route::get('posisi-manage', [PosisiController::class, 'manage'])->name('posisi.index');
+            Route::put('posisi/{id}', [PosisiController::class, 'update'])->name('posisi.update');
+            Route::delete('posisi/{id}', [PosisiController::class, 'destroy'])->name('posisi.destroy');
+            Route::get('posisi/{id}/download-fpk', [PosisiController::class, 'downloadFpk'])->name('posisi.download-fpk');
 
 
         // Pelamar & Tahapan
@@ -183,7 +181,7 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
     Route::resource('users', UserController::class);
     Route::delete('/users/batch-delete', [UserController::class, 'batchDelete'])->name('users.batchDelete');
 });
-Route::middleware(['auth', 'role:admin|superadmin|manager|GM|senior_manager|Supervisor|direktur'])->group(function () {
+Route::middleware(['auth', 'role:admin|superadmin|manager|GM|senior_manager|supervisor|direktur'])->group(function () {
     // User management resource
     // 7. monitoring
     Route::get('/kbi/monitoring', [App\Http\Controllers\KbiController::class, 'monitoring'])->name('kbi.monitoring');
@@ -216,6 +214,10 @@ Route::post('/kpi/bulk-create', [KpiAssessmentController::class, 'bulkCreateForM
 Route::get('/kpi/bulk-create/form', [KpiAssessmentController::class, 'bulkCreateForm'])->name('kpi.bulk-create.form');
 Route::post('/kpi/bulk-store', [KpiAssessmentController::class, 'bulkStoreWithItems'])->name('kpi.bulk-store');
 Route::post('/kpi/bulk-delete-assessments', [KpiAssessmentController::class, 'bulkDelete'])->name('kpi.bulk-delete-assessments');
+
+// KPI Import
+Route::get('/kpi/import/template', [KpiAssessmentController::class, 'downloadTemplate'])->name('kpi.import.template');
+Route::post('/kpi/import', [KpiAssessmentController::class, 'importExcel'])->name('kpi.import');
 
 // KPI Assessment Routes
 // Contoh URL: /kpi/penilaian/5/2025 (Karyawan ID 5, Tahun 2025)
@@ -309,18 +311,34 @@ Route::middleware(['auth', 'role:admin|superadmin|ketua_tempa'])->prefix('tempa'
 
 // Routes untuk Struktur Pekerjaan
 Route::middleware(['auth', 'role:admin|superadmin'])->prefix('organization')->name('organization.')->group(function () {
+    Route::resource('subsidiary', \App\Http\Controllers\SubsidiaryController::class)->parameters([
+        'subsidiary' => 'subsidiary'
+    ]);
     Route::resource('company', \App\Http\Controllers\CompanyController::class)->parameters([
         'company' => 'company'
+    ]);
+    Route::resource('holding', \App\Http\Controllers\HoldingController::class)->parameters([
+        'holding' => 'holding'
     ]);
     Route::resource('division', \App\Http\Controllers\DivisionController::class)->parameters([
         'division' => 'division'
     ]);
+    Route::get('division/parents/{holdingId}', [\App\Http\Controllers\DivisionController::class, 'parentsByHolding'])->name('division.parentsByHolding');
+    Route::get('division/by-company/{companyId}', [\App\Http\Controllers\DivisionController::class, 'listByCompany'])->name('division.byCompany');
+    Route::get('division/by-holding/{holdingId}', [\App\Http\Controllers\DivisionController::class, 'listByHolding'])->name('division.byHolding');
+
     Route::resource('department', \App\Http\Controllers\DepartmentController::class)->parameters([
         'department' => 'department'
     ]);
+    Route::get('department/parents/{holdingId}', [\App\Http\Controllers\DepartmentController::class, 'parentsByHolding'])->name('department.parentsByHolding');
+    Route::get('department/by-division/{divisionId}', [\App\Http\Controllers\DepartmentController::class, 'listByDivision'])->name('department.byDivision');
+    Route::get('department/by-holding/{holdingId}', [\App\Http\Controllers\DepartmentController::class, 'listByHolding'])->name('department.byHolding');
+
     Route::resource('unit', \App\Http\Controllers\UnitController::class)->parameters([
         'unit' => 'unit'
     ]);
+    Route::get('unit/parents/{holdingId}', [\App\Http\Controllers\UnitController::class, 'parentsByHolding'])->name('unit.parentsByHolding');
+    Route::get('unit/by-department/{departmentId}', [\App\Http\Controllers\UnitController::class, 'listByDepartment'])->name('unit.byDepartment');
     Route::resource('position', \App\Http\Controllers\PositionController::class)->parameters([
         'position' => 'position'
     ]);

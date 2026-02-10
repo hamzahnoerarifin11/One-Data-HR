@@ -24,36 +24,134 @@ class DashboardController extends Controller
      * MAIN FUNCTION: TRAFFIC CONTROLLER
      * Mengarahkan user berdasarkan Role di database.
      */
+    /**
+     * MAIN FUNCTION: TRAFFIC CONTROLLER & DATA LOADER
+     * Mengarahkan user berdasarkan Role di database.
+     */
     public function index(Request $request)
     {
         $user  = Auth::user();
-        // $roles = Role::orderBy('name')->get();
-        // $role  = $user->role; // Asumsi nama kolom di tabel users adalah 'role'
         $tahun = $request->input('tahun', date('Y'));
 
         // 1. LOGIKA UNTUK ADMIN & SUPERADMIN (Melihat Global Data)
+        // Admin tetap pakai dashboard terpisah (opsional, tapi request user fokus merge manager/spv/staff)
         if ($user->hasRole(['superadmin', 'admin'])) {
             return $this->adminDashboard();
         }
 
-        // --- Cek Data Karyawan (Wajib untuk Manager & Staff) ---
+        // --- Cek Data Karyawan (Wajib untuk Manager, Supervisor & Staff) ---
         $karyawan = Karyawan::where('nik', $user->nik)->first();
 
         if (!$karyawan) {
-            // Jika akun login tapi tidak connect ke data karyawan
-            // Logout user dan redirect ke signin dengan pesan error
             auth()->logout();
             return redirect()->route('signin')->with('error', 'Akun Anda tidak terhubung dengan Data Karyawan. Silakan hubungi admin.');
         }
 
-        // 2. LOGIKA UNTUK MANAGER (Melihat Tim)
-        if ($user->hasRole('manager')) {
-            return $this->managerDashboard($request, $karyawan, $tahun);
+        // =====================================================================
+        // A. DATA PRIBADI (SEMUA ROLE DAPAT INI)
+        // =====================================================================
+        // Ambil KPI Saya
+        $myKpi = KpiAssessment::where('karyawan_id', $karyawan->id_karyawan)
+            ->where('tahun', $tahun)
+            ->first();
+
+        // Ambil KBI Saya (Self Assessment)
+        $myKbi = KbiAssessment::where('karyawan_id', $karyawan->id_karyawan)
+            ->where('tahun', $tahun)
+            ->where('tipe_penilai', 'DIRI_SENDIRI')
+            ->first();
+
+        // =====================================================================
+        // B. DATA TIM (KHUSUS MANAGER & SUPERVISOR)
+        // =====================================================================
+        $teamMonitoring = null;
+        $totalTim = 0;
+        $butuhApprovalKPI = 0;
+        $belumDinilaiKBI = 0;
+        $isManagerOrSpv = false;
+        $roleTitle = 'Staff'; // Default
+
+        // Cek Role untuk akses TIM
+        // Manager / GM / Senior Manager -> Lihat Satuan Divisi
+        // Supervisor -> Lihat Bawahan Langsung
+        
+        if ($user->hasRole(['manager', 'GM', 'senior_manager', 'direktur', 'manajer', 'Supervisor', 'supervisor'])) {
+            $isManagerOrSpv = true;
+            $scopeIds = [];
+
+            // 1. Tentukan Scope Karyawan
+            if ($user->hasRole(['manager', 'GM', 'senior_manager', 'direktur', 'manajer'])) {
+                $roleTitle = 'Manager';
+                // Logic Manager: Lihat Divisi
+                $pekerjaanManager = $karyawan->pekerjaan()->orderByDesc('id_pekerjaan')->first();
+                if ($pekerjaanManager && $pekerjaanManager->division_id) {
+                    $divisionId = $pekerjaanManager->division_id;
+                    $scopeIds = Karyawan::whereHas('pekerjaan', function ($q) use ($divisionId) {
+                        $q->where('division_id', $divisionId);
+                    })->pluck('id_karyawan')->toArray();
+                }
+            } elseif ($user->hasRole(['Supervisor', 'supervisor'])) {
+                $roleTitle = 'Supervisor';
+                // Logic Supervisor: Lihat Bawahan Langsung (atasan_id)
+                $scopeIds = Karyawan::where('atasan_id', $karyawan->id_karyawan)
+                            ->pluck('id_karyawan')->toArray();
+            }
+
+            // Exclude diri sendiri dari monitoring tim (opsional, biasanya manager tidak menilai diri sendiri di tabel tim)
+            // $scopeIds = array_diff($scopeIds, [$karyawan->id_karyawan]);
+
+            $totalTim = count($scopeIds);
+
+            // 2. Hitung Statistik Tim
+            if ($totalTim > 0) {
+                // KPI Approved/Submitted
+                $butuhApprovalKPI = KpiAssessment::whereIn('karyawan_id', $scopeIds)
+                    ->where('tahun', $tahun)
+                    ->where('status', 'SUBMITTED')
+                    ->count();
+
+                // KBI Belum Dinilai
+                $sudahDinilaiKBI = KbiAssessment::whereIn('karyawan_id', $scopeIds)
+                    ->where('tahun', $tahun)
+                    ->where('penilai_id', Auth::id())
+                    ->where('tipe_penilai', 'ATASAN')
+                    ->count();
+                
+                $belumDinilaiKBI = max($totalTim - $sudahDinilaiKBI, 0);
+
+                // 3. Ambil Data Tim (Pagination)
+                $teamMonitoring = Karyawan::whereIn('id_karyawan', $scopeIds)
+                    ->with([
+                        'pekerjaan.division',
+                        'kpiAssessment' => function ($q) use ($tahun) {
+                            $q->where('tahun', $tahun);
+                        },
+                        'kbiAssessment' => function ($q) use ($tahun) {
+                            $q->where('tahun', $tahun)
+                              ->where('penilai_id', Auth::id())
+                              ->where('tipe_penilai', 'ATASAN');
+                        }
+                    ])
+                    ->paginate(5);
+            } else {
+                 // Empty Paginator
+                 $teamMonitoring = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 5, 1);
+            }
         }
 
-        // 3. LOGIKA UNTUK STAFF (Melihat Diri Sendiri)
-        // Default fallback jika role 'staff' atau role lain yang tidak terdefinisi
-        return $this->staffDashboard($request, $karyawan, $tahun);
+        // View Unified: pages/dashboard/index.blade.php
+        return view('pages.dashboard.index', compact(
+            'karyawan',
+            'tahun',
+            'myKpi',
+            'myKbi',
+            'isManagerOrSpv',
+            'roleTitle',
+            'teamMonitoring',
+            'totalTim',
+            'butuhApprovalKPI',
+            'belumDinilaiKBI'
+        ));
     }
 
     // =========================================================================
@@ -141,113 +239,5 @@ class DashboardController extends Controller
             'perusahaanData',
             'turnoverData'
         ));
-    }
-
-    // =========================================================================
-    // 2. DASHBOARD MANAGER (Monitoring Tim)
-    // =========================================================================
-    private function managerDashboard(Request $request, $manager, $tahun)
-    {
-        // ===============================
-        // VALIDASI DATA MANAGER
-        // ===============================
-        $pekerjaanManager = $manager->pekerjaan()
-            ->orderByDesc('id_pekerjaan') // atau created_at
-            ->first();
-
-        if (!$pekerjaanManager || !$pekerjaanManager->division_id) {
-            abort(403, 'Manager belum memiliki divisi.');
-        }
-
-        $divisionId = $pekerjaanManager->division_id;
-
-        // ===============================
-        // AMBIL SEMUA KARYAWAN DIVISI
-        // ===============================
-        $scopeIds = Karyawan::whereHas('pekerjaan', function ($q) use ($divisionId) {
-            $q->where('division_id', $divisionId);
-        })->pluck('id_karyawan')->toArray();
-
-        $totalTim = count($scopeIds);
-
-        // ===============================
-        // KPI BUTUH APPROVAL
-        // ===============================
-        $butuhApprovalKPI = $totalTim > 0
-            ? KpiAssessment::whereIn('karyawan_id', $scopeIds)
-                ->where('tahun', $tahun)
-                ->where('status', 'SUBMITTED')
-                ->count()
-            : 0;
-
-        // ===============================
-        // KBI BELUM DINILAI
-        // ===============================
-        $sudahDinilaiKBI = $totalTim > 0
-            ? KbiAssessment::whereIn('karyawan_id', $scopeIds)
-                ->where('tahun', $tahun)
-                ->where('penilai_id', Auth::id())
-                ->where('tipe_penilai', 'ATASAN')
-                ->count()
-            : 0;
-
-        $belumDinilaiKBI = max($totalTim - $sudahDinilaiKBI, 0);
-
-        // ===============================
-        // TABLE MONITORING
-        // ===============================
-        if (empty($scopeIds)) {
-            $page = $request->input('page', 1);
-            $teamMonitoring = new \Illuminate\Pagination\LengthAwarePaginator(
-                [],
-                0,
-                5,
-                $page,
-                ['path' => request()->url()]
-            );
-        } else {
-            $teamMonitoring = Karyawan::whereIn('id_karyawan', $scopeIds)
-                ->with([
-                    'pekerjaan.division',
-                    'kpiAssessment' => function ($q) use ($tahun) {
-                        $q->where('tahun', $tahun);
-                    },
-                    'kbiAssessment' => function ($q) use ($tahun) {
-                        $q->where('tahun', $tahun)
-                          ->where('penilai_id', Auth::id())
-                          ->where('tipe_penilai', 'ATASAN');
-                    }
-                ])
-                ->paginate(5);
-        }
-
-        return view('pages.dashboard.manager', compact(
-            'manager',
-            'tahun',
-            'totalTim',
-            'butuhApprovalKPI',
-            'belumDinilaiKBI',
-            'teamMonitoring'
-        ));
-    }
-
-    // =========================================================================
-    // 3. DASHBOARD STAFF (Data Pribadi)
-    // =========================================================================
-    private function staffDashboard($request, $karyawan, $tahun)
-    {
-        // Ambil KPI Saya
-        $myKpi = KpiAssessment::where('karyawan_id', $karyawan->id_karyawan)
-            ->where('tahun', $tahun)
-            ->first();
-
-        // Ambil KBI Saya (Self Assessment)
-        $myKbi = KbiAssessment::where('karyawan_id', $karyawan->id_karyawan)
-            ->where('tahun', $tahun)
-            ->where('tipe_penilai', 'DIRI_SENDIRI')
-            ->first();
-
-        // View: pages/dashboard/staff.blade.php
-        return view('pages.dashboard.staff', compact('karyawan', 'tahun', 'myKpi', 'myKbi'));
     }
 }

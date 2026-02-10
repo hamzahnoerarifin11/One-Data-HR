@@ -7,6 +7,7 @@ use App\Models\Pekerjaan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Storage;
 
 class PosisiController extends Controller
 {
@@ -50,63 +51,89 @@ class PosisiController extends Controller
 
     public function store(Request $request)
     {
-        // HAPUS pengecekan manual in_array(auth()->user()->role, ...)
-        // karena sudah ditangani oleh middleware di __construct
-
         $request->validate([
             'nama_posisi' => 'required|string|max:150|unique:posisi,nama_posisi',
             'status'      => 'required|in:Aktif,Nonaktif',
+            'fpk_file'    => 'nullable|file|mimes:pdf,doc,docx|max:2048',
         ]);
 
-        try {
-            $pos = Posisi::create([
-                'nama_posisi' => $request->nama_posisi,
-                'status'      => $request->status,
-                'activated_at' => $request->status === 'Aktif' ? now() : null
-            ]);
+        $fpkFilePath = null;
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Posisi berhasil ditambahkan',
-                'data'    => $pos
-            ]);
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        if ($request->hasFile('fpk_file')) {
+            $fpkFilePath = $request->file('fpk_file')
+                ->store('fpk', 'public');
         }
+
+        $pos = Posisi::create([
+            'nama_posisi' => $request->nama_posisi,
+            'status'      => $request->status,
+            'activated_at'=> $request->status === 'Aktif' ? now() : null,
+            'fpk_file'    => $fpkFilePath ? basename($fpkFilePath) : null
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Posisi berhasil ditambahkan',
+            'data' => $pos
+        ]);
     }
+
 
     public function update(Request $request, $id)
     {
-        // HAPUS pengecekan manual in_array(auth()->user()->role, ...)
-
         $request->validate([
             'nama_posisi' => 'required|string|max:150|unique:posisi,nama_posisi,' . $id . ',id_posisi',
             'status'      => 'required|in:Aktif,Nonaktif',
+            'fpk_file'    => 'nullable|file|mimes:pdf,doc,docx|max:2048',
         ]);
 
-        try {
-            $pos = Posisi::findOrFail($id);
-            $oldStatus = $pos->status;
-            $pos->update([
-                'nama_posisi' => $request->nama_posisi,
-                'status'      => $request->status
-            ]);
+        $pos = Posisi::findOrFail($id);
+        $oldStatus = $pos->status;
 
-            // Update activated_at based on status change
-            if ($request->status === 'Aktif' && $oldStatus !== 'Aktif') {
-                $pos->update(['activated_at' => now()]);
-            } elseif ($request->status === 'Nonaktif') {
-                $pos->update(['activated_at' => null]);
+        $data = [
+            'nama_posisi' => $request->nama_posisi,
+            'status'      => $request->status
+        ];
+
+        if ($request->hasFile('fpk_file')) {
+            // HAPUS FILE LAMA
+            if ($pos->fpk_file && Storage::disk('public')->exists('fpk/'.$pos->fpk_file)) {
+                Storage::disk('public')->delete('fpk/'.$pos->fpk_file);
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Posisi berhasil diperbarui',
-                'data'    => $pos
-            ]);
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Gagal memperbarui data'], 500);
+            $path = $request->file('fpk_file')->store('fpk', 'public');
+            $data['fpk_file'] = basename($path);
         }
+
+        if ($request->status === 'Aktif' && $oldStatus !== 'Aktif') {
+            $data['activated_at'] = now();
+        }
+
+        if ($request->status === 'Nonaktif') {
+            $data['activated_at'] = null;
+        }
+
+        $pos->update($data);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Posisi berhasil diperbarui',
+            'data' => $pos
+        ]);
+    }
+
+     /**
+     * Download Surat FPK file for a given posisi
+     */
+    public function downloadFpk($id)
+    {
+        $posisi = Posisi::findOrFail($id);
+        if (!$posisi->fpk_file || !\Storage::disk('public')->exists('fpk/' . $posisi->fpk_file)) {
+            abort(404, 'File tidak ditemukan');
+        }
+        $filePath = 'fpk/' . $posisi->fpk_file;
+        $fileName = $posisi->fpk_file;
+        return response()->download(storage_path('app/public/' . $filePath), $fileName);
     }
 
     public function destroy(Request $request, $id)

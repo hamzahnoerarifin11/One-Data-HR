@@ -460,19 +460,19 @@ class KbiController extends Controller
                     $jabatanUser = $karyawanUser->pekerjaan->first()?->position?->name ?? '';
                     $jabatanLower = strtolower($jabatanUser);
 
-                    // Jika senior_manager atau General Manager, tampilkan semua karyawan di divisi yang sama
-                    if (strpos($jabatanLower, 'general manager') !== false || strpos($jabatanLower, 'senior_manager') !== false) {
+                    // Jika senior_manager, General Manager, ATAU Manager, tampilkan semua karyawan di divisi yang sama
+                    if (strpos($jabatanLower, 'general manager') !== false || 
+                        strpos($jabatanLower, 'senior_manager') !== false || 
+                        strpos($jabatanLower, 'manager') !== false) {
+                        
                         $divisiUser = $karyawanUser->pekerjaan->first()?->division?->name ?? '';
                         $query->whereHas('pekerjaan', function ($q) use ($divisiUser) {
                             $q->whereHas('division', function ($divQ) use ($divisiUser) {
                                 $divQ->where('name', $divisiUser);
                             });
                         });
-                    } elseif (strpos($jabatanLower, 'manager') !== false) {
-                        // Jika manager (tapi bukan general manager), tampilkan bawahan langsung
-                        $query->where('atasan_id', $karyawanUser->id_karyawan);
                     } else {
-                        // Untuk jabatan lain dengan role manager, mungkin tampilkan bawahan
+                        // Untuk jabatan lain, tampilkan bawahan langsung
                         $query->where('atasan_id', $karyawanUser->id_karyawan);
                     }
                 }
@@ -506,16 +506,21 @@ class KbiController extends Controller
                 ->exists();
 
             if ($kry->atasan_id) {
+                // LOGIC REVERT: Check if EMPLOYEE has rated ATASAN (Feedback ke Atasan)
+                // This matches the Dashboard logic where "Feedback Atasan" means "Bawahan menilai Atasan"
+                
+                // 1. Get Employee's User ID (Penilai)
                 $penilaiUserId = $userMap[$kry->NIK] ?? 0;
+
                 if ($penilaiUserId > 0) {
-                    $sudahNilaiAtasan = KbiAssessment::where('karyawan_id', $kry->atasan_id)
-                        ->where('penilai_id', $penilaiUserId) // Sesuaikan logic user_id
+                    $sudahNilaiAtasan = KbiAssessment::where('karyawan_id', $kry->atasan_id) // Target: Boss
+                        ->where('penilai_id', $penilaiUserId) // Rater: Employee
                         ->where('tipe_penilai', 'BAWAHAN')
                         ->where('tahun', $tahun)
                         ->exists();
                     $kry->status_atasan = $sudahNilaiAtasan ? 'DONE' : 'PENDING';
                 } else {
-                    $kry->status_atasan = 'PENDING';
+                    $kry->status_atasan = 'PENDING'; // Employee user not found
                 }
             } else {
                 $kry->status_atasan = 'NA';

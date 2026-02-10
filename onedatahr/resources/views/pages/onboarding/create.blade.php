@@ -285,7 +285,9 @@
                     'kondisi_perizinan' => 'Kondisi Perizinan',
                     'tata_tertib' => 'Tata Tertib',
                     'bpjs' => 'BPJS Kesehatan/TK',
-                    'k3' => 'K3 Umum'
+                    'k3' => 'K3 Umum',
+                    'jobdesk' => 'Jobdesk',
+                    'ojt' => 'OJT'
                 ] as $field => $label)
                 <label class="flex items-center gap-3 cursor-pointer group
                   p-3 rounded-lg

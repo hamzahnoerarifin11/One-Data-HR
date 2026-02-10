@@ -137,7 +137,11 @@
                         <i class="fas fa-arrow-left"></i> <span>List</span>
                     </a>
                 @else
-                    <a href="{{ url('/kpi/dashboard') }}" class="px-4 py-2.5 bg-white border border-slate-300 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition flex items-center justify-center gap-2 shadow-sm">
+                    @php
+                        // Jika Staff, arahkan ke Dashboard Utama (karena akses ke KPI Dashboard akan di-redirect kembali ke form ini)
+                        $dashboardLink = $isStaff ? route('dashboard.index') : route('kpi.index');
+                    @endphp
+                    <a href="{{ $dashboardLink }}" class="px-4 py-2.5 bg-white border border-slate-300 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition flex items-center justify-center gap-2 shadow-sm">
                         <i class="fas fa-arrow-left"></i> <span>Dashboard</span>
                     </a>
                 @endif
@@ -375,8 +379,8 @@
 
                             {{-- BULANAN SMT 2 --}}
                             @foreach(['jul','aug','sep','okt','nov','des'] as $bln)
-                                <td class="p-1 border-r border-slate-100 align-middle"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][target_{{ $bln }}]" value="{{ $score->{'target_'.$bln} }}" class="input-target-{{ $bln }} kpi-input w-full h-8 px-1 rounded text-center text-slate-600 font-medium {{ $isStaff ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : '' }}" placeholder="-" {{ $isStaff ? 'readonly' : '' }}></td>
-                                <td class="p-1 border-r border-slate-100 align-middle"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][real_{{ $bln }}]" value="{{ $score->{'real_'.$bln} }}" class="input-real-{{ $bln }} kpi-input w-full h-8 px-1 rounded text-center text-slate-900 font-semibold" placeholder="-"></td>
+                                <td class="p-1 border-r border-slate-100 align-middle"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][target_{{ $bln }}]" value="{{ $score->{'target_'.$bln} ?? '' }}" class="input-target-{{ $bln }} kpi-input w-full h-8 px-1 rounded text-center text-slate-600 font-medium {{ $isStaff ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : '' }}" placeholder="-" {{ $isStaff ? 'readonly' : '' }}></td>
+                                <td class="p-1 border-r border-slate-100 align-middle"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][real_{{ $bln }}]" value="{{ $score->{'real_'.$bln} ?? '' }}" class="input-real-{{ $bln }} kpi-input w-full h-8 px-1 rounded text-center text-slate-900 font-semibold" placeholder="-"></td>
                                 <td class="p-1 border-r border-slate-100 align-middle text-center bg-sky-50/10"><div class="py-1.5 font-medium text-sky-600/80 text-[11px]"><span class="span-skor-{{ $bln }}"></span>%</div></td>
                                 <td class="p-1 border-r border-slate-200 align-middle text-center bg-sky-50/30"><div class="py-1.5 font-bold text-sky-700"><span class="span-nilai-{{ $bln }}"></span>%</div></td>
                             @endforeach
@@ -501,8 +505,8 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Polaritas</label>
                         <select name="polaritas" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none bg-white">
-                            <option value="Maximize">Maximize (Positif)</option>
-                            <option value="Minimize">Minimize (Negatif)</option>
+                            <option value="Max">Maximize (Positif)</option>
+                            <option value="Min">Minimize (Negatif)</option>
                         </select>
                     </div>
                     <div>
@@ -563,8 +567,8 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Polaritas</label>
                         <select id="edit_polaritas" name="polaritas" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none bg-white">
-                            <option value="Maximize">Maximize</option>
-                            <option value="Minimize">Minimize</option>
+                            <option value="Max">Maximize</option>
+                            <option value="Min">Minimize</option>
                         </select>
                     </div>
                     <div>

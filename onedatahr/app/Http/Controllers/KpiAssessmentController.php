@@ -9,6 +9,10 @@ use App\Models\KpiItem;
 use App\Models\KpiScore;
 use App\Models\KpiPerspective;
 use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -98,64 +102,53 @@ class KpiAssessmentController extends Controller
 
         // Jika yang login adalah Manager / GM / Senior Manager: tampilkan dashboard bawahan
         if ($this->roleMatches($user, ['manager', 'GM', 'senior_manager'])) {
-            // Ambil daftar bawahan langsung
-            $directIds = Karyawan::where('atasan_id', $me->id_karyawan)->pluck('id_karyawan')->toArray();
-            // Ambil juga bawahan tingkat 2 (bawahan dari bawahan)
-            $secondLevel = Karyawan::whereIn('atasan_id', $directIds)->pluck('id_karyawan')->toArray();
+            
+            // LOGIC FIX: SELALU TAMPILKAN SATU DIVISI
+            // Tidak peduli apakah mereka sudah punya atasan atau belum.
+            // Manager harus bisa melihat semua staff di divisinya.
 
-            $scopeIds = array_unique(array_merge($directIds, $secondLevel));
+            $pekerjaanManager = $me->pekerjaan()
+                ->orderByDesc('id_pekerjaan')
+                ->first();
 
-            $stats = [
-                'total_karyawan' => 0,
-                'sudah_final' => 0,
-                'draft' => 0,
-                'belum_ada' => 0,
-                'rata_rata' => 0,
-            ];
+            if (!$pekerjaanManager || !$pekerjaanManager->division_id) {
+                // Jika Manager tidak punya divisi, tampilkan pesan error atau kosong
+                // Option: abort(403, 'Manager tidak memiliki divisi.');
+                // Better: Return empty list to avoid crash
+                 $karyawanList = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10);
+                 $stats = [
+                    'total_karyawan' => 0,
+                    'sudah_final' => 0,
+                    'draft' => 0,
+                    'belum_ada' => 0,
+                    'rata_rata' => 0,
+                ];
+                $listJabatan = [];
+                $listCompanies = [];
 
+                return view('pages.kpi.index', compact('karyawanList', 'tahun', 'stats', 'listJabatan', 'listCompanies', 'me'))->with('error', 'Akun Anda tidak terdaftar dalam divisi manapun.');
+            }
+
+            $divisionId = $pekerjaanManager->division_id;
             $listJabatan = \App\Models\Level::distinct()->orderBy('name')->pluck('name');
             $listCompanies = \App\Models\Company::distinct()->orderBy('name')->pluck('name');
 
-            if (empty($scopeIds)) {
-                // 🔥 FALLBACK KE DIVISI
-                $pekerjaanManager = $me->pekerjaan()
-                    ->orderByDesc('id_pekerjaan')
-                    ->first();
-
-                if (!$pekerjaanManager || !$pekerjaanManager->division_id) {
-                    abort(403, 'Manager tidak memiliki divisi.');
+            $query = Karyawan::with([
+                'pekerjaan.company',
+                'pekerjaan.position',
+                'pekerjaan.division',
+                'pekerjaan.department',
+                'kpiAssessment' => function ($q) use ($tahun) {
+                    $q->where('tahun', $tahun);
                 }
-
-                $divisionId = $pekerjaanManager->division_id;
-
-                $query = Karyawan::with([
-                    'pekerjaan.company',
-                    'pekerjaan.position',
-                    'pekerjaan.division',
-                    'pekerjaan.department',
-                    'kpiAssessment' => function ($q) use ($tahun) {
-                        $q->where('tahun', $tahun);
-                    }
-                ])->whereHas('pekerjaan', function ($q) use ($divisionId) {
-                    $q->where('division_id', $divisionId);
-                });
-            } else {
-                // tetap pakai bawahan langsung jika ada
-                $query = Karyawan::with([
-                    'pekerjaan.company',
-                    'pekerjaan.position',
-                    'pekerjaan.division',
-                    'pekerjaan.department',
-                    'kpiAssessment' => function ($q) use ($tahun) {
-                        $q->where('tahun', $tahun);
-                    }
-                ])->whereIn('id_karyawan', $scopeIds);
-            }
+            ])->whereHas('pekerjaan', function ($q) use ($divisionId) {
+                $q->where('division_id', $divisionId);
+            });
 
             $this->applyIndexFilters($query, $request, $tahun);
 
             // Bangun statistik berdasarkan query yang sudah dibuat
-            $allKaryawan = $query->get();
+            $allKaryawan = $query->orderBy('Nama_Lengkap_Sesuai_Ijazah', 'ASC')->get();
             $stats = [
                 'total_karyawan' => $allKaryawan->count(),
                 'sudah_final' => $allKaryawan->filter(fn($k) => $k->kpiAssessment && $k->kpiAssessment->status == 'FINAL')->count(),
@@ -451,18 +444,18 @@ class KpiAssessmentController extends Controller
                     // ====================================================
 
                     // --- Semester 1 (Januari - Juni) ---
-                    $t_jan = $this->cleanInput($data['target_jan'] ?? 0);
-                    $r_jan = $this->cleanInput($data['real_jan'] ?? 0);
-                    $t_feb = $this->cleanInput($data['target_feb'] ?? 0);
-                    $r_feb = $this->cleanInput($data['real_feb'] ?? 0);
-                    $t_mar = $this->cleanInput($data['target_mar'] ?? 0);
-                    $r_mar = $this->cleanInput($data['real_mar'] ?? 0);
-                    $t_apr = $this->cleanInput($data['target_apr'] ?? 0);
-                    $r_apr = $this->cleanInput($data['real_apr'] ?? 0);
-                    $t_mei = $this->cleanInput($data['target_mei'] ?? 0);
-                    $r_mei = $this->cleanInput($data['real_mei'] ?? 0);
-                    $t_jun = $this->cleanInput($data['target_jun'] ?? 0);
-                    $r_jun = $this->cleanInput($data['real_jun'] ?? 0);
+                    $t_jan = $this->cleanInput($data['target_jan']);
+                    $r_jan = $this->cleanInput($data['real_jan']);
+                    $t_feb = $this->cleanInput($data['target_feb']);
+                    $r_feb = $this->cleanInput($data['real_feb']);
+                    $t_mar = $this->cleanInput($data['target_mar']);
+                    $r_mar = $this->cleanInput($data['real_mar']);
+                    $t_apr = $this->cleanInput($data['target_apr']);
+                    $r_apr = $this->cleanInput($data['real_apr']);
+                    $t_mei = $this->cleanInput($data['target_mei']);
+                    $r_mei = $this->cleanInput($data['real_mei']);
+                    $t_jun = $this->cleanInput($data['target_jun']);
+                    $r_jun = $this->cleanInput($data['real_jun']);
 
                     // Jumlahkan untuk menjadi Semester 1
                     $target1 = $t_jan + $t_feb + $t_mar + $t_apr + $t_mei + $t_jun;
@@ -472,7 +465,7 @@ class KpiAssessmentController extends Controller
                         $target1 = $this->cleanInput($data['target_smt1'] ?? $item->target);
                     }
                     if ($real1 == 0) {
-                        $real1 = $this->cleanInput($data['real_smt1'] ?? 0);
+                        $real1 = $this->cleanInput($data['real_smt1']);
                     }
 
                     // Tangkap Adjustment Smt 1 (Tengah Tahun)
@@ -480,18 +473,18 @@ class KpiAssessmentController extends Controller
 
                     // --- Bulanan (Juli - Desember) ---
                     // WAJIB DITANGKAP AGAR TIDAK HILANG
-                    $t_jul = $this->cleanInput($data['target_jul'] ?? 0);
-                    $r_jul = $this->cleanInput($data['real_jul'] ?? 0);
-                    $t_aug = $this->cleanInput($data['target_aug'] ?? 0);
-                    $r_aug = $this->cleanInput($data['real_aug'] ?? 0);
-                    $t_sep = $this->cleanInput($data['target_sep'] ?? 0);
-                    $r_sep = $this->cleanInput($data['real_sep'] ?? 0);
-                    $t_okt = $this->cleanInput($data['target_okt'] ?? 0);
-                    $r_okt = $this->cleanInput($data['real_okt'] ?? 0);
-                    $t_nov = $this->cleanInput($data['target_nov'] ?? 0);
-                    $r_nov = $this->cleanInput($data['real_nov'] ?? 0);
-                    $t_des = $this->cleanInput($data['target_des'] ?? 0);
-                    $r_des = $this->cleanInput($data['real_des'] ?? 0);
+                    $t_jul = $this->cleanInput($data['target_jul'] );
+                    $r_jul = $this->cleanInput($data['real_jul'] );
+                    $t_aug = $this->cleanInput($data['target_aug'] );
+                    $r_aug = $this->cleanInput($data['real_aug'] );
+                    $t_sep = $this->cleanInput($data['target_sep'] );
+                    $r_sep = $this->cleanInput($data['real_sep'] );
+                    $t_okt = $this->cleanInput($data['target_okt'] );
+                    $r_okt = $this->cleanInput($data['real_okt'] );
+                    $t_nov = $this->cleanInput($data['target_nov'] );
+                    $r_nov = $this->cleanInput($data['real_nov'] );
+                    $t_des = $this->cleanInput($data['target_des'] );
+                    $r_des = $this->cleanInput($data['real_des'] );
 
                     // --- Semester 2 (Jul - Des) computed from monthly inputs ---
                     $target2 = $t_jul + $t_aug + $t_sep + $t_okt + $t_nov + $t_des;
@@ -853,23 +846,22 @@ public function bulkCreateForm(Request $request)
         elseif ($this->roleMatches($user, ['manager', 'GM', 'senior_manager'])) {
             $me = Karyawan::where('nik', $user->nik)->first();
             if ($me) {
-                // Direct & 2nd Level
-                $directIds = Karyawan::where('atasan_id', $me->id_karyawan)->pluck('id_karyawan')->toArray();
-                $secondLevel = Karyawan::whereIn('atasan_id', $directIds)->pluck('id_karyawan')->toArray();
-                $scopeIds = array_unique(array_merge($directIds, $secondLevel));
+                // LOGIC FIX: SELALU TAMPILKAN SATU DIVISI
+                // Sama seperti perbaikan di Dashboard, Manager berhak melihat semua karyawan di divisi mereka.
+                // Tidak peduli apakah ada atasan_id atau tidak.
 
-                if (!empty($scopeIds)) {
-                    $employees = Karyawan::with('pekerjaan')->whereIn('id_karyawan', $scopeIds)
+                $pekerjaanManager = $me->pekerjaan()->orderByDesc('id_pekerjaan')->first();
+                
+                if ($pekerjaanManager && $pekerjaanManager->division_id) {
+                    $employees = Karyawan::with('pekerjaan')
+                        ->whereHas('pekerjaan', function ($q) use ($pekerjaanManager) {
+                            $q->where('division_id', $pekerjaanManager->division_id);
+                        })
                         ->orderBy('Nama_Lengkap_Sesuai_Ijazah')
                         ->get();
                 } else {
-                    // Fallback Division
-                    $pekerjaanManager = $me->pekerjaan()->orderByDesc('id_pekerjaan')->first();
-                    if ($pekerjaanManager && $pekerjaanManager->division_id) {
-                        $employees = Karyawan::with('pekerjaan')->whereHas('pekerjaan', function ($q) use ($pekerjaanManager) {
-                            $q->where('division_id', $pekerjaanManager->division_id);
-                        })->orderBy('Nama_Lengkap_Sesuai_Ijazah')->get();
-                    }
+                    // Jika tidak punya divisi, kosongkan list
+                    $employees = collect();
                 }
             }
         }
@@ -1038,8 +1030,209 @@ public function finalize(Request $request, $id)
     }
 
     // =================================================================
-    // 7. EXPORT FUNCTIONS
+    // 7. EXPORT FUNCTIONS & IMPORT EXCEL FEATURES
     // =================================================================
+
+    public function downloadTemplate()
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Header
+        $headers = [
+            'NIK',
+            'Nama Karyawan (Info)',
+            'Tahun',
+            'Key Result Area',
+            'Key Performance Indicator',
+            'Perspektif',
+            'Polaritas',
+            'Units',
+            'Bobot',
+            'Target'
+        ];
+
+        $sheet->fromArray($headers, NULL, 'A1');
+
+        // Style Header
+        $sheet->getStyle('A1:J1')->getFont()->setBold(true);
+        $sheet->getStyle('A1:J1')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setARGB('FFCCCCCC');
+
+        // Auto Size Columns
+        foreach (range('A', 'J') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        // Example Data
+        $sheet->fromArray([
+            '123456',
+            'John Doe',
+            date('Y'),
+            'Financial',
+            'Revenue Growth',
+            $this->getPerspektifAktif()->first() ?? 'Financial', // Default value from DB
+            'MAX',
+            'Percent',
+            20,
+            100
+        ], null, 'A2');
+
+        // ==========================================
+        // ADD DROPDOWN VALIDATION FOR PERSPEKTIF (COL F)
+        // ==========================================
+        $perspektifs = $this->getPerspektifAktif()->toArray();
+        if (!empty($perspektifs)) {
+            $options = implode(',', $perspektifs);
+            
+            // Define validation for Perspektif (Col F)
+            $validation = $sheet->getCell('F2')->getDataValidation();
+            $validation->setType(DataValidation::TYPE_LIST);
+            $validation->setErrorStyle(DataValidation::STYLE_INFORMATION);
+            $validation->setAllowBlank(false);
+            $validation->setShowInputMessage(true);
+            $validation->setShowErrorMessage(true);
+            $validation->setShowDropDown(true);
+            $validation->setErrorTitle('Input Error');
+            $validation->setError('Value is not in list.');
+            $validation->setPromptTitle('Pick from list');
+            $validation->setPrompt('Please pick a value from the drop-down list.');
+            $validation->setFormula1('"' . $options . '"');
+
+            // Clone validation to a range of rows (e.g., 2 to 100)
+            for ($i = 3; $i <= 100; $i++) {
+                $sheet->getCell("F$i")->setDataValidation(clone $validation);
+            }
+        }
+
+        // ==========================================
+        // ADD DROPDOWN VALIDATION FOR POLARITAS (COL G)
+        // ==========================================
+        $polaritasOptions = "Min,Max";
+        $validationPol = $sheet->getCell('G2')->getDataValidation();
+        $validationPol->setType(DataValidation::TYPE_LIST);
+        $validationPol->setErrorStyle(DataValidation::STYLE_INFORMATION);
+        $validationPol->setAllowBlank(false);
+        $validationPol->setShowInputMessage(true);
+        $validationPol->setShowErrorMessage(true);
+        $validationPol->setShowDropDown(true);
+        $validationPol->setErrorTitle('Input Error');
+        $validationPol->setError('Value is not in list.');
+        $validationPol->setPromptTitle('Pick from list');
+        $validationPol->setPrompt('Please select Min or Max.');
+        $validationPol->setFormula1('"' . $polaritasOptions . '"');
+
+        for ($i = 3; $i <= 100; $i++) {
+            $sheet->getCell("G$i")->setDataValidation(clone $validationPol);
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'Template_Import_KPI.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        $writer->save('php://output');
+        exit;
+    }
+
+   public function importExcel(Request $request)
+{
+    $request->validate([
+        'file' => 'required|mimes:xlsx,xls,csv|max:2048',
+    ]);
+
+    try {
+        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load(
+            $request->file('file')->getPathname()
+        );
+
+        $sheet = $spreadsheet->getActiveSheet();
+        $rows  = $sheet->toArray();
+
+        // Hapus header
+        array_shift($rows);
+
+        DB::beginTransaction();
+        $count = 0;
+
+        foreach ($rows as $row) {
+
+            // =========================
+            // Mapping kolom Excel
+            // =========================
+            $nik         = $row[0] ?? null;
+            $tahun       = $row[2] ?? date('Y');
+            $kra         = $row[3] ?? null;
+            $kpiName     = $row[4] ?? null;
+            $perspektif  = $row[5] ?? null;
+            $polaritas   = $row[6] ?? null;
+            $units       = $row[7] ?? null;
+            $bobot       = $row[8] ?? null;
+            $target      = $row[9] ?? null;
+
+            if (empty($nik) || empty($kpiName)) {
+                continue;
+            }
+
+            // =========================
+            // Cari karyawan
+            // =========================
+            $karyawan = Karyawan::where('NIK', $nik)->first();
+            if (!$karyawan) {
+                continue;
+            }
+
+            // =========================
+            // KPI Assessment (Header)
+            // =========================
+            $kpi = KpiAssessment::firstOrCreate(
+                [
+                    'karyawan_id' => $karyawan->id_karyawan,
+                    'tahun'       => $tahun,
+                ],
+                [
+                    'status'            => 'DRAFT',
+                    'periode'           => 'Tahunan',
+                    'grade'             => null,
+                    'total_skor_akhir'  => null,
+                    'penilai_id'        => auth()->id(),
+                ]
+            );
+
+            // =========================
+            // KPI Item
+            // =========================
+            $item = KpiItem::updateOrCreate(
+                [
+                    'kpi_assessment_id'       => $kpi->id_kpi_assessment,
+                    'key_performance_indicator' => $kpiName,
+                ],
+                [
+                    'perspektif'      => $perspektif,
+                    'key_result_area' => $kra,
+                    'units'           => $units,
+                    'polaritas'       => $polaritas, // Save Polaritas
+                    'bobot'           => is_numeric($bobot) ? $bobot : null,
+                    'target'          => is_numeric($target) ? $target : null,
+                ]
+            );
+
+            $count++;
+        }
+
+        if ($count === 0) {
+            DB::rollBack();
+            return back()->with('error', 'Tidak ada data valid yang berhasil diimport. Kesalahan Nik bisa menjadi penyebabnya');
+        }
+
+        DB::commit();
+        return back()->with('success', "Berhasil mengimport {$count} data KPI.");
+
+    } catch (\Throwable $e) {
+        DB::rollBack();
+        return back()->with('error', 'Gagal import file: ' . $e->getMessage());
+    }
+}
+
 
 public function exportExcel(Request $request)
     {
