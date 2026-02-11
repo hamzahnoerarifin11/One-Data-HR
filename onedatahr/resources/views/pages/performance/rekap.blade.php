@@ -382,7 +382,7 @@
                         <td class="px-4 py-3">
                             <div>
                                 <p class="font-medium text-gray-900 dark:text-white">{{ $data->nama }}</p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ $data->jabatan }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ $data->level ?? '-' }} | {{ $data->divisi ?? '-' }}</p>
                             </div>
                         </td>
                         <td class="px-4 py-3 text-center text-gray-600 dark:text-gray-400">{{ $data->nik }}</td>

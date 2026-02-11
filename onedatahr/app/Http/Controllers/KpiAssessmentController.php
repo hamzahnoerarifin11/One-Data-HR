@@ -634,8 +634,8 @@ class KpiAssessmentController extends Controller
 
         // Filter Jabatan
         if ($request->filled('filter_jabatan')) {
-            $query->whereHas('pekerjaan', function ($q) use ($request) {
-                $q->where('Jabatan', $request->filter_jabatan);
+            $query->whereHas('pekerjaan.level', function ($q) use ($request) {
+                $q->where('name', $request->filter_jabatan);
             });
         }
 
@@ -1267,18 +1267,20 @@ public function exportPdf(Request $request)
         $karyawan = Karyawan::findOrFail($karyawanId);
         $kpi = KpiAssessment::where('karyawan_id', $karyawanId)
             ->where('tahun', $tahun)
-            ->with(['items.scores'])
             ->first();
 
         if (!$kpi) {
             return redirect()->back()->with('error', 'Data KPI tidak ditemukan.');
         }
 
-        $items = $kpi->items ?? collect(); // Pastikan items selalu ada, meskipun kosong
+        // Fetch items explicitly to ensure consistency with show() method
+        $items = KpiItem::where('kpi_assessment_id', $kpi->id_kpi_assessment)
+            ->with('scores')
+            ->get();
 
         $filename = "KPI_{$karyawan->NIK}_{$tahun}.pdf";
 
-        $pdf = Pdf::loadView('pages.kpi.pdf', compact('karyawan', 'kpi', 'items', 'tahun'))->setPaper('a4', 'landscape');
+        $pdf = Pdf::loadView('pages.kpi.pdf', compact('karyawan', 'kpi', 'items', 'tahun'))->setPaper('legal', 'landscape');
 
         return $pdf->download($filename);
     }
