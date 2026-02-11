@@ -790,18 +790,18 @@ class KaryawanController extends Controller
                 $alamatKtp = $row[13] ?? null;
                 $rtKtp = $row[14] ?? null;
                 $rwKtp = $row[15] ?? null;
-                $kelKtp = $row[16] ?? null;
-                $kecKtp = $row[17] ?? null;
-                $kabKtp = $row[18] ?? null;
-                $provKtp = $row[19] ?? null;
+                $provKtp = $row[16] ?? null;
+                $kabKtp = $row[17] ?? null;
+                $kecKtp = $row[18] ?? null;
+                $kelKtp = $row[19] ?? null;
 
                 $alamatDom = $row[20] ?? null;
                 $rtDom = $row[21] ?? null;
                 $rwDom = $row[22] ?? null;
-                $kelDom = $row[23] ?? null;
-                $kecDom = $row[24] ?? null;
-                $kabDom = $row[25] ?? null;
-                $provDom = $row[26] ?? null;
+                $provDom = $row[23] ?? null;
+                $kabDom = $row[24] ?? null;
+                $kecDom = $row[25] ?? null;
+                $kelDom = $row[26] ?? null;
 
                 $alamatLengkap = $row[27] ?? null;
 
@@ -1061,9 +1061,9 @@ class KaryawanController extends Controller
             'Status Pernikahan', 'Golongan Darah',
             'Nomor Telepon', 'Email',
             
-            // Alamat (Indices 13-27) - Reordered to match DB
-            'Alamat KTP', 'RT KTP', 'RW KTP', 'Kelurahan/Desa KTP', 'Kecamatan KTP', 'Kabupaten/Kota KTP', 'Provinsi KTP',
-            'Alamat Domisili', 'RT Domisili', 'RW Domisili', 'Kelurahan/Desa Domisili', 'Kecamatan Domisili', 'Kabupaten/Kota Domisili', 'Provinsi Domisili',
+            // Alamat (Indices 13-27)
+            'Alamat KTP', 'RT KTP', 'RW KTP', 'Provinsi KTP', 'Kabupaten/Kota KTP', 'Kecamatan KTP', 'Kelurahan/Desa KTP',
+            'Alamat Domisili', 'RT Domisili', 'RW Domisili', 'Provinsi Domisili', 'Kabupaten/Kota Domisili', 'Kecamatan Domisili', 'Kelurahan/Desa Domisili',
             'Alamat Lengkap',
 
             // Data Keluarga (Step 1) - Indices 28-35
