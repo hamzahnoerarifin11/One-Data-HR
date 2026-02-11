@@ -7,7 +7,7 @@ class StatusKaryawan extends Model
     protected $table = 'status_karyawan';
     protected $primaryKey = 'id_status';
     public $timestamps = false;
-    protected $fillable = ['id_karyawan','Tanggal_Non_Aktif','Alasan_Non_Aktif','Ijazah_Dikembalikan','Bulan'];
+    protected $fillable = ['id_karyawan','Status_Karyawan','Tanggal_Non_Aktif','Alasan_Non_Aktif','Ijazah_Dikembalikan','Bulan'];
     protected $touches = ['karyawan'];
 
     public function karyawan()

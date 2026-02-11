@@ -67,6 +67,8 @@ Route::middleware(['auth', 'role:admin|superadmin'])->group(function () {
         // Custom routes MUST be defined BEFORE resource route to avoid conflict with {karyawan} wildcard
         Route::post('karyawan/batch-delete', [KaryawanController::class, 'batchDelete'])->name('karyawan.batchDelete');
         Route::get('karyawan/export', [KaryawanController::class, 'export'])->name('karyawan.export');
+        Route::post('karyawan/import', [KaryawanController::class, 'import'])->name('karyawan.import');
+        Route::get('karyawan/import-template', [KaryawanController::class, 'downloadTemplate'])->name('karyawan.import-template');
         Route::resource('karyawan', KaryawanController::class);
 
     Route::middleware(['auth', 'role:superadmin'])->group(function () {

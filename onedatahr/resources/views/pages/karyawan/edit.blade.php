@@ -44,23 +44,6 @@
             </div>
         @endif
 
-
-
-            <!-- window.karyawanEditData = {
-                companies: @json($companies),
-                levels: @json($levels),
-                divisions: @json($divisions),
-                departments: @json($departments),
-                units: @json($units),
-                current: {
-                    company_id: @json(old('company_id', optional($karyawan->pekerjaan->first())->company_id)),
-                    division_id: @json(old('division_id', optional($karyawan->pekerjaan->first())->division_id)),
-                    department_id: @json(old('department_id', optional($karyawan->pekerjaan->first())->department_id)),
-                    unit_id: @json(old('unit_id', optional($karyawan->pekerjaan->first())->unit_id)),
-                    level_id: @json(old('level_id', optional($karyawan->pekerjaan->first())->level_id))
-                }
-            }; -->
-        </script>
         <form action="{{ route('karyawan.update', $karyawan->id_karyawan) }}" method="POST" x-data="karyawanForm(window.karyawanEditData)" @submit.prevent="submit">
             @csrf
             @method('PUT')
@@ -810,17 +793,20 @@
             <div x-show="currentStep===2" x-transition class="space-y-6">
                 <div class="grid grid-cols-2 gap-4">
 
-                    <!-- PERUSAHAAN -->
+                    <!-- PERUSAHAAN / HOLDING -->
                     <div>
                         <x-searchable-select
                             id="company"
-                            name="company_id"
+                            name="entity_selection"
                             label="Perusahaan"
                             :options="$companies"
                             x-model="selectedCompany"
-                            @change="updateDivisions($event.detail)"
+                            @change="updateEntity($event.detail)"
                             placeholder="-- Pilih Perusahaan --"
                         />
+                        <!-- Hidden fields for actual company_id and holding_id -->
+                        <input type="hidden" name="company_id" :value="actualCompanyId">
+                        <input type="hidden" name="holding_id" :value="actualHoldingId">
                     </div>
 
                     <!-- DIVISI -->
@@ -881,7 +867,7 @@
                             id="levelSelect"
                             name="level_id"
                             required
-                            x-effect="dynamicOptionsRaw = levels"
+                            :options="$levels->map(fn($l) => ['id' => $l->id, 'name' => $l->name])"
                             x-model="selectedLevel"
                             placeholder="-- Pilih Level --"
                         />
@@ -1500,26 +1486,68 @@ function karyawanForm(initData = {}) {
         levels: initData.levels || [],
 
         // Organization Selection
-        selectedCompany: initData.old?.company_id || initData.current?.company_id || '',
-        selectedDivision: initData.old?.division_id || initData.current?.division_id || '',
-        selectedDepartment: initData.old?.department_id || initData.current?.department_id || '',
-        selectedUnit: initData.old?.unit_id || initData.current?.unit_id || '',
-        selectedLevel: initData.old?.level_id || initData.current?.level_id || '',
+        selectedCompany: function() {
+            let cid = initData.current?.company_id;
+            let hid = initData.current?.holding_id;
+            
+            if (cid) return cid;
+            if (hid) return `holding_${hid}`;
+            return '';
+        }(),
+
+        selectedDivision: initData.current?.division_id || '',
+        selectedDepartment: initData.current?.department_id || '',
+        selectedUnit: initData.current?.unit_id || '',
+        selectedLevel: initData.current?.level_id || '',
+
+        // Actual IDs for form submission (parsed from selectedCompany)
+        actualCompanyId: initData.current?.company_id || '',
+        actualHoldingId: initData.current?.holding_id || '',
 
         init() {
-            if (this.selectedCompany) this.fetchDivisions(this.selectedCompany, true);
+             // Parse initial selection
+            if (this.selectedCompany) {
+                this.parseEntitySelection(this.selectedCompany);
+            }
+            
+            // Watchers for dependent dropdowns
+            this.$watch('selectedCompany', (val) => {
+                if(val) this.updateEntity(val);
+            });
+        },
+        
+        // Parse entity selection to set actualCompanyId or actualHoldingId
+        parseEntitySelection(val) {
+            if (String(val).startsWith('holding_')) {
+                this.actualHoldingId = String(val).replace('holding_', '');
+                this.actualCompanyId = '';
+            } else {
+                this.actualCompanyId = val;
+                this.actualHoldingId = '';
+            }
+        },
+        
+        // Called when entity (company/holding) is selected
+        updateEntity(val) {
+            this.parseEntitySelection(val);
+            this.updateDivisions(val);
         },
 
-        fetchDivisions(companyId, chain = false) {
-            if (!companyId) return;
-            fetch(`/karyawan/divisions/${companyId}`)
+        fetchDivisions(entityId) {
+            if (!entityId) return;
+            
+            // Detect if this is a Holding ID (prefixed with 'holding_')
+            let url;
+            if (String(entityId).startsWith('holding_')) {
+                const holdingId = String(entityId).replace('holding_', '');
+                url = `/organization/division/by-holding/${holdingId}`;
+            } else {
+                url = `/karyawan/divisions/${entityId}`;
+            }
+            
+            fetch(url)
                 .then(r => r.json())
-                .then(data => {
-                    this.divisions = data;
-                    if (chain && this.selectedDivision) {
-                        this.fetchDepartments(this.selectedDivision, true);
-                    }
-                });
+                .then(data => this.divisions = data);
         },
 
         fetchDepartments(divisionId, chain = false) {
@@ -1549,11 +1577,10 @@ function karyawanForm(initData = {}) {
             this.selectedDivision = '';
             this.selectedDepartment = '';
             this.selectedUnit = '';
-            this.selectedLevel = '';
             this.divisions = [];
             this.departments = [];
             this.units = [];
-            this.levels = [];
+            // Note: levels are global and should not be reset
             
             if (val) this.fetchDivisions(val);
         },
@@ -1561,10 +1588,9 @@ function karyawanForm(initData = {}) {
         updateDepartments(val) {
             this.selectedDepartment = '';
             this.selectedUnit = '';
-            this.selectedLevel = '';
             this.departments = [];
             this.units = [];
-            this.levels = [];
+            // Note: levels are global and should not be reset
 
             if (val) this.fetchDepartments(val);
         },
@@ -1572,11 +1598,10 @@ function karyawanForm(initData = {}) {
         updateUnits(val) {
             this.selectedUnit = '';
             this.units = [];
+            // Note: levels are global and should not be reset
 
             if (val) this.fetchUnits(val);
         },
-
-
 
         go(i){ this.currentStep = i; window.scrollTo(0,0); },
         next(){ if(this.currentStep < this.steps.length-1) this.currentStep++; window.scrollTo(0,0); },
@@ -1912,6 +1937,24 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 });
+</script>
+<script>
+ window.karyawanEditData = {
+
+                companies: @json($companies),
+                levels: @json($levels),
+                divisions: @json($divisions),
+                departments: @json($departments),
+                units: @json($units),
+                current: {
+                    company_id: @json(old('company_id', optional($karyawan->pekerjaan->first())->company_id)),
+                    holding_id: @json(old('holding_id', optional($karyawan->pekerjaan->first())->holding_id)),
+                    division_id: @json(old('division_id', optional($karyawan->pekerjaan->first())->division_id)),
+                    department_id: @json(old('department_id', optional($karyawan->pekerjaan->first())->department_id)),
+                    unit_id: @json(old('unit_id', optional($karyawan->pekerjaan->first())->unit_id)),
+                    level_id: @json(old('level_id', optional($karyawan->pekerjaan->first())->level_id))
+                }
+            };
 </script>
 <!-- <script>
 function kontrakForm() {

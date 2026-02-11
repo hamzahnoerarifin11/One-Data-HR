@@ -15,14 +15,23 @@
             </p>
         </div>
 
-        <a href="{{ route('karyawan.create') }}"
-           class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700 transition">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M12 4v16m8-8H4"/>
-            </svg>
-            Tambah Karyawan
-        </a>
+        <div class="flex gap-2">
+            <button onclick="openImportModal()"
+               class="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-green-700 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                </svg>
+                Import
+            </button>
+            <a href="{{ route('karyawan.create') }}"
+               class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 4v16m8-8H4"/>
+                </svg>
+                Tambah Karyawan
+            </a>
+        </div>
 
     </div>
 
@@ -186,7 +195,7 @@ Password: ${password}
                 <!-- <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Pencarian Karyawan</label> -->
                 <div class="relative">
                     <input type="text" name="search" id="search" value="{{ request('search') }}" placeholder="Cari nama, NIK, jabatan, lokasi kerja, divisi, perusahaan..."
-                           class="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-4 pr-10 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400">
+                           class="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-4 pr-10 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400">
                     <div class="absolute inset-y-0 right-0 flex items-center pr-3">
                         <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -226,6 +235,32 @@ Password: ${password}
             <div class="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
                 <div class="flex items-center gap-3">
                     <span class="text-sm text-gray-500 dark:text-gray-400">Menampilkan {{ $karyawans->firstItem() ?? 0 }} sampai {{ $karyawans->lastItem() ?? 0 }} dari {{ $karyawans->total() }} data</span>
+                </div>
+                <div class="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
+                <div class="flex items-center gap-3">
+                    <span class="text-sm text-gray-500 dark:text-gray-400">Show</span>
+                    <div class="relative z-20">
+                        <select x-model.number="perPage" @change="resetPage"
+                            class="h-11 w-20 appearance-none rounded-lg border
+                                border-gray-300 bg-transparent px-4 py-2.5 pr-8
+                                text-sm text-gray-800 outline-none
+                                focus:border-blue-600 focus:ring-1 focus:ring-blue-600
+                                dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                        </select>
+                        <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">
+                            <svg class="fill-current" width="18" height="18" viewBox="0 0 20 20">
+                                <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293
+                                        a1 1 0 111.414 1.414l-4 4a1 1 0
+                                        01-1.414 0l-4-4a1 1 0 010-1.414z"/>
+                            </svg>
+                        </span>
+                    </div>
+                    <span class="text-sm text-gray-500 dark:text-gray-400">entries</span>
+                </div>
                 </div>
 
                 <div class="flex items-center gap-2">
@@ -309,7 +344,9 @@ Password: ${password}
                             </td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $karyawan->pekerjaan->first()->Lokasi_Kerja ?? '-' }}</td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $karyawan->pekerjaan->first()->division->name ?? '-' }}</td>
-                            <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{{ $karyawan->pekerjaan->first()->company->name ?? '-' }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                                {{ $karyawan->pekerjaan->first()?->company->name ?? $karyawan->pekerjaan->first()?->holding->name ?? '-' }}
+                            </td>
                             <td class="px-4 py-3 text-sm font-medium text-right whitespace-nowrap">
                                 <div class="flex items-center justify-end gap-2">
                                     <a href="{{ route('karyawan.show', $karyawan->id_karyawan) }}" class="inline-flex items-center justify-center rounded-lg bg-blue-50 p-2 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/40 transition" title="Lihat Detail">
@@ -466,5 +503,6 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 });
 </script>
+@include('pages.karyawan.components.import-modal')
 @endsection
 
