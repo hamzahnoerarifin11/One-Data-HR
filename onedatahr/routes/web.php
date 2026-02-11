@@ -9,6 +9,7 @@ use App\Http\Controllers\KandidatController;
 use App\Http\Controllers\ProsesRekrutmenController;
 use App\Http\Controllers\PemberkasanController;
 use App\Http\Controllers\KpiAssessmentController;
+use App\Http\Controllers\KpiPerspectiveController;
 use App\Http\Controllers\KbiController;
 use App\Http\Controllers\WigRekrutmenController;
 use App\Http\Controllers\PosisiController;

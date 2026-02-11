@@ -32,7 +32,7 @@
                     <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 </div>
                 <input type="text" id="employee-search" placeholder="Cari nama atau jabatan..." 
-                    class="block w-full rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:bg-white focus:ring-2 focus:ring-brand-500/20 outline-none transition dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500">
+                    class="block w-full rounded-xl border border-gray-200 bg-gray-50 pl-12 pr-14 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-brand-500 focus:bg-white focus:ring-2 focus:ring-brand-500/20 outline-none transition dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500">
             </div>
 
             <!-- List -->
@@ -61,7 +61,7 @@
         </div>
 
         <!-- Template Info Card -->
-        <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+        <!-- <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
             <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4">Informasi Template</h2>
             <div>
                 <label class="mb-1.5 block text-sm font-semibold text-gray-700 dark:text-gray-300">Nama Template (Opsional)</label>
@@ -70,7 +70,7 @@
                     placeholder="Contoh: KPI Standar Tahun 2026">
                 <p class="mt-1.5 text-xs text-gray-500">Nama ini membantu Anda mengidentifikasi template di masa depan.</p>
             </div>
-        </div>
+        </div> -->
 
         <!-- Indicators Card -->
         <div class="rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900 overflow-hidden">
