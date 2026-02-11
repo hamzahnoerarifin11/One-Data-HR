@@ -90,24 +90,26 @@
     <table class="table-data">
         <thead>
             <tr>
-                <th width="5%">No</th>
-                <th width="35%">Indikator Kinerja (KPI)</th>
-                <th width="15%">KRA</th>
-                <th width="10%">Bobot</th>
-                <th width="10%">Target</th>
-                <th width="15%">Realisasi (Total)</th>
-                <th width="10%">Skor Akhir</th>
+                <th rowspan="2" width="3%">No</th>
+                <th rowspan="2" width="36%">Indikator Kinerja (KPI)</th>
+                <th rowspan="2" width="12%">KRA</th>
+                <th rowspan="2" width="6%">Bobot</th>
+                <th rowspan="2" width="6%">Target</th>
+                <th colspan="24" width="30%">Bulan (Target / Real)</th>
+                <th rowspan="2" width="7%">Skor Akhir</th>
+            </tr>
+            <tr>
+                @foreach(['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Aug','Sep','Okt','Nov','Des'] as $m)
+                    <th>Trg</th><th>Real</th>
+                @endforeach
             </tr>
         </thead>
         <tbody>
             @forelse($items as $index => $item)
             @php
                 $score = $item->scores->first();
-                // Hitung total realisasi (Smt1 + Smt2) untuk tampilan report
-                $totalRealisasi = 0;
-                if($score) {
-                    $totalRealisasi = $score->real_smt1 + $score->total_real_smt2;
-                }
+                // Per-bulan
+                $months = ['jan','feb','mar','apr','mei','jun','jul','aug','sep','okt','nov','des'];
             @endphp
             <tr>
                 <td>{{ $loop->iteration }}</td>
@@ -120,16 +122,18 @@
                 <td>{{ $item->key_result_area }}</td>
                 <td>{{ $item->bobot }}%</td>
                 <td>{{ $item->target }} {{ $item->units }}</td>
-                <td>
-                    {{ number_format($totalRealisasi, 2) }}
-                </td>
-                <td style="font-weight: bold;">
-                    {{ $score ? number_format($score->skor_akhir, 2) : '0.00' }}
-                </td>
+
+                {{-- Bulan 12 kolom: tiap bulan Trg & Real --}}
+                @foreach($months as $m)
+                    <td>{{ $score ? number_format($score->{"target_{$m}"} ?? 0, 2) : '0.00' }}</td>
+                    <td>{{ $score ? number_format($score->{"real_{$m}"} ?? 0, 2) : '0.00' }}</td>
+                @endforeach
+
+                <td style="font-weight: bold;">{{ $score ? number_format($score->skor_akhir, 2) : '0.00' }}</td>
             </tr>
             @empty
             <tr>
-                <td colspan="7" style="text-align: center; font-style: italic; color: #666;">
+                <td colspan="30" style="text-align: center; font-style: italic; color: #666;">
                     Belum ada indikator KPI yang ditambahkan
                 </td>
             </tr>
@@ -137,11 +141,11 @@
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="6" style="text-align: right; padding-right: 10px;"><strong>TOTAL SKOR AKHIR</strong></td>
+                <td colspan="29" style="text-align: right; padding-right: 10px;"><strong>TOTAL SKOR AKHIR</strong></td>
                 <td style="background-color: #eee;"><strong>{{ number_format($kpi->total_skor_akhir, 2) }}</strong></td>
             </tr>
             <tr>
-                <td colspan="6" style="text-align: right; padding-right: 10px;"><strong>GRADE / PREDIKAT</strong></td>
+                <td colspan="29" style="text-align: right; padding-right: 10px;"><strong>GRADE / PREDIKAT</strong></td>
                 <td><strong>{{ $kpi->grade }}</strong></td>
             </tr>
         </tfoot>

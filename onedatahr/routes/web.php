@@ -22,6 +22,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\OnboardingKaryawanController;
 use App\Http\Controllers\TurnoverController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\KpiPerspectiveController;
 
 
 
@@ -72,17 +73,17 @@ Route::middleware(['auth', 'role:admin|superadmin'])->group(function () {
         Route::resource('karyawan', KaryawanController::class);
 
     Route::middleware(['auth', 'role:superadmin'])->group(function () {
-    // User management resource
-    Route::resource('users', UserController::class);
-    Route::delete('/users/batch-delete', [UserController::class, 'batchDelete'])->name('users.batchDelete');
+        // User management resource
+        Route::resource('users', UserController::class);
+        Route::delete('/users/batch-delete', [UserController::class, 'batchDelete'])->name('users.batchDelete');
     });
 
-        // --- REKRUTMEN MODULE ---
-        Route::prefix('rekrutmen')->name('rekrutmen.')->group(function () {
+    // --- REKRUTMEN MODULE ---
+    Route::prefix('rekrutmen')->name('rekrutmen.')->group(function () {
 
-            // Dashboards & Main Pages
-            Route::get('/', [RecruitmentDashboardController::class, 'index'])->name('dashboard');
-            Route::get('calendar', [RecruitmentDashboardController::class, 'calendarPage'])->name('calendar');
+        // Dashboards & Main Pages
+        Route::get('/', [RecruitmentDashboardController::class, 'index'])->name('dashboard');
+        Route::get('calendar', [RecruitmentDashboardController::class, 'calendarPage'])->name('calendar');
 
             // WIG & Positions
             Route::get('wig', [WigRekrutmenController::class, 'index'])->name('wig.index');
@@ -104,155 +105,188 @@ Route::middleware(['auth', 'role:admin|superadmin'])->group(function () {
         Route::resource('kandidat_lanjut_user', KandidatLanjutUserController::class);
         Route::resource('pemberkasan', PemberkasanController::class);
 
-            // Kandidat CRUD & Exports
-            Route::get('kandidat/list', [KandidatController::class, 'list'])->name('kandidat.list');
-            Route::get('kandidat/{id}/preview-excel', [KandidatController::class, 'previewExcel'])->name('kandidat.preview-excel');
-            Route::get('kandidat/{id}/laporan', [KandidatController::class, 'generateLaporan'])->name('kandidat.laporan');
-            Route::get('kandidat/download-excel/{id}', [KandidatController::class, 'downloadExcel'])->name('kandidat.downloadExcel');
-            Route::get('kandidat/export-pdf/{id}', [KandidatController::class, 'exportExcelToPdf'])->name('kandidat.export-pdf');
-            Route::resource('kandidat', KandidatController::class);
+        // Kandidat CRUD & Exports
+        Route::get('kandidat/list', [KandidatController::class, 'list'])->name('kandidat.list');
+        Route::get('kandidat/{id}/preview-excel', [KandidatController::class, 'previewExcel'])->name('kandidat.preview-excel');
+        Route::get('kandidat/{id}/laporan', [KandidatController::class, 'generateLaporan'])->name('kandidat.laporan');
+        Route::get('kandidat/download-excel/{id}', [KandidatController::class, 'downloadExcel'])->name('kandidat.downloadExcel');
+        Route::get('kandidat/export-pdf/{id}', [KandidatController::class, 'exportExcelToPdf'])->name('kandidat.export-pdf');
+        Route::resource('kandidat', KandidatController::class);
 
-            // Proses Rekrutmen
-            Route::get('proses/{kandidat_id}/edit', [ProsesRekrutmenController::class, 'edit'])->name('proses.edit');
-            Route::post('proses', [ProsesRekrutmenController::class, 'store'])->name('proses.store');
+        // Proses Rekrutmen
+        Route::get('proses/{kandidat_id}/edit', [ProsesRekrutmenController::class, 'edit'])->name('proses.edit');
+        Route::post('proses', [ProsesRekrutmenController::class, 'store'])->name('proses.store');
 
-            // Daily Activity
-            Route::resource('daily', RekrutmenDailyController::class);
-            Route::resource('daily/entries', RekrutmenCalendarController::class)->names('daily.entries');
+        // Daily Activity
+        Route::resource('daily', RekrutmenDailyController::class);
+        Route::resource('daily/entries', RekrutmenCalendarController::class)->names('daily.entries');
 
-            // METRICS & ANALYTICS
-            Route::prefix('metrics')->name('metrics.')->group(function () {
-                // Data Endpoints (JSON)
-                Route::get('candidates', [RecruitmentDashboardController::class, 'candidatesByPositionMonth'])->name('candidates');
-                Route::get('cv', [RecruitmentDashboardController::class, 'cvPassedByPositionMonth'])->name('cv');
-                Route::get('psikotes', [RecruitmentDashboardController::class, 'psikotesPassedByPosition'])->name('psikotes');
-                Route::get('kompetensi', [RecruitmentDashboardController::class, 'kompetensiPassedByPosition'])->name('kompetensi');
-                Route::get('interview-hr', [RecruitmentDashboardController::class, 'interviewHrPassedByPositionMonth'])->name('hr');
-                Route::get('interview-user', [RecruitmentDashboardController::class, 'interviewUserPassedByPositionMonth'])->name('user');
-                Route::get('progress', [RecruitmentDashboardController::class, 'recruitmentProgressByPosition'])->name('progress');
-                Route::get('pemberkasan', [RecruitmentDashboardController::class, 'pemberkasanProgress'])->name('pemberkasan');
+        // METRICS & ANALYTICS
+        Route::prefix('metrics')->name('metrics.')->group(function () {
+            // Data Endpoints (JSON)
+            Route::get('candidates', [RecruitmentDashboardController::class, 'candidatesByPositionMonth'])->name('candidates');
+            Route::get('cv', [RecruitmentDashboardController::class, 'cvPassedByPositionMonth'])->name('cv');
+            Route::get('psikotes', [RecruitmentDashboardController::class, 'psikotesPassedByPosition'])->name('psikotes');
+            Route::get('kompetensi', [RecruitmentDashboardController::class, 'kompetensiPassedByPosition'])->name('kompetensi');
+            Route::get('interview-hr', [RecruitmentDashboardController::class, 'interviewHrPassedByPositionMonth'])->name('hr');
+            Route::get('interview-user', [RecruitmentDashboardController::class, 'interviewUserPassedByPositionMonth'])->name('user');
+            Route::get('progress', [RecruitmentDashboardController::class, 'recruitmentProgressByPosition'])->name('progress');
+            Route::get('pemberkasan', [RecruitmentDashboardController::class, 'pemberkasanProgress'])->name('pemberkasan');
 
-                // View Pages
-                Route::get('cv-page', [RecruitmentDashboardController::class, 'cvPage'])->name('cv.page');
-                Route::get('psikotes-page', [RecruitmentDashboardController::class, 'psikotesPage'])->name('psikotes.page');
-                Route::get('kompetensi-page', [RecruitmentDashboardController::class, 'kompetensiPage'])->name('kompetensi.page');
-                Route::get('interview-hr-page', [RecruitmentDashboardController::class, 'interviewHrPage'])->name('hr.page');
-                Route::get('interview-user-page', [RecruitmentDashboardController::class, 'interviewUserPage'])->name('user.page');
-                Route::get('pemberkasan-page', [RecruitmentDashboardController::class, 'pemberkasanPage'])->name('pemberkasan.page');
+            // View Pages
+            Route::get('cv-page', [RecruitmentDashboardController::class, 'cvPage'])->name('cv.page');
+            Route::get('psikotes-page', [RecruitmentDashboardController::class, 'psikotesPage'])->name('psikotes.page');
+            Route::get('kompetensi-page', [RecruitmentDashboardController::class, 'kompetensiPage'])->name('kompetensi.page');
+            Route::get('interview-hr-page', [RecruitmentDashboardController::class, 'interviewHrPage'])->name('hr.page');
+            Route::get('interview-user-page', [RecruitmentDashboardController::class, 'interviewUserPage'])->name('user.page');
+            Route::get('pemberkasan-page', [RecruitmentDashboardController::class, 'pemberkasanPage'])->name('pemberkasan.page');
 
-                // Exports
-                Route::get('cv/export', [RecruitmentDashboardController::class, 'exportCvCsv'])->name('cv.export');
-                Route::get('psikotes/export', [RecruitmentDashboardController::class, 'exportPsikotesCsv'])->name('psikotes.export');
-                Route::get('kompetensi/export', [RecruitmentDashboardController::class, 'exportKompetensiCsv'])->name('kompetensi.export');
-                Route::get('progress/export', [RecruitmentDashboardController::class, 'exportProgressCsv'])->name('progress.export');
-                Route::get('candidates/export', [RecruitmentDashboardController::class, 'exportCandidatesCsv'])->name('candidates.export');
-            });
-        });
-
-        // --- OTHER ADMIN MODULES ---
-        Route::resource('training', TrainingController::class);
-        Route::resource('onboarding', OnboardingKaryawanController::class);
-
-        Route::prefix('turnover')->name('turnover.')->group(function () {
-            Route::get('/', [TurnoverController::class, 'index'])->name('index');
-            Route::get('/export-excel', [TurnoverController::class, 'exportExcel'])->name('export.excel');
-            Route::get('/export-pdf', [TurnoverController::class, 'exportPdf'])->name('export.pdf');
+            // Exports
+            Route::get('cv/export', [RecruitmentDashboardController::class, 'exportCvCsv'])->name('cv.export');
+            Route::get('psikotes/export', [RecruitmentDashboardController::class, 'exportPsikotesCsv'])->name('psikotes.export');
+            Route::get('kompetensi/export', [RecruitmentDashboardController::class, 'exportKompetensiCsv'])->name('kompetensi.export');
+            Route::get('progress/export', [RecruitmentDashboardController::class, 'exportProgressCsv'])->name('progress.export');
+            Route::get('candidates/export', [RecruitmentDashboardController::class, 'exportCandidatesCsv'])->name('candidates.export');
         });
     });
 
-    // Route::resource('karyawan', KaryawanController::class);
+    // --- OTHER ADMIN MODULES ---
+    Route::resource('training', TrainingController::class);
+    Route::resource('onboarding', OnboardingKaryawanController::class);
 
-    Route::middleware(['auth', 'role:superadmin'])->group(function () {
-        // User management resource
-        Route::resource('users', UserController::class);
-        Route::delete('/users/batch-delete', [UserController::class, 'batchDelete'])->name('users.batchDelete');
+    Route::prefix('turnover')->name('turnover.')->group(function () {
+        Route::get('/', [TurnoverController::class, 'index'])->name('index');
+        Route::get('/export-excel', [TurnoverController::class, 'exportExcel'])->name('export.excel');
+        Route::get('/export-pdf', [TurnoverController::class, 'exportPdf'])->name('export.pdf');
     });
-    Route::middleware(['auth', 'role:admin|superadmin|manager|senior_manager'])->group(function () {
-        // User management resource
-        // 7. monitoring
-        Route::get('/kbi/monitoring', [App\Http\Controllers\KbiController::class, 'monitoring'])->name('kbi.monitoring');
-        // --- rekap PERFORMANCE ROUTES ---
-        Route::get('/performance/rekap', [App\Http\Controllers\PerformanceController::class, 'index'])->name('performance.rekap');
-    });
+    // Route::middleware(['auth', 'role:admin|superadmin|manager|senior_manager'])->group(function () {
+    //     // User management resource
+    //     // 7. monitoring
+    //     Route::get('/kbi/monitoring', [App\Http\Controllers\KbiController::class, 'monitoring'])->name('kbi.monitoring');
+    //     // --- rekap PERFORMANCE ROUTES ---
+    //     Route::get('/performance/rekap', [App\Http\Controllers\PerformanceController::class, 'index'])->name('performance.rekap');
+    // });
     // Route::resource('wig-rekrutmen', WigRekrutmenController::class);
 
-    // Recruitment / Kandidat resources and metrics
+    // Route::resource('karyawan', KaryawanController::class);
+});
 
-    // --- KPI ROUTES (DIPINDAHKAN KE SINI AGAR AMAN) ---
+Route::middleware(['auth', 'role:admin|superadmin'])->prefix('kpi')->name('kpi.')->group(function () {
+    Route::get('perspectives', [KpiPerspectiveController::class, 'index'])->name('perspectives.index');
+    Route::post('perspectives', [KpiPerspectiveController::class, 'store'])->name('perspectives.store');
+    Route::put('perspectives/{perspective}', [KpiPerspectiveController::class, 'update'])->name('perspectives.update');
+    Route::post('perspectives/{perspective}/toggle', [KpiPerspectiveController::class, 'toggleStatus'])->name('perspectives.toggle');
+    Route::post('perspectives/bulk-delete', [KpiPerspectiveController::class, 'bulkDelete'])->name('perspectives.bulk-delete');
+});
 
-    // Dashboard Monitoring (All Karyawan)
-    Route::get('/kpi/dashboard', [KpiAssessmentController::class, 'index'])->name('kpi.index');
+Route::middleware(['auth', 'role:superadmin'])->group(function () {
+    // User management resource
+    Route::resource('users', UserController::class);
+    Route::delete('/users/batch-delete', [UserController::class, 'batchDelete'])->name('users.batchDelete');
+});
+Route::middleware(['auth', 'role:admin|superadmin|manager|GM|senior_manager|supervisor|direktur'])->group(function () {
+    // User management resource
+    // 7. monitoring
+    Route::get('/kbi/monitoring', [App\Http\Controllers\KbiController::class, 'monitoring'])->name('kbi.monitoring');
+    // --- rekap PERFORMANCE ROUTES ---
+    Route::get('/performance/rekap', [App\Http\Controllers\PerformanceController::class, 'index'])->name('performance.rekap');
+    Route::get('/performance/rekap/export/excel', [App\Http\Controllers\PerformanceController::class, 'exportExcel'])->name('performance.rekap.export.excel');
+    Route::get('/performance/rekap/export/pdf', [App\Http\Controllers\PerformanceController::class, 'exportPDF'])->name('performance.rekap.export.pdf');
+    Route::post('/performance/rekap/lock', [App\Http\Controllers\PerformanceController::class, 'lockPeriod'])->name('performance.rekap.lock');
+    Route::post('/performance/rekap/unlock', [App\Http\Controllers\PerformanceController::class, 'unlockPeriod'])->name('performance.rekap.unlock');
+    Route::get('/performance/rekap/lock-history', [App\Http\Controllers\PerformanceController::class, 'getLockHistory'])->name('performance.rekap.lock-history');
+});
+// Route::resource('wig-rekrutmen', WigRekrutmenController::class);
 
-    // Hapus KPI
-    Route::delete('/kpi/delete/{id}', [KpiAssessmentController::class, 'destroy'])->name('kpi.destroy');
+// Recruitment / Kandidat resources and metrics
 
-    // Generate KPI Baru
-    Route::post('/kpi/store', [KpiAssessmentController::class, 'store'])->name('kpi.store');
+// --- KPI ROUTES (DIPINDAHKAN KE SINI AGAR AMAN) ---
 
-    // KPI Assessment Routes
-    // Contoh URL: /kpi/penilaian/5/2025 (Karyawan ID 5, Tahun 2025)
-    Route::get('/kpi/penilaian/{karyawan_id}/{tahun}', [KpiAssessmentController::class, 'show'])->name('kpi.show');
-    Route::post('/kpi/update/{id}', [KpiAssessmentController::class, 'update'])->name('kpi.update');
+// Dashboard Monitoring (All Karyawan)
+Route::get('/kpi/dashboard', [KpiAssessmentController::class, 'index'])->name('kpi.index');
 
-    Route::post('/kpi/{id}/finalize', [App\Http\Controllers\KpiAssessmentController::class, 'finalize'])->name('kpi.finalize');
+// Hapus KPI
+Route::delete('/kpi/delete/{id}', [KpiAssessmentController::class, 'destroy'])->name('kpi.destroy');
 
-    // --- KBI ROUTES ---
-    // 1. Dashboard KBI (Menu Utama untuk memilih siapa yang dinilai)
-    Route::get('/kbi/dashboard', [KbiController::class, 'index'])->name('kbi.index');
+// Generate KPI Baru
+Route::post('/kpi/store', [KpiAssessmentController::class, 'store'])->name('kpi.store');
 
-    // 2. Form Penilaian (Form yang sudah Anda buat)
-    // Parameter: id karyawan yg dinilai, dan tipe penilai (DIRI_SENDIRI/ATASAN/BAWAHAN)
-    Route::get('/kbi/nilai/{karyawan_id}/{tipe}', [KbiController::class, 'create'])->name('kbi.create');
+// Bulk create KPI for manager scope (simple header creation)
+Route::post('/kpi/bulk-create', [KpiAssessmentController::class, 'bulkCreateForManager'])->name('kpi.bulk-create');
+// Form-based bulk create (Manager fills template then submit)
+Route::get('/kpi/bulk-create/form', [KpiAssessmentController::class, 'bulkCreateForm'])->name('kpi.bulk-create.form');
+Route::post('/kpi/bulk-store', [KpiAssessmentController::class, 'bulkStoreWithItems'])->name('kpi.bulk-store');
+Route::post('/kpi/bulk-delete-assessments', [KpiAssessmentController::class, 'bulkDelete'])->name('kpi.bulk-delete-assessments');
 
-    // 3. Simpan Data
-    Route::post('/kbi/store', [KbiController::class, 'store'])->name('kbi.store');
+// KPI Import
+Route::get('/kpi/import/template', [KpiAssessmentController::class, 'downloadTemplate'])->name('kpi.import.template');
+Route::post('/kpi/import', [KpiAssessmentController::class, 'importExcel'])->name('kpi.import');
 
-    // 4. Lihat Hasil Detail (Report)
-    Route::get('/kbi/hasil/{id_assessment}', [KbiController::class, 'show'])->name('kbi.show');
-    // 5. Update Atasan yang dinilai oleh Karyawan
-    Route::post('/kbi/update-atasan', [App\Http\Controllers\KbiController::class, 'updateAtasan'])->name('kbi.update-atasan');
-    // 6. Reset Atasan yang dinilai oleh Karyawan
-    Route::post('/kbi/reset-atasan', [App\Http\Controllers\KbiController::class, 'resetAtasan'])->name('kbi.reset-atasan');
+// KPI Assessment Routes
+// Contoh URL: /kpi/penilaian/5/2025 (Karyawan ID 5, Tahun 2025)
+Route::get('/kpi/penilaian/{karyawan_id}/{tahun}', [KpiAssessmentController::class, 'show'])->name('kpi.show');
+Route::post('/kpi/update/{id}', [KpiAssessmentController::class, 'update'])->name('kpi.update');
+
+Route::post('/kpi/{id}/finalize', [App\Http\Controllers\KpiAssessmentController::class, 'finalize'])->name('kpi.finalize');
+
+// --- KBI ROUTES ---
+// 1. Dashboard KBI (Menu Utama untuk memilih siapa yang dinilai)
+Route::get('/kbi/dashboard', [KbiController::class, 'index'])->name('kbi.index');
+
+// 2. Form Penilaian (Form yang sudah Anda buat)
+// Parameter: id karyawan yg dinilai, dan tipe penilai (DIRI_SENDIRI/ATASAN/BAWAHAN)
+Route::get('/kbi/nilai/{karyawan_id}/{tipe}', [KbiController::class, 'create'])->name('kbi.create');
+
+// 3. Simpan Data
+Route::post('/kbi/store', [KbiController::class, 'store'])->name('kbi.store');
+
+// 4. Lihat Hasil Detail (Report)
+Route::get('/kbi/hasil/{id_assessment}', [KbiController::class, 'show'])->name('kbi.show');
+// 5. Update Atasan yang dinilai oleh Karyawan
+Route::post('/kbi/update-atasan', [App\Http\Controllers\KbiController::class, 'updateAtasan'])->name('kbi.update-atasan');
+// 6. Reset Atasan yang dinilai oleh Karyawan
+Route::post('/kbi/reset-atasan', [App\Http\Controllers\KbiController::class, 'resetAtasan'])->name('kbi.reset-atasan');
 
 
-    // Export routes (accessible to all authenticated users)
-    Route::get('/kpi/export/excel', [KpiAssessmentController::class, 'exportExcel'])->name('performance.export.excel');
-    Route::get('/kpi/export/pdf', [KpiAssessmentController::class, 'exportPdf'])->name('performance.export.pdf');
+// Export routes (accessible to all authenticated users)
+Route::get('/kpi/export/excel', [KpiAssessmentController::class, 'exportExcel'])->name('performance.export.excel');
+Route::get('/kpi/export/pdf', [KpiAssessmentController::class, 'exportPdf'])->name('performance.export.pdf');
 
-    // // --- SCRIPT SEMENTARA (HAPUS SETELAH DIPAKAI) ---
-    // Route::get('/fix-grades-manual', function () {
-    //     // 1. Ambil semua data KPI
-    //     $allKpi = \App\Models\KpiAssessment::all();
-    //     $count = 0;
-    //         if ($skor >= 100) { $grade = 'Outstanding'; }
-    //         elseif ($skor >= 90) { $grade = 'Great'; }
-    //         elseif ($skor >= 75) { $grade = 'Good'; }
-    //         elseif ($skor >= 60) { $grade = 'Enough'; }
-    //         // 3. Update Database
-    //         $kpi->update(['grade' => $grade]);
-    //         $count++;
-    //     }
-    //     foreach ($allKpi as $kpi) {
-    //         // 2. Tentukan Grade berdasarkan Skor yang sudah ada
-    //         $skor = $kpi->total_skor_akhir;
-    //         $grade = 'Poor'; // Default
-    //         if ($skor >= 100) { $grade = 'Outstanding'; }
-    //         elseif ($skor >= 90) { $grade = 'Great'; }
-    //         elseif ($skor >= 75) { $grade = 'Good'; }
-    //         elseif ($skor >= 60) { $grade = 'Enough'; }
-    //         // 3. Update Database
-    //         $kpi->update(['grade' => $grade]);
-    //         $count++;
-    //     }
-    //     return "Sukses! Berhasil update grade untuk $count data KPI. Silakan kembali ke Dashboard.";
-    // });
+// // --- SCRIPT SEMENTARA (HAPUS SETELAH DIPAKAI) ---
+// Route::get('/fix-grades-manual', function () {
+//     // 1. Ambil semua data KPI
+//     $allKpi = \App\Models\KpiAssessment::all();
+//     $count = 0;
+//         if ($skor >= 100) { $grade = 'Outstanding'; }
+//         elseif ($skor >= 90) { $grade = 'Great'; }
+//         elseif ($skor >= 75) { $grade = 'Good'; }
+//         elseif ($skor >= 60) { $grade = 'Enough'; }
+//         // 3. Update Database
+//         $kpi->update(['grade' => $grade]);
+//         $count++;
+//     }
+//     foreach ($allKpi as $kpi) {
+//         // 2. Tentukan Grade berdasarkan Skor yang sudah ada
+//         $skor = $kpi->total_skor_akhir;
+//         $grade = 'Poor'; // Default
+//         if ($skor >= 100) { $grade = 'Outstanding'; }
+//         elseif ($skor >= 90) { $grade = 'Great'; }
+//         elseif ($skor >= 75) { $grade = 'Good'; }
+//         elseif ($skor >= 60) { $grade = 'Enough'; }
+//         // 3. Update Database
+//         $kpi->update(['grade' => $grade]);
+//         $count++;
+//     }
+//     return "Sukses! Berhasil update grade untuk $count data KPI. Silakan kembali ke Dashboard.";
+// });
 
-    // Route khusus untuk menyimpan ITEM KPI baru
-    Route::post('/kpi/items/store', [KpiAssessmentController::class, 'storeItem'])->name('kpi.store-item');
-    // Route untuk Hapus Item KPI
-    Route::delete('/kpi/items/{id}', [KpiAssessmentController::class, 'destroyItem'])->name('kpi.delete-item');
-    // Route untuk Update Item KPI
-    Route::put('/kpi/items/{id}', [KpiAssessmentController::class, 'updateItem'])->name('kpi.update-item');
+// Route khusus untuk menyimpan ITEM KPI baru
+Route::post('/kpi/items/store', [KpiAssessmentController::class, 'storeItem'])->name('kpi.store-item');
+// Route untuk Hapus Item KPI
+Route::delete('/kpi/items/{id}', [KpiAssessmentController::class, 'destroyItem'])->name('kpi.delete-item');
+// Route untuk Update Item KPI
+Route::put('/kpi/items/{id}', [KpiAssessmentController::class, 'updateItem'])->name('kpi.update-item');
+Route::post('/kpi/items/bulk-delete', [KpiAssessmentController::class, 'bulkDestroyItems'])->name('kpi.items.bulk-delete');
 
 
 // Routes untuk TEMPA

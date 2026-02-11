@@ -726,6 +726,11 @@ class KaryawanController extends Controller
     {
         $karyawan = Karyawan::findOrFail($id);
         DB::transaction(function () use ($karyawan) {
+            // Delete linked user if exists
+            if ($karyawan->user_id) {
+                User::destroy($karyawan->user_id);
+            }
+
             $karyawan->pekerjaan()->delete();
             $karyawan->pendidikan()->delete();
             $karyawan->kontrak()->delete();
@@ -921,23 +926,13 @@ class KaryawanController extends Controller
                 $unitId = $unitName ? \App\Models\Unit::where('name', $unitName)->value('id') : null;
                 $levelId = $levelName ? \App\Models\Level::where('name', $levelName)->value('id') : null;
 
-                // 3. Create User
-                try {
-                     $user = User::create([
-                        'name' => $nama,
-                        'email' => $email,
-                        'password' => \Illuminate\Support\Facades\Hash::make('password123'),
-                        'role' => 'employee',
-                    ]);
-                } catch (\Exception $e) {
-                    $failCount++;
-                    $errors[] = "Row " . ($index + 2) . ": Gagal membuat User - " . $e->getMessage();
-                    continue; 
-                }
+                // 3. User Creation moved to after Karyawan & Pekerjaan creation to use UserHelper
+
 
                 // 4. Create Karyawan
                 $karyawan = Karyawan::create([
-                    'user_id' => $user->id,
+                    // 'user_id' will be assigned by UserHelper
+
                     'Nama_Sesuai_KTP' => $nama,
                     'NIK' => $nik,
                     'Email' => $email,
@@ -1040,6 +1035,11 @@ class KaryawanController extends Controller
                     'Nama_Lengkap_Tempat_Pendidikan_Terakhir' => $namaInstitusi,
                     'Jurusan' => $jurusan,
                 ]);
+
+                // Create User Account using Helper
+                $level = $levelId ? \App\Models\Level::find($levelId) : null;
+                \App\Helpers\UserHelper::createUserForKaryawan($karyawan, $level);
+
                 
                 $successCount++;
             }

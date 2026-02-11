@@ -15,16 +15,16 @@ class KpiItem extends Model
     // Pastikan 'target', 'polaritas', dan 'satuan' masuk disini.
     protected $fillable = [
         'kpi_assessment_id',
-        'perspektif',
         'key_result_area',
         'key_performance_indicator',
+        'perspektif',
+        'polaritas',   
+        'units',   
         'bobot',
-        'target',      // <--- Kolom Baru (Penting untuk Template)
+        'target',      
         'realisasi',
         'skor',
         'skor_akhir',
-        'polaritas',   // <--- Kolom Baru (Penting untuk Template)
-        'units',      // <--- Kolom Baru (Penting untuk Template)
     ];
 
     public function scores()

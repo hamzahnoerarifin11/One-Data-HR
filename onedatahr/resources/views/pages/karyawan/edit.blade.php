@@ -1568,18 +1568,10 @@ function karyawanForm(initData = {}) {
                 .then(r => r.json())
                 .then(data => {
                      this.units = data;
-                     if (chain && this.selectedUnit) {
-                         this.fetchLevels(this.selectedUnit);
-                     }
                 });
         },
 
-        fetchLevels(unitId) {
-            if (!unitId) return;
-            fetch(`/karyawan/positions/${unitId}`)
-                 .then(r => r.json())
-                 .then(data => this.levels = data);
-        },
+
 
         updateDivisions(val) {
             this.selectedDivision = '';

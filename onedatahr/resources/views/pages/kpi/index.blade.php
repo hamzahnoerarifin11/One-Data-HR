@@ -16,45 +16,71 @@
 
     <div class="max-w-7xl mx-auto">
         {{-- TOMBOL KEMBALI --}}
-        <div class="mb-4">
+        <div class="mb-6 relative flex items-center pt-3 border-b border-gray-300 dark:border-gray-700 pb-5">
             <a href="{{ url('/dashboard') }}" class="inline-flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors font-medium text-sm">
                 <i class="fas fa-arrow-left"></i>
                 <span>Kembali ke Dashboard Utama</span>
             </a>
+            {{-- Toggle Dark Mode --}}
+            <div class="absolute right-0 justify-end sm:block">
+                <button id="theme-toggle"
+                    class="flex items-center gap-2 bg-white dark:bg-gray-800
+                        border border-gray-300 dark:border-gray-700
+                        text-gray-600 dark:text-gray-300
+                        px-4 py-2 rounded-lg
+                        hover:bg-gray-50 dark:hover:bg-gray-700
+                        transition text-sm font-medium shadow-sm">
+                    
+                    {{-- <i  class="fas fa-sun hidden"></i> --}}
+                    <svg id="theme-toggle-light-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun-icon lucide-sun hidden"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+
+                    {{-- <i class="fas fa-moon hidden"></i> --}}
+                    <svg id="theme-toggle-dark-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-moon-icon lucide-moon hidden"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
+                    <span>Switch Theme</span>
+                </button>
+            </div>
         </div>
 
-        {{-- HEADER & FILTER --}}
-        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
-            <div>
-                <h2 class="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white">Performance Dashboard</h2>
-                {{-- Menampilkan Tahun yang sedang dipilih --}}
-                <p class="text-gray-500 dark:text-gray-400 text-sm">Monitoring Penilaian Kinerja Karyawan Tahun {{ $tahun ?? date('Y') }}</p>
-            </div>
-            
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
-                {{-- Toggle Dark Mode --}}
-                <div class="flex justify-end sm:block">
-                    <button id="theme-toggle" class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-300 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition h-full">
-                        <i id="theme-toggle-light-icon" class="fas fa-sun hidden"></i>
-                        <i id="theme-toggle-dark-icon" class="fas fa-moon hidden"></i>
-                    </button>
-                </div>
+        <div class="mb-5 text-center">
+            <h2 class="text-3xl sm:text-2xl font-bold text-gray-800 dark:text-white">Performance Dashboard</h2>
+            {{-- Menampilkan Tahun yang sedang dipilih --}}
+            <p class="text-gray-500 dark:text-gray-400 text-sm">Monitoring Penilaian Kinerja Karyawan Tahun {{ $tahun ?? date('Y') }}</p>
 
-                {{-- FORM FILTER & SEARCH --}}
-                <div class="mb-6 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 w-full">
+            @if(isset($me) && auth()->user()->hasRole(['manager','GM','senior_manager','direktur']))
+                <div class="mt-3 flex items-center justify-center gap-3">
+                    <a href="{{ route('kpi.bulk-create.form', ['tahun' => $tahun]) }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-bold shadow inline-flex items-center">
+                        <i class="fas fa-layer-group mr-1"></i> Tetapkan KPI untuk Semua Karyawan
+                    </a>
+
+                    <button onclick="openImportModal()" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded text-sm font-bold shadow inline-flex items-center">
+                        <i class="fas fa-file-import mr-1"></i> Import Excel
+                    </button>
+
+                    <a href="{{ route('kpi.show', ['karyawan_id' => $me->id_karyawan, 'tahun' => $tahun]) }}" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded text-sm font-bold shadow">
+                        <i class="fas fa-user-check mr-1"></i> Nilai Diri Sendiri
+                    </a>
+                </div>
+            @endif
+        </div>
+        {{-- FILTER AREA (CENTERED) --}}
+        <div class="flex justify-center mb-8">
+            <div class="w-full max-w-6xl">
+                
+                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
                     <form method="GET" action="{{ route('kpi.index') }}">
                         
-                        {{-- GRID FILTER DIGANTI DARI 4 KOLOM JADI 5 KOLOM (ATAU SESUAI KEBUTUHAN) --}}
-                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                        <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
                             
-                            {{-- [BARU] 1. FILTER TAHUN --}}
-                            <div class="md:col-span-1">
+                            {{-- 1. TAHUN --}}
+                            <div>
                                 <label class="block text-xs font-bold text-gray-500 mb-1">Tahun</label>
-                                <select name="tahun" class="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600">
+                                <select name="tahun"
+                                    class="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg
+                                        focus:ring-blue-500 focus:border-blue-500
+                                        dark:bg-gray-700 dark:border-gray-600">
                                     @php
                                         $currentYear = date('Y');
-                                        // Pilihan Tahun: Tahun ini + 1 tahun ke depan, mundur 4 tahun ke belakang
-                                        $startYear = $currentYear - 4; 
+                                        $startYear = $currentYear - 4;
                                         $endYear = $currentYear + 1;
                                     @endphp
                                     @for($y = $endYear; $y >= $startYear; $y--)
@@ -66,23 +92,26 @@
                             </div>
 
                             {{-- 2. SEARCH --}}
-                            <div class="md:col-span-1">
-                                <label class="block text-xs font-bold text-gray-500 mb-1">Cari Nama / NIK</label>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1">Nama / NIK</label>
                                 <div class="relative">
-                                    <input type="text" name="search" value="{{ request('search') }}" 
-                                           class="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600" 
-                                           placeholder="Cari karyawan...">
-                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i class="fas fa-search text-gray-400"></i>
-                                    </div>
+                                    <input type="text" name="search" value="{{ request('search') }}"
+                                        class="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg
+                                            focus:ring-blue-500 focus:border-blue-500
+                                            dark:bg-gray-700 dark:border-gray-600"
+                                        placeholder="Cari karyawan...">
+                                    <i class="fas fa-search absolute left-3 top-2.5 text-gray-400"></i>
                                 </div>
                             </div>
 
-                            {{-- 3. FILTER JABATAN --}}
-                            <div class="md:col-span-1">
+                            {{-- 3. JABATAN --}}
+                            <div>
                                 <label class="block text-xs font-bold text-gray-500 mb-1">Jabatan</label>
-                                <select name="filter_jabatan" class="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600">
-                                    <option value="">Semua Jabatan</option>
+                                <select name="filter_jabatan"
+                                    class="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg
+                                        focus:ring-blue-500 focus:border-blue-500
+                                        dark:bg-gray-700 dark:border-gray-600">
+                                    <option value="">Semua</option>
                                     @foreach($listJabatan as $jabatan)
                                         <option value="{{ $jabatan }}" {{ request('filter_jabatan') == $jabatan ? 'selected' : '' }}>
                                             {{ $jabatan }}
@@ -91,37 +120,60 @@
                                 </select>
                             </div>
 
-                            {{-- 4. FILTER STATUS KPI --}}
-                            <div class="md:col-span-1">
+                            {{-- 4. STATUS KPI --}}
+                            <div>
                                 <label class="block text-xs font-bold text-gray-500 mb-1">Status KPI</label>
-                                <select name="filter_status" class="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600">
-                                    <option value="">Semua Status</option>
-                                    <option value="DRAFT" {{ request('filter_status') == 'DRAFT' ? 'selected' : '' }}>Draft (Proses)</option>
-                                    <option value="FINAL" {{ request('filter_status') == 'FINAL' ? 'selected' : '' }}>Final (Selesai)</option>
-                                    <option value="BELUM_ADA" {{ request('filter_status') == 'BELUM_ADA' ? 'selected' : '' }}>Belum Ada KPI</option>
+                                <select name="filter_status"
+                                    class="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg
+                                        focus:ring-blue-500 focus:border-blue-500
+                                        dark:bg-gray-700 dark:border-gray-600">
+                                    <option value="">Semua</option>
+                                    <option value="DRAFT" {{ request('filter_status') == 'DRAFT' ? 'selected' : '' }}>Draft</option>
+                                    <option value="FINAL" {{ request('filter_status') == 'FINAL' ? 'selected' : '' }}>Final</option>
+                                    <option value="BELUM_ADA" {{ request('filter_status') == 'BELUM_ADA' ? 'selected' : '' }}>Belum Ada</option>
                                 </select>
                             </div>
 
-                            {{-- 5. TOMBOL ACTION --}}
-                            <div class="md:col-span-1 flex gap-2">
-                                <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition shadow-sm">
+                            {{-- 5. PERUSAHAAN --}}
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-1">Perusahaan</label>
+                                <select name="filter_company"
+                                    class="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg
+                                        focus:ring-blue-500 focus:border-blue-500
+                                        dark:bg-gray-700 dark:border-gray-600">
+                                    <option value="">Semua</option>
+                                    @foreach($listCompanies as $company)
+                                        <option value="{{ $company }}" {{ request('filter_company') == $company ? 'selected' : '' }}>
+                                            {{ $company }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            {{-- 6. ACTION --}}
+                            <div class="flex gap-2">
+                                <button type="submit"
+                                    class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold
+                                        py-2 px-4 rounded-lg text-sm transition shadow-sm">
                                     <i class="fas fa-filter mr-1"></i> Terapkan
                                 </button>
-                                
-                                {{-- Tombol Reset --}}
-                                @if(request('search') || request('filter_jabatan') || request('filter_status') || (request('tahun') && request('tahun') != date('Y')))
-                                    <a href="{{ route('kpi.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-600 font-bold py-2 px-3 rounded-lg text-sm transition" title="Reset Filter">
+
+                                @if(request()->query())
+                                    <a href="{{ route('kpi.index') }}"
+                                    class="bg-gray-200 hover:bg-gray-300 text-gray-600
+                                            px-3 py-2 rounded-lg text-sm font-bold flex items-center justify-center">
                                         <i class="fas fa-undo"></i>
                                     </a>
                                 @endif
                             </div>
 
                         </div>
-                        
                     </form>
                 </div>
+
             </div>
         </div>
+
 
         {{-- STATS CARDS (Kode card statistik tetap sama) --}}
         {{-- ... (Bagian card statistik tidak perlu diubah karena datanya ($stats) dikirim dari controller berdasarkan filter tahun ini) ... --}}
@@ -191,19 +243,41 @@
                 <h3 class="font-bold text-gray-700 dark:text-gray-200">Daftar Status Karyawan ({{ $tahun ?? date('Y') }})</h3>
             </div>
 
-            {{-- TAMPILAN MOBILE (Tetap sama) --}}
-            <div class="block md:hidden">
+                <div class="mb-4 flex justify-between items-center hidden" id="bulkActionContainer">
+                    <div class="text-sm text-slate-600">
+                        <span id="selectedCount" class="font-bold">0</span> data dipilih
+                    </div>
+                    <button type="button" onclick="confirmBulkDelete()" class="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-bold hover:bg-red-700 transition shadow-sm flex items-center gap-2">
+                        <i class="fas fa-trash-alt"></i> Hapus Terpilih
+                    </button>
+                </div>
+
+                <div class="mb-4 flex justify-between items-center hidden" id="bulkActionContainer">
+                    <div class="text-sm text-slate-600">
+                        <span id="selectedCount" class="font-bold">0</span> data dipilih
+                    </div>
+                    <button type="button" onclick="confirmBulkDelete()" class="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-bold hover:bg-red-700 transition shadow-sm flex items-center gap-2">
+                        <i class="fas fa-trash-alt"></i> Hapus Terpilih
+                    </button>
+                </div>
+
+                {{-- TAMPILAN MOBILE --}}
+                <div class="block md:hidden">
                 <div class="divide-y divide-gray-200 dark:divide-gray-700">
+                    @php $mobileRowNum = $karyawanList->firstItem(); @endphp
                     @forelse($karyawanList as $index => $kry)
+                        @if(isset($me) && $kry->id_karyawan == $me->id_karyawan) @continue @endif
                         @php $kpi = $kry->kpiAssessment; @endphp
                         <div class="p-4 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                             <div class="flex justify-between items-start mb-3">
                                 <div>
                                     <div class="font-bold text-gray-200 dark:text-white text-base">{{ $kry->Nama_Lengkap_Sesuai_Ijazah }}</div>
                                     <div class="text-xs text-gray-500">{{ $kry->pekerjaan->first()?->position?->name ?? '-' }}</div>
+                                    <div class="text-xs text-gray-400">{{ $kry->pekerjaan->first()?->division?->name ?? '-' }}</div>
+                                    <div class="text-xs text-gray-400">{{ $kry->pekerjaan->first()?->company?->name ?? '-' }}</div>
                                     <div class="text-xs text-gray-400 mt-0.5">NIK: {{ $kry->NIK ?? '-' }}</div>
                                 </div>
-                                <div class="text-xs dark:text-white text-gray-400 font-mono">#{{ $index + 1 }}</div>
+                                <div class="text-xs dark:text-white text-gray-400 font-mono">#{{ $mobileRowNum++ }}</div>
                             </div>
 
                             <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-900/50 p-3 rounded-lg mb-3">
@@ -240,6 +314,17 @@
                                        class="flex-1 text-center font-medium text-blue-600 dark:text-blue-500 border border-blue-500 px-3 py-2 rounded text-sm hover:bg-blue-50 dark:hover:bg-gray-700 transition">
                                         <i class="fas fa-edit"></i> Buka KPI
                                     </a>
+
+                                    {{-- Approve (Manager/Admin) --}}
+                                    @if(auth()->user()->hasRole(['manager','GM','senior_manager','admin','superadmin']) && $kpi && $kpi->status != 'FINAL')
+                                        <form action="{{ route('kpi.finalize', $kpi->id_kpi_assessment) }}" method="POST" onsubmit="return confirm('Setujui dan finalisasi KPI ini?');" class="">
+                                            @csrf
+                                            <button type="submit" class="ml-2 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded text-sm font-medium shadow">
+                                                <i class="fas fa-check"></i> Setujui
+                                            </button>
+                                        </form>
+                                    @endif
+
                                     <form action="{{ route('kpi.destroy', $kpi->id_kpi_assessment) }}" method="POST" onsubmit="return confirm('Hapus data KPI ini?');">
                                         @csrf @method('DELETE')
                                         <button type="submit" class="text-red-600 dark:text-red-400 p-2 border border-red-200 dark:border-red-900/50 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition">
@@ -253,11 +338,11 @@
                                         {{-- Pastikan tahun yang dikirim adalah tahun yang dipilih di filter --}}
                                         <input type="hidden" name="tahun" value="{{ $tahun }}">
                                         <button type="submit" class="w-full justify-center font-medium text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-sm flex items-center gap-2 transition shadow">
-                                            <i class="fas fa-plus-circle"></i> Buat KPI Baru
+                                            <i class="fas fa-plus-circle"></i> Buat aw Baru
                                         </button>
                                     </form>
                                 @endif
-                            </div>
+                            </div> 
                         </div>
                     @empty
                         <div class="p-8 text-center text-gray-500 dark:text-gray-400">
@@ -268,14 +353,18 @@
                 </div>
             </div>
 
-            {{-- TAMPILAN DESKTOP (Tetap sama, hanya penyesuaian variabel $tahun) --}}
             <div class="hidden md:block overflow-x-auto">
                 <table class="w-full text-left text-sm text-gray-500 dark:text-gray-400">
                     <thead class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 uppercase text-xs">
                         <tr>
-                            <th scope="col" class="px-6 py-4 w-16 text-center">No</th>
+                            <th scope="col" class="px-6 py-4 w-10 text-center">
+                                <input type="checkbox" id="selectAll" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            </th>
+                            <th scope="col" class="px-2 py-4 w-12 text-center">No</th>
                             <th scope="col" class="px-6 py-4">Nama Karyawan</th>
                             <th scope="col" class="px-6 py-4">Jabatan</th>
+                            <th scope="col" class="px-6 py-4">Divisi</th>
+                            <th scope="col" class="px-6 py-4">Perusahaan</th>
                             <th scope="col" class="px-6 py-4 text-center">Periode</th>
                             <th scope="col" class="px-6 py-4 text-center">Status</th>
                             <th scope="col" class="px-6 py-4 text-center">Skor & Grade</th>
@@ -283,17 +372,28 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                        @php $rowNum = $karyawanList->firstItem(); @endphp
                         @forelse($karyawanList as $index => $kry)
+                        @if(isset($me) && $kry->id_karyawan == $me->id_karyawan) @continue @endif
                         @php $kpi = $kry->kpiAssessment; @endphp
                         <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-200">
-                                {{ $karyawanList->firstItem() + $index }}
+                            <td class="px-6 py-4 text-center">
+                                @if($kpi)
+                                    <input type="checkbox" class="kpi-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500" value="{{ $kpi->id_kpi_assessment }}">
+                                @else
+                                    <input type="checkbox" disabled class="rounded border-gray-200 text-gray-300 cursor-not-allowed bg-gray-100">
+                                @endif
+                            </td>
+                            <td class="px-2 py-4 text-center whitespace-nowrap text-sm font-medium text-gray-500 dark:text-gray-400">
+                                {{ $rowNum++ }}
                             </td>
                             <td class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
                                 <div class="text-base font-semibold">{{ $kry->Nama_Lengkap_Sesuai_Ijazah }}</div>
                                 <div class="font-normal text-gray-500 text-xs">{{ $kry->NIK ?? '-' }}</div>
                             </td>
-                            <td class="px-6 py-4">{{ $kry->pekerjaan->first()?->position?->name ?? '-' }}</td>
+                            <td class="px-6 py-4">{{ $kry->pekerjaan->first()?->level?->name ?? '-' }}</td>
+                            <td class="px-6 py-4">{{ $kry->pekerjaan->first()?->division?->name ?? '-' }}</td>
+                            <td class="px-6 py-4">{{ $kry->pekerjaan->first()?->company?->name ?? '-' }}</td>
                             {{-- Tampilkan Tahun sesuai filter --}}
                             <td class="px-6 py-4 text-center">{{ $tahun }}</td>
                             <td class="px-6 py-4 text-center whitespace-nowrap">
@@ -332,6 +432,17 @@
                                            class="font-medium text-blue-600 dark:text-blue-500 hover:underline border border-blue-500 px-3 py-1 rounded hover:bg-blue-50 dark:hover:bg-gray-700 transition text-xs">
                                             <i class="fas fa-edit"></i> Buka
                                         </a>
+
+                                        {{-- Approve (hanya jika belum FINAL) --}}
+                                        @if(auth()->user()->hasRole(['manager','GM','senior_manager','admin','superadmin']) && $kpi && $kpi->status != 'FINAL')
+                                            <form action="{{ route('kpi.finalize', $kpi->id_kpi_assessment) }}" method="POST" onsubmit="return confirm('Setujui dan finalisasi KPI ini?');">
+                                                @csrf
+                                                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-xs font-medium" title="Approve KPI">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            </form>
+                                        @endif
+
                                         <form action="{{ route('kpi.destroy', $kpi->id_kpi_assessment) }}" method="POST" onsubmit="return confirm('Yakin ingin mereset/menghapus data KPI ini?');">
                                             @csrf @method('DELETE')
                                             <button type="submit" class="text-red-600 hover:text-red-800 dark:text-red-400 p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition" title="Hapus Data">
@@ -354,7 +465,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
+                            <td colspan="9" class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
                                 <div class="flex flex-col items-center justify-center">
                                     <i class="fas fa-search text-4xl mb-3 text-gray-300"></i>
                                     <p>Tidak ada data karyawan ditemukan.</p>
@@ -370,6 +481,144 @@
             </div>
         </div>
     </div>
+    </div>
+
+    {{-- IMPORT MODAL --}}
+    <div id="importModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeImportModal()"></div>
+
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+                <form action="{{ route('kpi.import') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div class="sm:flex sm:items-start">
+                            <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-teal-100 dark:bg-teal-900 sm:mx-0 sm:h-10 sm:w-10">
+                                <i class="fas fa-file-import text-teal-600 dark:text-teal-300"></i>
+                            </div>
+                            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white" id="modal-title">
+                                    Import KPI dari Excel
+                                </h3>
+                                <div class="mt-2">
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                                        Unduh template, isi data KPI karyawan, lalu upload kembali. Pastikan NIK Karyawan benar.
+                                    </p>
+                                    
+                                    <a href="{{ route('kpi.import.template') }}" class="text-blue-600 hover:text-blue-800 text-sm font-bold underline mb-4 inline-block">
+                                        <i class="fas fa-download mr-1"></i> Download Template Excel
+                                    </a>
+
+                                    <div class="mt-2">
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                            Upload File Excel (.xlsx)
+                                        </label>
+                                        <input type="file" name="file" accept=".xlsx, .xls" required
+                                            class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 dark:file:bg-teal-900 dark:file:text-teal-300"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-teal-600 text-base font-medium text-white hover:bg-teal-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                            Import
+                        </button>
+                        <button type="button" onclick="closeImportModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700">
+                            Batal
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openImportModal() {
+            document.getElementById('importModal').classList.remove('hidden');
+        }
+        function closeImportModal() {
+            document.getElementById('importModal').classList.add('hidden');
+        }
+
+        // BULK DELETE SCRIPT
+        const selectAll = document.getElementById('selectAll');
+        const checkboxes = document.querySelectorAll('.kpi-checkbox');
+        const bulkActionContainer = document.getElementById('bulkActionContainer');
+        const selectedCountSpan = document.getElementById('selectedCount');
+
+        function updateBulkUI() {
+            const checkedBoxes = document.querySelectorAll('.kpi-checkbox:checked');
+            const count = checkedBoxes.length;
+            selectedCountSpan.innerText = count;
+
+            if (count > 0) {
+                bulkActionContainer.classList.remove('hidden');
+                bulkActionContainer.classList.add('flex');
+            } else {
+                bulkActionContainer.classList.add('hidden');
+                bulkActionContainer.classList.remove('flex');
+            }
+        }
+
+        if(selectAll){
+            selectAll.addEventListener('change', function() {
+                checkboxes.forEach(cb => {
+                    if(!cb.disabled) cb.checked = this.checked;
+                });
+                updateBulkUI();
+            });
+        }
+
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', updateBulkUI);
+        });
+
+        function confirmBulkDelete() {
+            const checkedBoxes = document.querySelectorAll('.kpi-checkbox:checked');
+            if (checkedBoxes.length === 0) return;
+
+            if (!confirm('Apakah Anda yakin ingin menghapus ' + checkedBoxes.length + ' data KPI yang dipilih? Data yang dihapus tidak dapat dikembalikan.')) {
+                return;
+            }
+
+            const ids = Array.from(checkedBoxes).map(cb => cb.value);
+
+            // Show Loading
+            const originalText = document.querySelector('#bulkActionContainer button').innerHTML;
+            document.querySelector('#bulkActionContainer button').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menghapus...';
+            document.querySelector('#bulkActionContainer button').disabled = true;
+
+            fetch('{{ route("kpi.bulk-delete-assessments") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ ids: ids })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    window.location.reload();
+                } else {
+                    alert('Gagal: ' + data.message);
+                    document.querySelector('#bulkActionContainer button').innerHTML = originalText;
+                    document.querySelector('#bulkActionContainer button').disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan saat menghapus data.');
+                document.querySelector('#bulkActionContainer button').innerHTML = originalText;
+                document.querySelector('#bulkActionContainer button').disabled = false;
+            });
+        }
+    </script>
 
     {{-- SCRIPT DARK MODE (Tetap sama) --}}
     <script>

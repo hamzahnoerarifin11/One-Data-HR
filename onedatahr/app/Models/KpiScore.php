@@ -28,14 +28,33 @@ class KpiScore extends Model
         'adjustment_smt1', // Nilai Adjustment Smt 1
         'adjustment_real_smt1', // Nilai Adjustment Real Smt 1
 
-        // --- 3. DATA BULANAN (SEMESTER 2) ---
+        // --- 3. DATA BULANAN (Januari - Desember) ---
         // Wajib didaftarkan agar loop di controller tersimpan
-        'target_jul', 'real_jul',
-        'target_aug', 'real_aug',
-        'target_sep', 'real_sep',
-        'target_okt', 'real_okt',
-        'target_nov', 'real_nov',
-        'target_des', 'real_des',
+        'target_jan',
+        'real_jan',
+        'target_feb',
+        'real_feb',
+        'target_mar',
+        'real_mar',
+        'target_apr',
+        'real_apr',
+        'target_mei',
+        'real_mei',
+        'target_jun',
+        'real_jun',
+
+        'target_jul',
+        'real_jul',
+        'target_aug',
+        'real_aug',
+        'target_sep',
+        'real_sep',
+        'target_okt',
+        'real_okt',
+        'target_nov',
+        'real_nov',
+        'target_des',
+        'real_des',
 
         // --- 4. TOTAL SEMESTER 2 (INPUT MANUAL BARU) ---
         'total_target_smt2',

@@ -1558,18 +1558,10 @@ function karyawanForm(initData = {}) {
                 .then(r => r.json())
                 .then(data => {
                      this.units = data;
-                     if (chain && this.selectedUnit) {
-                         this.fetchLevels(this.selectedUnit);
-                     }
                 });
         },
 
-        fetchLevels(unitId) {
-            if (!unitId) return;
-            fetch(`/karyawan/positions/${unitId}`)
-                 .then(r => r.json())
-                 .then(data => this.levels = data);
-        },
+
 
         updateDivisions(val) {
             this.selectedDivision = '';
@@ -1601,12 +1593,7 @@ function karyawanForm(initData = {}) {
             if (val) this.fetchUnits(val);
         },
 
-        updateLevels(val) {
-            this.selectedLevel = '';
-            this.levels = [];
 
-            if (val) this.fetchLevels(val);
-        },
 
         go(i){ this.currentStep = i; window.scrollTo(0,0); },
         next(){ if(this.currentStep < this.steps.length-1) this.currentStep++; window.scrollTo(0,0); },
