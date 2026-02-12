@@ -264,7 +264,7 @@ class KpiAssessmentController extends Controller
             // nothing to check
         }
         // 2) Manager / GM / Senior Manager => boleh lihat milik sendiri, bawahan langsung, atau bawahan level-2
-        elseif ($this->roleMatches($user, ['manager', 'GM', 'senior_manager'])) {
+        elseif ($this->roleMatches($user, ['manager', 'GM', 'senior_manager','direktur'])) {
             $me = Karyawan::where('nik', $user->nik)->first();
             $allowed = false;
             if ($me && $me->id_karyawan == $karyawanId) $allowed = true; // melihat punya sendiri
@@ -979,7 +979,7 @@ public function bulkStoreWithItems(Request $request)
 public function finalize(Request $request, $id)
     {
         $user = Auth::user();
-        if (!$this->roleMatches($user, ['manager', 'GM', 'senior_manager', 'admin', 'superadmin'])) {
+        if (!$this->roleMatches($user, ['direktur', 'manager', 'GM', 'senior_manager', 'admin', 'superadmin'])) {
             return redirect()->back()->with('error', 'Akses ditolak.');
         }
 
@@ -987,7 +987,7 @@ public function finalize(Request $request, $id)
         if (!$kpi) return redirect()->back()->with('error', 'KPI tidak ditemukan.');
 
         // Additional scope check for managers (same rules as show())
-        if ($this->roleMatches($user, ['manager', 'GM', 'senior_manager'])) {
+        if ($this->roleMatches($user, ['direktur', 'manager', 'GM', 'senior_manager'])) {
             $me = Karyawan::where('nik', $user->nik)->first();
             $allowed = false;
             if ($me && $me->id_karyawan == $kpi->karyawan_id) $allowed = true;
