@@ -69,6 +69,27 @@ class PerformanceController extends Controller
             });
         }
 
+        // Filter Perusahaan
+        if ($request->has('perusahaan') && $request->perusahaan != '') {
+            $query->whereHas('pekerjaan', function ($q) use ($request) {
+                $q->where('company_id', $request->perusahaan);
+            });
+        }
+
+        // Filter Divisi
+        if ($request->has('divisi') && $request->divisi != '') {
+            $query->whereHas('pekerjaan', function ($q) use ($request) {
+                $q->where('division_id', $request->divisi);
+            });
+        }
+
+        // Filter Departemen
+        if ($request->has('departemen') && $request->departemen != '') {
+            $query->whereHas('pekerjaan', function ($q) use ($request) {
+                $q->where('department_id', $request->departemen);
+            });
+        }
+
         // B. Filter Role (Manager/senior_manager hanya lihat bawahan)
         if ($user->hasRole(['manager', 'senior_manager', 'GM', 'manajer'])) {
             // MODIFIKASI: Manager melihat SEMUA karyawan di DIVISI-nya (bukan hanya direct subordinate)
