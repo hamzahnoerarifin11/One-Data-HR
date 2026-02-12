@@ -23,7 +23,7 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $users = User::with(['roles', 'holding', 'company', 'division', 'department', 'unit'])
+        $users = User::with(['roles', 'holding', 'company', 'division', 'department', 'unit', 'karyawan'])
             ->orderBy('created_at', 'desc')
             ->get();
         return view('pages.users.index', compact('users'));

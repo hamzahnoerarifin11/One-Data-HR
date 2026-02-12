@@ -115,19 +115,26 @@
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-2">
                         Scope Akses <span class="text-red-500">*</span>
                     </label>
-                    <select name="org_scope" x-model="orgScope" required
-                        @change="holdingId=''; companyId=''; divisionId=''; departmentId=''; unitId='';"
-                        class="dark:bg-dark-900 shadow-theme-xs h-11 w-full rounded-lg
-                               border border-gray-300 bg-transparent px-4 py-2.5
-                               text-sm text-gray-800 dark:border-gray-700
-                               dark:bg-gray-900 dark:text-white/90">
-                        <option value="all">Semua Data (Superadmin/Admin)</option>
-                        <option value="holding">Holding</option>
-                        <option value="company">Perusahaan</option>
-                        <option value="division">Divisi</option>
-                        <option value="department">Departemen</option>
-                        <option value="unit">Unit</option>
-                    </select>
+                    <div class="relative z-20 bg-transparent">
+                        <select name="org_scope" x-model="orgScope" required
+                            @change="holdingId=''; companyId=''; divisionId=''; departmentId=''; unitId='';"
+                            class="dark:bg-dark-900 shadow-theme-xs h-11 w-full appearance-none rounded-lg
+                                   border border-gray-300 bg-transparent px-4 py-2.5 pr-11
+                                   text-sm text-gray-800 focus:outline-none focus:ring-0 dark:border-gray-700
+                                   dark:bg-gray-900 dark:text-white/90">
+                            <option value="all">Semua Data (Superadmin/Admin)</option>
+                            <option value="holding">Holding</option>
+                            <option value="company">Perusahaan</option>
+                            <option value="division">Divisi</option>
+                            <option value="department">Departemen</option>
+                            <option value="unit">Unit</option>
+                        </select>
+                        <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
+                            <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </span>
+                    </div>
                 </div>
 
                 {{-- Holding --}}
@@ -135,18 +142,25 @@
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-2">
                         Holding <span x-show="orgScope !== 'all'" class="text-red-500">*</span>
                     </label>
-                    <select name="holding_id" x-model="holdingId"
-                        @change="companyId=''; divisionId=''; departmentId=''; unitId='';"
-                        :required="orgScope !== 'all'"
-                        class="dark:bg-dark-900 shadow-theme-xs h-11 w-full rounded-lg
-                               border border-gray-300 bg-transparent px-4 py-2.5
-                               text-sm text-gray-800 dark:border-gray-700
-                               dark:bg-gray-900 dark:text-white/90">
-                        <option value="">-- Pilih Holding --</option>
-                        @foreach($holdings as $holding)
-                            <option value="{{ $holding->id }}">{{ $holding->name }} ({{ $holding->type }})</option>
-                        @endforeach
-                    </select>
+                    <div class="relative z-20 bg-transparent">
+                        <select name="holding_id" x-model="holdingId"
+                            @change="companyId=''; divisionId=''; departmentId=''; unitId='';"
+                            :required="orgScope !== 'all'"
+                            class="dark:bg-dark-900 shadow-theme-xs h-11 w-full appearance-none rounded-lg
+                                   border border-gray-300 bg-transparent px-4 py-2.5 pr-11
+                                   text-sm text-gray-800 focus:outline-none focus:ring-0 dark:border-gray-700
+                                   dark:bg-gray-900 dark:text-white/90">
+                            <option value="">-- Pilih Holding --</option>
+                            @foreach($holdings as $holding)
+                                <option value="{{ $holding->id }}">{{ $holding->name }} ({{ $holding->type }})</option>
+                            @endforeach
+                        </select>
+                        <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
+                            <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </span>
+                    </div>
                 </div>
 
                 {{-- Company --}}
@@ -154,18 +168,25 @@
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-2">
                         Perusahaan <span class="text-red-500">*</span>
                     </label>
-                    <select name="company_id" x-model="companyId"
-                        @change="divisionId=''; departmentId=''; unitId='';"
-                        :required="['company','division','department','unit'].includes(orgScope)"
-                        class="dark:bg-dark-900 shadow-theme-xs h-11 w-full rounded-lg
-                               border border-gray-300 bg-transparent px-4 py-2.5
-                               text-sm text-gray-800 dark:border-gray-700
-                               dark:bg-gray-900 dark:text-white/90">
-                        <option value="">-- Pilih Perusahaan --</option>
-                        <template x-for="company in filteredCompanies" :key="company.id">
-                            <option :value="company.id" x-text="company.name"></option>
-                        </template>
-                    </select>
+                    <div class="relative z-20 bg-transparent">
+                        <select name="company_id" x-model="companyId"
+                            @change="divisionId=''; departmentId=''; unitId='';"
+                            :required="['company','division','department','unit'].includes(orgScope)"
+                            class="dark:bg-dark-900 shadow-theme-xs h-11 w-full appearance-none rounded-lg
+                                   border border-gray-300 bg-transparent px-4 py-2.5 pr-11
+                                   text-sm text-gray-800 focus:outline-none focus:ring-0 dark:border-gray-700
+                                   dark:bg-gray-900 dark:text-white/90">
+                            <option value="">-- Pilih Perusahaan --</option>
+                            <template x-for="company in filteredCompanies" :key="company.id">
+                                <option :value="company.id" x-text="company.name"></option>
+                            </template>
+                        </select>
+                        <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
+                            <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </span>
+                    </div>
                 </div>
 
                 {{-- Division --}}
@@ -173,18 +194,25 @@
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-2">
                         Divisi <span class="text-red-500">*</span>
                     </label>
-                    <select name="division_id" x-model="divisionId"
-                        @change="departmentId=''; unitId='';"
-                        :required="['division','department','unit'].includes(orgScope)"
-                        class="dark:bg-dark-900 shadow-theme-xs h-11 w-full rounded-lg
-                               border border-gray-300 bg-transparent px-4 py-2.5
-                               text-sm text-gray-800 dark:border-gray-700
-                               dark:bg-gray-900 dark:text-white/90">
-                        <option value="">-- Pilih Divisi --</option>
-                        <template x-for="division in filteredDivisions" :key="division.id">
-                            <option :value="division.id" x-text="division.name"></option>
-                        </template>
-                    </select>
+                    <div class="relative z-20 bg-transparent">
+                        <select name="division_id" x-model="divisionId"
+                            @change="departmentId=''; unitId='';"
+                            :required="['division','department','unit'].includes(orgScope)"
+                            class="dark:bg-dark-900 shadow-theme-xs h-11 w-full appearance-none rounded-lg
+                                   border border-gray-300 bg-transparent px-4 py-2.5 pr-11
+                                   text-sm text-gray-800 focus:outline-none focus:ring-0 dark:border-gray-700
+                                   dark:bg-gray-900 dark:text-white/90">
+                            <option value="">-- Pilih Divisi --</option>
+                            <template x-for="division in filteredDivisions" :key="division.id">
+                                <option :value="division.id" x-text="division.name"></option>
+                            </template>
+                        </select>
+                        <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
+                            <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </span>
+                    </div>
                 </div>
 
                 {{-- Department --}}
@@ -192,18 +220,25 @@
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-2">
                         Departemen <span class="text-red-500">*</span>
                     </label>
-                    <select name="department_id" x-model="departmentId"
-                        @change="unitId='';"
-                        :required="['department','unit'].includes(orgScope)"
-                        class="dark:bg-dark-900 shadow-theme-xs h-11 w-full rounded-lg
-                               border border-gray-300 bg-transparent px-4 py-2.5
-                               text-sm text-gray-800 dark:border-gray-700
-                               dark:bg-gray-900 dark:text-white/90">
-                        <option value="">-- Pilih Departemen --</option>
-                        <template x-for="department in filteredDepartments" :key="department.id">
-                            <option :value="department.id" x-text="department.name"></option>
-                        </template>
-                    </select>
+                    <div class="relative z-20 bg-transparent">
+                        <select name="department_id" x-model="departmentId"
+                            @change="unitId='';"
+                            :required="['department','unit'].includes(orgScope)"
+                            class="dark:bg-dark-900 shadow-theme-xs h-11 w-full appearance-none rounded-lg
+                                   border border-gray-300 bg-transparent px-4 py-2.5 pr-11
+                                   text-sm text-gray-800 focus:outline-none focus:ring-0 dark:border-gray-700
+                                   dark:bg-gray-900 dark:text-white/90">
+                            <option value="">-- Pilih Departemen --</option>
+                            <template x-for="department in filteredDepartments" :key="department.id">
+                                <option :value="department.id" x-text="department.name"></option>
+                            </template>
+                        </select>
+                        <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
+                            <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </span>
+                    </div>
                 </div>
 
                 {{-- Unit --}}
@@ -211,17 +246,24 @@
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-2">
                         Unit <span class="text-red-500">*</span>
                     </label>
-                    <select name="unit_id" x-model="unitId"
-                        :required="orgScope === 'unit'"
-                        class="dark:bg-dark-900 shadow-theme-xs h-11 w-full rounded-lg
-                               border border-gray-300 bg-transparent px-4 py-2.5
-                               text-sm text-gray-800 dark:border-gray-700
-                               dark:bg-gray-900 dark:text-white/90">
-                        <option value="">-- Pilih Unit --</option>
-                        <template x-for="unit in filteredUnits" :key="unit.id">
-                            <option :value="unit.id" x-text="unit.name"></option>
-                        </template>
-                    </select>
+                    <div class="relative z-20 bg-transparent">
+                        <select name="unit_id" x-model="unitId"
+                            :required="orgScope === 'unit'"
+                            class="dark:bg-dark-900 shadow-theme-xs h-11 w-full appearance-none rounded-lg
+                                   border border-gray-300 bg-transparent px-4 py-2.5 pr-11
+                                   text-sm text-gray-800 focus:outline-none focus:ring-0 dark:border-gray-700
+                                   dark:bg-gray-900 dark:text-white/90">
+                            <option value="">-- Pilih Unit --</option>
+                            <template x-for="unit in filteredUnits" :key="unit.id">
+                                <option :value="unit.id" x-text="unit.name"></option>
+                            </template>
+                        </select>
+                        <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
+                            <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </span>
+                    </div>
                 </div>
             </div>
 

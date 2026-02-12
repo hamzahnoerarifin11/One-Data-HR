@@ -23,6 +23,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\OnboardingKaryawanController;
 use App\Http\Controllers\TurnoverController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\KpiPerspectiveController;
 
 
 

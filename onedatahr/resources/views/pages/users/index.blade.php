@@ -43,10 +43,12 @@
             return [
                 'id'         => $u->id,
                 'name'       => $u->name ?? '',
-                'nik'        => $u->nik ?? '-',
+                'nik'        => $u->nik ?? ($u->karyawan->NIK ?? '-'),
                 'email'      => $u->email ?? '-',
                 'jabatan'    => $u->jabatan ?? '-',
                 'role'       => $u->roles->pluck('name')->map(fn($r) => ucfirst($r))->implode(', '),
+                'org_label'  => $u->getOrganizationScopeLabel(),
+                'org_entity' => $u->getOrganizationEntityName(),
                 'created_at' => $u->created_at ? $u->created_at->format('d M Y') : '-',
             ];
         })->values()->toArray(); // Pastikan jadi array murni
@@ -149,6 +151,9 @@
                                 <svg :class="sortCol === 'role' ? (sortDir === 'asc' ? 'rotate-0' : 'rotate-180') : 'opacity-20'" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
                             </div>
                         </th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400">
+                            Organization
+                        </th>
                         <th @click="sortBy('created_at')" class="px-4 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400 cursor-pointer hover:text-blue-600 transition">
                             <div class="flex items-center gap-1">
                                 Created At
@@ -179,6 +184,12 @@
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400" x-text="row.email || '-' "></td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400" x-text="row.jabatan || '-' "></td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400" x-text="row.role || '-' "></td>
+                            <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                                <div class="flex flex-col">
+                                    <span class="text-xs font-semibold text-gray-500" x-text="row.org_label"></span>
+                                    <span class="text-sm text-gray-700 dark:text-gray-300" x-text="row.org_entity"></span>
+                                </div>
+                            </td>
                             <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400" x-text="row.created_at || '-' "></td>
                             <td class="px-4 py-3 text-sm font-medium text-right whitespace-nowrap">
                                 <div class="flex items-center justify-end gap-2">

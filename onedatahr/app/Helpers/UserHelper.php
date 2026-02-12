@@ -79,6 +79,62 @@ class UserHelper
                 }
             }
 
+            // Check if user with same NIK already exists
+            if ($karyawan->NIK && User::where('nik', $karyawan->NIK)->exists()) {
+                $existingUser = User::where('nik', $karyawan->NIK)->first();
+                // Link existing user to karyawan
+                $karyawan->user_id = $existingUser->id;
+                $karyawan->save();
+
+                return [
+                    'success' => true,
+                    'user' => $existingUser,
+                    'email' => $existingUser->email,
+                    'password' => '(sudah ada)',
+                    'roles' => $existingUser->roles->pluck('name')->toArray(),
+                    'message' => 'User sudah ada, otomatis terhubung',
+                    'existing' => true,
+                ];
+            }
+
+            // Determine org scope from pekerjaan data
+            $pekerjaan = $karyawan->pekerjaan()->first();
+            $orgScope = 'all';
+            $holdingId = null;
+            $companyId = null;
+            $divisionId = null;
+            $departmentId = null;
+            $unitId = null;
+
+            if ($pekerjaan) {
+                if ($pekerjaan->unit_id) {
+                    $orgScope = 'unit';
+                    $unitId = $pekerjaan->unit_id;
+                    $departmentId = $pekerjaan->department_id;
+                    $divisionId = $pekerjaan->division_id;
+                    $companyId = $pekerjaan->company_id;
+                    $holdingId = $pekerjaan->holding_id;
+                } elseif ($pekerjaan->department_id) {
+                    $orgScope = 'department';
+                    $departmentId = $pekerjaan->department_id;
+                    $divisionId = $pekerjaan->division_id;
+                    $companyId = $pekerjaan->company_id;
+                    $holdingId = $pekerjaan->holding_id;
+                } elseif ($pekerjaan->division_id) {
+                    $orgScope = 'division';
+                    $divisionId = $pekerjaan->division_id;
+                    $companyId = $pekerjaan->company_id;
+                    $holdingId = $pekerjaan->holding_id;
+                } elseif ($pekerjaan->company_id) {
+                    $orgScope = 'company';
+                    $companyId = $pekerjaan->company_id;
+                    $holdingId = $pekerjaan->holding_id;
+                } elseif ($pekerjaan->holding_id) {
+                    $orgScope = 'holding';
+                    $holdingId = $pekerjaan->holding_id;
+                }
+            }
+
             // Generate password
             $plainPassword = self::generatePassword();
 
@@ -87,12 +143,23 @@ class UserHelper
                 'name' => $karyawan->Nama_Sesuai_KTP,
                 'email' => $email,
                 'nik' => $karyawan->NIK,
-                'jabatan' => optional($karyawan->pekerjaan->first())->Jabatan ?? 'Staff',
-                'password' => Hash::make($plainPassword),
+                'jabatan' => optional($pekerjaan)->Jabatan ?? 'Staff',
+                'password' => \Illuminate\Support\Facades\Hash::make($plainPassword),
+                'org_scope' => $orgScope,
+                'holding_id' => $holdingId,
+                'company_id' => $companyId,
+                'division_id' => $divisionId,
+                'department_id' => $departmentId,
+                'unit_id' => $unitId,
             ]);
+
+            // Link user back to karyawan
+            $karyawan->user_id = $user->id;
+            $karyawan->save();
 
             // Assign role based on level
             $roles = [];
+            $roleNames = ['staff']; // default
             if ($level) {
                 $roleNames = self::mapLevelToRole($level);
                 $roles = Role::whereIn('name', $roleNames)->pluck('id')->toArray();
@@ -115,7 +182,7 @@ class UserHelper
                 'user' => $user,
                 'email' => $email,
                 'password' => $plainPassword,
-                'roles' => $roleNames ?? ['user'],
+                'roles' => $roleNames,
                 'message' => 'User berhasil dibuat'
             ];
         } catch (\Exception $e) {
