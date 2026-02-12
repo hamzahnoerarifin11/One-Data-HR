@@ -1064,7 +1064,202 @@ class KaryawanController extends Controller
 
     public function downloadTemplate()
     {
+        // 1. Fetch Hierarchical Master Data for Dropdowns
+        // Perusahaan = Holdings + Companies
+        $holdings = \App\Models\Holding::with(['divisions' => function($q) {
+            $q->where('based_on', 'holding');
+        }])->get();
+        
+        $companies = \App\Models\Company::with(['divisions' => function($q) {
+            $q->where('based_on', 'company');
+        }])->get();
+
+        // Divisions with Departments
+        $divisions = \App\Models\Division::with('departments')->get();
+        
+        // Departments with Units
+        $departments = \App\Models\Department::with('units')->get();
+
+        // Lists for other dropdowns
+        $listLevel = \App\Models\Level::pluck('name')->unique()->sort()->values()->toArray();
+        $listLokasi = function_exists('getlokasikerja') ? getlokasikerja('pekerjaan', 'Lokasi_Kerja') : [];
+        sort($listLokasi);
+
         $spreadsheet = new Spreadsheet();
+
+        // ============================================================
+        // SHEET: MasterData (Hidden) for Hierarchical Dropdowns
+        // ============================================================
+        $sheetMaster = $spreadsheet->createSheet(); 
+        $sheetMaster->setTitle('MasterData');
+
+        // Helper to sanitize string for Named Range (A-Z, 0-9, _)
+        $sanitize = function($str) {
+            return preg_replace('/[^A-Za-z0-9_]/', '_', $str);
+        };
+
+        // --- 1. Perusahaan List (Col A) ---
+        $sheetMaster->setCellValue('A1', 'ListPerusahaan');
+        $row = 2;
+        $perusahaanNames = [];
+
+        // Collect all Perusahaan & write to Col A
+        // Also map Perusahaan -> Divisions for next step
+        $perusahaanDivisions = []; // [ 'PT_Maju' => ['Div A', 'Div B'] ]
+
+        foreach ($holdings as $h) {
+            $name = $h->name;
+            $sheetMaster->setCellValue('A' . $row, $name);
+            $perusahaanNames[] = $name;
+            $sanitizedName = $sanitize($name);
+            
+            // Get divisions for this holding
+            $divs = $h->divisions->pluck('name')->unique()->sort()->values()->toArray();
+            if (!empty($divs)) {
+                $perusahaanDivisions[$sanitizedName] = $divs;
+            }
+            $row++;
+        }
+        foreach ($companies as $c) {
+            $name = $c->name;
+            $sheetMaster->setCellValue('A' . $row, $name);
+            $perusahaanNames[] = $name;
+            $sanitizedName = $sanitize($name);
+
+            // Get divisions for this company
+            $divs = $c->divisions->pluck('name')->unique()->sort()->values()->toArray();
+            if (!empty($divs)) {
+                $perusahaanDivisions[$sanitizedName] = $divs;
+            }
+            $row++;
+        }
+
+        // Named Range: ListPerusahaan
+        if ($row > 2) {
+            $spreadsheet->addNamedRange(new \PhpOffice\PhpSpreadsheet\NamedRange('ListPerusahaan', $sheetMaster, '$A$2:$A$' . ($row - 1)));
+        }
+
+        // --- 2. Divisions List (Grouped by Perusahaan) ---
+        // We start from Col C to leave some space.
+        // For each Perusahaan, we write its divisions in a column and name the range "PerusahaanName"
+        $colIndex = 3; // 'C'
+        
+        foreach ($perusahaanDivisions as $pName => $divs) {
+            $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
+            
+            // Write Header (Perusahaan Name) - helpful for debugging
+            $sheetMaster->setCellValue($colLetter . '1', $pName);
+            
+            // Write Divisions
+            $r = 2;
+            foreach ($divs as $divName) {
+                $sheetMaster->setCellValue($colLetter . $r, $divName);
+                $r++;
+            }
+            
+            // Create Named Range: "PT_Maju" -> C2:C10
+            if ($r > 2) {
+                $spreadsheet->addNamedRange(new \PhpOffice\PhpSpreadsheet\NamedRange($pName, $sheetMaster, '$' . $colLetter . '$2:$' . $colLetter . '$' . ($r - 1)));
+            }
+            
+            $colIndex++;
+        }
+
+        // --- 3. Departments List (Grouped by Division) ---
+        // Map Division -> Departments
+        $divDepartments = [];
+        $uniqueDivisionNames = []; // To track unique division names for processing
+        
+        foreach ($divisions as $d) {
+            $sanitizedDiv = $sanitize($d->name);
+            if (!isset($divDepartments[$sanitizedDiv])) {
+                $divDepartments[$sanitizedDiv] = [];
+            }
+            // Add departments to this division's list
+            $depts = $d->departments->pluck('name')->toArray();
+            $divDepartments[$sanitizedDiv] = array_unique(array_merge($divDepartments[$sanitizedDiv], $depts));
+            sort($divDepartments[$sanitizedDiv]);
+        }
+
+        // Write Departments columns
+        foreach ($divDepartments as $divDetails => $depts) {
+            if (empty($depts)) continue;
+            
+            $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
+            $sheetMaster->setCellValue($colLetter . '1', $divDetails); // Header
+
+            $r = 2;
+            foreach ($depts as $deptName) {
+                $sheetMaster->setCellValue($colLetter . $r, $deptName);
+                $r++;
+            }
+
+            // Named Range: "Divisi_Teknik" -> D2:D10
+             if ($r > 2) {
+                $spreadsheet->addNamedRange(new \PhpOffice\PhpSpreadsheet\NamedRange($divDetails, $sheetMaster, '$' . $colLetter . '$2:$' . $colLetter . '$' . ($r - 1)));
+            }
+            $colIndex++;
+        }
+
+        // --- 4. Units List (Grouped by Department) ---
+        // Map Department -> Units
+        $deptUnits = [];
+        
+        foreach ($departments as $dept) {
+            $sanitizedDept = $sanitize($dept->name);
+            if (!isset($deptUnits[$sanitizedDept])) {
+                $deptUnits[$sanitizedDept] = [];
+            }
+            // Add units
+            $units = $dept->units->pluck('name')->toArray();
+            $deptUnits[$sanitizedDept] = array_unique(array_merge($deptUnits[$sanitizedDept], $units));
+            sort($deptUnits[$sanitizedDept]);
+        }
+
+        // Write Units columns
+        foreach ($deptUnits as $deptName => $units) {
+             if (empty($units)) continue;
+             
+             $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
+             $sheetMaster->setCellValue($colLetter . '1', $deptName);
+             
+             $r = 2;
+             foreach ($units as $unitName) {
+                 $sheetMaster->setCellValue($colLetter . $r, $unitName);
+                 $r++;
+             }
+             
+             // Named Range: "Dept_IT" -> E2:E10
+             if ($r > 2) {
+                $spreadsheet->addNamedRange(new \PhpOffice\PhpSpreadsheet\NamedRange($deptName, $sheetMaster, '$' . $colLetter . '$2:$' . $colLetter . '$' . ($r - 1)));
+            }
+            $colIndex++;
+        }
+        
+        // --- 5. Other Flat Lists (Level, Lokasi) ---
+        // Level
+        $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
+        $sheetMaster->setCellValue($colLetter . '1', 'ListLevel');
+        $r = 2;
+        foreach ($listLevel as $l) {
+            $sheetMaster->setCellValue($colLetter . $r, $l);
+            $r++;
+        }
+        if ($r > 2) $spreadsheet->addNamedRange(new \PhpOffice\PhpSpreadsheet\NamedRange('ListLevel', $sheetMaster, '$' . $colLetter . '$2:$' . $colLetter . '$' . ($r - 1)));
+        $colIndex++;
+        
+         // Lokasi
+        $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
+        $sheetMaster->setCellValue($colLetter . '1', 'ListLokasi');
+        $r = 2;
+        foreach ($listLokasi as $l) {
+            $sheetMaster->setCellValue($colLetter . $r, $l);
+            $r++;
+        }
+        if ($r > 2) $spreadsheet->addNamedRange(new \PhpOffice\PhpSpreadsheet\NamedRange('ListLokasi', $sheetMaster, '$' . $colLetter . '$2:$' . $colLetter . '$' . ($r - 1)));
+
+        // Hide Master Data Sheet
+        $sheetMaster->setSheetState(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet::SHEETSTATE_HIDDEN);
 
         // ============================================================
         // SHEET 1: PANDUAN PENGISIAN (Guide)
@@ -1219,15 +1414,15 @@ class KaryawanController extends Controller
 
             // Section Header: Data Pekerjaan
             ['section' => 'DATA PEKERJAAN (Kolom AZ - BH)', 'color' => $sectionColors['pekerjaan']],
-            ['52', 'Perusahaan / Holding', 'Nama perusahaan atau holding (harus cocok dengan data di sistem)', 'Tidak', 'PT Maju Bersama'],
-            ['53', 'Divisi', 'Nama divisi (harus cocok dengan data di sistem)', 'Tidak', 'Teknologi Informasi'],
-            ['54', 'Departemen', 'Nama departemen (harus cocok)', 'Tidak', 'Development'],
-            ['55', 'Unit', 'Nama unit kerja (harus cocok)', 'Tidak', 'Backend'],
-            ['56', 'Level Jabatan', 'Nama level jabatan (harus cocok)', 'Tidak', 'Staff'],
+            ['52', 'Perusahaan / Holding', 'Pilih dari dropdown (sesuai data sistem)', 'Tidak', 'PT Maju Bersama'],
+            ['53', 'Divisi', 'Pilih dari dropdown (sesuai data sistem)', 'Tidak', 'Teknologi Informasi'],
+            ['54', 'Departemen', 'Pilih dari dropdown (sesuai data sistem)', 'Tidak', 'Development'],
+            ['55', 'Unit', 'Pilih dari dropdown (sesuai data sistem)', 'Tidak', 'Backend'],
+            ['56', 'Level Jabatan', 'Pilih dari dropdown (sesuai data sistem)', 'Tidak', 'Staff'],
             ['57', 'Jabatan', 'Nama jabatan/posisi', 'Tidak', 'Software Engineer'],
             ['58', 'Jenis Kontrak', 'PKWT / PKWTT', 'Tidak', 'PKWT'],
             ['59', 'Perjanjian', 'Nomor atau jenis perjanjian kerja', 'Tidak', 'Kontrak'],
-            ['60', 'Lokasi Kerja', 'Lokasi penempatan kerja (maks 50 karakter)', 'Tidak', 'Central Java - Pati'],
+            ['60', 'Lokasi Kerja', 'Pilih dari dropdown', 'Tidak', 'Central Java - Pati'],
 
             // Section Header: Data Pendidikan
             ['section' => 'DATA PENDIDIKAN (Kolom BI - BK)', 'color' => $sectionColors['pendidikan']],
@@ -1304,7 +1499,7 @@ class KaryawanController extends Controller
         $r++;
         // Footer note
         $guide->mergeCells("A{$r}:E{$r}");
-        $guide->setCellValue("A{$r}", '💡 TIP: Kolom yang bertanda "harus cocok dengan data di sistem" artinya nilai harus PERSIS sama dengan nama yang terdaftar di menu Organisasi (Holding/Perusahaan/Divisi/Departemen/Unit/Level).');
+        $guide->setCellValue("A{$r}", '💡 TIP: Kolom Perusahaan, Divisi, Departemen, Unit, Level, dan Lokasi Kerja menggunakan dropdown. Silakan pilih nilai yang tersedia.');
         $guide->getStyle("A{$r}")->applyFromArray($tipStyle);
         $r++;
         $guide->mergeCells("A{$r}:E{$r}");
@@ -1521,32 +1716,123 @@ class KaryawanController extends Controller
         $sheet->setDataValidation("{$bpjsKtCol}4:{$bpjsKtCol}1000", clone $bpjsValidation);
         $sheet->setDataValidation("{$bpjsKsCol}4:{$bpjsKsCol}1000", clone $bpjsValidation);
 
-        // Data validation: Jenis Kontrak
-        $kontrakCol = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(58);
-        $kontrakValidation = new \PhpOffice\PhpSpreadsheet\Cell\DataValidation();
-        $kontrakValidation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
-        $kontrakValidation->setFormula1('"PKWT,PKWTT"');
-        $kontrakValidation->setAllowBlank(true);
-        $kontrakValidation->setShowDropDown(true);
-        $sheet->setDataValidation("{$kontrakCol}4:{$kontrakCol}1000", $kontrakValidation);
+        // VALIDATIONS — helper to set validation on a range
+        $setValidation = function($sheet, $colLetter, $type, $formula, $allowBlank = true) {
+            $firstCell = "{$colLetter}3";
+            $range = "{$colLetter}3:{$colLetter}1000";
+            $val = $sheet->getCell($firstCell)->getDataValidation();
+            $val->setType($type);
+            $val->setFormula1($formula);
+            $val->setShowDropDown(true);
+            $val->setAllowBlank($allowBlank);
+            $val->setSqref($range);
+        };
 
-        // Data validation: Pendidikan Terakhir
-        $pendCol = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(61);
-        $pendValidation = new \PhpOffice\PhpSpreadsheet\Cell\DataValidation();
-        $pendValidation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
-        $pendValidation->setFormula1('"SD,SLTP,SLTA,DIPLOMA I,DIPLOMA II,DIPLOMA III,DIPLOMA IV,S1,S2"');
-        $pendValidation->setAllowBlank(true);
-        $pendValidation->setShowDropDown(true);
-        $sheet->setDataValidation("{$pendCol}4:{$pendCol}1000", $pendValidation);
+        $typeList = \PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST;
 
-        // Freeze header rows (row 1 = section, row 2 = column name)
-        $sheet->freezePane('A3');
+        // Helper to create nested SUBSTITUTE formula for sanitization
+        // Matches PHP logic: preg_replace('/[^A-Za-z0-9_]/', '_', $str)
+        // Excel Names cannot contain spaces or special chars (except _ . \)
+        // We replace common special chars with _ to match the PHP sanitization.
+        $createIndirectFormula = function($cellRef) {
+            $chars = [' ', '.', '-', '(', ')', '&', ',', '\'', '/', '"', '’'];
+            $formula = $cellRef;
+            foreach ($chars as $char) {
+                // Escape double quote for formula string
+                $safeChar = $char === '"' ? '""' : $char; 
+                $formula = "SUBSTITUTE($formula,\"$safeChar\",\"_\")";
+            }
+            return "=INDIRECT($formula)";
+        };
 
-        // Set the data sheet as the active/first-visible sheet
-        $spreadsheet->setActiveSheetIndex(1);
+        // 1. Perusahaan (Col 52 - AZ) - Parent of Divisi
+        $colPerusahaan = 'AZ';
+        $setValidation($sheet, $colPerusahaan, $typeList, 'ListPerusahaan');
+
+        // 2. Divisi (Col 53 - BA) -> Cascading based on Perusahaan
+        $colDivisi = 'BA';
+        $pCell = $colPerusahaan . '3'; // MN3
+        $formulaDivisi = $createIndirectFormula($pCell);
+        $setValidation($sheet, $colDivisi, $typeList, $formulaDivisi);
+
+        // 3. Departemen (Col 54 - BB) -> Cascading based on Divisi
+        $colDept = 'BB';
+        $dCell = $colDivisi . '3'; // MO3
+        $formulaDept = $createIndirectFormula($dCell);
+        $setValidation($sheet, $colDept, $typeList, $formulaDept);
+
+        // 4. Unit (Col 55 - BC) -> Cascading based on Departemen
+        $colUnit = 'BC';
+        $deptCell = $colDept . '3'; // MP3
+        $formulaUnit = $createIndirectFormula($deptCell);
+        $setValidation($sheet, $colUnit, $typeList, $formulaUnit);
+
+        // 5. Level (Col 56 - BD)
+        $colLevel = 'BD';
+        $setValidation($sheet, $colLevel, $typeList, 'ListLevel');
+
+        // 6. Lokasi (Col 60 - BH)
+        $colLokasi = 'BH';
+        $setValidation($sheet, $colLokasi, $typeList, 'ListLokasi');
+
+        // 7. Perjanjian (Col 59 - BG) -> Not a list, but free text usually, or flat list if defined.
+        // Current code had 'ListPerjanjian', but it wasn't defined in MasterData sheet above. 
+        // Checking previous code: it was 'ListPerjanjian'. 
+        // Is 'ListPerjanjian' generated? In my previous replace_file_content, I only generated ListLevel and ListLokasi.
+        // Let's check if 'ListPerjanjian' is needed. The original code (before I rolled back) had it, 
+        // but the code I just read (lines 1065+) didn't seem to generate it.
+        // Wait, the original 'downloadTemplate' I read earlier had 'ListPerjanjian' at line 1373?
+        // Ah, the code at 1373 in the PREVIOUS version (before rollback or before my analysis) might have had it.
+        // But the code I viewed in step 830 (lines 1065-1734) did NOT have 'ListPerjanjian' logic in MasterData generation.
+        // It only had Perusahaan, Divisi, Departemen, Unit, Level, Lokasi.
+        // Line 1629 validates 'Jenis Kontrak' with hardcoded "PKWT,PKWTT".
+        // Line 1280 says 'Perjanjian' is 'Nomor atau jenis perjanjian kerja' (free text usually).
+        // Let's look at line 1394 'Jenis Kontrak', 'Perjanjian', 'Lokasi Kerja'.
+        // So Perjanjian (BG) is likely free text in the original template.
+        // I will NOT add validation for 'Perjanjian' as it wasn't in the code I analyzed in Step 830/855.
+        
+        // 8. Gender
+        $setValidation($sheet, 'I', $typeList, '"L,P"');
+        
+        // 9. Status (1/0)
+        $setValidation($sheet, 'B', $typeList, '"1,0"');
+
+        // 10. Kode Check
+        $setValidation($sheet, 'C', $typeList, '"Aktif,Non Aktif"');
+        
+        // 11. Status Pernikahan
+        $setValidation($sheet, 'J', $typeList, '"Belum Menikah,Menikah,Cerai Hidup,Cerai Mati"');
+
+        // 12. Golongan Darah
+        $setValidation($sheet, 'K', $typeList, '"A,B,AB,O"');
+        
+        // 13. Ijazah Dikembalikan
+        $setValidation($sheet, 'BW', $typeList, '"Ya,Tidak"');
+
+        // 14. BPJS
+        $setValidation($sheet, 'BX', $typeList, '"Aktif,Tidak Aktif"');
+        $setValidation($sheet, 'BY', $typeList, '"Aktif,Tidak Aktif"');
+
+        // 15. Jenis Kontrak (Column 58 - BF)
+        $colKontrak = 'BF';
+        $setValidation($sheet, $colKontrak, $typeList, '"PKWT,PKWTT"');
+
+        // 16. Pendidikan Terakhir (Column 61 - BI)
+        $colPend = 'BI';
+        $setValidation($sheet, $colPend, $typeList, '"SD,SLTP,SLTA,DIPLOMA I,DIPLOMA II,DIPLOMA III,DIPLOMA IV,S1,S2"');
+
+        // Sample Row (Row 3)
+         $sheet->setCellValue('A3', '220022');
+         $sheet->setCellValue('D3', 'Budi Santoso (CONTOH)');
+         $sheet->setCellValue('I3', 'L');
+         $sheet->getStyle('A3:BY3')->getFont()->setItalic(true);
+         $sheet->getStyle('A3:BY3')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('FFFDE7');
+         $sheet->getComment('A3')->getText()->createTextRun('Baris contoh. Hapus sebelum import.');
+
+        $spreadsheet->setActiveSheetIndex(1); // Auto-select Data Sheet
 
         $writer = new Xlsx($spreadsheet);
-        $fileName = 'template_import_karyawan.xlsx';
+        $fileName = 'template_import_karyawan_v2.xlsx';
         
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment; filename="'. urlencode($fileName).'"');

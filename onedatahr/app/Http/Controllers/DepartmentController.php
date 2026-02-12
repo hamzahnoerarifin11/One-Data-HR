@@ -98,6 +98,7 @@ class DepartmentController extends Controller
 
     public function show(Department $department)
     {
+        $department->load(['units']);
         return view('pages.organization.department.show', compact('department'));
     }
 

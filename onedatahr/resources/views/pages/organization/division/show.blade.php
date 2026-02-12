@@ -12,13 +12,13 @@
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 01-1.414 1.414L7.293 14.707z" clip-rule="evenodd"/>
                 </svg>
-                <a href="{{ route('organization.company.index') }}" class="hover:text-blue-600 transition">Data Perusahaan</a>
+                <a href="{{ route('organization.division.index') }}" class="hover:text-blue-600 transition">Data Divisi</a>
             </li>
             <li class="flex items-center gap-2">
                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 01-1.414 1.414L7.293 14.707z" clip-rule="evenodd"/>
                 </svg>
-                <span class="text-gray-900 dark:text-white">Detail Perusahaan</span>
+                <span class="text-gray-900 dark:text-white">Detail Divisi</span>
             </li>
         </ol>
     </nav>
@@ -26,68 +26,54 @@
     <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-                {{ $company->name }}
+                {{ $division->name }}
             </h1>
             <p class="mt-1 text-gray-600 dark:text-gray-400">
-                Informasi detail perusahaan dan struktur divisi terkait.
+                Informasi detail divisi dan struktur departemen/unit terkait.
             </p>
         </div>
         <div class="flex items-center gap-3">
-            <a href="{{ route('organization.company.index') }}"
+             <a href="{{ route('organization.division.index') }}"
                class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow hover:bg-gray-50 transition dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
-               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                 </svg>
-               Kembali
+                Kembali
             </a>
-            <!-- <a href="{{ route('organization.company.edit', $company->id) }}"
-               class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700 transition">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                </svg>
-                Edit Perusahaan
-            </a> -->
         </div>
     </div>
 
     <div class="grid grid-cols-1 gap-6">
         <div class="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] p-6">
             <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 italic">Informasi Umum</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Nama Perusahaan</label>
-                    <p class="mt-1 text-base font-semibold text-gray-900 dark:text-white">{{ $company->name }}</p>
+                    <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Nama Divisi</label>
+                    <p class="mt-1 text-base font-semibold text-gray-900 dark:text-white">{{ $division->name }}</p>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Holding Naungan</label>
+                    <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Naungan</label>
                     <p class="mt-1 text-base text-gray-900 dark:text-white">
-                        @if($company->holding)
+                        @if($division->based_on == 'holding' && $division->holding)
+                             <span class="inline-flex items-center gap-1.5 rounded-full bg-purple-50 px-2.5 py-0.5 text-xs font-medium text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">
+                                Holding: {{ $division->holding->name }}
+                            </span>
+                        @elseif($division->based_on == 'company' && $division->company)
                             <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-                                {{ $company->holding->name }}
+                                Perusahaan: {{ $division->company->name }}
                             </span>
                         @else
-                            <span class="text-gray-400 italic text-sm">Tanpa Holding</span>
+                            <span class="text-gray-400 italic text-sm">-</span>
                         @endif
                     </p>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-500 dark:text-gray-400">Terdaftar Sejak</label>
-                    <p class="mt-1 text-base text-gray-900 dark:text-white">{{ $company->created_at->format('d F Y') }}</p>
                 </div>
             </div>
         </div>
 
-        <div x-data="companyDetails()" class="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
-            <!-- Tabs Header -->
+        <div x-data="divisionDetails()" class="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+             <!-- Tabs Header -->
             <div class="border-b border-gray-200 dark:border-gray-700">
                 <nav class="-mb-px flex gap-6 px-6" aria-label="Tabs">
-                    <button 
-                        @click="activeTab = 'divisions'"
-                        :class="activeTab === 'divisions' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
-                        class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200">
-                        Divisi
-                        <span class="ml-2 py-0.5 px-2.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300" x-text="data.divisions.length"></span>
-                    </button>
                     <button 
                         @click="activeTab = 'departments'"
                         :class="activeTab === 'departments' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
@@ -102,13 +88,6 @@
                         Unit
                         <span class="ml-2 py-0.5 px-2.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300" x-text="data.units.length"></span>
                     </button>
-                    <button 
-                        @click="activeTab = 'subsidiaries'"
-                        :class="activeTab === 'subsidiaries' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
-                        class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200">
-                        Anak Perusahaan
-                        <span class="ml-2 py-0.5 px-2.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300" x-text="data.subsidiaries.length"></span>
-                    </button>
                 </nav>
             </div>
 
@@ -120,7 +99,7 @@
                         <button class="absolute text-gray-500 -translate-y-1/2 left-4 top-1/2">
                             <svg class="h-5 w-5 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.04199 9.37363C3.04199 5.87693 5.87735 3.04199 9.37533 3.04199C12.8733 3.04199 15.7087 5.87693 15.7087 9.37363C15.7087 12.8703 12.8733 15.7053 9.37533 15.7053C5.87735 15.7053 3.04199 12.8703 3.04199 9.37363ZM9.37533 1.54199C5.04926 1.54199 1.54199 5.04817 1.54199 9.37363C1.54199 13.6991 5.04926 17.2053 9.37533 17.2053C11.2676 17.2053 13.0032 16.5344 14.3572 15.4176L17.1773 18.238C17.4702 18.5309 17.945 18.5309 18.2379 18.238C18.5308 17.9451 18.5309 17.4703 18.238 17.1773L15.4182 14.3573C16.5367 13.0033 17.2087 11.2669 17.2087 9.37363C17.2087 5.04817 13.7014 1.54199 9.37533 1.54199Z"/></svg>
                         </button>
-                        <input
+                         <input
                             x-model="search"
                             type="text"
                             :placeholder="'Cari ' + tabLabel + '...'"
@@ -129,32 +108,18 @@
                     </div>
 
                     <!-- Dynamic Action Button -->
-                    <template x-if="activeTab === 'divisions'">
-                         <a href="{{ route('organization.division.create', ['company_id' => $company->id]) }}"
-                            class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700 transition">
-                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                             Tambah Divisi
-                         </a>
-                    </template>
-                     <template x-if="activeTab === 'departments'">
-                         <a href="{{ route('organization.department.create', ['company_id' => $company->id]) }}"
+                    <template x-if="activeTab === 'departments'">
+                         <a href="{{ route('organization.department.create', ['division_id' => $division->id]) }}"
                             class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700 transition">
                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                              Tambah Departemen
                          </a>
                     </template>
                      <template x-if="activeTab === 'units'">
-                         <a href="{{ route('organization.unit.create', ['company_id' => $company->id]) }}"
+                         <a href="{{ route('organization.unit.create', ['division_id' => $division->id]) }}"
                             class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700 transition">
                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                              Tambah Unit
-                         </a>
-                    </template>
-                     <template x-if="activeTab === 'subsidiaries'">
-                         <a href="{{ route('organization.subsidiary.create', ['parent_id' => $company->id]) }}"
-                            class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700 transition">
-                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                             Tambah Anak Perusahaan
                          </a>
                     </template>
                 </div>
@@ -214,25 +179,21 @@
 </div>
 
 <script>
-function companyDetails() {
+function divisionDetails() {
     return {
-        activeTab: 'divisions',
+        activeTab: 'departments',
         search: '',
         sortCol: 'name',
         sortDir: 'asc',
         data: {
-            divisions: @json($company->divisions ?? []),
-            departments: @json($company->departments ?? []),
-            units: @json($company->units ?? []),
-            subsidiaries: @json($company->children ?? []),
+            departments: @json($division->departments ?? []),
+            units: @json($division->units ?? []),
         },
 
         get tabLabel() {
             switch(this.activeTab) {
-                case 'divisions': return 'Divisi';
                 case 'departments': return 'Departemen';
                 case 'units': return 'Unit';
-                case 'subsidiaries': return 'Anak Perusahaan';
                 default: return '';
             }
         },
@@ -272,11 +233,9 @@ function companyDetails() {
         },
 
         getItemUrl(id) {
-            switch(this.activeTab) {
-                case 'divisions': return '{{ url("organization/division") }}/' + id;
+             switch(this.activeTab) {
                 case 'departments': return '{{ url("organization/department") }}/' + id;
                 case 'units': return '{{ url("organization/unit") }}/' + id;
-                case 'subsidiaries': return '{{ url("organization/subsidiary") }}/' + id;
                 default: return '#';
             }
         }

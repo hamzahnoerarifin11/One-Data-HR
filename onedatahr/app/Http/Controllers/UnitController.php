@@ -85,6 +85,7 @@ class UnitController extends Controller
 
     public function show(Unit $unit)
     {
+        $unit->load(['positions']);
         return view('pages.organization.unit.show', compact('unit'));
     }
 

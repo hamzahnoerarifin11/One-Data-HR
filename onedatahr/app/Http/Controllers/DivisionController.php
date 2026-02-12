@@ -114,6 +114,7 @@ class DivisionController extends Controller
 
     public function show(Division $division)
     {
+        $division->load(['departments', 'units']);
         return view('pages.organization.division.show', compact('division'));
     }
 
