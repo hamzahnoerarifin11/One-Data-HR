@@ -8,9 +8,9 @@ class AddHoldingIdToCompaniesTable extends Migration
 {
     public function up()
     {
-        Schema::table('companies', function (Blueprint $table) {
-            $table->foreignId('holding_id')->nullable()->constrained('holdings')->nullOnDelete();
-        });
+        // Schema::table('companies', function (Blueprint $table) {
+        //     $table->foreignId('holding_id')->nullable()->constrained('holdings')->nullOnDelete();
+        // });
     }
 
     public function down()

@@ -16,9 +16,16 @@ use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Services\KpiCalculationService;
 
 class KpiAssessmentController extends Controller
 {
+    protected $calculationService;
+
+    public function __construct(KpiCalculationService $calculationService)
+    {
+        $this->calculationService = $calculationService;
+    }
     public function getPerspektifAktif(){
         return KpiPerspective::where('is_active', true)
             ->orderBy('name')
@@ -338,8 +345,11 @@ class KpiAssessmentController extends Controller
             ->paginate(10); // Pagination untuk item
 
         $perspektifList = $this->getPerspektifAktif();
+        
+        // Cek Hak Akses Adjustment
+        $canAdjust = $this->canAdjust($user, $karyawan);
 
-        return view('pages.kpi.form', compact('karyawan', 'kpi', 'items', 'tahun', 'perspektifList'));
+        return view('pages.kpi.form', compact('karyawan', 'kpi', 'items', 'tahun', 'perspektifList', 'canAdjust'));
     }
 
 
@@ -386,11 +396,12 @@ class KpiAssessmentController extends Controller
             'bobot'                     => 'required|numeric',
             'target'                    => 'required|numeric',
             'polaritas'                 => 'required|string',
+            'calculation_method'        => 'required|in:positive,negative,progress', // Added
             'perspektif'                => 'nullable|string',
         ]);
 
-        // default target 0 since form doesn't request target
-        $defaultTarget = 0;
+        // Bersihkan input target
+        $target = $this->cleanInput($request->target);
 
         // 1. Simpan Item KPI
         $item = KpiItem::create([
@@ -400,17 +411,25 @@ class KpiAssessmentController extends Controller
             'key_performance_indicator' => $request->key_performance_indicator,
             'units'                     => $request->units,
             'polaritas'                 => $request->polaritas,
+            'calculation_method'        => $request->calculation_method, // Added
+            'previous_progress'         => $request->previous_progress ?? 0, // Added
             'bobot'                     => $request->bobot,
-            'target'                    => $defaultTarget,
+            'target'                    => $target,
         ]);
 
         // 2. Simpan Score
+        // Target bulanan di-set sama dengan target tahunan/global sebagai default
         KpiScore::create([
             'kpi_item_id'  => $item->id_kpi_item,
-            'target'       => $defaultTarget,
-            'target_smt1'  => $defaultTarget,
+            'target'       => $target,
+            'target_smt1'  => $target,
             'nama_periode' => 'Semester 1',
-            'realisasi'    => 0
+            'realisasi'    => 0,
+            // Init monthly targets
+            'target_jan' => $target, 'target_feb' => $target, 'target_mar' => $target,
+            'target_apr' => $target, 'target_mei' => $target, 'target_jun' => $target,
+            'target_jul' => $target, 'target_aug' => $target, 'target_sep' => $target,
+            'target_okt' => $target, 'target_nov' => $target, 'target_des' => $target,
         ]);
 
         return redirect()->back()->with('success', 'Indikator berhasil ditambahkan');
@@ -427,6 +446,20 @@ class KpiAssessmentController extends Controller
                 return response()->json(['success' => false, 'message' => 'Tidak ada data dikirim.']);
             }
             return redirect()->back()->with('error', 'Tidak ada data dikirim.');
+        }
+
+        // Define canAdjust for this request
+        $user = auth()->user();
+        $karyawan = $assessment->karyawan;
+        $canAdjust = $this->canAdjust($user, $karyawan);
+
+        // Cek Total Bobot (Server Side Validation)
+        $totalBobot = KpiItem::where('kpi_assessment_id', $id_kpi_assessment)->sum('bobot');
+        if ($totalBobot > 100.05) { // Sedikit toleransi float
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Total Bobot melebihi 100% (' . $totalBobot . '%). Mohon sesuaikan bobot item.']);
+            }
+            return redirect()->back()->with('error', 'Gagal: Total Bobot melebihi 100% (' . $totalBobot . '%).');
         }
 
         DB::beginTransaction();
@@ -457,6 +490,20 @@ class KpiAssessmentController extends Controller
                     $t_jun = $this->cleanInput($data['target_jun']);
                     $r_jun = $this->cleanInput($data['real_jun']);
 
+                    // --- Semester 2 (Juli - Desember) ---
+                    $t_jul = $this->cleanInput($data['target_jul']);
+                    $r_jul = $this->cleanInput($data['real_jul']);
+                    $t_aug = $this->cleanInput($data['target_aug']);
+                    $r_aug = $this->cleanInput($data['real_aug']);
+                    $t_sep = $this->cleanInput($data['target_sep']);
+                    $r_sep = $this->cleanInput($data['real_sep']);
+                    $t_okt = $this->cleanInput($data['target_okt']);
+                    $r_okt = $this->cleanInput($data['real_okt']);
+                    $t_nov = $this->cleanInput($data['target_nov']);
+                    $r_nov = $this->cleanInput($data['real_nov']);
+                    $t_des = $this->cleanInput($data['target_des']);
+                    $r_des = $this->cleanInput($data['real_des']);
+
                     // Jumlahkan untuk menjadi Semester 1
                     $target1 = $t_jan + $t_feb + $t_mar + $t_apr + $t_mei + $t_jun;
                     $real1   = $r_jan + $r_feb + $r_mar + $r_apr + $r_mei + $r_jun;
@@ -465,59 +512,138 @@ class KpiAssessmentController extends Controller
                         $target1 = $this->cleanInput($data['target_smt1'] ?? $item->target);
                     }
                     if ($real1 == 0) {
-                        $real1 = $this->cleanInput($data['real_smt1']);
+                        $real1 = $this->cleanInput($data['real_smt1'] ?? 0);
                     }
 
-                    // Tangkap Adjustment Smt 1 (Tengah Tahun)
-                    $adjReal1 = isset($data['adjustment_real_smt1']) ? $this->cleanInput($data['adjustment_real_smt1']) : null;
+                    // Tangkap Adjustment Smt 1
+                    $adjReal1 = null;
+                    if ($canAdjust) {
+                        $adjReal1 = isset($data['adjustment_real_smt1']) ? $this->cleanInput($data['adjustment_real_smt1']) : null;
+                    } else {
+                        // Keep existing value if user cannot adjust
+                        $adjReal1 = $score->adjustment_real_smt1;
+                    }
 
-                    // --- Bulanan (Juli - Desember) ---
-                    // WAJIB DITANGKAP AGAR TIDAK HILANG
-                    $t_jul = $this->cleanInput($data['target_jul'] );
-                    $r_jul = $this->cleanInput($data['real_jul'] );
-                    $t_aug = $this->cleanInput($data['target_aug'] );
-                    $r_aug = $this->cleanInput($data['real_aug'] );
-                    $t_sep = $this->cleanInput($data['target_sep'] );
-                    $r_sep = $this->cleanInput($data['real_sep'] );
-                    $t_okt = $this->cleanInput($data['target_okt'] );
-                    $r_okt = $this->cleanInput($data['real_okt'] );
-                    $t_nov = $this->cleanInput($data['target_nov'] );
-                    $r_nov = $this->cleanInput($data['real_nov'] );
-                    $t_des = $this->cleanInput($data['target_des'] );
-                    $r_des = $this->cleanInput($data['real_des'] );
+                    // ... intermediate logic ...
 
-                    // --- Semester 2 (Jul - Des) computed from monthly inputs ---
+                    // Tangkap Adjustment Smt 2
+                    $adjReal2 = null;
+                    // $adjTarget2 = ... (if used)
+                    
+                    if ($canAdjust) {
+                        $adjReal2 = isset($data['adjustment_real_smt2']) ? $this->cleanInput($data['adjustment_real_smt2']) : null;
+                        $adjTarget2 = isset($data['adjustment_target_smt2']) ? $this->cleanInput($data['adjustment_target_smt2']) : null;
+                    } else {
+                        $adjReal2 = $score->adjustment_real_smt2;
+                        $adjTarget2 = $score->adjustment_target_smt2;
+                    }
+                    // Re-calculate for safety: Average of Monthly Scores
+                    // Note: If using complex polaritas patterns, better to trust the Service.
+                    // Let's use the Frontend logic principle: Subtotal = Avg(Monthly Scores)
+                    // But we need to calculate Monthly Scores first.
+                    
+                    // --- 2. HITUNG SKOR DI BACKEND (LOGIKA PENILAIAN BARU) ---
+                    
+                    // Calculate Monthly Scores for SMT 1
+                    $sumSkor1 = 0; $count1 = 0;
+                    $months1 = ['jan','feb','mar','apr','mei','jun'];
+                    $justification = []; // Collect justification
+
+                    foreach ($months1 as $m) {
+                        $t_val = ${'t_'.$m};
+                        $r_val = ${'r_'.$m};
+                        
+                        // Collect Justification
+                        if(isset($data['justification'][$m])) {
+                            $justification[$m] = $data['justification'][$m];
+                        }
+
+                        if ($t_val != 0) {
+                            $skorMonth = $this->hitungSkor($t_val, $r_val, $item->polaritas, $item->calculation_method, $item->previous_progress);
+                            $sumSkor1 += $skorMonth;
+                            $count1++;
+                        }
+                    }
+                    
+                    // Subtotal Smt 1
+                    $subtotal1 = ($count1 > 0) ? ($sumSkor1 / $count1) : 0;
+                    
+                    // Final Score Smt 1 -> (Subtotal + Adjustment) * Bobot% in Frontend
+                    // Here we save the components.
+                    // The 'skor1' variable in previous logic was "Total Sum of Weighted Values".
+                    // Now we need "Final Score" (0-100 scale) to multiply by weight later?
+                    // Wait, previous logic: $skor1 = calculateScore(Target, Real).
+                    // New logic: $skor1 = Subtotal + Adjustment.
+                    
+                    $real1Final = $subtotal1 + ($adjReal1 ?? 0);
+                    $real1Final = max(0, $real1Final); // Clamp min 0
+                    
+                    // Effective Score for Smt 1 (Weighted)
+                    $nilaiSmt1 = ($real1Final * $item->bobot) / 100;
+                    
+                    
+                    // --- Semester 2 ---
+                    // Capture Adjustment Smt 2
+                    $adjReal2   = isset($data['adjustment_real_smt2']) ? $this->cleanInput($data['adjustment_real_smt2']) : null;
+                    // $adjTarget2 = isset($data['adjustment_target_smt2']) ? $this->cleanInput($data['adjustment_target_smt2']) : null; // Unused?
+
+                    // Calculate Monthly Scores for SMT 2
+                    $sumSkor2 = 0; $count2 = 0;
+                    $months2 = ['jul','aug','sep','okt','nov','des'];
+                    
+                    foreach ($months2 as $m) {
+                        $t_val = ${'t_'.$m};
+                        $r_val = ${'r_'.$m};
+                        
+                        // Collect Justification
+                        if(isset($data['justification'][$m])) {
+                            $justification[$m] = $data['justification'][$m];
+                        }
+
+                        if ($t_val != 0) {
+                            $skorMonth = $this->hitungSkor($t_val, $r_val, $item->polaritas, $item->calculation_method, $item->previous_progress);
+                            $sumSkor2 += $skorMonth;
+                            $count2++;
+                        }
+                    }
+
+                    // Calculate Semester 2 Totals (Target & Real)
                     $target2 = $t_jul + $t_aug + $t_sep + $t_okt + $t_nov + $t_des;
                     $real2   = $r_jul + $r_aug + $r_sep + $r_okt + $r_nov + $r_des;
-                    // Fallback for backward compatibility (if manual totals provided)
-                    if (isset($data['total_target_smt2']) && $data['total_target_smt2'] !== "") {
-                        $target2 = $this->cleanInput($data['total_target_smt2']);
+                    // Fallback for compatibility
+                    if ($target2 == 0) {
+                        $target2 = $this->cleanInput($data['target_smt2'] ?? 0); // Smt 2 usually sum of months
                     }
-                    if (isset($data['total_real_smt2']) && $data['total_real_smt2'] !== "") {
-                        $real2 = $this->cleanInput($data['total_real_smt2']);
+                    if ($real2 == 0) {
+                        $real2 = $this->cleanInput($data['real_smt2'] ?? 0);
                     }
-                    // Tangkap Adjustment Smt 2
-                    $adjReal2   = isset($data['adjustment_real_smt2']) ? $this->cleanInput($data['adjustment_real_smt2']) : null;
-                    $adjTarget2 = isset($data['adjustment_target_smt2']) ? $this->cleanInput($data['adjustment_target_smt2']) : null;
 
-                    // ====================================================
-                    // 2. HITUNG SKOR DI BACKEND (LOGIKA PENILAIAN)
-                    // ====================================================
+                    // Subtotal Smt 2
+                    $subtotal2 = ($count2 > 0) ? ($sumSkor2 / $count2) : 0;
+                    
+                    $real2Final = $subtotal2 + ($adjReal2 ?? 0);
+                    $real2Final = max(0, $real2Final);
 
-                    // --- Hitung SMT 1 ---
-                    // Gunakan Adjustment Real jika ada, jika tidak pakai Real biasa
-                    $real1Final = ($adjReal1 !== null && $data['adjustment_real_smt1'] !== "") ? $adjReal1 : $real1;
-                    $skor1      = $this->hitungSkor($target1, $real1Final, $item->polaritas);
-
-                    // --- Hitung SMT 2 ---
-                    // Gunakan Adjustment Target/Real jika ada
-                    $target2Final = ($adjTarget2 !== null && $data['adjustment_target_smt2'] !== "") ? $adjTarget2 : $target2;
-                    $real2Final   = ($adjReal2 !== null && $data['adjustment_real_smt2'] !== "") ? $adjReal2 : $real2;
-                    $skor2        = $this->hitungSkor($target2Final, $real2Final, $item->polaritas);
+                    // Effective Score for Smt 2 (Weighted)
+                    $nilaiSmt2 = ($real2Final * $item->bobot) / 100;
 
                     // --- Final Score Item ---
-                    $pencapaianTotal = ($skor1 + $skor2) / 2;
-                    $finalSkorItem   = ($pencapaianTotal * $item->bobot) / 100;
+                    // Average of Weighted Values
+                    $pencapaianTotal = ($nilaiSmt1 + $nilaiSmt2) / 2; // This is actually "Average Value"
+                    // Wait. In previous code:
+                    // $pencapaianTotal = ($skor1 + $skor2) / 2; (where skor1/2 were raw scores)
+                    // $finalSkorItem   = ($pencapaianTotal * $item->bobot) / 100;
+                    // IF we change Logic, we must be careful.
+                    // New Logic: 
+                    // Smt 1 Value = (Subtotal1 + Adj1) * Weight%
+                    // Smt 2 Value = (Subtotal2 + Adj2) * Weight%
+                    // Final Value = (Value1 + Value2) / 2 ???
+                    // Example: 
+                    // Smt 1: Subtotal 100 + 0 Adj -> 100 * 10% = 10.
+                    // Smt 2: Subtotal 100 + 0 Adj -> 100 * 10% = 10.
+                    // Final = (10+10)/2 = 10. Correct.
+                    
+                    $finalSkorItem = ($nilaiSmt1 + $nilaiSmt2) / 2;
 
                     // ====================================================
                     // 3. SIMPAN KE DATABASE (UPDATE LENGKAP)
@@ -526,44 +652,33 @@ class KpiAssessmentController extends Controller
                         // Data Semester 1
                         'target_smt1' => $target1,
                         'real_smt1'   => $real1,
-                        'adjustment_real_smt1' => $adjReal1, // <--- Jangan Lupa Disimpan
+                        'subtotal_smt1' => $subtotal1, // NEW
+                        'adjustment_real_smt1' => $adjReal1, // Saved as Adjustment Value
 
                         // Data Bulanan (AGAR TIDAK HILANG) - JAN-JUN & JUL-DEC
-                        'target_jan' => $t_jan,
-                        'real_jan' => $r_jan,
-                        'target_feb' => $t_feb,
-                        'real_feb' => $r_feb,
-                        'target_mar' => $t_mar,
-                        'real_mar' => $r_mar,
-                        'target_apr' => $t_apr,
-                        'real_apr' => $r_apr,
-                        'target_mei' => $t_mei,
-                        'real_mei' => $r_mei,
-                        'target_jun' => $t_jun,
-                        'real_jun' => $r_jun,
+                        'target_jan' => $t_jan, 'real_jan' => $r_jan,
+                        'target_feb' => $t_feb, 'real_feb' => $r_feb,
+                        'target_mar' => $t_mar, 'real_mar' => $r_mar,
+                        'target_apr' => $t_apr, 'real_apr' => $r_apr,
+                        'target_mei' => $t_mei, 'real_mei' => $r_mei,
+                        'target_jun' => $t_jun, 'real_jun' => $r_jun,
 
-                        'target_jul' => $t_jul,
-                        'real_jul' => $r_jul,
-                        'target_aug' => $t_aug,
-                        'real_aug' => $r_aug,
-                        'target_sep' => $t_sep,
-                        'real_sep' => $r_sep,
-                        'target_okt' => $t_okt,
-                        'real_okt' => $r_okt,
-                        'target_nov' => $t_nov,
-                        'real_nov' => $r_nov,
-                        'target_des' => $t_des,
-                        'real_des' => $r_des,
+                        'target_jul' => $t_jul, 'real_jul' => $r_jul,
+                        'target_aug' => $t_aug, 'real_aug' => $r_aug,
+                        'target_sep' => $t_sep, 'real_sep' => $r_sep,
+                        'target_okt' => $t_okt, 'real_okt' => $r_okt,
+                        'target_nov' => $t_nov, 'real_nov' => $r_nov,
+                        'target_des' => $t_des, 'real_des' => $r_des,
 
-                        // Data Semester 1 (total dari Jan-Jun)
-                        'target_smt1' => $target1,
-                        'real_smt1' => $real1,
+                        // Justification
+                        'justification' => $justification, // NEW JSON
 
                         // Data Semester 2
                         'total_target_smt2' => $target2,
                         'total_real_smt2'   => $real2,
-                        'adjustment_target_smt2' => $adjTarget2, // <--- Jangan Lupa Disimpan
-                        'adjustment_real_smt2'   => $adjReal2,   // <--- Jangan Lupa Disimpan
+                        'subtotal_smt2'     => $subtotal2, // NEW
+                        'adjustment_target_smt2' => $adjTarget2,
+                        'adjustment_real_smt2'   => $adjReal2, // Saved as Adjustment Value
 
                         // Skor Akhir
                         'skor_akhir' => $finalSkorItem
@@ -664,21 +779,13 @@ class KpiAssessmentController extends Controller
         return floatval(str_replace(['%', ','], ['', '.'], $value));
     }
 
-    private function hitungSkor($target, $realisasi, $polaritas)
+    private function hitungSkor($target, $realisasi, $polaritas, $method = 'positive', $previousProgress = 0)
     {
         $t = $this->cleanInput($target);
         $r = $this->cleanInput($realisasi);
 
-        if ($t == 0) return 0;
-
-        $p = strtolower($polaritas);
-        if (str_contains($p, 'min')) {
-            // Minimize: Makin kecil makin bagus
-            return ($t / ($r == 0 ? 1 : $r)) * 100; // Rumus sederhana minimize
-        } else {
-            // Maximize: Makin besar makin bagus
-            return ($r / $t) * 100;
-        }
+        // Delegasikan ke Service
+        return $this->calculationService->calculateScore($method, $t, $r, $previousProgress);
     }
 
     private function determineGrade($skor)
@@ -729,6 +836,8 @@ class KpiAssessmentController extends Controller
             'key_performance_indicator' => $request->key_performance_indicator, // atau 'indikator'
             'units'                     => $request->units,
             'polaritas'                 => $request->polaritas,
+            'calculation_method'        => $request->calculation_method ?? $item->calculation_method, 
+            'previous_progress'         => $request->previous_progress ?? $item->previous_progress,
             'bobot'                     => $request->bobot,
             'target'                    => $cleanTarget,
         ]);
@@ -1406,5 +1515,36 @@ private function roleMatches($user, $roles)
                 'message' => 'Gagal menghapus data: ' . $e->getMessage()
             ], 500);
         }
+    }
+    // =================================================================
+    // HELPER: CEK HAK AKSES ADJUSTMENT
+    // =================================================================
+    private function canAdjust($user, $karyawan)
+    {
+        // 1. Superadmin / Senior Manager (Grand Super)
+        if ($this->roleMatches($user, ['superadmin', 'senior_manager'])) {
+            return true;
+        }
+
+        $me = Karyawan::where('nik', $user->nik)->first();
+        if (!$me) return false;
+
+        // 2. Atasan Langsung (Direct Supervisor)
+        if ($karyawan->atasan_id == $me->id_karyawan) {
+            return true;
+        }
+
+        // 3. Manager dalam Satu Divisi (Hierarchy check)
+        // Jika User adalah Manager, dan Karyawan berada di Divisi yang sama
+        if ($this->roleMatches($user, 'manager')) {
+            $myJob = $me->pekerjaan()->orderByDesc('id_pekerjaan')->first();
+            $targetJob = $karyawan->pekerjaan()->orderByDesc('id_pekerjaan')->first();
+
+            if ($myJob && $targetJob && $myJob->division_id == $targetJob->division_id) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

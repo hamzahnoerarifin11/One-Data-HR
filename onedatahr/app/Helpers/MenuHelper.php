@@ -209,7 +209,7 @@ class MenuHelper
 
         // Sign out action (rendered as a button that submits a POST logout form)
         $items[] = [
-            'icon' => 'authentication',
+            'icon' => 'signout',
             'name' => 'Sign Out',
             'action' => 'logout',
         ];
@@ -311,6 +311,10 @@ stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                 <path fill-rule="evenodd" d="M0 0h1v15h15v1H0V0z"/>
                 <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-1 0v1.793l-3.646-3.647a.5.5 0 0 0-.708 0L6.5 9.793l-3.146-3.147a.5.5 0 1 0-.708.708l3.5 3.5a.5.5 0 0 0 .708 0L9 8.707l3.293 3.293H10.5a.5.5 0 0 0-.5.5z"/>
             </svg>',
+
+            'signout' => '<svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>',
 
 
             // 3. Ikon User Shield / Admin (Alternatif Monitoring)

@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\TempaPeserta;
 use App\Models\TempaKelompok;
-use App\Models\Tempa;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class TempaPesertaController extends Controller
 {
@@ -21,11 +24,11 @@ class TempaPesertaController extends Controller
         $this->authorize('viewTempaPeserta');
 
         $user = Auth::user();
+        $isKetuaTempa = false;
+
         if ($user instanceof User) {
             $user->loadMissing('roles');
             $isKetuaTempa = $user->hasRole('ketua_tempa') && !$user->hasRole(['admin', 'superadmin']);
-        } else {
-            $isKetuaTempa = false;
         }
 
         if ($isKetuaTempa) {
@@ -47,11 +50,11 @@ class TempaPesertaController extends Controller
         $this->authorize('viewTempaPeserta');
 
         $user = Auth::user();
+        $isKetuaTempa = false;
+
         if ($user instanceof User) {
             $user->loadMissing('roles');
             $isKetuaTempa = $user->hasRole('ketua_tempa') && !$user->hasRole(['admin', 'superadmin']);
-        } else {
-            $isKetuaTempa = false;
         }
 
         $pesertaModel = TempaPeserta::with(['kelompok.ketuaTempa'])->findOrFail($peserta);
@@ -69,11 +72,11 @@ class TempaPesertaController extends Controller
         $this->authorize('createTempaPeserta');
 
         $user = Auth::user();
+        $isKetuaTempa = false;
+
         if ($user instanceof User) {
             $user->loadMissing('roles');
             $isKetuaTempa = $user->hasRole('ketua_tempa') && !$user->hasRole(['admin', 'superadmin']);
-        } else {
-            $isKetuaTempa = false;
         }
 
         if ($isKetuaTempa) {
@@ -90,11 +93,11 @@ class TempaPesertaController extends Controller
     public function store(\App\Http\Requests\TempaPesertaRequest $request)
     {
         $user = Auth::user();
+        $isKetuaTempa = false;
+
         if ($user instanceof User) {
             $user->loadMissing('roles');
             $isKetuaTempa = $user->hasRole('ketua_tempa') && !$user->hasRole(['admin', 'superadmin']);
-        } else {
-            $isKetuaTempa = false;
         }
 
         $validated = $request->validated();
@@ -131,18 +134,16 @@ class TempaPesertaController extends Controller
             ->with('success', 'Peserta berhasil ditambahkan');
     }
 
-
-
     public function edit($peserta)
     {
         $this->authorize('editTempaPeserta');
 
         $user = Auth::user();
+        $isKetuaTempa = false;
+
         if ($user instanceof User) {
             $user->loadMissing('roles');
             $isKetuaTempa = $user->hasRole('ketua_tempa') && !$user->hasRole(['admin', 'superadmin']);
-        } else {
-            $isKetuaTempa = false;
         }
         $peserta = TempaPeserta::findOrFail($peserta);
 
@@ -165,11 +166,11 @@ class TempaPesertaController extends Controller
     public function update(\App\Http\Requests\TempaPesertaRequest $request, $peserta)
     {
         $user = Auth::user();
+        $isKetuaTempa = false;
+
         if ($user instanceof User) {
             $user->loadMissing('roles');
             $isKetuaTempa = $user->hasRole('ketua_tempa') && !$user->hasRole(['admin', 'superadmin']);
-        } else {
-            $isKetuaTempa = false;
         }
         $pesertaModel = TempaPeserta::findOrFail($peserta);
 
@@ -211,11 +212,11 @@ class TempaPesertaController extends Controller
         $this->authorize('deleteTempaPeserta');
 
         $user = Auth::user();
+        $isKetuaTempa = false;
+
         if ($user instanceof User) {
             $user->loadMissing('roles');
             $isKetuaTempa = $user->hasRole('ketua_tempa') && !$user->hasRole(['admin', 'superadmin']);
-        } else {
-            $isKetuaTempa = false;
         }
         $pesertaModel = TempaPeserta::findOrFail($peserta);
 
@@ -229,5 +230,140 @@ class TempaPesertaController extends Controller
         return redirect()
             ->route('tempa.peserta.index')
             ->with('success', 'Peserta berhasil dihapus');
+    }
+
+    public function downloadTemplate()
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Headers
+        $headers = [
+            'Nama Peserta',
+            'NIK Karyawan',
+            'Nama Kelompok (Harus Sesuai)',
+            'Status (Aktif/Pindah/Keluar)',
+            'Keterangan Pindah (Opsional)'
+        ];
+        $sheet->fromArray($headers, NULL, 'A1');
+
+        // Style Check
+        $headerStyle = [
+            'font' => ['bold' => true],
+            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => 'E0E0E0']],
+        ];
+        $sheet->getStyle('A1:G1')->applyFromArray($headerStyle);
+        foreach (range('A', 'G') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        // Sample Data
+        $sheet->setCellValue('A2', 'Ahmad Fulan');
+        $sheet->setCellValue('B2', '12345678');
+        $sheet->setCellValue('C2', 'Kelompok Alpha');
+        $sheet->setCellValue('D2', 'Aktif');
+        $sheet->setCellValue('E2', '');
+        
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'template_import_peserta_tempa.xlsx';
+
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="'. urlencode($fileName).'"');
+        $writer->save('php://output');
+        exit;
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:2048',
+        ]);
+
+        $file = $request->file('file');
+
+        try {
+            $spreadsheet = IOFactory::load($file->getPathname());
+            $sheet = $spreadsheet->getActiveSheet();
+            $rows = $sheet->toArray();
+
+            // Remove header row
+            array_shift($rows);
+
+            $successCount = 0;
+            $failCount = 0;
+            $errors = [];
+
+            DB::beginTransaction();
+
+            $allKelompoks = TempaKelompok::all()->keyBy(function($item) {
+                return strtolower(trim($item->nama_kelompok));
+            });
+
+            foreach ($rows as $index => $row) {
+                // Skip empty rows
+                if (empty(array_filter($row))) {
+                    continue;
+                }
+
+                try {
+                    $namaPeserta = $row[0] ?? null;
+                    $nik = $row[1] ?? null;
+                    $namaKelompok = trim($row[2] ?? '');
+                    $statusStr = strtolower(trim($row[3] ?? 'aktif'));
+                    $ketPindah = $row[4] ?? null;
+                    $tempat = strtolower($row[5] ?? 'pusat');
+                    $ketCabang = $row[6] ?? null;
+
+                    if (!$namaPeserta || !$namaKelompok) {
+                        throw new \Exception("Nama Peserta dan Nama Kelompok wajib diisi.");
+                    }
+
+                    // Mapping Status
+                    $status = match($statusStr) {
+                        'aktif' => 1,
+                        'pindah' => 2,
+                        'keluar' => 3,
+                        default => 1
+                    };
+
+                    // Search Kelompok Case Insensitive
+                    $kelompok = $allKelompoks->get(strtolower($namaKelompok));
+
+                    if (!$kelompok) {
+                        throw new \Exception("Kelompok '$namaKelompok' tidak ditemukan dalam sistem.");
+                    }
+
+                    TempaPeserta::create([
+                        'nama_peserta' => $namaPeserta,
+                        'nik_karyawan' => $nik,
+                        'id_kelompok' => $kelompok->id_kelompok,
+                        'status_peserta' => $status,
+                        'keterangan_pindah' => $ketPindah
+                    ]);
+
+                    $successCount++;
+                } catch (\Exception $e) {
+                    $failCount++;
+                    $errors[] = "Baris " . ($index + 2) . ": " . $e->getMessage();
+                }
+            }
+
+            if ($failCount > 0 && $successCount == 0) {
+                 DB::rollBack();
+                 return back()->with('error', 'Gagal import data. ' . implode(', ', $errors));
+            }
+
+            DB::commit();
+
+            $msg = "$successCount peserta berhasil diimport.";
+            if ($failCount > 0) {
+                $msg .= " $failCount gagal. Error: " . implode(', ', $errors);
+            }
+
+            return redirect()->route('tempa.peserta.index')->with('success', $msg);
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Terjadi kesalahan saat membaca file: ' . $e->getMessage());
+        }
     }
 }

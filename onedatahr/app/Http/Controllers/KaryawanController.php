@@ -1050,8 +1050,456 @@ class KaryawanController extends Controller
 
     public function downloadTemplate()
     {
+        // 1. Fetch Hierarchical Master Data for Dropdowns
+        // Perusahaan = Holdings + Companies
+        $holdings = \App\Models\Holding::with(['divisions' => function($q) {
+            $q->where('based_on', 'holding');
+        }])->get();
+        
+        $companies = \App\Models\Company::with(['divisions' => function($q) {
+            $q->where('based_on', 'company');
+        }])->get();
+
+        // Divisions with Departments
+        $divisions = \App\Models\Division::with('departments')->get();
+        
+        // Departments with Units
+        $departments = \App\Models\Department::with('units')->get();
+
+        // Lists for other dropdowns
+        $listLevel = \App\Models\Level::pluck('name')->unique()->sort()->values()->toArray();
+        $listLokasi = function_exists('getlokasikerja') ? getlokasikerja('pekerjaan', 'Lokasi_Kerja') : [];
+        sort($listLokasi);
+
         $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
+
+        // ============================================================
+        // SHEET: MasterData (Hidden) for Hierarchical Dropdowns
+        // ============================================================
+        $sheetMaster = $spreadsheet->createSheet(); 
+        $sheetMaster->setTitle('MasterData');
+
+        // Helper to sanitize string for Named Range (A-Z, 0-9, _)
+        $sanitize = function($str) {
+            return preg_replace('/[^A-Za-z0-9_]/', '_', $str);
+        };
+
+        // --- 1. Perusahaan List (Col A) ---
+        $sheetMaster->setCellValue('A1', 'ListPerusahaan');
+        $row = 2;
+        $perusahaanNames = [];
+
+        // Collect all Perusahaan & write to Col A
+        // Also map Perusahaan -> Divisions for next step
+        $perusahaanDivisions = []; // [ 'PT_Maju' => ['Div A', 'Div B'] ]
+
+        foreach ($holdings as $h) {
+            $name = $h->name;
+            $sheetMaster->setCellValue('A' . $row, $name);
+            $perusahaanNames[] = $name;
+            $sanitizedName = $sanitize($name);
+            
+            // Get divisions for this holding
+            $divs = $h->divisions->pluck('name')->unique()->sort()->values()->toArray();
+            if (!empty($divs)) {
+                $perusahaanDivisions[$sanitizedName] = $divs;
+            }
+            $row++;
+        }
+        foreach ($companies as $c) {
+            $name = $c->name;
+            $sheetMaster->setCellValue('A' . $row, $name);
+            $perusahaanNames[] = $name;
+            $sanitizedName = $sanitize($name);
+
+            // Get divisions for this company
+            $divs = $c->divisions->pluck('name')->unique()->sort()->values()->toArray();
+            if (!empty($divs)) {
+                $perusahaanDivisions[$sanitizedName] = $divs;
+            }
+            $row++;
+        }
+
+        // Named Range: ListPerusahaan
+        if ($row > 2) {
+            $spreadsheet->addNamedRange(new \PhpOffice\PhpSpreadsheet\NamedRange('ListPerusahaan', $sheetMaster, '$A$2:$A$' . ($row - 1)));
+        }
+
+        // --- 2. Divisions List (Grouped by Perusahaan) ---
+        // We start from Col C to leave some space.
+        // For each Perusahaan, we write its divisions in a column and name the range "PerusahaanName"
+        $colIndex = 3; // 'C'
+        
+        foreach ($perusahaanDivisions as $pName => $divs) {
+            $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
+            
+            // Write Header (Perusahaan Name) - helpful for debugging
+            $sheetMaster->setCellValue($colLetter . '1', $pName);
+            
+            // Write Divisions
+            $r = 2;
+            foreach ($divs as $divName) {
+                $sheetMaster->setCellValue($colLetter . $r, $divName);
+                $r++;
+            }
+            
+            // Create Named Range: "PT_Maju" -> C2:C10
+            if ($r > 2) {
+                $spreadsheet->addNamedRange(new \PhpOffice\PhpSpreadsheet\NamedRange($pName, $sheetMaster, '$' . $colLetter . '$2:$' . $colLetter . '$' . ($r - 1)));
+            }
+            
+            $colIndex++;
+        }
+
+        // --- 3. Departments List (Grouped by Division) ---
+        // Map Division -> Departments
+        $divDepartments = [];
+        $uniqueDivisionNames = []; // To track unique division names for processing
+        
+        foreach ($divisions as $d) {
+            $sanitizedDiv = $sanitize($d->name);
+            if (!isset($divDepartments[$sanitizedDiv])) {
+                $divDepartments[$sanitizedDiv] = [];
+            }
+            // Add departments to this division's list
+            $depts = $d->departments->pluck('name')->toArray();
+            $divDepartments[$sanitizedDiv] = array_unique(array_merge($divDepartments[$sanitizedDiv], $depts));
+            sort($divDepartments[$sanitizedDiv]);
+        }
+
+        // Write Departments columns
+        foreach ($divDepartments as $divDetails => $depts) {
+            if (empty($depts)) continue;
+            
+            $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
+            $sheetMaster->setCellValue($colLetter . '1', $divDetails); // Header
+
+            $r = 2;
+            foreach ($depts as $deptName) {
+                $sheetMaster->setCellValue($colLetter . $r, $deptName);
+                $r++;
+            }
+
+            // Named Range: "Divisi_Teknik" -> D2:D10
+             if ($r > 2) {
+                $spreadsheet->addNamedRange(new \PhpOffice\PhpSpreadsheet\NamedRange($divDetails, $sheetMaster, '$' . $colLetter . '$2:$' . $colLetter . '$' . ($r - 1)));
+            }
+            $colIndex++;
+        }
+
+        // --- 4. Units List (Grouped by Department) ---
+        // Map Department -> Units
+        $deptUnits = [];
+        
+        foreach ($departments as $dept) {
+            $sanitizedDept = $sanitize($dept->name);
+            if (!isset($deptUnits[$sanitizedDept])) {
+                $deptUnits[$sanitizedDept] = [];
+            }
+            // Add units
+            $units = $dept->units->pluck('name')->toArray();
+            $deptUnits[$sanitizedDept] = array_unique(array_merge($deptUnits[$sanitizedDept], $units));
+            sort($deptUnits[$sanitizedDept]);
+        }
+
+        // Write Units columns
+        foreach ($deptUnits as $deptName => $units) {
+             if (empty($units)) continue;
+             
+             $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
+             $sheetMaster->setCellValue($colLetter . '1', $deptName);
+             
+             $r = 2;
+             foreach ($units as $unitName) {
+                 $sheetMaster->setCellValue($colLetter . $r, $unitName);
+                 $r++;
+             }
+             
+             // Named Range: "Dept_IT" -> E2:E10
+             if ($r > 2) {
+                $spreadsheet->addNamedRange(new \PhpOffice\PhpSpreadsheet\NamedRange($deptName, $sheetMaster, '$' . $colLetter . '$2:$' . $colLetter . '$' . ($r - 1)));
+            }
+            $colIndex++;
+        }
+        
+        // --- 5. Other Flat Lists (Level, Lokasi) ---
+        // Level
+        $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
+        $sheetMaster->setCellValue($colLetter . '1', 'ListLevel');
+        $r = 2;
+        foreach ($listLevel as $l) {
+            $sheetMaster->setCellValue($colLetter . $r, $l);
+            $r++;
+        }
+        if ($r > 2) $spreadsheet->addNamedRange(new \PhpOffice\PhpSpreadsheet\NamedRange('ListLevel', $sheetMaster, '$' . $colLetter . '$2:$' . $colLetter . '$' . ($r - 1)));
+        $colIndex++;
+        
+         // Lokasi
+        $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
+        $sheetMaster->setCellValue($colLetter . '1', 'ListLokasi');
+        $r = 2;
+        foreach ($listLokasi as $l) {
+            $sheetMaster->setCellValue($colLetter . $r, $l);
+            $r++;
+        }
+        if ($r > 2) $spreadsheet->addNamedRange(new \PhpOffice\PhpSpreadsheet\NamedRange('ListLokasi', $sheetMaster, '$' . $colLetter . '$2:$' . $colLetter . '$' . ($r - 1)));
+
+        // Hide Master Data Sheet
+        $sheetMaster->setSheetState(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet::SHEETSTATE_HIDDEN);
+
+        // ============================================================
+        // SHEET 1: PANDUAN PENGISIAN (Guide)
+        // ============================================================
+        $guide = $spreadsheet->getActiveSheet();
+        $guide->setTitle('PANDUAN PENGISIAN');
+
+        // Styling helpers
+        $titleStyle = [
+            'font' => ['bold' => true, 'size' => 16, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => '1F4E79']],
+            'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER, 'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER],
+        ];
+        $sectionStyle = [
+            'font' => ['bold' => true, 'size' => 12, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => '2E75B6']],
+            'alignment' => ['vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER],
+        ];
+        $subHeaderStyle = [
+            'font' => ['bold' => true, 'size' => 10],
+            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => 'D6E4F0']],
+            'borders' => ['allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN]],
+        ];
+        $cellBorder = [
+            'borders' => ['allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN]],
+            'alignment' => ['vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP, 'wrapText' => true],
+        ];
+        $warnStyle = [
+            'font' => ['bold' => true, 'color' => ['rgb' => 'CC0000']],
+        ];
+        $tipStyle = [
+            'font' => ['italic' => true, 'color' => ['rgb' => '2E75B6']],
+        ];
+
+        // Column widths
+        $guide->getColumnDimension('A')->setWidth(6);
+        $guide->getColumnDimension('B')->setWidth(40);
+        $guide->getColumnDimension('C')->setWidth(55);
+        $guide->getColumnDimension('D')->setWidth(25);
+        $guide->getColumnDimension('E')->setWidth(35);
+
+        $r = 1;
+
+        // ---- Title ----
+        $guide->mergeCells("A{$r}:E{$r}");
+        $guide->setCellValue("A{$r}", '📋 PANDUAN PENGISIAN TEMPLATE IMPORT KARYAWAN');
+        $guide->getStyle("A{$r}:E{$r}")->applyFromArray($titleStyle);
+        $guide->getRowDimension($r)->setRowHeight(40);
+        $r++;
+
+        // ---- General Instructions ----
+        $guide->mergeCells("A{$r}:E{$r}");
+        $guide->setCellValue("A{$r}", '⚠️ PETUNJUK UMUM');
+        $guide->getStyle("A{$r}:E{$r}")->applyFromArray($sectionStyle);
+        $guide->getRowDimension($r)->setRowHeight(28);
+        $r++;
+
+        $generalInstructions = [
+            ['1.', 'Isi data pada sheet "DATA KARYAWAN", JANGAN mengubah baris header (baris 1-2).'],
+            ['2.', 'Mulai mengisi data karyawan dari BARIS ke-3 pada sheet "DATA KARYAWAN".'],
+            ['3.', 'Kolom bertanda (*) bersifat WAJIB diisi. Import akan gagal jika kolom wajib kosong.'],
+            ['4.', 'Format tanggal HARUS menggunakan format: YYYY-MM-DD (contoh: 1990-05-15).'],
+            ['5.', 'Untuk kolom pilihan (Gender, Status, dll), gunakan nilai yang sudah ditentukan.'],
+            ['6.', 'Nama Perusahaan/Holding, Divisi, Departemen, Unit, dan Level HARUS sesuai data yang sudah ada di sistem.'],
+            ['7.', 'NIK dan Email harus unik — tidak boleh duplikat dengan data yang sudah ada di sistem.'],
+            ['8.', 'Kolom yang tidak wajib boleh dikosongkan.'],
+            ['9.', 'Maksimal data anak yang dapat diisi: 3 anak per karyawan.'],
+            ['10.', 'File yang diunggah harus berformat .xlsx, .xls, atau .csv, maksimal 2MB.'],
+        ];
+
+        foreach ($generalInstructions as $instr) {
+            $guide->setCellValue("A{$r}", $instr[0]);
+            $guide->mergeCells("B{$r}:E{$r}");
+            $guide->setCellValue("B{$r}", $instr[1]);
+            $guide->getStyle("A{$r}:E{$r}")->applyFromArray($cellBorder);
+            if (in_array($instr[0], ['3.', '4.', '7.'])) {
+                $guide->getStyle("B{$r}")->applyFromArray($warnStyle);
+            }
+            $r++;
+        }
+        $r++;
+
+        // ---- Detail Column Guide ----
+        // Section colors mapping
+        $sectionColors = [
+            'personal' => 'FF4472C4',
+            'keluarga' => 'FF548235',
+            'pekerjaan' => 'FFBF8F00',
+            'pendidikan' => 'FF7030A0',
+            'kontrak' => 'FFC55A11',
+            'status' => 'FFFF0000',
+        ];
+
+        // Column detail data: [No, NamaKolom, Keterangan, Wajib, Contoh]
+        $columnGuide = [
+            // Section Header: Data Pribadi
+            ['section' => 'DATA PRIBADI KARYAWAN (Kolom A - AB)', 'color' => $sectionColors['personal']],
+            ['1', 'NIK', 'Nomor Induk Karyawan unik perusahaan', 'YA *', '220022'],
+            ['2', 'Status (1/0)', '1 = Aktif, 0 = Non-Aktif', 'Tidak', '1'],
+            ['3', 'Kode (Aktif/Non Aktif)', 'Tuliskan "Aktif" atau "Non Aktif"', 'Tidak', 'Aktif'],
+            ['4', 'Nama Lengkap (Sesuai KTP)', 'Nama lengkap sesuai KTP', 'YA *', 'Budi Santoso'],
+            ['5', 'NIK KTP', 'Nomor Induk Kependudukan (16 digit)', 'Tidak', '3201234567890001'],
+            ['6', 'Nama Lengkap (Sesuai Ijazah)', 'Nama sesuai ijazah terakhir', 'Tidak', 'Budi Santoso, S.Kom'],
+            ['7', 'Tempat Lahir', 'Kota/kabupaten tempat lahir', 'Tidak', 'Jakarta'],
+            ['8', 'Tanggal Lahir', 'Format: YYYY-MM-DD', 'Tidak', '1990-05-15'],
+            ['9', 'Jenis Kelamin', 'L = Laki-laki, P = Perempuan', 'Tidak', 'L'],
+            ['10', 'Status Pernikahan', 'Belum Menikah / Menikah / Cerai', 'Tidak', 'Menikah'],
+            ['11', 'Golongan Darah', 'A / B / AB / O', 'Tidak', 'O'],
+            ['12', 'Nomor Telepon', 'Nomor HP aktif', 'Tidak', '081234567890'],
+            ['13', 'Email', 'Email aktif (harus unik di sistem)', 'YA *', 'budi@email.com'],
+            ['14', 'Alamat KTP', 'Alamat lengkap sesuai KTP', 'Tidak', 'Jl. Merdeka No. 10'],
+            ['15', 'RT KTP', 'RT sesuai KTP', 'Tidak', '005'],
+            ['16', 'RW KTP', 'RW sesuai KTP', 'Tidak', '003'],
+            ['17', 'Provinsi KTP', 'Provinsi sesuai KTP', 'Tidak', 'DKI Jakarta'],
+            ['18', 'Kabupaten/Kota KTP', 'Kabupaten/Kota sesuai KTP', 'Tidak', 'Jakarta Selatan'],
+            ['19', 'Kecamatan KTP', 'Kecamatan sesuai KTP', 'Tidak', 'Kebayoran Baru'],
+            ['20', 'Kelurahan/Desa KTP', 'Kelurahan/Desa sesuai KTP', 'Tidak', 'Senayan'],
+            ['21', 'Alamat Domisili', 'Alamat tempat tinggal saat ini', 'Tidak', 'Jl. Sudirman No. 5'],
+            ['22', 'RT Domisili', 'RT domisili', 'Tidak', '002'],
+            ['23', 'RW Domisili', 'RW domisili', 'Tidak', '001'],
+            ['24', 'Provinsi Domisili', 'Provinsi domisili', 'Tidak', 'DKI Jakarta'],
+            ['25', 'Kabupaten/Kota Domisili', 'Kabupaten/Kota domisili', 'Tidak', 'Jakarta Pusat'],
+            ['26', 'Kecamatan Domisili', 'Kecamatan domisili', 'Tidak', 'Tanah Abang'],
+            ['27', 'Kelurahan/Desa Domisili', 'Kelurahan/Desa domisili', 'Tidak', 'Kebon Melati'],
+            ['28', 'Alamat Lengkap', 'Alamat lengkap gabungan (opsional)', 'Tidak', 'Jl. Sudirman No.5, RT02/01, Tanah Abang, Jakarta Pusat'],
+
+            // Section Header: Data Keluarga
+            ['section' => 'DATA KELUARGA (Kolom AC - AY)', 'color' => $sectionColors['keluarga']],
+            ['29', 'Nama Ayah Kandung', 'Nama ayah kandung', 'Tidak', 'Ahmad Santoso'],
+            ['30', 'Nama Ibu Kandung', 'Nama ibu kandung', 'Tidak', 'Siti Aminah'],
+            ['31', 'Nama Suami/Istri', 'Nama lengkap pasangan', 'Tidak', 'Dewi Lestari'],
+            ['32', 'NIK Suami/Istri', 'NIK KTP pasangan (16 digit)', 'Tidak', '3201234567890002'],
+            ['33', 'Tempat Lahir Suami/Istri', 'Tempat lahir pasangan', 'Tidak', 'Bandung'],
+            ['34', 'Tanggal Lahir Suami/Istri', 'Format: YYYY-MM-DD', 'Tidak', '1992-08-20'],
+            ['35', 'Nomor Telepon Suami/Istri', 'Nomor HP pasangan', 'Tidak', '082112345678'],
+            ['36', 'Pendidikan Suami/Istri', 'Pendidikan terakhir pasangan', 'Tidak', 'S1'],
+            ['37', 'Anak 1 Nama', 'Nama lengkap anak pertama', 'Tidak', 'Adi Santoso'],
+            ['38', 'Anak 1 Tempat Lahir', 'Tempat lahir anak pertama', 'Tidak', 'Jakarta'],
+            ['39', 'Anak 1 Tanggal Lahir', 'Format: YYYY-MM-DD', 'Tidak', '2018-03-10'],
+            ['40', 'Anak 1 Jenis Kelamin', 'L = Laki-laki, P = Perempuan', 'Tidak', 'L'],
+            ['41', 'Anak 1 Pendidikan', 'Jenjang pendidikan anak', 'Tidak', 'TK'],
+            ['42', 'Anak 2 Nama', 'Nama lengkap anak kedua', 'Tidak', 'Ani Santoso'],
+            ['43', 'Anak 2 Tempat Lahir', 'Tempat lahir anak kedua', 'Tidak', 'Jakarta'],
+            ['44', 'Anak 2 Tanggal Lahir', 'Format: YYYY-MM-DD', 'Tidak', '2020-07-25'],
+            ['45', 'Anak 2 Jenis Kelamin', 'L / P', 'Tidak', 'P'],
+            ['46', 'Anak 2 Pendidikan', 'Jenjang pendidikan anak', 'Tidak', 'PAUD'],
+            ['47', 'Anak 3 Nama', 'Nama lengkap anak ketiga', 'Tidak', ''],
+            ['48', 'Anak 3 Tempat Lahir', 'Tempat lahir anak ketiga', 'Tidak', ''],
+            ['49', 'Anak 3 Tanggal Lahir', 'Format: YYYY-MM-DD', 'Tidak', ''],
+            ['50', 'Anak 3 Jenis Kelamin', 'L / P', 'Tidak', ''],
+            ['51', 'Anak 3 Pendidikan', 'Jenjang pendidikan anak', 'Tidak', ''],
+
+            // Section Header: Data Pekerjaan
+            ['section' => 'DATA PEKERJAAN (Kolom AZ - BH)', 'color' => $sectionColors['pekerjaan']],
+            ['52', 'Perusahaan / Holding', 'Pilih dari dropdown (sesuai data sistem)', 'Tidak', 'PT Maju Bersama'],
+            ['53', 'Divisi', 'Pilih dari dropdown (sesuai data sistem)', 'Tidak', 'Teknologi Informasi'],
+            ['54', 'Departemen', 'Pilih dari dropdown (sesuai data sistem)', 'Tidak', 'Development'],
+            ['55', 'Unit', 'Pilih dari dropdown (sesuai data sistem)', 'Tidak', 'Backend'],
+            ['56', 'Level Jabatan', 'Pilih dari dropdown (sesuai data sistem)', 'Tidak', 'Staff'],
+            ['57', 'Jabatan', 'Nama jabatan/posisi', 'Tidak', 'Software Engineer'],
+            ['58', 'Jenis Kontrak', 'PKWT / PKWTT', 'Tidak', 'PKWT'],
+            ['59', 'Perjanjian', 'Nomor atau jenis perjanjian kerja', 'Tidak', 'Kontrak'],
+            ['60', 'Lokasi Kerja', 'Pilih dari dropdown', 'Tidak', 'Central Java - Pati'],
+
+            // Section Header: Data Pendidikan
+            ['section' => 'DATA PENDIDIKAN (Kolom BI - BK)', 'color' => $sectionColors['pendidikan']],
+            ['61', 'Pendidikan Terakhir', 'SD/SLTP/SLTA/DIPLOMA I/DIPLOMA II/DIPLOMA III/DIPLOMA IV/S1/S2', 'Tidak', 'S1'],
+            ['62', 'Nama Institusi', 'Nama sekolah/universitas', 'Tidak', 'Universitas Indonesia'],
+            ['63', 'Jurusan', 'Program studi/jurusan', 'Tidak', 'Teknik Informatika'],
+
+            // Section Header: Data Kontrak
+            ['section' => 'DATA KONTRAK & RIWAYAT (Kolom BL - BT)', 'color' => $sectionColors['kontrak']],
+            ['64', 'Tanggal Mulai Tugas', 'Format: YYYY-MM-DD', 'Tidak', '2024-01-15'],
+            ['65', 'PKWT Berakhir', 'Tanggal berakhir kontrak. Format: YYYY-MM-DD', 'Tidak', '2025-01-14'],
+            ['66', 'Tanggal Diangkat Tetap', 'Tanggal diangkat karyawan tetap. YYYY-MM-DD', 'Tidak', ''],
+            ['67', 'Riwayat Penempatan', 'Catatan riwayat penempatan kerja', 'Tidak', 'Head Office → Cabang Surabaya'],
+            ['68', 'Tanggal Riwayat Penempatan', 'Format: YYYY-MM-DD', 'Tidak', '2024-06-01'],
+            ['69', 'Mutasi / Promosi / Demosi', 'Keterangan mutasi/promosi/demosi', 'Tidak', 'Promosi ke Senior'],
+            ['70', 'Tanggal Mutasi', 'Format: YYYY-MM-DD', 'Tidak', '2024-06-01'],
+            ['71', 'Nomor PKWT Pertama', 'Nomor surat PKWT pertama', 'Tidak', 'PKWT/2024/001'],
+            ['72', 'Nomor SK Pertama', 'Nomor SK pengangkatan pertama', 'Tidak', 'SK/2024/001'],
+
+            // Section Header: Status & BPJS
+            ['section' => 'STATUS KARYAWAN & BPJS (Kolom BU - BY)', 'color' => $sectionColors['status']],
+            ['73', 'Tanggal Non Aktif', 'Format: YYYY-MM-DD (kosongkan jika masih aktif)', 'Tidak', ''],
+            ['74', 'Alasan Non Aktif', 'Alasan berhenti/non aktif', 'Tidak', ''],
+            ['75', 'Ijazah Dikembalikan', 'Ya / Tidak', 'Tidak', ''],
+            ['76', 'Status BPJS Ketenagakerjaan', 'Aktif / Tidak Aktif', 'Tidak', 'Aktif'],
+            ['77', 'Status BPJS Kesehatan', 'Aktif / Tidak Aktif', 'Tidak', 'Aktif'],
+        ];
+
+        // Table header for guide
+        $guide->mergeCells("A{$r}:E{$r}");
+        $guide->setCellValue("A{$r}", '📖 DETAIL KOLOM PENGISIAN');
+        $guide->getStyle("A{$r}:E{$r}")->applyFromArray($sectionStyle);
+        $guide->getRowDimension($r)->setRowHeight(28);
+        $r++;
+
+        $guide->setCellValue("A{$r}", 'No');
+        $guide->setCellValue("B{$r}", 'Nama Kolom');
+        $guide->setCellValue("C{$r}", 'Keterangan');
+        $guide->setCellValue("D{$r}", 'Wajib?');
+        $guide->setCellValue("E{$r}", 'Contoh Pengisian');
+        $guide->getStyle("A{$r}:E{$r}")->applyFromArray($subHeaderStyle);
+        $guide->getRowDimension($r)->setRowHeight(22);
+        $r++;
+
+        foreach ($columnGuide as $item) {
+            if (isset($item['section'])) {
+                // Section header row
+                $guide->mergeCells("A{$r}:E{$r}");
+                $guide->setCellValue("A{$r}", $item['section']);
+                $guide->getStyle("A{$r}:E{$r}")->applyFromArray([
+                    'font' => ['bold' => true, 'size' => 11, 'color' => ['rgb' => 'FFFFFF']],
+                    'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => ltrim($item['color'], 'F')]],
+                    'alignment' => ['vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER],
+                ]);
+                $guide->getRowDimension($r)->setRowHeight(25);
+            } else {
+                $guide->setCellValue("A{$r}", $item[0]);
+                $guide->setCellValue("B{$r}", $item[1]);
+                $guide->setCellValue("C{$r}", $item[2]);
+                $guide->setCellValue("D{$r}", $item[3]);
+                $guide->setCellValue("E{$r}", $item[4]);
+                $guide->getStyle("A{$r}:E{$r}")->applyFromArray($cellBorder);
+                // Highlight mandatory fields
+                if (str_contains($item[3], 'YA')) {
+                    $guide->getStyle("D{$r}")->applyFromArray([
+                        'font' => ['bold' => true, 'color' => ['rgb' => 'CC0000']],
+                        'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => 'FFE0E0']],
+                    ]);
+                }
+            }
+            $r++;
+        }
+
+        $r++;
+        // Footer note
+        $guide->mergeCells("A{$r}:E{$r}");
+        $guide->setCellValue("A{$r}", '💡 TIP: Kolom Perusahaan, Divisi, Departemen, Unit, Level, dan Lokasi Kerja menggunakan dropdown. Silakan pilih nilai yang tersedia.');
+        $guide->getStyle("A{$r}")->applyFromArray($tipStyle);
+        $r++;
+        $guide->mergeCells("A{$r}:E{$r}");
+        $guide->setCellValue("A{$r}", '💡 TIP: Password default untuk user yang dibuat melalui import adalah "password123". Segera minta karyawan mengganti password setelah login pertama.');
+        $guide->getStyle("A{$r}")->applyFromArray($tipStyle);
+
+        // Freeze top rows
+        $guide->freezePane('A3');
+
+        // ============================================================
+        // SHEET 2: DATA KARYAWAN (Actual data entry)
+        // ============================================================
+        $sheet = $spreadsheet->createSheet();
+        $sheet->setTitle('DATA KARYAWAN');
 
         $headers = [
             // Data Karyawan (Step 0) - Indices 0-12
@@ -1107,9 +1555,239 @@ class KaryawanController extends Controller
                 ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
                 ->getStartColor()->setARGB('NOPE'); // Light Grey
         }
+        $sheet->getRowDimension(2)->setRowHeight(40);
+
+        // Row 3: Sample data row (light yellow background)
+        $sampleData = [
+            '220022', '1', 'Aktif', 'Budi Santoso', '3201234567890001', 'Budi Santoso, S.Kom', 'Jakarta',
+            '1990-05-15', 'L', 'Menikah', 'O', '081234567890', 'budi@perusahaan.com',
+            'Jl. Merdeka No. 10', '005', '003', 'DKI Jakarta', 'Jakarta Selatan', 'Kebayoran Baru', 'Senayan',
+            'Jl. Sudirman No. 5', '002', '001', 'DKI Jakarta', 'Jakarta Pusat', 'Tanah Abang', 'Kebon Melati',
+            'Jl. Sudirman No. 5, Jakarta Pusat',
+            // Keluarga
+            'Ahmad Santoso', 'Siti Aminah',
+            'Dewi Lestari', '3201234567890002', 'Bandung', '1992-08-20', '082112345678', 'S1',
+            'Adi Santoso', 'Jakarta', '2018-03-10', 'L', 'SD',
+            'Ani Santoso', 'Jakarta', '2020-07-25', 'P', 'TK',
+            '', '', '', '', '',
+            // Pekerjaan
+            'PT Maju Bersama', 'Teknologi Informasi', 'Development', 'Backend', 'Staff', 'Software Engineer',
+            'PKWT', 'Kontrak', 'Central Java - Pati',
+            // Pendidikan
+            'S1', 'Universitas Indonesia', 'Teknik Informatika',
+            // Kontrak
+            '2024-01-15', '2025-01-14', '', 'Head Office', '2024-01-15', '', '', 'PKWT/2024/001', '',
+            // Status & BPJS
+            '', '', '', 'Aktif', 'Aktif'
+        ];
+
+        foreach ($sampleData as $index => $val) {
+            $columnLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($index + 1);
+            $sheet->setCellValue($columnLetter . '3', $val);
+            $sheet->getStyle($columnLetter . '3')->applyFromArray([
+                'font' => ['italic' => true, 'size' => 9, 'color' => ['rgb' => '666666']],
+                'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => 'FFFDE7']],
+                'borders' => ['allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN, 'color' => ['rgb' => 'CCCCCC']]],
+            ]);
+        }
+
+        // Add "CONTOH →" label
+        // We use a comment approach: Insert a note that row 3 is sample
+        $sheet->getComment('A3')->getText()->createTextRun('Ini adalah baris contoh. Hapus atau timpa baris ini sebelum import.');
+
+        // Data validation: Gender (L/P)
+        $genderValidation = new \PhpOffice\PhpSpreadsheet\Cell\DataValidation();
+        $genderValidation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
+        $genderValidation->setFormula1('"L,P"');
+        $genderValidation->setAllowBlank(true);
+        $genderValidation->setShowDropDown(true);
+        $genderValidation->setPromptTitle('Jenis Kelamin');
+        $genderValidation->setPrompt('Pilih L (Laki-laki) atau P (Perempuan)');
+
+        // Col I (index 8) = Gender
+        $sheet->getCell('I4')->setDataValidation(clone $genderValidation);
+        $sheet->setDataValidation('I4:I1000', clone $genderValidation);
+        // Anak genders: col AN (index 39), AS (44), AX (49)
+        $anakGenderCols = [
+            \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(40),
+            \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(45),
+            \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(50),
+        ];
+        foreach ($anakGenderCols as $col) {
+            $sheet->setDataValidation("{$col}4:{$col}1000", clone $genderValidation);
+        }
+
+        // Data validation: Status (1/0)
+        $statusValidation = new \PhpOffice\PhpSpreadsheet\Cell\DataValidation();
+        $statusValidation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
+        $statusValidation->setFormula1('"1,0"');
+        $statusValidation->setAllowBlank(true);
+        $statusValidation->setShowDropDown(true);
+        $statusValidation->setPromptTitle('Status');
+        $statusValidation->setPrompt('1 = Aktif, 0 = Non-Aktif');
+        $sheet->setDataValidation('B4:B1000', $statusValidation);
+
+        // Data validation: Kode (Aktif/Non Aktif)
+        $kodeValidation = new \PhpOffice\PhpSpreadsheet\Cell\DataValidation();
+        $kodeValidation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
+        $kodeValidation->setFormula1('"Aktif,Non Aktif"');
+        $kodeValidation->setAllowBlank(true);
+        $kodeValidation->setShowDropDown(true);
+        $sheet->setDataValidation('C4:C1000', $kodeValidation);
+
+        // Data validation: Status Pernikahan
+        $nikahValidation = new \PhpOffice\PhpSpreadsheet\Cell\DataValidation();
+        $nikahValidation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
+        $nikahValidation->setFormula1('"Belum Menikah,Menikah,Cerai Hidup,Cerai Mati"');
+        $nikahValidation->setAllowBlank(true);
+        $nikahValidation->setShowDropDown(true);
+        $sheet->setDataValidation('J4:J1000', $nikahValidation);
+
+        // Data validation: Golongan Darah
+        $darahValidation = new \PhpOffice\PhpSpreadsheet\Cell\DataValidation();
+        $darahValidation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
+        $darahValidation->setFormula1('"A,B,AB,O"');
+        $darahValidation->setAllowBlank(true);
+        $darahValidation->setShowDropDown(true);
+        $sheet->setDataValidation('K4:K1000', $darahValidation);
+
+        // Data validation: Ijazah Dikembalikan (Ya/Tidak)
+        $ijazahCol = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(75); // col 75 = BW
+        $ijazahValidation = new \PhpOffice\PhpSpreadsheet\Cell\DataValidation();
+        $ijazahValidation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
+        $ijazahValidation->setFormula1('"Ya,Tidak"');
+        $ijazahValidation->setAllowBlank(true);
+        $ijazahValidation->setShowDropDown(true);
+        $sheet->setDataValidation("{$ijazahCol}4:{$ijazahCol}1000", $ijazahValidation);
+
+        // Data validation: BPJS KT & KS (Aktif/Tidak Aktif)
+        $bpjsValidation = new \PhpOffice\PhpSpreadsheet\Cell\DataValidation();
+        $bpjsValidation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
+        $bpjsValidation->setFormula1('"Aktif,Tidak Aktif"');
+        $bpjsValidation->setAllowBlank(true);
+        $bpjsValidation->setShowDropDown(true);
+        $bpjsKtCol = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(76);
+        $bpjsKsCol = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(77);
+        $sheet->setDataValidation("{$bpjsKtCol}4:{$bpjsKtCol}1000", clone $bpjsValidation);
+        $sheet->setDataValidation("{$bpjsKsCol}4:{$bpjsKsCol}1000", clone $bpjsValidation);
+
+        // VALIDATIONS — helper to set validation on a range
+        $setValidation = function($sheet, $colLetter, $type, $formula, $allowBlank = true) {
+            $firstCell = "{$colLetter}3";
+            $range = "{$colLetter}3:{$colLetter}1000";
+            $val = $sheet->getCell($firstCell)->getDataValidation();
+            $val->setType($type);
+            $val->setFormula1($formula);
+            $val->setShowDropDown(true);
+            $val->setAllowBlank($allowBlank);
+            $val->setSqref($range);
+        };
+
+        $typeList = \PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST;
+
+        // Helper to create nested SUBSTITUTE formula for sanitization
+        // Matches PHP logic: preg_replace('/[^A-Za-z0-9_]/', '_', $str)
+        // Excel Names cannot contain spaces or special chars (except _ . \)
+        // We replace common special chars with _ to match the PHP sanitization.
+        $createIndirectFormula = function($cellRef) {
+            $chars = [' ', '.', '-', '(', ')', '&', ',', '\'', '/', '"', '’'];
+            $formula = $cellRef;
+            foreach ($chars as $char) {
+                // Escape double quote for formula string
+                $safeChar = $char === '"' ? '""' : $char; 
+                $formula = "SUBSTITUTE($formula,\"$safeChar\",\"_\")";
+            }
+            return "=INDIRECT($formula)";
+        };
+
+        // 1. Perusahaan (Col 52 - AZ) - Parent of Divisi
+        $colPerusahaan = 'AZ';
+        $setValidation($sheet, $colPerusahaan, $typeList, 'ListPerusahaan');
+
+        // 2. Divisi (Col 53 - BA) -> Cascading based on Perusahaan
+        $colDivisi = 'BA';
+        $pCell = $colPerusahaan . '3'; // MN3
+        $formulaDivisi = $createIndirectFormula($pCell);
+        $setValidation($sheet, $colDivisi, $typeList, $formulaDivisi);
+
+        // 3. Departemen (Col 54 - BB) -> Cascading based on Divisi
+        $colDept = 'BB';
+        $dCell = $colDivisi . '3'; // MO3
+        $formulaDept = $createIndirectFormula($dCell);
+        $setValidation($sheet, $colDept, $typeList, $formulaDept);
+
+        // 4. Unit (Col 55 - BC) -> Cascading based on Departemen
+        $colUnit = 'BC';
+        $deptCell = $colDept . '3'; // MP3
+        $formulaUnit = $createIndirectFormula($deptCell);
+        $setValidation($sheet, $colUnit, $typeList, $formulaUnit);
+
+        // 5. Level (Col 56 - BD)
+        $colLevel = 'BD';
+        $setValidation($sheet, $colLevel, $typeList, 'ListLevel');
+
+        // 6. Lokasi (Col 60 - BH)
+        $colLokasi = 'BH';
+        $setValidation($sheet, $colLokasi, $typeList, 'ListLokasi');
+
+        // 7. Perjanjian (Col 59 - BG) -> Not a list, but free text usually, or flat list if defined.
+        // Current code had 'ListPerjanjian', but it wasn't defined in MasterData sheet above. 
+        // Checking previous code: it was 'ListPerjanjian'. 
+        // Is 'ListPerjanjian' generated? In my previous replace_file_content, I only generated ListLevel and ListLokasi.
+        // Let's check if 'ListPerjanjian' is needed. The original code (before I rolled back) had it, 
+        // but the code I just read (lines 1065+) didn't seem to generate it.
+        // Wait, the original 'downloadTemplate' I read earlier had 'ListPerjanjian' at line 1373?
+        // Ah, the code at 1373 in the PREVIOUS version (before rollback or before my analysis) might have had it.
+        // But the code I viewed in step 830 (lines 1065-1734) did NOT have 'ListPerjanjian' logic in MasterData generation.
+        // It only had Perusahaan, Divisi, Departemen, Unit, Level, Lokasi.
+        // Line 1629 validates 'Jenis Kontrak' with hardcoded "PKWT,PKWTT".
+        // Line 1280 says 'Perjanjian' is 'Nomor atau jenis perjanjian kerja' (free text usually).
+        // Let's look at line 1394 'Jenis Kontrak', 'Perjanjian', 'Lokasi Kerja'.
+        // So Perjanjian (BG) is likely free text in the original template.
+        // I will NOT add validation for 'Perjanjian' as it wasn't in the code I analyzed in Step 830/855.
+        
+        // 8. Gender
+        $setValidation($sheet, 'I', $typeList, '"L,P"');
+        
+        // 9. Status (1/0)
+        $setValidation($sheet, 'B', $typeList, '"1,0"');
+
+        // 10. Kode Check
+        $setValidation($sheet, 'C', $typeList, '"Aktif,Non Aktif"');
+        
+        // 11. Status Pernikahan
+        $setValidation($sheet, 'J', $typeList, '"Belum Menikah,Menikah,Cerai Hidup,Cerai Mati"');
+
+        // 12. Golongan Darah
+        $setValidation($sheet, 'K', $typeList, '"A,B,AB,O"');
+        
+        // 13. Ijazah Dikembalikan
+        $setValidation($sheet, 'BW', $typeList, '"Ya,Tidak"');
+
+        // 14. BPJS
+        $setValidation($sheet, 'BX', $typeList, '"Aktif,Tidak Aktif"');
+        $setValidation($sheet, 'BY', $typeList, '"Aktif,Tidak Aktif"');
+
+        // 15. Jenis Kontrak (Column 58 - BF)
+        $colKontrak = 'BF';
+        $setValidation($sheet, $colKontrak, $typeList, '"PKWT,PKWTT"');
+
+        // 16. Pendidikan Terakhir (Column 61 - BI)
+        $colPend = 'BI';
+        $setValidation($sheet, $colPend, $typeList, '"SD,SLTP,SLTA,DIPLOMA I,DIPLOMA II,DIPLOMA III,DIPLOMA IV,S1,S2"');
+
+        // Sample Row (Row 3)
+         $sheet->setCellValue('A3', '220022');
+         $sheet->setCellValue('D3', 'Budi Santoso (CONTOH)');
+         $sheet->setCellValue('I3', 'L');
+         $sheet->getStyle('A3:BY3')->getFont()->setItalic(true);
+         $sheet->getStyle('A3:BY3')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)->getStartColor()->setRGB('FFFDE7');
+         $sheet->getComment('A3')->getText()->createTextRun('Baris contoh. Hapus sebelum import.');
+
+        $spreadsheet->setActiveSheetIndex(1); // Auto-select Data Sheet
 
         $writer = new Xlsx($spreadsheet);
-        $fileName = 'template_import_karyawan.xlsx';
+        $fileName = 'template_import_karyawan_v2.xlsx';
         
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header('Content-Disposition: attachment; filename="'. urlencode($fileName).'"');

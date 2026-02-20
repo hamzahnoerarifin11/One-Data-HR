@@ -132,4 +132,22 @@ if (!function_exists('getpendidikan')) {
             ->toArray();
     }
 }
+if (!function_exists('getperjanjian')) {
+    function getperjanjian(string $pekerjaan, string $Perjanjian): array
+    {
+        $result = DB::selectOne(
+            "SHOW COLUMNS FROM {$pekerjaan} WHERE Field = '{$Perjanjian}'"
+        );
+
+        if (!$result) {
+            return [];
+        }
+
+        preg_match("/^enum\((.*)\)$/", $result->Type, $matches);
+
+        return collect(explode(',', $matches[1]))
+            ->map(fn ($value) => trim($value, "'"))
+            ->toArray();
+    }
+}
 }

@@ -59,9 +59,20 @@ class KpiScore extends Model
         // --- 4. TOTAL SEMESTER 2 (INPUT MANUAL BARU) ---
         'total_target_smt2',
         'total_real_smt2',
+        'subtotal_smt2', // <--- Subtotal Smt 2
         'adjustment_smt2', // Nilai Adjustment Smt 2
         'adjustment_target_smt2', // <--- TAMBAHKAN INI (Input User)
         'adjustment_real_smt2',
+
+        // --- NEW FIELDS ---
+        'subtotal_smt1',
+        'justification', // JSON
+    ];
+
+    protected $casts = [
+        'justification' => 'array',
+        'subtotal_smt1' => 'decimal:2',
+        'subtotal_smt2' => 'decimal:2',
     ];
 
     // Relasi balik ke Item

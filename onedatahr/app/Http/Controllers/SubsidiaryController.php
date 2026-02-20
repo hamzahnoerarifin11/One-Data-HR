@@ -97,6 +97,15 @@ class SubsidiaryController extends Controller
     }
 
     /**
+     * Display the specified subsidiary.
+     */
+    public function show(Company $subsidiary)
+    {
+        $subsidiary->load(['holding', 'parent', 'divisions', 'departments', 'units']);
+        return view('pages.organization.subsidiary.show', compact('subsidiary'));
+    }
+
+    /**
      * Remove the specified subsidiary.
      */
     public function destroy(Company $subsidiary)

@@ -35,6 +35,10 @@ class HoldingController extends Controller
 
     public function show(Holding $holding)
     {
+        // Load relationships for the strict hierarchy based on 'based_on' = 'holding'
+        // Note: The Holding model should have these relationships defined with where('based_on', 'holding')
+        $holding->load(['company', 'divisions', 'departments', 'units']);
+        
         return view('pages.organization.holding.show', compact('holding'));
     }
 

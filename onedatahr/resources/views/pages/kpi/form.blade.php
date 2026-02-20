@@ -48,13 +48,14 @@
         .bg-semester-1 { background-color: #f8fafc; }
         .bg-semester-2 { background-color: #fff; }
     </style>
+    @vite(['resources/js/react-app.jsx'])
 </head>
 <body class="bg-slate-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 p-3 md:p-6 font-sans">
 @php
     // Cek apakah user yang login berhak melakukan adjustment?
-    // Staff TIDAK BOLEH (False), Manager TIDAK BOLEH kecuali senior_manager (superadmin)
+    // Value $canAdjust Passed from Controller
     $isStaff = auth()->user()->hasRole('staff');
-    $canAdjust = auth()->user()->hasRole(['superadmin', 'senior_manager']); // senior_manager dan superadmin yang bisa adjust
+    // $canAdjust = defined in controller now
     $canManageKpi = !$isStaff;
 
     // Class CSS untuk input yang dikunci (Abu-abu & tidak bisa diklik)
@@ -273,6 +274,7 @@
                             <th rowspan="2" class="sticky left-[48px] ml-4 bg-slate-100 z-40 p-3 w-48 border-r border-slate-300 kpi-sticky-shadow text-slate-700">Area Kinerja Utama (KRA)</th>
                             <th rowspan="2" class="p-3 w-48 border-r border-slate-200 text-slate-700">Indikator Kinerja (KPI)</th>
                             <th rowspan="2" class="p-3 w-32 border-r border-slate-200 text-slate-700 bg-slate-50">Perspektif</th>
+                            <th rowspan="2" class="p-3 w-20 text-center border-r border-slate-200 bg-slate-50">Satuan</th>
                             <th rowspan="2" class="p-3 w-16 text-center border-r border-slate-200 bg-slate-50">Bobot</th>
                             <th rowspan="2" class="p-3 w-20 text-center border-r border-slate-200 bg-slate-50">Target</th>
                             
@@ -282,6 +284,7 @@
                             @endforeach
                             
                             <!-- ADJ SEMESTER 1 (TENGAH TAHUN) - MOVED HERE -->
+                            <th rowspan="2" class="p-1 px-2 text-center border-r border-slate-200 bg-indigo-50/50 text-indigo-800 font-bold">Subtotal<br>Smt 1</th>
                             <th colspan="3" class="p-1 px-2 text-center border-r border-slate-200 bg-amber-50/50 text-amber-800">Adj. Tengah Tahun</th>
 
                             <!-- SEMESTER 2 HEADERS -->
@@ -290,7 +293,8 @@
                             @endforeach
                             
                             <!-- ADJ SEMESTER 2 (AKHIR TAHUN) -->
-                            <th colspan="4" class="p-1 px-2 text-center border-r border-slate-200 bg-amber-50/50 text-amber-800">Adj. Akhir Tahun</th>
+                            <th rowspan="2" class="p-1 px-2 text-center border-r border-slate-200 bg-indigo-50/50 text-indigo-800 font-bold">Subtotal<br>Smt 2</th>
+                            <th colspan="3" class="p-1 px-2 text-center border-r border-slate-200 bg-amber-50/50 text-amber-800">Adj. Akhir Tahun</th>
                             <th rowspan="2" class="p-2 w-24 text-center border-l bg-slate-100 text-slate-800 font-bold sticky right-0 z-30 shadow-l">FINAL<br>SCORE</th>
                         </tr>
                         <tr>
@@ -315,7 +319,6 @@
                             @endforeach
                             
                             <!-- ADJ S-2 SUBHEADERS -->
-                            <th class="p-1 border-r border-amber-100 w-16 bg-amber-50/30 text-amber-700">Tgt</th>
                             <th class="p-1 border-r border-amber-100 w-16 bg-amber-50/30 text-amber-700">Real</th>
                             <th class="p-1 border-r border-amber-100 w-14 bg-amber-50/30 text-amber-700">Skor</th>
                             <th class="p-1 border-r border-amber-200 w-16 bg-amber-100/50 text-amber-800 font-bold">Nilai</th>
@@ -341,14 +344,15 @@
                                     @endif
                                 </div>
                                 <div class="text-[11px] font-mono text-slate-500 mt-1.5 flex items-center gap-2">
-                                    <span class="bg-slate-100 px-1.5 rounded">{{ $item->units }}</span>
-                                    <span>{{ $item->polaritas }}</span>
+                                    <!-- Unit removed from here -->
+                                    <span class="bg-slate-100 px-1.5 rounded">{{ $item->polaritas }}</span>
                                 </div>
                                 <input type="hidden" class="input-bobot" value="{{ $item->bobot }}">
                                 <input type="hidden" class="input-polaritas" value="{{ $item->polaritas }}">
                             </td>
                             <td class="p-3 border-r border-slate-200 align-top text-slate-600">{{ $item->key_performance_indicator ?? $item->indikator }}</td>
                             <td class="p-3 border-r border-slate-200 align-top text-slate-500 bg-slate-50/30">{{ $item->perspektif }}</td>
+                            <td class="p-3 text-center border-r border-slate-200 align-top text-slate-600 bg-slate-50/30">{{ $item->units }}</td>
                             <td class="p-3 text-center border-r border-slate-200 align-top font-bold text-indigo-600 bg-indigo-50/10">{{ $item->bobot }}%</td>
                             <td class="p-3 text-center border-r border-slate-200 align-top font-bold text-slate-700 bg-slate-50/50">
                                 {{ $item->target }}
@@ -358,10 +362,27 @@
                             {{-- BULANAN JANUARI - JUNI (Semester 1) --}}
                             @foreach(['jan','feb','mar','apr','mei','jun'] as $bln)
                                 <td class="p-1 border-r border-slate-100 align-middle"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][target_{{ $bln }}]" value="{{ $score->{'target_'.$bln} ?? '' }}" class="input-target-{{ $bln }} kpi-input w-full h-8 px-1 rounded text-center text-slate-600 font-medium {{ $isStaff ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : '' }}" placeholder="-" {{ $isStaff ? 'readonly' : '' }}></td>
-                                <td class="p-1 border-r border-slate-100 align-middle"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][real_{{ $bln }}]" value="{{ $score->{'real_'.$bln} ?? '' }}" class="input-real-{{ $bln }} kpi-input w-full h-8 px-1 rounded text-center text-slate-900 font-semibold" placeholder="-"></td>
+                                <td class="p-1 border-r border-slate-100 align-middle relative group/cell">
+                                    <input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][real_{{ $bln }}]" value="{{ $score->{'real_'.$bln} ?? '' }}" class="input-real-{{ $bln }} kpi-input w-full h-8 px-1 rounded text-center text-slate-900 font-semibold" placeholder="-">
+                                    <button type="button" onclick="openJustificationModal('{{ $item->id_kpi_item }}', '{{ $bln }}')" class="absolute top-1 right-1 text-slate-300 hover:text-indigo-500 opacity-0 group-hover/cell:opacity-100 transition-opacity p-0.5">
+                                        <i class="fas fa-comment-alt text-xs"></i>
+                                        @if(isset($score->justification[$bln])) <span class="absolute top-0 right-0 w-1.5 h-1.5 bg-red-500 rounded-full"></span> @endif
+                                    </button>
+                                    <input type="hidden" name="kpi[{{ $item->id_kpi_item }}][justification][{{ $bln }}]" id="justification-{{ $item->id_kpi_item }}-{{ $bln }}" value="{{ $score->justification[$bln] ?? '' }}">
+                                </td>
                                 <td class="p-1 border-r border-slate-100 align-middle text-center bg-emerald-50/10"><div class="py-1.5 font-medium text-emerald-600/80 text-[11px]"><span class="span-skor-{{ $bln }}"></span>%</div></td>
                                 <td class="p-1 border-r border-slate-200 align-middle text-center bg-emerald-50/30 border-semester-1"><div class="py-1.5 font-bold text-emerald-700"><span class="span-nilai-{{ $bln }}"></span>%</div></td>
                             @endforeach
+
+                            <!-- SUBTOTAL SMT 1 -->
+                            <td class="p-1 border-r border-indigo-100 bg-indigo-50/20 align-middle text-center font-bold text-indigo-700">
+                                <div class="text-[10px] text-slate-400 font-normal leading-tight">Avg</div>
+                                <span class="span-subtotal-smt1 text-sm">0</span>%
+                                <div class="text-[10px] text-slate-500 font-semibold mt-1 border-t border-indigo-100 pt-0.5">
+                                    Tot: <span class="span-total-real-smt1">0</span>
+                                </div>
+                                <input type="hidden" name="kpi[{{ $item->id_kpi_item }}][subtotal_smt1]" class="input-subtotal-smt1" value="{{ $score->subtotal_smt1 ?? 0 }}">
+                            </td>
 
                             {{-- ADJ S-I (MOVED) --}}
                             <td class="p-1 text-center border-r border-amber-100 bg-amber-50/20 align-middle">
@@ -380,18 +401,29 @@
                             {{-- BULANAN SMT 2 --}}
                             @foreach(['jul','aug','sep','okt','nov','des'] as $bln)
                                 <td class="p-1 border-r border-slate-100 align-middle"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][target_{{ $bln }}]" value="{{ $score->{'target_'.$bln} ?? '' }}" class="input-target-{{ $bln }} kpi-input w-full h-8 px-1 rounded text-center text-slate-600 font-medium {{ $isStaff ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : '' }}" placeholder="-" {{ $isStaff ? 'readonly' : '' }}></td>
-                                <td class="p-1 border-r border-slate-100 align-middle"><input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][real_{{ $bln }}]" value="{{ $score->{'real_'.$bln} ?? '' }}" class="input-real-{{ $bln }} kpi-input w-full h-8 px-1 rounded text-center text-slate-900 font-semibold" placeholder="-"></td>
+                                <td class="p-1 border-r border-slate-100 align-middle relative group/cell">
+                                    <input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][real_{{ $bln }}]" value="{{ $score->{'real_'.$bln} ?? '' }}" class="input-real-{{ $bln }} kpi-input w-full h-8 px-1 rounded text-center text-slate-900 font-semibold" placeholder="-">
+                                    <button type="button" onclick="openJustificationModal('{{ $item->id_kpi_item }}', '{{ $bln }}')" class="absolute top-1 right-1 text-slate-300 hover:text-indigo-500 opacity-0 group-hover/cell:opacity-100 transition-opacity p-0.5">
+                                        <i class="fas fa-comment-alt text-xs"></i>
+                                         @if(isset($score->justification[$bln])) <span class="absolute top-0 right-0 w-1.5 h-1.5 bg-red-500 rounded-full"></span> @endif
+                                    </button>
+                                    <input type="hidden" name="kpi[{{ $item->id_kpi_item }}][justification][{{ $bln }}]" id="justification-{{ $item->id_kpi_item }}-{{ $bln }}" value="{{ $score->justification[$bln] ?? '' }}">
+                                </td>
                                 <td class="p-1 border-r border-slate-100 align-middle text-center bg-sky-50/10"><div class="py-1.5 font-medium text-sky-600/80 text-[11px]"><span class="span-skor-{{ $bln }}"></span>%</div></td>
                                 <td class="p-1 border-r border-slate-200 align-middle text-center bg-sky-50/30"><div class="py-1.5 font-bold text-sky-700"><span class="span-nilai-{{ $bln }}"></span>%</div></td>
                             @endforeach
 
+                            <!-- SUBTOTAL SMT 2 -->
+                            <td class="p-1 border-r border-indigo-100 bg-indigo-50/20 align-middle text-center font-bold text-indigo-700">
+                                <div class="text-[10px] text-slate-400 font-normal leading-tight">Avg</div>
+                                <span class="span-subtotal-smt2 text-sm">0</span>%
+                                <div class="text-[10px] text-slate-500 font-semibold mt-1 border-t border-indigo-100 pt-0.5">
+                                    Tot: <span class="span-total-real-smt2">0</span>
+                                </div>
+                                <input type="hidden" name="kpi[{{ $item->id_kpi_item }}][subtotal_smt2]" class="input-subtotal-smt2" value="{{ $score->subtotal_smt2 ?? 0 }}">
+                            </td>
+
                             {{-- ADJ S-II --}}
-                            <td class="p-1 border-r border-amber-100 bg-amber-50/20 align-middle">
-                                <input type="number"
-                                name="kpi[{{ $item->id_kpi_item }}][adjustment_target_smt2]"
-                                value="{{ old('kpi.'.$item->id_kpi_item.'.adjustment_target_smt2', $score->adjustment_target_smt2 ?? '') }}"
-                                {{ !$canAdjust ? 'readonly' : '' }}
-                                step="0.01" class="input-adj-target-smt2 kpi-input w-full h-8 px-1 text-center text-amber-800" placeholder="-"></td>
                             <td class="p-1 border-r border-amber-100 bg-amber-50/20 align-middle">
                                 <input type="number"
                                 name="kpi[{{ $item->id_kpi_item }}][adjustment_real_smt2]"
@@ -414,8 +446,8 @@
         Total Skor Akhir 
     </td>
 
-    <!-- KPI + Perspektif + Bobot + Target -->
-    <td colspan="4" class="border-r border-slate-200 bg-slate-50"></td>
+    <!-- KPI + Perspektif + Satuan + Bobot + Target -->
+    <td colspan="5" class="border-r border-slate-200 bg-slate-50"></td>
 
     <!-- JAN–JUN -->
     @foreach(['jan','feb','mar','apr','mei','jun'] as $bln)
@@ -426,6 +458,7 @@
     @endforeach
 
     <!-- ADJ SMT 1 (MOVED) -->
+    <td class="border-r border-indigo-200 bg-indigo-50/50"></td>
     <td colspan="2" class="border-r border-slate-200 bg-amber-50/50"></td>
     <td class="p-2 border-r border-slate-300 bg-amber-100/50 font-bold text-amber-800 text-center">
         <span id="footer-adj-smt1"></span>%
@@ -440,7 +473,8 @@
     @endforeach
 
     <!-- ADJ SMT 2 -->
-    <td colspan="3" class="border-r border-slate-200 bg-amber-50/50"></td>
+    <td class="border-r border-indigo-200 bg-indigo-50/50"></td>
+    <td colspan="2" class="border-r border-slate-200 bg-amber-50/50"></td>
     <td class="p-2 border-r border-slate-300 bg-amber-100/50 font-bold text-amber-800 text-center">
         <span id="footer-adj-smt2"></span>%
     </td>
@@ -470,50 +504,15 @@
         <div class="p-6 overflow-y-auto max-h-[80vh]">
             <form action="{{ route('kpi.store-item') }}" method="POST">
                 @csrf <input type="hidden" name="kpi_assessment_id" value="{{ $kpi->id_kpi_assessment }}">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Area Kinerja Utama (KRA)</label>
-                        <input type="text" name="key_result_area" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition" placeholder="Contoh: Peningkatan Revenue" required>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Indikator Kinerja (KPI)</label>
-                        <textarea name="key_performance_indicator" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition" rows="2" placeholder="Detail KPI..." required></textarea>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Perspektif</label>
-                        <select name="perspektif" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none bg-white" {{ $perspektifList->isEmpty() ? 'disabled' : '' }}>
-                            @if($perspektifList->isEmpty())
-                                <option value="">Default</option>
-                            @else
-                                @foreach($perspektifList as $perspektif)
-                                    <option value="{{ $perspektif }}">{{ $perspektif }}</option>
-                                @endforeach
-                            @endif
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Bobot (%)</label>
-                        <div class="relative">
-                            <input type="number" step="0.01" name="bobot" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none pl-3 pr-8" required>
-                            <span class="absolute right-3 top-2 text-slate-400 text-sm">%</span>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Satuan (Units)</label>
-                        <input type="text" name="units" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none" placeholder="Ex: Rp, %, Dokumen" required>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Polaritas</label>
-                        <select name="polaritas" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none bg-white">
-                            <option value="Max">Maximize (Positif)</option>
-                            <option value="Min">Minimize (Negatif)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Target Tahunan</label>
-                        <input type="number" step="0.01" name="target" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none {{ $isStaff ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : '' }}" required {{ $isStaff ? 'readonly' : '' }}>
-                    </div>
+                <div id="react-kpi-item-form" 
+                     data-kpi-id="{{ $kpi->id_kpi_assessment }}"
+                     data-perspectives="{{ json_encode($perspektifList ?? []) }}">
+                     <!-- React Integration Point - Loading State -->
+                     <div class="p-10 flex justify-center text-slate-400">
+                        <i class="fas fa-circle-notch fa-spin text-2xl"></i>
+                     </div>
                 </div>
+
                 <div class="mt-8 flex justify-end gap-3 pt-4 border-t border-slate-100">
                     <button type="button" onclick="document.getElementById('modalTambahKPI').classList.add('hidden')" class="px-5 py-2.5 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 font-medium text-sm transition">Batal</button>
                     @if ($canManageKpi)
@@ -576,6 +575,22 @@
                         <input type="number" step="0.01" name="target" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none {{ $isStaff ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : '' }}" required {{ $isStaff ? 'readonly' : '' }}>
                     </div>
                 </div>
+                <!-- Logic Adjustment -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Metode Kalkulasi</label>
+                        <select id="edit_calculation_method" name="calculation_method" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none bg-white" onchange="toggleEditProgressField()">
+                            <option value="positive">Target Angka (Positif)</option>
+                            <option value="negative">Target Negatif (Error/Complain)</option>
+                            <option value="progress">Progress Project (Akumulatif)</option>
+                        </select>
+                    </div>
+                    <div id="edit_progress_container" class="hidden">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Progress Awal (Carry Over)</label>
+                        <input type="number" step="0.01" id="edit_previous_progress" name="previous_progress" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none" placeholder="0">
+                        <p class="text-[10px] text-slate-400 mt-1">Isi jika proyek dimulai sebelum tahun ini.</p>
+                    </div>
+                </div>
                 <div class="mt-8 flex justify-end gap-3 pt-4 border-t border-slate-100">
                     <button type="button" onclick="closeEditModal()" class="px-5 py-2.5 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 font-medium text-sm transition">Batal</button>
                     @if ($canManageKpi)
@@ -618,6 +633,25 @@
             <button id="discardBtn" class="px-4 py-2 rounded-lg bg-rose-600 text-white font-semibold hover:bg-rose-700 transition shadow-lg shadow-rose-200">
                 Ya, Keluar
             </button>
+        </div>
+    </div>
+</div>
+
+{{-- MODAL JUSTIFICATION --}}
+<div id="modalJustification" class="fixed inset-0 bg-slate-900/60 hidden z-[70] flex justify-center items-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-0 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+            <h2 class="text-lg font-bold text-slate-800"><i class="fas fa-comment-alt text-indigo-600 mr-2"></i>Catatan / Justifikasi</h2>
+            <button onclick="closeJustificationModal()" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="p-6">
+            <input type="hidden" id="justification-target-id">
+            <label class="block text-sm font-medium text-slate-700 mb-2">Berikan alasan atau catatan untuk nilai ini:</label>
+            <textarea id="justification-text" rows="4" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" placeholder="Contoh: Target tidak tercapai karena mesin breakdown..."></textarea>
+            <div class="mt-6 flex justify-end gap-3">
+                <button type="button" onclick="closeJustificationModal()" class="px-4 py-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 font-medium text-sm transition">Batal</button>
+                <button type="button" onclick="saveJustification()" class="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 font-bold text-sm shadow-lg shadow-indigo-200 transition">Simpan Catatan</button>
+            </div>
         </div>
     </div>
 </div>
@@ -755,9 +789,10 @@
         const btn = document.getElementById('btnSimpan');
 
         // Cek Bobot
+        // Cek Bobot (Hanya Blokir jika > 100%)
         const alertBobot = document.getElementById('total-bobot-alert');
-        if(alertBobot && alertBobot.innerText.includes('Harus 100%')) {
-            alert('Gagal: Total Bobot belum 100%.');
+        if(alertBobot && alertBobot.innerText.includes('Melebihi 100%')) {
+            alert('Gagal: Total Bobot melebihi 100%. Harap kurangi bobot item.');
             return;
         }
 
@@ -867,18 +902,34 @@
         const p = (polaritas || '').toLowerCase();
 
         // Accept various historical/abbreviated polaritas values (e.g. "I MAX", "MAX", "Min", "Minimize")
+        // Logic: Semakin besar semakin bagus (Positive)
         if (p.includes('posit') || p.includes('max') || p.includes('maximize')) {
             score = (real / target) * 100;
-        } else if (p.includes('neg') || p.includes('min') || p.includes('minimize')) {
-            score = (real === 0) ? 100 : (target / real) * 100;
-        } else if (p.includes('yes') || p.includes('no')) {
+        } 
+        // Logic: Semakin kecil semakin bagus (Negative / Minimize)
+        // Rule: Cap 100 if Real <= Target. Penalty if Real > Target.
+        else if (p.includes('neg') || p.includes('min') || p.includes('minimize')) {
+            if (real <= target) {
+                score = 100;
+            } else {
+                if (target === 0) {
+                    score = 0; // Avoid division by zero
+                } else {
+                    // Formula: 100 - (((Real - Target) / Target) * 100)
+                    let deviation = ((real - target) / target) * 100;
+                    score = 100 - deviation;
+                }
+            }
+        } 
+        // Logic: Binary (Yes/No)
+        else if (p.includes('yes') || p.includes('no')) {
             score = (real >= target) ? 100 : 0;
         } else {
-            // Fallback: assume maximizing (positive) to avoid silent zero scores for unknown labels
+            // Default Fallback (Maximize)
             score = (real / target) * 100;
         }
 
-        return Math.max(0, score);
+        return Math.max(0, score); // Ensure min 0
     }
 
     function calculateAll() {
@@ -897,9 +948,13 @@
 
                 // SMT 1 (Januari - Juni)
                 let totalTargetSmt1 = 0; let totalRealSmt1 = 0;
+                let sumSkorSmt1 = 0; let countSmt1 = 0;
+
                 monthsSmt1.forEach(bln => {
                     const inputTgt = row.querySelector(`.input-target-${bln}`);
                     const inputReal = row.querySelector(`.input-real-${bln}`);
+                    const inputJustification = row.querySelector(`#justification-${row.querySelector('.item-checkbox').value}-${bln}`);
+                    
                     let t = 0; let r = 0;
                     if (inputTgt) t = parseNumber(inputTgt.value);
                     if (inputReal) r = parseNumber(inputReal.value);
@@ -909,97 +964,128 @@
                     // compute per-month if target exists (real may be zero)
                     if (inputTgt) {
                         let skor = (t !== 0) ? calculateSingleScore(t, r, polaritas) : 0;
-                        let nilai = (skor * bobot) / 100;
+                        let nilai = (skor * bobot) / 100; // Old Logic (still used for monthly footer?)
                         const spanSkor = row.querySelector(`.span-skor-${bln}`);
                         const spanNilai = row.querySelector(`.span-nilai-${bln}`);
                         if (spanSkor) spanSkor.textContent = formatNumber(skor);
                         if (spanNilai) spanNilai.textContent = formatNumber(nilai);
                         footerMonthly[bln] += nilai;
-
-                        // Debug: if user has entered non-zero values but UI not updating
-                        if (t !== 0 || r !== 0) {
-                            console.log(`KPI row #${row.querySelector('td')?.textContent?.trim() || 'unknown'} - month ${bln}: target=${t}, real=${r}, skor=${skor}, nilai=${nilai}`);
-                        }
+                        
+                        // Accumulate for Subtotal (Average of Scores)
+                        sumSkorSmt1 += skor;
+                        countSmt1++;
                     }
                 });
 
-                // Total Semester 1 (computed from Jan-Jun)
-                let skorTotalSmt1 = (totalTargetSmt1 !== 0) ? calculateSingleScore(totalTargetSmt1, totalRealSmt1, polaritas) : 0;
-                let nilaiTotalSmt1 = (skorTotalSmt1 * bobot) / 100;
+                // Subtotal Smt 1 (Average Score) & Total Real
+                let subtotalSmt1 = countSmt1 > 0 ? sumSkorSmt1 / countSmt1 : 0;
+                if (row.querySelector('.span-subtotal-smt1')) row.querySelector('.span-subtotal-smt1').textContent = formatNumber(subtotalSmt1);
+                if (row.querySelector('.span-total-real-smt1')) row.querySelector('.span-total-real-smt1').textContent = formatNumber(totalRealSmt1);
+                if (row.querySelector('.input-subtotal-smt1')) row.querySelector('.input-subtotal-smt1').value = formatNumber(subtotalSmt1);
 
-                // BULANAN SMT2 (Juli - Desember)
+                // ADJ SMT 1 (Tengah Tahun)
+                const adjReal1Input = row.querySelector('.input-adj-real-smt1'); // Adjustment Value Input
+                const adjNilaiInput1 = row.querySelector('.input-adj-nilai-smt1'); // Final Value Smt 1
+                
+                let finalSmt1Score = subtotalSmt1;
+                
+                // Logic Adjustment: Add/Subtract from Subtotal
+                // Input 'adjReal1Input' is treated as the ADJUSTMENT VALUE (e.g., +5, -2, 10) NOT "Real" anymore based on request context "menambah atau mengurangi nilai"
+                // But wait, the previous logic used it as "Real Adjusment". 
+                // Request says: "Atasan dapat mengisi kolom 'Adj. Tengah Tahun' ... untuk menambah atau mengurangi nilai dari 'Subtotal Skor'"
+                // So I will treat `adjustment_real_smt1` as the adjustment (+/- value). 
+                
+                let adjustment1 = 0;
+                if (adjReal1Input && adjReal1Input.value !== "") {
+                    adjustment1 = parseNumber(adjReal1Input.value);
+                }
+                
+                finalSmt1Score = subtotalSmt1 + adjustment1;
+                // Clamp 0-100? or allow >100? KPI usually allows >100. Let's keep it open.
+                finalSmt1Score = Math.max(0, finalSmt1Score);
+
+                // Final Value Smt 1 = (Final Score * Bobot) / 100
+                let nilaiTotalSmt1 = (finalSmt1Score * bobot) / 100;
+                
+                if (row.querySelector('.span-adj-skor-smt1')) row.querySelector('.span-adj-skor-smt1').textContent = formatNumber(finalSmt1Score); // Display Adjusted Score
+                if (adjNilaiInput1) adjNilaiInput1.value = formatNumber(nilaiTotalSmt1);
+
+
+
+                
+                // Subtotal Smt 2 (Average Score)
+                // SMT 2 (Juli - Desember)
+                let totalTargetSmt2 = 0; let totalRealSmt2 = 0;
+                let sumSkorSmt2 = 0; let countSmt2 = 0;
+
                 monthsSmt2.forEach(bln => {
                     const inputTgt = row.querySelector(`.input-target-${bln}`);
                     const inputReal = row.querySelector(`.input-real-${bln}`);
-                    if(inputTgt) {
-                        const t = parseNumber(inputTgt.value);
-                        const r = parseNumber(inputReal?.value);
+                    const inputJustification = row.querySelector(`#justification-${row.querySelector('.item-checkbox').value}-${bln}`);
+                    
+                    let t = 0; let r = 0;
+                    if (inputTgt) t = parseNumber(inputTgt.value);
+                    if (inputReal) r = parseNumber(inputReal.value);
+                    totalTargetSmt2 += t;
+                    totalRealSmt2 += r;
+
+                    if (inputTgt) {
                         let skor = (t !== 0) ? calculateSingleScore(t, r, polaritas) : 0;
-                        let nilai = (skor * bobot) / 100;
+                        let nilai = (skor * bobot)/100;
                         const spanSkor = row.querySelector(`.span-skor-${bln}`);
                         const spanNilai = row.querySelector(`.span-nilai-${bln}`);
-                        if(spanSkor) spanSkor.textContent = formatNumber(skor);
-                        if(spanNilai) spanNilai.textContent = formatNumber(nilai);
+                        if (spanSkor) spanSkor.textContent = formatNumber(skor);
+                        if (spanNilai) spanNilai.textContent = formatNumber(nilai);
                         footerMonthly[bln] += nilai;
-
-                        if (t !== 0 || r !== 0) {
-                            console.log(`KPI row #${row.querySelector('td')?.textContent?.trim() || 'unknown'} - month ${bln}: target=${t}, real=${r}, skor=${skor}, nilai=${nilai}`);
-                        }
+                        
+                        sumSkorSmt2 += skor;
+                        countSmt2++;
                     }
                 });
 
-                // Total Semester 2 computed from Jul-Dec
-                let totalTargetSmt2 = 0; let totalRealSmt2 = 0;
-                monthsSmt2.forEach(bln => {
-                    const it = row.querySelector(`.input-target-${bln}`);
-                    const ir = row.querySelector(`.input-real-${bln}`);
-                    if (it) totalTargetSmt2 += parseNumber(it.value);
-                    if (ir) totalRealSmt2 += parseNumber(ir.value);
-                });
-                let skorTotalSmt2 = (totalTargetSmt2 !== 0) ? calculateSingleScore(totalTargetSmt2, totalRealSmt2, polaritas) : 0;
-                let nilaiTotalSmt2 = (skorTotalSmt2 * bobot) / 100;
+                let subtotalSmt2 = countSmt2 > 0 ? sumSkorSmt2 / countSmt2 : 0;
+                if (row.querySelector('.span-subtotal-smt2')) row.querySelector('.span-subtotal-smt2').textContent = formatNumber(subtotalSmt2);
+                if (row.querySelector('.span-total-real-smt2')) row.querySelector('.span-total-real-smt2').textContent = formatNumber(totalRealSmt2);
+                if (row.querySelector('.input-subtotal-smt2')) row.querySelector('.input-subtotal-smt2').value = formatNumber(subtotalSmt2);
 
-                // ADJ SMT 1 (Tengah Tahun)
-                const adjReal1Input = row.querySelector('.input-adj-real-smt1');
-                const adjNilaiInput1 = row.querySelector('.input-adj-nilai-smt1');
-                let finalSmt1 = nilaiTotalSmt1;
-                if (adjReal1Input && adjReal1Input.value !== "") {
-                    let adjSkor1 = calculateSingleScore(totalTargetSmt1, parseNumber(adjReal1Input.value), polaritas);
-                    let adjNilai1 = (adjSkor1 * bobot) / 100;
-                    if (row.querySelector('.span-adj-skor-smt1')) row.querySelector('.span-adj-skor-smt1').textContent = formatNumber(adjSkor1);
-                    if (adjNilaiInput1) adjNilaiInput1.value = formatNumber(adjNilai1);
-                    finalSmt1 = adjNilai1;
-                } else {
-                    if (row.querySelector('.span-adj-skor-smt1')) row.querySelector('.span-adj-skor-smt1').textContent = '0';
-                    if (adjNilaiInput1) adjNilaiInput1.value = '';
-                }
 
                 // ADJ SMT 2 (Akhir Tahun)
-                const adjTarget2Input = row.querySelector('.input-adj-target-smt2');
-                const adjReal2Input = row.querySelector('.input-adj-real-smt2');
-                const adjNilaiInput2 = row.querySelector('.input-adj-nilai-smt2');
-                let finalSmt2 = nilaiTotalSmt2;
-                if (adjTarget2Input && adjReal2Input && adjTarget2Input.value !== "" && adjReal2Input.value !== "") {
-                    let adjSkor2 = calculateSingleScore(parseNumber(adjTarget2Input.value), parseNumber(adjReal2Input.value), polaritas);
-                    let adjNilai2 = (adjSkor2 * bobot) / 100;
-                    if (row.querySelector('.span-adj-skor-smt2')) row.querySelector('.span-adj-skor-smt2').textContent = formatNumber(adjSkor2);
-                    if (adjNilaiInput2) adjNilaiInput2.value = formatNumber(adjNilai2);
-                    finalSmt2 = adjNilai2;
-                } else {
-                    if (row.querySelector('.span-adj-skor-smt2')) row.querySelector('.span-adj-skor-smt2').textContent = '0';
-                    if (adjNilaiInput2) adjNilaiInput2.value = '';
+                // const adjTarget2Input = row.querySelector('.input-adj-target-smt2'); // Removed HTML
+                const adjReal2Input = row.querySelector('.input-adj-real-smt2'); // Adjustment Value Smt 2
+                const adjNilaiInput2 = row.querySelector('.input-adj-nilai-smt2'); // Final Value Smt 2
+                
+                let finalSmt2Score = subtotalSmt2;
+                let adjustment2 = 0;
+                if (adjReal2Input && adjReal2Input.value !== "") {
+                    adjustment2 = parseNumber(adjReal2Input.value);
                 }
+                
+                finalSmt2Score = subtotalSmt2 + adjustment2;
+                finalSmt2Score = Math.max(0, finalSmt2Score);
+                
+                let nilaiTotalSmt2 = (finalSmt2Score * bobot) / 100;
+
+                if (row.querySelector('.span-adj-skor-smt2')) row.querySelector('.span-adj-skor-smt2').textContent = formatNumber(finalSmt2Score);
+                if (adjNilaiInput2) adjNilaiInput2.value = formatNumber(nilaiTotalSmt2);
 
                 // TOTALS
                 footerSmt1 += nilaiTotalSmt1;
                 footerSmt2 += nilaiTotalSmt2;
-                footerAdjSmt1 += (adjReal1Input && adjReal1Input.value !== "") ? finalSmt1 : nilaiTotalSmt1;
-                footerAdjSmt2 += (adjTarget2Input && adjReal2Input && adjTarget2Input.value !== "" && adjReal2Input.value !== "") ? finalSmt2 : nilaiTotalSmt2;
-                let grandFinal = (finalSmt1 + finalSmt2) / 2;
+                footerAdjSmt1 += nilaiTotalSmt1; // Use final value
+                footerAdjSmt2 += nilaiTotalSmt2; // Use final value
+                
+                let grandFinal = (nilaiTotalSmt1 + nilaiTotalSmt2) / 2; // Average of Values? Or Sum?
+                // Wait. If Smt 1 Value = 5 (from 50% score * 10% weight) and Smt 2 Value = 5.
+                // Total should be ... 
+                // Usually: (Score1 + Score2)/2 * Weight? Or (Value1 + Value2)?
+                // Previous logic: (finalSmt1 + finalSmt2) / 2. 
+                // If finalSmt1 is ALREADY weighted value (e.g. 10), and finalSmt2 is 10.
+                // Then (10+10)/2 = 10. Correct.
+                
                 if (row.querySelector('.span-final-score')) row.querySelector('.span-final-score').textContent = formatNumber(grandFinal);
                 footerGrandTotal += grandFinal;
             });
-
+            
             const setFooterText = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = formatNumber(val); };
             setFooterText('footer-total-smt1', footerSmt1);
             setFooterText('footer-total-smt2', footerSmt2);
@@ -1020,9 +1106,13 @@
         totalBobot = Math.round(totalBobot * 100) / 100;
         const alertBox = document.getElementById('total-bobot-alert');
         if (alertBox) {
-            alertBox.innerHTML = totalBobot != 100
-                ? `<span class="text-white bg-red-600 px-2 py-1 rounded border border-red-200"><i class="fas fa-exclamation-triangle"></i> Total Bobot: ${totalBobot}% (Harus 100%)</span>`
-                : `<span class="text-white bg-green-600 px-2 py-1 rounded border border-green-200"><i class="fas fa-check-circle"></i> Total Bobot: 100% (OK)</span>`;
+            if (totalBobot > 100) {
+                 alertBox.innerHTML = `<span class="text-white bg-red-600 px-2 py-1 rounded border border-red-200"><i class="fas fa-exclamation-triangle"></i> Total Bobot: ${totalBobot}% (Melebihi 100%)</span>`;
+            } else if (totalBobot < 100) {
+                 alertBox.innerHTML = `<span class="text-slate-700 bg-yellow-400 px-2 py-1 rounded border border-yellow-500"><i class="fas fa-info-circle"></i> Total Bobot: ${totalBobot}% (Kurang dari 100%, Boleh Disimpan)</span>`;
+            } else {
+                 alertBox.innerHTML = `<span class="text-white bg-green-600 px-2 py-1 rounded border border-green-200"><i class="fas fa-check-circle"></i> Total Bobot: 100% (OK)</span>`;
+            }
         }
     }
 
@@ -1044,7 +1134,7 @@
         if (completionTextEl) completionTextEl.textContent = `${filled}/${total}`;
 
         if (statusEl) {
-            const isReady = completion >= 80 && !document.getElementById('total-bobot-alert')?.innerText.includes('Harus 100%');
+            const isReady = completion >= 80 && !document.getElementById('total-bobot-alert')?.innerText.includes('Melebihi 100%');
             const isEmpty = rowsCount === 0;
             if (isEmpty) {
                 statusEl.className = 'mt-2 inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 border border-gray-200';
@@ -1072,12 +1162,30 @@
         }
         document.getElementById('edit_kra').value = data.key_result_area || data.kra;
         document.getElementById('edit_kpi').value = data.key_performance_indicator || data.indikator;
-        // Units & Target are not part of the simplified form
+        // Units & Target
         document.getElementById('edit_polaritas').value = data.polaritas;
         document.getElementById('edit_bobot').value = data.bobot;
         document.getElementById('edit_units').value = data.units;
+        
+        // New Fields
+        const calcMethod = data.calculation_method || 'positive';
+        document.getElementById('edit_calculation_method').value = calcMethod;
+        document.getElementById('edit_previous_progress').value = data.previous_progress || 0;
+        
+        toggleEditProgressField();
+
         const modal = document.getElementById('modalEditKPI');
         modal.classList.remove('hidden'); modal.classList.add('flex');
+    }
+
+    function toggleEditProgressField() {
+        const method = document.getElementById('edit_calculation_method').value;
+        const container = document.getElementById('edit_progress_container');
+        if (method === 'progress') {
+            container.classList.remove('hidden');
+        } else {
+            container.classList.add('hidden');
+        }
     }
     function closeEditModal() {
         const modal = document.getElementById('modalEditKPI');
@@ -1088,6 +1196,56 @@
             const form = document.getElementById('globalDeleteForm');
             form.action = deleteUrl; form.submit();
         }
+    }
+
+    // --- JUSTIFICATION MODAL LOGIC ---
+    function openJustificationModal(itemId, month) {
+        const inputId = `justification-${itemId}-${month}`;
+        const inputEl = document.getElementById(inputId);
+        const modal = document.getElementById('modalJustification');
+        const textarea = document.getElementById('justification-text');
+        
+        document.getElementById('justification-target-id').value = inputId;
+        textarea.value = inputEl ? inputEl.value : '';
+        
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        setTimeout(() => textarea.focus(), 100);
+    }
+
+    function closeJustificationModal() {
+        const modal = document.getElementById('modalJustification');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    function saveJustification() {
+        const targetId = document.getElementById('justification-target-id').value;
+        const text = document.getElementById('justification-text').value;
+        const inputEl = document.getElementById(targetId);
+        
+        if (inputEl) {
+            inputEl.value = text;
+            
+            // Visual feedback on button (add dot if text exists)
+            // Need to find the button associated (parentElement lookup)
+            const btn = inputEl.parentElement.querySelector('button');
+            if(btn) {
+                 if(text.trim() !== '') {
+                     if(!btn.querySelector('.bg-red-500')) {
+                         btn.innerHTML += '<span class="absolute top-0 right-0 w-1.5 h-1.5 bg-red-500 rounded-full"></span>';
+                     }
+                 } else {
+                     const dot = btn.querySelector('.bg-red-500');
+                     if(dot) dot.remove();
+                 }
+            }
+            
+            // Trigger change for unsaved badge
+            const event = new Event('change', { bubbles: true });
+            inputEl.dispatchEvent(event);
+        }
+        closeJustificationModal();
     }
 </script>
 
