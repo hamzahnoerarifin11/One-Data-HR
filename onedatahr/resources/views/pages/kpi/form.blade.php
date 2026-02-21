@@ -6,6 +6,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script>tailwind.config = { darkMode: 'class' }</script>
+    <!-- Tooltip Library (Tippy.js) -->
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/shift-away.css" />
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         :root { color-scheme: light; }
@@ -345,7 +350,15 @@
                                 </div>
                                 <div class="text-[11px] font-mono text-slate-500 mt-1.5 flex items-center gap-2">
                                     <!-- Unit removed from here -->
-                                    <span class="bg-slate-100 px-1.5 rounded">{{ $item->polaritas }}</span>
+                                    <span class="bg-slate-100 px-1.5 rounded flex items-center gap-1.5 cursor-help" 
+                                          data-tippy-content="{{ 
+                                            $item->calculation_method === 'positive' ? 'Target Positif: Semakin tinggi realisasi, semakin baik skornya. Cocok untuk Volume Produksi.' : 
+                                            ($item->calculation_method === 'negative' ? 'Target Negatif: Semakin rendah realisasi, semakin baik skornya. Cocok untuk keterlambatan atau jumlah reject.' : 
+                                            'Progress Project: Menghitung selisih kenaikan progres dari bulan sebelumnya. Cocok untuk proyek jangka panjang.') 
+                                          }}">
+                                        {{ $item->polaritas }}
+                                        <i class="far fa-question-circle text-[9px] text-slate-400"></i>
+                                    </span>
                                 </div>
                                 <input type="hidden" class="input-bobot" value="{{ $item->bobot }}">
                                 <input type="hidden" class="input-polaritas" value="{{ $item->polaritas }}">
@@ -1324,6 +1337,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Initial check
     toggleBulkDeleteButton();
+
+    // Initialize Tippy
+    tippy('[data-tippy-content]', {
+        animation: 'shift-away',
+        theme: 'dark',
+        arrow: true,
+    });
 });
 </script>
 </body>

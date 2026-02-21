@@ -39,9 +39,9 @@ export default function KpiItemForm({ kpiId, perspectives, oldData = {} }) {
                     <label className={`cursor-pointer p-3 border rounded-lg flex flex-col gap-1 transition-all ${method === 'positive' ? 'border-emerald-500 bg-emerald-50 ring-1 ring-emerald-500' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'}`}>
                         <input type="radio" name="calculation_method" value="positive" checked={method === 'positive'} onChange={() => setMethod('positive')} className="hidden" />
                         <div className="flex items-center gap-2 font-bold text-slate-700 text-sm">
-                            <i className="fas fa-chart-line text-emerald-500"></i> Target Angka
+                            <i className="fas fa-chart-line text-emerald-500"></i> Target Positif
                         </div>
-                        <div className="text-[10px] text-slate-500 leading-tight">Realisasi tinggi = Bagus. (Revenue, Produksi)</div>
+                        <div className="text-[10px] text-slate-500 leading-tight">Semakin tinggi realisasi, semakin baik skornya. Cocok untuk Volume Produksi.</div>
                     </label>
 
                     <label className={`cursor-pointer p-3 border rounded-lg flex flex-col gap-1 transition-all ${method === 'negative' ? 'border-rose-500 bg-rose-50 ring-1 ring-rose-500' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'}`}>
@@ -49,14 +49,14 @@ export default function KpiItemForm({ kpiId, perspectives, oldData = {} }) {
                         <div className="flex items-center gap-2 font-bold text-slate-700 text-sm">
                             <i className="fas fa-exclamation-triangle text-rose-500"></i> Target Negatif
                         </div>
-                        <div className="text-[10px] text-slate-500 leading-tight">Realisasi tinggi = Buruk. (Komplain, Reject)</div>
+                        <div className="text-[10px] text-slate-500 leading-tight">Semakin rendah realisasi, semakin baik skornya. Cocok untuk keterlambatan atau jumlah reject.</div>
                     </label>
                     <label className={`cursor-pointer p-3 border rounded-lg flex flex-col gap-1 transition-all ${method === 'progress' ? 'border-sky-500 bg-sky-50 ring-1 ring-sky-500' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'}`}>
                         <input type="radio" name="calculation_method" value="progress" checked={method === 'progress'} onChange={() => setMethod('progress')} className="hidden" />
                         <div className="flex items-center gap-2 font-bold text-slate-700 text-sm">
                             <i className="fas fa-tasks text-sky-500"></i> Progress Project
                         </div>
-                        <div className="text-[10px] text-slate-500 leading-tight">Bertahap (0-100%). Carry over sisa target.</div>
+                        <div className="text-[10px] text-slate-500 leading-tight">Menghitung selisih kenaikan progres dari bulan sebelumnya. Cocok untuk proyek jangka panjang.</div>
                     </label>
                 </div>
             </div>
