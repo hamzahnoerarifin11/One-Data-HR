@@ -455,27 +455,20 @@ class PerformanceController extends Controller
         }
 
         if ($mode === 'manager' && $user->hasRole(['manager', 'gm', 'manajer', 'senior_manager'])) {
-            if (!$me) {
-                $query->whereRaw('1 = 0');
-            } else {
-                // MOD: Manager see all in division
-                $latestJob = $me->pekerjaan()->latest('id_pekerjaan')->first();
-                $divisionId = $latestJob ? $latestJob->division_id : null;
+             // MOD: Manager see all in division
+            $latestJob = $me->pekerjaan()->latest('id_pekerjaan')->first();
+            $divisionId = $latestJob ? $latestJob->division_id : null;
 
-                if ($divisionId) {
-                    $query->whereHas('pekerjaan', function($q) use ($divisionId) {
-                        $q->where('division_id', $divisionId);
-                    });
-                } else {
-                    $query->where('atasan_id', $me->id_karyawan);
-                }
+            if ($divisionId) {
+                $query->whereHas('pekerjaan', function($q) use ($divisionId) {
+                    $q->where('division_id', $divisionId);
+                });
+            } else {
+                $query->where('atasan_id', $me->id_karyawan);
             }
         } elseif ($mode === 'manager' && $user->hasRole('staff')) {
-            if (!$me) {
-                $query->whereRaw('1 = 0');
-            } else {
-                $query->where('id_karyawan', $me->id_karyawan);
-            }        }
+            $query->where('id_karyawan', $me->id_karyawan);
+        }
 
         $karyawans = $query->get();
 

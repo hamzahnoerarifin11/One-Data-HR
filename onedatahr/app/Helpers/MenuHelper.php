@@ -21,7 +21,8 @@ class MenuHelper
                 $userRoleNames = $auth->roles()->pluck('name')->map(function ($r) {
                     return strtolower($r);
                 })->toArray();
-            } catch (\Throwable $e) {
+            }
+            catch (\Throwable $e) {
                 $userRoleNames = [];
             }
 
@@ -34,19 +35,25 @@ class MenuHelper
             if ($karyawan) {
                 $pekerjaan = $karyawan->pekerjaanTerkini()->first() ?? $karyawan->pekerjaan()->first();
                 if ($pekerjaan) {
-                    if (!empty($pekerjaan->level) && !empty($pekerjaan->level->name)) $derivedRoles[] = strtolower($pekerjaan->level->name);
-                    if (!empty($pekerjaan->position) && !empty($pekerjaan->position->name)) $derivedRoles[] = strtolower($pekerjaan->position->name);
-                    if (!empty($pekerjaan->Jabatan)) $derivedRoles[] = strtolower($pekerjaan->Jabatan);
+                    if (!empty($pekerjaan->level) && !empty($pekerjaan->level->name))
+                        $derivedRoles[] = strtolower($pekerjaan->level->name);
+                    if (!empty($pekerjaan->position) && !empty($pekerjaan->position->name))
+                        $derivedRoles[] = strtolower($pekerjaan->position->name);
+                    if (!empty($pekerjaan->Jabatan))
+                        $derivedRoles[] = strtolower($pekerjaan->Jabatan);
                 }
             }
         }
 
         $roleMatches = function ($roles) use ($userRoleNames, $derivedRoles) {
-            if (is_string($roles)) $roles = [$roles];
+            if (is_string($roles))
+                $roles = [$roles];
             $roles = array_map('strtolower', $roles);
             foreach ($roles as $r) {
-                if (in_array($r, $userRoleNames)) return true;
-                if (in_array($r, $derivedRoles)) return true;
+                if (in_array($r, $userRoleNames))
+                    return true;
+                if (in_array($r, $derivedRoles))
+                    return true;
             }
             return false;
         };
@@ -59,6 +66,8 @@ class MenuHelper
             'name' => 'Dashboard',
             'path' => '/dashboard',
         ];
+
+
 
 
         // =============================================================
@@ -103,7 +112,7 @@ class MenuHelper
                     ['name' => 'Kalender Rekrutmen', 'path' => '/rekrutmen/calendar'],
                     ['name' => 'Interview HR', 'path' => '/rekrutmen/interview_hr'],
                     ['name' => 'Kandidat Lanjut User', 'path' => '/rekrutmen/kandidat_lanjut_user'],
-                    ['name' => 'Pemberkasan',          'path' => '/rekrutmen/pemberkasan'],
+                    ['name' => 'Pemberkasan', 'path' => '/rekrutmen/pemberkasan'],
                     // ['name' => 'Database WIG',         'path' => '/rekrutmen/wig'],
                 ],
             ];
@@ -126,6 +135,19 @@ class MenuHelper
                 'path' => '/turnover',
             ];
         }
+
+
+        // =============================================================
+        // 0. MENU contoh materi untuk superadmin, manajer, admin 
+        // =============================================================
+        if ($roleMatches(['admin', 'superadmin', 'manajer'])) {
+            $menu[] = [
+                'icon' => 'book',
+                'name' => 'Materi',
+                'path' => '/materi',
+            ];
+        }
+
 
         // =============================================================
         // 3. MENU TEMPA (Untuk ketua_tempa, admin, superadmin)
@@ -155,6 +177,8 @@ class MenuHelper
         }
 
 
+
+
         // KPI Karyawan (Punya Staff Sendiri)
         $menu[] = [
             'icon' => 'chartline', // Icon untuk penilaian
@@ -173,13 +197,13 @@ class MenuHelper
         }
 
         // Monitoring KBI (Khusus HRD memantau Staff)
-        if ($roleMatches(['admin', 'superadmin','direktur', 'manager', 'GM', 'senior_manager','supervisor'])) {
+        if ($roleMatches(['admin', 'superadmin', 'direktur', 'manager', 'GM', 'senior_manager', 'supervisor'])) {
             // Tambahkan ke subItems Penilaian Karyawan (roleMatches memperhitungkan role manajemen + role turunan dari pekerjaan)
             $menu[count($menu) - 1]['subItems'][] = ['name' => 'Monitoring KBI', 'path' => '/kbi/monitoring'];
         }
-        
+
         // Rekap Performance (Supervisor TIDAK boleh lihat)
-        if ($roleMatches(['admin', 'superadmin','direktur', 'manager', 'GM', 'senior_manager'])) {
+        if ($roleMatches(['admin', 'superadmin', 'direktur', 'manager', 'GM', 'senior_manager'])) {
             $menu[count($menu) - 1]['subItems'][] = ['name' => 'Rekap Performance', 'path' => '/performance/rekap'];
         }
         // Manajemen User

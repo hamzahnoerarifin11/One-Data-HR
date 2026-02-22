@@ -31,56 +31,106 @@
         </div>
         <div x-show="open" x-collapse>
              <form method="GET" action="{{ route('dashboard.index') }}" class="p-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
+                <div class="flex items-center gap-2">
                 <!-- Holding -->
                 <div class="space-y-1">
-                    <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Holding</label>
-                    <select name="holding_id" onchange="this.form.submit()" class="w-full text-sm border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white transition">
-                        <option value="">Semua Holding</option>
-                        @foreach($holdings as $h)
-                            <option value="{{ $h->id }}" {{ request('holding_id') == $h->id ? 'selected' : '' }}>{{ $h->name }}</option>
-                        @endforeach
-                    </select>
+                <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">
+                    Holding
+                </label>
+                <select name="holding_id" onchange="this.form.submit()"
+                    class="w-full h-10 text-sm border-gray-300 rounded-lg shadow-sm
+                        focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                        dark:bg-gray-700 dark:border-gray-600 dark:text-white transition">
+                    <option value="">Semua Holding</option>
+                    @foreach($holdings as $h)
+                        <option value="{{ $h->id }}" {{ request('holding_id') == $h->id ? 'selected' : '' }}>
+                            {{ $h->name }}
+                        </option>
+                    @endforeach
+                </select>
                 </div>
+            </div>
 
                 <!-- Company -->
                 <div class="space-y-1">
-                    <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Perusahaan</label>
-                    <select name="company_id" onchange="this.form.submit()" class="w-full text-sm border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white transition">
+                    <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">
+                        Perusahaan
+                    </label>
+                    <select name="company_id" onchange="this.form.submit()"
+                        class="w-full h-10 text-sm border-gray-300 rounded-lg shadow-sm
+                               focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                               dark:bg-gray-700 dark:border-gray-600 dark:text-white transition">
                         <option value="">Semua Perusahaan</option>
                         @foreach($companies as $c)
-                            <option value="{{ $c->id }}" {{ request('company_id') == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
+                            <option value="{{ $c->id }}" {{ request('company_id') == $c->id ? 'selected' : '' }}>
+                                {{ $c->name }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
+
 
                  <!-- Division -->
-                 <div class="space-y-1">
-                    <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Divisi</label>
-                    <select name="division_id" onchange="this.form.submit()" class="w-full text-sm border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white transition">
+                <div class="space-y-1">
+                    <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">
+                        Divisi
+                    </label>
+                    <select name="division_id" onchange="this.form.submit()"
+                        class="w-full h-10 text-sm border-gray-300 rounded-lg shadow-sm
+                               focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                               dark:bg-gray-700 dark:border-gray-600 dark:text-white transition">
                         <option value="">Semua Divisi</option>
                         @foreach($divisions as $d)
-                            <option value="{{ $d->id }}" {{ request('division_id') == $d->id ? 'selected' : '' }}>{{ $d->name }}</option>
+                            <option value="{{ $d->id }}" {{ request('division_id') == $d->id ? 'selected' : '' }}>
+                                {{ $d->name }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
 
+
                  <!-- Date Range -->
-                 <div class="space-y-1">
-                    <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Tanggal Mulai</label>
-                    <input type="date" name="start_date" value="{{ $filters['start_date'] }}" class="w-full text-sm border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                </div>
-                <div class="space-y-1">
-                    <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Tanggal Akhir</label>
-                    <div class="flex gap-2">
-                        <input type="date" name="end_date" value="{{ $filters['end_date'] }}" class="w-full text-sm border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-lg shadow-sm transition-colors" title="Terapkan Filter">
-                            <i class="fas fa-search"></i>
-                        </button>
+                 <!-- Tanggal Mulai -->
+                    <div class="space-y-1">
+                        <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">
+                            Tanggal Mulai
+                        </label>
+
+                        <input type="date"
+                            name="start_date"
+                            value="{{ $filters['start_date'] }}"
+                            class="w-full h-10 text-sm border-gray-300 rounded-lg shadow-sm
+                                focus:ring-blue-500
+                                dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                     </div>
-                </div>
-             </form>
-        </div>
-    </div>
+
+                    <!-- Tanggal Akhir -->
+                    <div class="space-y-1">
+                        <label class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">
+                            Tanggal Akhir
+                        </label>
+
+                        <div class="flex items-center gap-2">
+                            <input type="date"
+                                name="end_date"
+                                value="{{ $filters['end_date'] }}"
+                                class="flex-1 h-10 text-sm border-gray-300 rounded-lg shadow-sm
+                                    focus:ring-blue-500
+                                    dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+
+                            <button type="submit"
+                                class="h-10 px-4 bg-blue-600 hover:bg-blue-700 
+                                    text-white rounded-lg shadow-sm transition-colors"
+                                title="Terapkan Filter">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+
+
+                                </form>
+                            </div>
+                        </div>
 
     <!-- Main Stats Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
