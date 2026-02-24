@@ -298,11 +298,15 @@ Route::post('/kpi/items/bulk-delete', [KpiAssessmentController::class , 'bulkDes
 // Routes untuk TEMPA
 Route::middleware(['auth', 'role:admin|superadmin|ketua_tempa'])->prefix('tempa')->name('tempa.')->group(function () {
     // Kelompok TEMPA
+    Route::get('kelompok/import-template', [\App\Http\Controllers\TempaKelompokController::class, 'downloadTemplate'])->name('kelompok.import-template');
+    Route::post('kelompok/import', [\App\Http\Controllers\TempaKelompokController::class, 'import'])->name('kelompok.import');
     Route::resource('kelompok', \App\Http\Controllers\TempaKelompokController::class)->parameters([
         'kelompok' => 'kelompok'
     ]);
 
     // Peserta TEMPA
+    Route::get('peserta/import-template', [\App\Http\Controllers\TempaPesertaController::class, 'downloadTemplate'])->name('peserta.import-template');
+    Route::post('peserta/import', [\App\Http\Controllers\TempaPesertaController::class, 'import'])->name('peserta.import');
     Route::resource('peserta', \App\Http\Controllers\TempaPesertaController::class)->parameters([
         'peserta' => 'peserta' // This forces the parameter to be {peserta} instead of {pesertum}
     ]);

@@ -13,15 +13,25 @@
             </p>
         </div>
 
-        @can('createTempaKelompok')
-        <a href="{{ route('tempa.kelompok.create') }}"
-           class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700 transition">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-            </svg>
-            Tambah Kelompok
-        </a>
-        @endcan
+        <div class="flex items-center gap-2">
+            @can('createTempaKelompok')
+            <button @click="$dispatch('open-import-modal')"
+               class="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-green-700 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                </svg>
+                Import Excel
+            </button>
+
+            <a href="{{ route('tempa.kelompok.create') }}"
+               class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Tambah Kelompok
+            </a>
+            @endcan
+        </div>
     </div>
 
     @if(session('success'))
@@ -195,6 +205,107 @@
                     <button @click="goToPage(p)" :class="page === p ? 'bg-blue-600 text-white' : 'hover:bg-blue-500/[0.08] hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-500 dark:text-white'" class="px-3 py-1 text-sm rounded-lg" x-text="p"></button>
                 </template>
                 <button @click="nextPage" :disabled="page === totalPages" class="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white disabled:opacity-50">Next</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Import Modal using Alpine.js -->
+<div x-data="{ open: false }"
+     @open-import-modal.window="open = true"
+     @keydown.escape.window="open = false"
+     class="relative z-50"
+     aria-labelledby="modal-title"
+     role="dialog"
+     aria-modal="true"
+     x-show="open"
+     x-cloak>
+
+    <div x-show="open"
+         x-transition:enter="ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity"></div>
+
+    <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <div x-show="open"
+                 x-transition:enter="ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                 x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                 x-transition:leave="ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                 @click.away="open = false"
+                 class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
+
+                <div class="bg-white dark:bg-gray-800 px-4 pb-4 pt-5 sm:p-6 sm:pb-4 max-h-[80vh] overflow-y-auto">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10 dark:bg-green-900/30">
+                            <svg class="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                            </svg>
+                        </div>
+                        <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
+                            <h3 class="text-xl font-semibold leading-6 text-gray-900 dark:text-white" id="modal-title">Import Kelompok TEMPA</h3>
+                            <div class="mt-4 space-y-4">
+                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                    Upload file Excel untuk import data kelompok secara massal.
+                                </p>
+
+                                <!-- Guideline Box -->
+                                <div class="rounded-lg bg-blue-50/50 p-4 border border-blue-100 dark:bg-blue-900/20 dark:border-blue-800">
+                                    <h4 class="flex items-center gap-2 text-sm font-semibold text-blue-800 dark:text-blue-300 mb-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        Panduan Format
+                                    </h4>
+                                    <ul class="text-xs text-blue-700 dark:text-blue-400 space-y-1.5 list-disc list-inside ml-1">
+                                        <li><span class="font-medium text-blue-900 dark:text-blue-200">Nama Kelompok:</span> Wajib (mis: "Kelompok Alpha").</li>
+                                        <li><span class="font-medium text-blue-900 dark:text-blue-200">Nama Mentor:</span> Opsional.</li>
+                                        <li><span class="font-medium text-blue-900 dark:text-blue-200">Tempat:</span> "pusat" atau "cabang".</li>
+                                    </ul>
+                                    <div class="mt-3 pt-3 border-t border-blue-200 dark:border-blue-800">
+                                        <a href="{{ route('tempa.kelompok.import-template') }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                            Download Template.xlsx
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <form action="{{ route('tempa.kelompok.import') }}" method="POST" enctype="multipart/form-data" class="mt-4">
+                                    @csrf
+                                    <div class="space-y-3">
+                                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            File Excel
+                                        </label>
+                                        <div class="relative">
+                                            <input type="file" name="file" accept=".xlsx, .xls, .csv" required
+                                                   class="block w-full text-sm text-gray-500
+                                                          file:mr-4 file:py-2.5 file:px-4
+                                                          file:rounded-lg file:border-0
+                                                          file:text-sm file:font-semibold
+                                                          file:bg-blue-50 file:text-blue-700
+                                                          hover:file:bg-blue-100
+                                                          dark:file:bg-blue-900/30 dark:file:text-blue-400
+                                                          border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
+                                        </div>
+                                    </div>
+                                    <div class="mt-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+                                        <button type="button" @click="open = false" class="inline-flex w-full justify-center rounded-lg bg-gray-50 px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-100 sm:w-auto dark:bg-gray-700 dark:text-white dark:ring-gray-600 dark:hover:bg-gray-600 transition">
+                                            Batal
+                                        </button>
+                                        <button type="submit" class="inline-flex w-full justify-center rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:w-auto transition">
+                                            Import Data
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
