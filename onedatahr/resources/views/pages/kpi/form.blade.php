@@ -289,7 +289,7 @@
                             @endforeach
                             
                             <!-- ADJ SEMESTER 1 (TENGAH TAHUN) - MOVED HERE -->
-                            <th rowspan="2" class="p-1 px-2 text-center border-r border-slate-200 bg-indigo-50/50 text-indigo-800 font-bold">Subtotal<br>Smt 1</th>
+                            <th rowspan="2" class="p-1 px-2 text-center border-r border-slate-200 bg-indigo-50/50 text-indigo-800 font-bold w-20">Skor H1</th>
                             <th colspan="3" class="p-1 px-2 text-center border-r border-slate-200 bg-amber-50/50 text-amber-800">Adj. Tengah Tahun</th>
 
                             <!-- SEMESTER 2 HEADERS -->
@@ -298,7 +298,7 @@
                             @endforeach
                             
                             <!-- ADJ SEMESTER 2 (AKHIR TAHUN) -->
-                            <th rowspan="2" class="p-1 px-2 text-center border-r border-slate-200 bg-indigo-50/50 text-indigo-800 font-bold">Subtotal<br>Smt 2</th>
+                            <th rowspan="2" class="p-1 px-2 text-center border-r border-slate-200 bg-indigo-50/50 text-indigo-800 font-bold w-20">Skor H2</th>
                             <th colspan="3" class="p-1 px-2 text-center border-r border-slate-200 bg-amber-50/50 text-amber-800">Adj. Akhir Tahun</th>
                             <th rowspan="2" class="p-2 w-24 text-center border-l bg-slate-100 text-slate-800 font-bold sticky right-0 z-30 shadow-l">FINAL<br>SCORE</th>
                         </tr>
@@ -379,9 +379,21 @@
                                     <input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][real_{{ $bln }}]" value="{{ $score->{'real_'.$bln} ?? '' }}" class="input-real-{{ $bln }} kpi-input w-full h-8 px-1 rounded text-center text-slate-900 font-semibold" placeholder="-">
                                     <button type="button" onclick="openJustificationModal('{{ $item->id_kpi_item }}', '{{ $bln }}')" class="absolute top-1 right-1 text-slate-300 hover:text-indigo-500 opacity-0 group-hover/cell:opacity-100 transition-opacity p-0.5">
                                         <i class="fas fa-comment-alt text-xs"></i>
-                                        @if(isset($score->justification[$bln])) <span class="absolute top-0 right-0 w-1.5 h-1.5 bg-red-500 rounded-full"></span> @endif
+                                        @php
+                                            $rawNote = $score->justification[$bln] ?? '';
+                                            if (is_string($rawNote)) {
+                                                $staffNote = $rawNote;
+                                                $managerNote = '';
+                                            } else {
+                                                $staffNote = $rawNote['staff'] ?? '';
+                                                $managerNote = $rawNote['manager'] ?? '';
+                                            }
+                                            $hasNote = !empty($staffNote) || !empty($managerNote);
+                                        @endphp
+                                        @if($hasNote) <span class="absolute top-0 right-0 w-1.5 h-1.5 bg-red-500 rounded-full"></span> @endif
                                     </button>
-                                    <input type="hidden" name="kpi[{{ $item->id_kpi_item }}][justification][{{ $bln }}]" id="justification-{{ $item->id_kpi_item }}-{{ $bln }}" value="{{ $score->justification[$bln] ?? '' }}">
+                                    <input type="hidden" name="kpi[{{ $item->id_kpi_item }}][justification][{{ $bln }}][staff]" id="justification-staff-{{ $item->id_kpi_item }}-{{ $bln }}" value="{{ $staffNote }}">
+                                    <input type="hidden" name="kpi[{{ $item->id_kpi_item }}][justification][{{ $bln }}][manager]" id="justification-manager-{{ $item->id_kpi_item }}-{{ $bln }}" value="{{ $managerNote }}">
                                 </td>
                                 <td class="p-1 border-r border-slate-100 align-middle text-center bg-emerald-50/10"><div class="py-1.5 font-medium text-emerald-600/80 text-[11px]"><span class="span-skor-{{ $bln }}"></span>%</div></td>
                                 <td class="p-1 border-r border-slate-200 align-middle text-center bg-emerald-50/30 border-semester-1"><div class="py-1.5 font-bold text-emerald-700"><span class="span-nilai-{{ $bln }}"></span>%</div></td>
@@ -418,9 +430,21 @@
                                     <input type="number" step="0.01" name="kpi[{{ $item->id_kpi_item }}][real_{{ $bln }}]" value="{{ $score->{'real_'.$bln} ?? '' }}" class="input-real-{{ $bln }} kpi-input w-full h-8 px-1 rounded text-center text-slate-900 font-semibold" placeholder="-">
                                     <button type="button" onclick="openJustificationModal('{{ $item->id_kpi_item }}', '{{ $bln }}')" class="absolute top-1 right-1 text-slate-300 hover:text-indigo-500 opacity-0 group-hover/cell:opacity-100 transition-opacity p-0.5">
                                         <i class="fas fa-comment-alt text-xs"></i>
-                                         @if(isset($score->justification[$bln])) <span class="absolute top-0 right-0 w-1.5 h-1.5 bg-red-500 rounded-full"></span> @endif
+                                        @php
+                                            $rawNote2 = $score->justification[$bln] ?? '';
+                                            if (is_string($rawNote2)) {
+                                                $staffNote2 = $rawNote2;
+                                                $managerNote2 = '';
+                                            } else {
+                                                $staffNote2 = $rawNote2['staff'] ?? '';
+                                                $managerNote2 = $rawNote2['manager'] ?? '';
+                                            }
+                                            $hasNote2 = !empty($staffNote2) || !empty($managerNote2);
+                                        @endphp
+                                        @if($hasNote2) <span class="absolute top-0 right-0 w-1.5 h-1.5 bg-red-500 rounded-full"></span> @endif
                                     </button>
-                                    <input type="hidden" name="kpi[{{ $item->id_kpi_item }}][justification][{{ $bln }}]" id="justification-{{ $item->id_kpi_item }}-{{ $bln }}" value="{{ $score->justification[$bln] ?? '' }}">
+                                    <input type="hidden" name="kpi[{{ $item->id_kpi_item }}][justification][{{ $bln }}][staff]" id="justification-staff-{{ $item->id_kpi_item }}-{{ $bln }}" value="{{ $staffNote2 }}">
+                                    <input type="hidden" name="kpi[{{ $item->id_kpi_item }}][justification][{{ $bln }}][manager]" id="justification-manager-{{ $item->id_kpi_item }}-{{ $bln }}" value="{{ $managerNote2 }}">
                                 </td>
                                 <td class="p-1 border-r border-slate-100 align-middle text-center bg-sky-50/10"><div class="py-1.5 font-medium text-sky-600/80 text-[11px]"><span class="span-skor-{{ $bln }}"></span>%</div></td>
                                 <td class="p-1 border-r border-slate-200 align-middle text-center bg-sky-50/30"><div class="py-1.5 font-bold text-sky-700"><span class="span-nilai-{{ $bln }}"></span>%</div></td>
@@ -452,53 +476,53 @@
                         @endforeach
                     </tbody>
                     <tfoot class="bg-slate-50 border-t-2 border-slate-300 sticky bottom-0 z-40 text-xs md:text-sm">
-<tr class="shadow-sm">
+                        <tr class="shadow-sm">
 
-    <!-- LABEL -->
-    <td colspan="2" class="sticky left-0 bg-slate-100 p-3 font-bold uppercase border-r border-slate-300 text-slate-600 kpi-sticky-shadow text-right">
-        Total Skor Akhir 
-    </td>
+                            <!-- LABEL -->
+                            <td colspan="2" class="sticky left-0 bg-slate-100 p-3 font-bold uppercase border-r border-slate-300 text-slate-600 kpi-sticky-shadow text-right">
+                                Total Skor Akhir 
+                            </td>
 
-    <!-- KPI + Perspektif + Satuan + Bobot + Target -->
-    <td colspan="5" class="border-r border-slate-200 bg-slate-50"></td>
+                            <!-- KPI + Perspektif + Satuan + Bobot + Target -->
+                            <td colspan="5" class="border-r border-slate-200 bg-slate-50"></td>
 
-    <!-- JAN–JUN -->
-    @foreach(['jan','feb','mar','apr','mei','jun'] as $bln)
-        <td colspan="3" class="border-r border-slate-200"></td>
-        <td class="p-2 text-center font-bold text-emerald-800 border-r border-slate-300 bg-emerald-50">
-            <span id="footer-total-{{ $bln }}"></span>%
-        </td>
-    @endforeach
+                            <!-- JAN–JUN -->
+                            @foreach(['jan','feb','mar','apr','mei','jun'] as $bln)
+                                <td colspan="3" class="border-r border-slate-200"></td>
+                                <td class="p-2 text-center font-bold text-emerald-800 border-r border-slate-300 bg-emerald-50">
+                                    <span id="footer-total-{{ $bln }}"></span>%
+                                </td>
+                            @endforeach
 
-    <!-- ADJ SMT 1 (MOVED) -->
-    <td class="border-r border-indigo-200 bg-indigo-50/50"></td>
-    <td colspan="2" class="border-r border-slate-200 bg-amber-50/50"></td>
-    <td class="p-2 border-r border-slate-300 bg-amber-100/50 font-bold text-amber-800 text-center">
-        <span id="footer-adj-smt1"></span>%
-    </td>
+                            <!-- ADJ SMT 1 (MOVED) -->
+                            <td class="border-r border-indigo-200 bg-indigo-50/50 w-20"></td>
+                            <td colspan="2" class="border-r border-slate-200 bg-amber-50/50"></td>
+                            <td class="p-2 border-r border-slate-300 bg-amber-100/50 font-bold text-amber-800 text-center">
+                                <span id="footer-adj-smt1"></span>%
+                            </td>
 
-    <!-- JUL–DES -->
-    @foreach(['jul','aug','sep','okt','nov','des'] as $bln)
-        <td colspan="3" class="border-r border-slate-200"></td>
-        <td class="p-2 text-center font-bold text-sky-800 border-r border-slate-300 bg-sky-50">
-            <span id="footer-total-{{ $bln }}"></span>%
-        </td>
-    @endforeach
+                            <!-- JUL–DES -->
+                            @foreach(['jul','aug','sep','okt','nov','des'] as $bln)
+                                <td colspan="3" class="border-r border-slate-200"></td>
+                                <td class="p-2 text-center font-bold text-sky-800 border-r border-slate-300 bg-sky-50">
+                                    <span id="footer-total-{{ $bln }}"></span>%
+                                </td>
+                            @endforeach
 
-    <!-- ADJ SMT 2 -->
-    <td class="border-r border-indigo-200 bg-indigo-50/50"></td>
-    <td colspan="2" class="border-r border-slate-200 bg-amber-50/50"></td>
-    <td class="p-2 border-r border-slate-300 bg-amber-100/50 font-bold text-amber-800 text-center">
-        <span id="footer-adj-smt2"></span>%
-    </td>
+                            <!-- ADJ SMT 2 -->
+                            <td class="border-r border-indigo-200 bg-indigo-50/50 w-20"></td>
+                            <td colspan="2" class="border-r border-slate-200 bg-amber-50/50"></td>
+                            <td class="p-2 border-r border-slate-300 bg-amber-100/50 font-bold text-amber-800 text-center">
+                                <span id="footer-adj-smt2"></span>%
+                            </td>
 
-    <!-- FINAL -->
-    <td class="p-2 text-center font-black text-indigo-900 bg-slate-200 border-l border-slate-300 sticky right-0 z-50">
-        <span id="footer-grand-total"></span>%
-    </td>
+                            <!-- FINAL -->
+                            <td class="p-2 text-center font-black text-indigo-900 bg-slate-200 border-l border-slate-300 sticky right-0 z-50">
+                                <span id="footer-grand-total"></span>%
+                            </td>
 
-</tr>
-</tfoot>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
         </div>
@@ -658,12 +682,30 @@
             <button onclick="closeJustificationModal()" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times"></i></button>
         </div>
         <div class="p-6">
-            <input type="hidden" id="justification-target-id">
-            <label class="block text-sm font-medium text-slate-700 mb-2">Berikan alasan atau catatan untuk nilai ini:</label>
-            <textarea id="justification-text" rows="4" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" placeholder="Contoh: Target tidak tercapai karena mesin breakdown..."></textarea>
+            <input type="hidden" id="justification-item-id">
+            <input type="hidden" id="justification-month">
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Catatan Staff</label>
+                    <textarea id="justification-staff-text" rows="3" 
+                        class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none {{ !$isStaff ? 'bg-slate-50 text-slate-500' : '' }}" 
+                        placeholder="{{ $isStaff ? 'Berikan penjelasan realisasi Anda...' : '(Belum ada catatan dari staff)' }}"
+                        {{ !$isStaff ? 'readonly' : '' }}></textarea>
+                </div>
+
+                <div class="pt-4 border-t border-slate-100">
+                    <label class="block text-xs font-bold text-indigo-600 uppercase mb-1">Feedback Manager / Atasan</label>
+                    <textarea id="justification-manager-text" rows="3" 
+                        class="w-full border border-indigo-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none {{ $isStaff ? 'bg-slate-50 text-slate-500' : '' }}" 
+                        placeholder="{{ !$isStaff ? 'Berikan tanggapan atau evaluasi...' : '(Belum ada feedback dari atasan)' }}"
+                        {{ $isStaff ? 'readonly' : '' }}></textarea>
+                </div>
+            </div>
+
             <div class="mt-6 flex justify-end gap-3">
                 <button type="button" onclick="closeJustificationModal()" class="px-4 py-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50 font-medium text-sm transition">Batal</button>
-                <button type="button" onclick="saveJustification()" class="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 font-bold text-sm shadow-lg shadow-indigo-200 transition">Simpan Catatan</button>
+                <button type="button" onclick="saveJustification()" class="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 font-bold text-sm shadow-lg shadow-indigo-200 transition">Simpan</button>
             </div>
         </div>
     </div>
@@ -1213,17 +1255,31 @@
 
     // --- JUSTIFICATION MODAL LOGIC ---
     function openJustificationModal(itemId, month) {
-        const inputId = `justification-${itemId}-${month}`;
-        const inputEl = document.getElementById(inputId);
-        const modal = document.getElementById('modalJustification');
-        const textarea = document.getElementById('justification-text');
+        const staffInputId = `justification-staff-${itemId}-${month}`;
+        const managerInputId = `justification-manager-${itemId}-${month}`;
         
-        document.getElementById('justification-target-id').value = inputId;
-        textarea.value = inputEl ? inputEl.value : '';
+        const staffInputEl = document.getElementById(staffInputId);
+        const managerInputEl = document.getElementById(managerInputId);
+        
+        const modal = document.getElementById('modalJustification');
+        const staffTextarea = document.getElementById('justification-staff-text');
+        const managerTextarea = document.getElementById('justification-manager-text');
+        
+        document.getElementById('justification-item-id').value = itemId;
+        document.getElementById('justification-month').value = month;
+        
+        staffTextarea.value = staffInputEl ? staffInputEl.value : '';
+        managerTextarea.value = managerInputEl ? managerInputEl.value : '';
         
         modal.classList.remove('hidden');
         modal.classList.add('flex');
-        setTimeout(() => textarea.focus(), 100);
+        
+        // Auto focus the editable one
+        if(!staffTextarea.readOnly) {
+            setTimeout(() => staffTextarea.focus(), 100);
+        } else if(!managerTextarea.readOnly) {
+            setTimeout(() => managerTextarea.focus(), 100);
+        }
     }
 
     function closeJustificationModal() {
@@ -1233,18 +1289,24 @@
     }
 
     function saveJustification() {
-        const targetId = document.getElementById('justification-target-id').value;
-        const text = document.getElementById('justification-text').value;
-        const inputEl = document.getElementById(targetId);
+        const itemId = document.getElementById('justification-item-id').value;
+        const month = document.getElementById('justification-month').value;
         
-        if (inputEl) {
-            inputEl.value = text;
+        const staffText = document.getElementById('justification-staff-text').value;
+        const managerText = document.getElementById('justification-manager-text').value;
+        
+        const staffInputEl = document.getElementById(`justification-staff-${itemId}-${month}`);
+        const managerInputEl = document.getElementById(`justification-manager-${itemId}-${month}`);
+        
+        if (staffInputEl && managerInputEl) {
+            staffInputEl.value = staffText;
+            managerInputEl.value = managerText;
             
             // Visual feedback on button (add dot if text exists)
-            // Need to find the button associated (parentElement lookup)
-            const btn = inputEl.parentElement.querySelector('button');
+            const parent = staffInputEl.parentElement;
+            const btn = parent.querySelector('button');
             if(btn) {
-                 if(text.trim() !== '') {
+                 if(staffText.trim() !== '' || managerText.trim() !== '') {
                      if(!btn.querySelector('.bg-red-500')) {
                          btn.innerHTML += '<span class="absolute top-0 right-0 w-1.5 h-1.5 bg-red-500 rounded-full"></span>';
                      }
@@ -1256,7 +1318,7 @@
             
             // Trigger change for unsaved badge
             const event = new Event('change', { bubbles: true });
-            inputEl.dispatchEvent(event);
+            staffInputEl.dispatchEvent(event);
         }
         closeJustificationModal();
     }

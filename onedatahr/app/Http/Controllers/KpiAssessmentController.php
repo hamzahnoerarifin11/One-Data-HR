@@ -553,9 +553,30 @@ class KpiAssessmentController extends Controller
                         $t_val = ${'t_'.$m};
                         $r_val = ${'r_'.$m};
                         
-                        // Collect Justification
+                        // Collect Justification (Staff and Manager merged securely)
                         if(isset($data['justification'][$m])) {
-                            $justification[$m] = $data['justification'][$m];
+                            $existing = $score->justification[$m] ?? ['staff' => '', 'manager' => ''];
+                            
+                            // Handling legacy string justification
+                            if (is_string($existing)) {
+                                $existing = ['staff' => $existing, 'manager' => ''];
+                            }
+
+                            $newStaff = $data['justification'][$m]['staff'] ?? ($existing['staff'] ?? '');
+                            $newManager = $data['justification'][$m]['manager'] ?? ($existing['manager'] ?? '');
+
+                            // If staff, only update staff part. If manager/admin, they can update feedback.
+                            if ($this->roleMatches($user, 'staff')) {
+                                $justification[$m] = [
+                                    'staff'   => $newStaff,
+                                    'manager' => $existing['manager'] ?? ''
+                                ];
+                            } else {
+                                $justification[$m] = [
+                                    'staff'   => $newStaff,
+                                    'manager' => $newManager
+                                ];
+                            }
                         }
 
                         if ($t_val != 0) {
