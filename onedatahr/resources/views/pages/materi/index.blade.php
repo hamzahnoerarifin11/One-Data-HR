@@ -6,3 +6,6 @@
     <p>Menu ini hanya bisa diakses admin, superadmin, dan manajer.</p>
 </div>
 @endsection
+<div>
+    
+</div>

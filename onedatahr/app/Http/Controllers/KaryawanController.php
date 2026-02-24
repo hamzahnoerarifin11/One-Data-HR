@@ -1419,7 +1419,7 @@ class KaryawanController extends Controller
             ['54', 'Departemen', 'Pilih dari dropdown (sesuai data sistem)', 'Tidak', 'Development'],
             ['55', 'Unit', 'Pilih dari dropdown (sesuai data sistem)', 'Tidak', 'Backend'],
             ['56', 'Level Jabatan', 'Pilih dari dropdown (sesuai data sistem)', 'Tidak', 'Staff'],
-            ['57', 'Jabatan', 'Nama jabatan/posisi', 'Tidak', 'Software Engineer'],
+            ['57', 'Jabatan', 'Nama jabatan/posisi', 'YA *', 'Software Engineer'],
             ['58', 'Jenis Kontrak', 'PKWT / PKWTT', 'Tidak', 'PKWT'],
             ['59', 'Perjanjian', 'Nomor atau jenis perjanjian kerja', 'Tidak', 'Kontrak'],
             ['60', 'Lokasi Kerja', 'Pilih dari dropdown', 'Tidak', 'Central Java - Pati'],
@@ -1534,7 +1534,7 @@ class KaryawanController extends Controller
             'Anak 3 Nama', 'Anak 3 Tempat Lahir', 'Anak 3 Tanggal Lahir (YYYY-MM-DD)', 'Anak 3 Jenis Kelamin (L/P)', 'Anak 3 Pendidikan',
 
             // Data Pekerjaan (Step 2) — 9 cols
-            'Perusahaan / Holding', 'Divisi', 'Departemen', 'Unit', 'Level Jabatan', 'Jabatan',
+            'Perusahaan / Holding', 'Divisi', 'Departemen', 'Unit', 'Level Jabatan', 'Jabatan*',
             'Jenis Kontrak', 'Perjanjian', 'Lokasi Kerja',
             
             // Data Pendidikan (Step 3) — 3 cols
@@ -1592,9 +1592,19 @@ class KaryawanController extends Controller
                 }
             }
 
-            $isMandatory = str_contains($header, '*');
-            $sheet->getStyle($columnLetter . '2')->applyFromArray([
-                'font' => ['bold' => true, 'size' => 9, 'color' => $isMandatory ? ['rgb' => 'CC0000'] : ['rgb' => '000000']],
+            $isJabatan = $header === 'Jabatan*';
+$isMandatory = str_contains($header, '*');
+
+$sheet->getStyle($columnLetter . '2')->applyFromArray([
+    'font' => [
+        'bold' => true,
+        'size' => 9,
+        'color' => $isJabatan
+            ? ['rgb' => 'FF0000']   // Merah terang untuk Jabatan
+            : ($isMandatory
+                ? ['rgb' => 'CC0000']  // Merah gelap untuk wajib lainnya
+                : ['rgb' => '000000']) // Hitam normal
+    ],
                 'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => $colColor]],
                 'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER, 'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER, 'wrapText' => true],
                 'borders' => ['allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN]],
