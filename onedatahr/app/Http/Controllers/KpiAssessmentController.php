@@ -65,7 +65,7 @@ class KpiAssessmentController extends Controller
             // List Companies Dropdown
             $listCompanies = \App\Models\Company::distinct()->orderBy('name')->pluck('name');
 
-            $karyawanList = $query->paginate(10)->appends($request->all());
+            $karyawanList = $query->orderBy('Nama_Lengkap_Sesuai_Ijazah', 'ASC')->paginate(10)->appends($request->all());
 
             return view('pages.kpi.index', compact('karyawanList', 'tahun', 'stats', 'listJabatan', 'listCompanies'));
         }
@@ -94,7 +94,7 @@ class KpiAssessmentController extends Controller
             $listJabatan = \App\Models\Level::distinct()->orderBy('name')->pluck('name');
             $listCompanies = \App\Models\Company::distinct()->orderBy('name')->pluck('name');
 
-            $karyawanList = $query->paginate(10)->appends($request->all());
+            $karyawanList = $query->orderBy('Nama_Lengkap_Sesuai_Ijazah', 'ASC')->paginate(10)->appends($request->all());
 
             return view('pages.kpi.index', compact('karyawanList', 'tahun', 'stats', 'listJabatan', 'listCompanies', 'me'));
         }
@@ -165,7 +165,7 @@ class KpiAssessmentController extends Controller
             ];
 
             // Paginasi untuk daftar karyawan (bisa dipakai di view ->links())
-            $karyawanList = $query->paginate(10)->appends($request->all());
+            $karyawanList = $query->orderBy('Nama_Lengkap_Sesuai_Ijazah', 'ASC')->paginate(10)->appends($request->all());
 
             return view('pages.kpi.index', compact('karyawanList', 'tahun', 'stats', 'listJabatan', 'listCompanies', 'me'));
         }
@@ -215,7 +215,7 @@ class KpiAssessmentController extends Controller
                 'rata_rata' => $allKaryawan->filter(fn($k) => $k->kpiAssessment)->avg(fn($k) => $k->kpiAssessment->total_skor_akhir),
             ];
 
-            $karyawanList = $query->paginate(10)->appends($request->all());
+            $karyawanList = $query->orderBy('Nama_Lengkap_Sesuai_Ijazah', 'ASC')->paginate(10)->appends($request->all());
 
             return view('pages.kpi.index', compact('karyawanList', 'tahun', 'stats', 'listJabatan', 'listCompanies', 'me'));
         }

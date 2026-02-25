@@ -8,7 +8,7 @@ class Pekerjaan extends Model
     protected $primaryKey = 'id_pekerjaan';
     public $timestamps = false;
     protected $fillable = [
-        'id_karyawan','position_id','Jabatan','department_id','division_id','unit_id','company_id','holding_id','level_id','Jenis_Kontrak','Perjanjian','Lokasi_Kerja','Status'
+        'id_karyawan','position_id','department_id','division_id','unit_id','company_id','holding_id','level_id','Jenis_Kontrak','Perjanjian','Lokasi_Kerja','Status'
     ];
     protected $touches = ['karyawan'];
 

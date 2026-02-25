@@ -12,6 +12,7 @@ use App\Models\Bpjs;
 use App\Models\Perusahaan;
 use App\Models\StatusKaryawan;
 use App\Models\Level;
+use App\Models\Position;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Company;
@@ -388,7 +389,19 @@ class KaryawanController extends Controller
             DataKeluarga::create($keluargaData);
 
             // Pekerjaan
-            $pekerjaanData = $request->only(['Jabatan', 'department_id', 'division_id', 'unit_id', 'company_id', 'holding_id', 'level_id', 'Jenis_Kontrak', 'Perjanjian', 'Lokasi_Kerja']);
+            $pekerjaanData = $request->only(['department_id', 'division_id', 'unit_id', 'company_id', 'holding_id', 'level_id', 'Jenis_Kontrak', 'Perjanjian', 'Lokasi_Kerja']);
+            
+            if ($request->filled('Jabatan')) {
+                $position = Position::firstOrCreate([
+                    'name' => $request->Jabatan,
+                    'company_id' => $request->company_id,
+                    'division_id' => $request->division_id,
+                    'department_id' => $request->department_id,
+                    'unit_id' => $request->unit_id,
+                ]);
+                $pekerjaanData['position_id'] = $position->id;
+            }
+
             $pekerjaanData['id_karyawan'] = $karyawan->id_karyawan;
             Pekerjaan::create($pekerjaanData);
 
@@ -677,8 +690,25 @@ class KaryawanController extends Controller
             $karyawan->kontrak ? $karyawan->kontrak->update($dataKontrak) : Kontrak::create(array_merge(['id_karyawan' => $id], $dataKontrak));
 
             // 8. Update Pekerjaan
-            $dataKerja = $request->only(['Jabatan', 'department_id', 'division_id', 'unit_id', 'company_id', 'holding_id', 'level_id', 'Jenis_Kontrak', 'Perjanjian', 'Lokasi_Kerja']);
-            $karyawan->pekerjaan()->exists() ? $karyawan->pekerjaan()->first()->update($dataKerja) : Pekerjaan::create(array_merge(['id_karyawan' => $id], $dataKerja));
+            $pekerjaanData = $request->only(['department_id', 'division_id', 'unit_id', 'company_id', 'holding_id', 'level_id', 'Jenis_Kontrak', 'Perjanjian', 'Lokasi_Kerja']);
+            
+            if ($request->filled('Jabatan')) {
+                $position = Position::firstOrCreate([
+                    'name' => $request->Jabatan,
+                    'company_id' => $request->company_id,
+                    'division_id' => $request->division_id,
+                    'department_id' => $request->department_id,
+                    'unit_id' => $request->unit_id,
+                ]);
+                $pekerjaanData['position_id'] = $position->id;
+            }
+
+            if ($karyawan->pekerjaan()->exists()) {
+                $karyawan->pekerjaan()->first()->update($pekerjaanData);
+            } else {
+                $pekerjaanData['id_karyawan'] = $id;
+                Pekerjaan::create($pekerjaanData);
+            }
 
             // 9. Update User Role jika level_id berubah
             if ($request->filled('level_id')) {
@@ -1050,6 +1080,16 @@ class KaryawanController extends Controller
 
     public function downloadTemplate()
     {
+        // Define sections for coloring data sheet headers
+        $sections = [
+            [0, 27, '4472C4'],  // Personal
+            [28, 50, '548235'], // Keluarga
+            [51, 59, 'BF8F00'], // Pekerjaan
+            [60, 62, '7030A0'], // Pendidikan
+            [63, 71, 'C55A11'], // Kontrak
+            [72, 76, 'FF0000'], // Status & BPJS
+        ];
+
         // 1. Fetch Hierarchical Master Data for Dropdowns
         // Perusahaan = Holdings + Companies
         $holdings = \App\Models\Holding::with(['divisions' => function($q) {
@@ -1815,5 +1855,29 @@ $sheet->getStyle($columnLetter . '2')->applyFromArray([
         header('Content-Disposition: attachment; filename="'. urlencode($fileName).'"');
         $writer->save('php://output');
         exit;
+    }
+
+    /**
+     * Lighten a hex color by a percentage.
+     * 
+     * @param string $hex
+     * @param float $percent (0.0 to 1.0)
+     * @return string
+     */
+    private function lightenColor($hex, $percent)
+    {
+        $hex = ltrim($hex, '#');
+        if (strlen($hex) == 3) {
+            $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+        }
+        $r = hexdec(substr($hex, 0, 2));
+        $g = hexdec(substr($hex, 2, 2));
+        $b = hexdec(substr($hex, 4, 2));
+
+        $r = round($r + (255 - $r) * $percent);
+        $g = round($g + (255 - $g) * $percent);
+        $b = round($b + (255 - $b) * $percent);
+
+        return sprintf('%02X%02X%02X', $r, $g, $b);
     }
 }

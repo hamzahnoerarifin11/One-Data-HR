@@ -110,7 +110,7 @@ class PerformanceController extends Controller
         // Jika mode superadmin, tampilkan semua (tidak ada filter role)
 
         // Eksekusi Query
-        $karyawans = $query->get();
+        $karyawans = $query->orderBy('Nama_Lengkap_Sesuai_Ijazah', 'ASC')->get();
 
         // ======================================================
         // 2. HITUNG NILAI & MAPPING

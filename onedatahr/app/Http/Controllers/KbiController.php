@@ -495,7 +495,7 @@ class KbiController extends Controller
             });
         }
 
-        $rawList = $query->get();
+        $rawList = $query->orderBy('Nama_Lengkap_Sesuai_Ijazah', 'ASC')->get();
         $userMap = \App\Models\User::whereNotNull('nik')->pluck('id', 'nik')->toArray();
 
         // 4. Mapping Status (Sama seperti sebelumnya)

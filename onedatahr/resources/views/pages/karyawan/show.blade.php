@@ -232,7 +232,7 @@
 
             <div>
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Jabatan</p>
-                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaan->first()->Jabatan ?? '-' }}</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ optional($karyawan->pekerjaan->first())->position?->name ?? '-' }}</p>
             </div>
 
             <div>

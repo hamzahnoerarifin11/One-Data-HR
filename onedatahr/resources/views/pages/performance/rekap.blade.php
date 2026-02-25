@@ -414,8 +414,8 @@
                         </td>
                         <td class="px-4 py-3 text-center">
                             <div class="flex justify-center gap-2">
-                                {{-- Tandai Perlu Evaluasi --}}
-                                @if($data->grade == 'D')
+                                {{-- Tandai Perlu Evaluasi (Hanya muncul di Mode Manager) --}}
+                                @if($mode === 'manager' && $data->grade == 'D')
                                 <button onclick="toggleEvaluasi('{{ $data->id_karyawan }}')" title="Tandai Perlu Evaluasi" 
                                     class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-orange-100 text-orange-600 hover:bg-orange-200 dark:bg-orange-900/30 dark:text-orange-400 transition-all">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -423,8 +423,8 @@
                                     </svg>
                                 </button>
                                 @endif
-                                {{-- Lihat Detail --}}
-                                <a href="#" title="Lihat Detail" 
+                                {{-- Lihat Detail (Link ke halaman asli KPI) --}}
+                                <a href="{{ route('kpi.show', ['karyawan_id' => $data->id_karyawan, 'tahun' => $tahun]) }}" title="Lihat Detail" 
                                     class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-400 transition-all">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
