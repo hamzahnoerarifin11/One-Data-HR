@@ -121,7 +121,6 @@
                         <th class="px-6 py-3">Jabatan</th>
                         <th class="px-6 py-3 text-center">Penilaian Diri</th>
                         <th class="px-6 py-3 text-center">Feedback Atasan</th>
-                        <th class="px-6 py-3 text-center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
@@ -171,24 +170,10 @@
                             @endif
                         </td>
 
-                        {{-- AKSI --}}
-                        <td class="px-6 py-4 text-center">
-                            @if(!$kry->status_diri || ($kry->status_atasan == 'PENDING'))
-                                @php 
-                                    $pesan = "Halo {$kry->Nama_Lengkap_Sesuai_Ijazah}, mohon segera melengkapi penilaian KBI Anda di sistem HRIS. Status: " . (!$kry->status_diri ? "[Penilaian Diri Belum] " : "") . ($kry->status_atasan == 'PENDING' ? "[Feedback Atasan Belum]" : "") . ". Terima kasih.";
-                                    $linkWa = "https://wa.me/628123456789?text=" . urlencode($pesan); // Ganti no HP dinamis jika ada
-                                @endphp
-                                <a href="{{ $linkWa }}" target="_blank" class="text-green-600 hover:text-green-800 bg-green-50 hover:bg-green-100 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/40 p-2 rounded-full transition" title="Kirim Reminder via WA">
-                                    <i class="fab fa-whatsapp text-xl"></i>
-                                </a>
-                            @else
-                                <span class="text-gray-300 dark:text-gray-600"><i class="fas fa-check-double"></i></span>
-                            @endif
-                        </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
+                        <td colspan="5" class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
                             <div class="flex flex-col items-center">
                                 <i class="fas fa-search text-4xl mb-3 text-gray-300 dark:text-gray-600"></i>
                                 <p>Tidak ada data karyawan yang sesuai filter.</p>
