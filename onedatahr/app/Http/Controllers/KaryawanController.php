@@ -1405,7 +1405,7 @@ class KaryawanController extends Controller
             ['54', 'Departemen', 'Pilih dari dropdown (sesuai data sistem)', 'Tidak', 'Development'],
             ['55', 'Unit', 'Pilih dari dropdown (sesuai data sistem)', 'Tidak', 'Backend'],
             ['56', 'Level Jabatan', 'Pilih dari dropdown (sesuai data sistem)', 'Tidak', 'Staff'],
-            ['57', 'Jabatan', 'Nama jabatan/posisi', 'Tidak', 'Software Engineer'],
+            ['57', 'Jabatan', 'Nama jabatan/posisi', 'YA *', 'Software Engineer'],
             ['58', 'Jenis Kontrak', 'PKWT / PKWTT', 'Tidak', 'PKWT'],
             ['59', 'Perjanjian', 'Nomor atau jenis perjanjian kerja', 'Tidak', 'Kontrak'],
             ['60', 'Lokasi Kerja', 'Pilih dari dropdown', 'Tidak', 'Central Java - Pati'],
@@ -1525,8 +1525,8 @@ class KaryawanController extends Controller
             // Anak 3 (Indices 46-50)
             'Anak 3 Nama', 'Anak 3 Tempat Lahir', 'Anak 3 Tanggal Lahir (YYYY-MM-DD)', 'Anak 3 Jenis Kelamin (L/P)', 'Anak 3 Pendidikan',
 
-            // Data Pekerjaan (Step 2) - Indices 51-59
-            'Perusahaan / Holding', 'Divisi', 'Departemen', 'Unit', 'Level Jabatan', 'Jabatan',
+            // Data Pekerjaan (Step 2) — 9 cols
+            'Perusahaan / Holding', 'Divisi', 'Departemen', 'Unit', 'Level Jabatan', 'Jabatan*',
             'Jenis Kontrak', 'Perjanjian', 'Lokasi Kerja',
             
             // Data Pendidikan (Step 3) - Indices 60-62
@@ -1546,14 +1546,36 @@ class KaryawanController extends Controller
         // Set headers
         foreach ($headers as $index => $header) {
             $columnLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($index + 1);
-            $sheet->setCellValue($columnLetter . '1', $header);
-            $sheet->getColumnDimension($columnLetter)->setAutoSize(true);
-            
-            // Style the header
-            $sheet->getStyle($columnLetter . '1')->getFont()->setBold(true);
-            $sheet->getStyle($columnLetter . '1')->getFill()
-                ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                ->getStartColor()->setARGB('NOPE'); // Light Grey
+            $sheet->setCellValue($columnLetter . '2', $header);
+            $sheet->getColumnDimension($columnLetter)->setWidth(22);
+
+            // Find section color for this column
+            $colColor = 'D6E4F0';
+            foreach ($sections as $sec) {
+                if ($index >= $sec[0] && $index <= $sec[1]) {
+                    // Lighter version of section color for header
+                    $colColor = $this->lightenColor($sec[2], 0.7);
+                    break;
+                }
+            }
+
+            $isJabatan = $header === 'Jabatan*';
+$isMandatory = str_contains($header, '*');
+
+$sheet->getStyle($columnLetter . '2')->applyFromArray([
+    'font' => [
+        'bold' => true,
+        'size' => 9,
+        'color' => $isJabatan
+            ? ['rgb' => 'FF0000']   // Merah terang untuk Jabatan
+            : ($isMandatory
+                ? ['rgb' => 'CC0000']  // Merah gelap untuk wajib lainnya
+                : ['rgb' => '000000']) // Hitam normal
+    ],
+                'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => $colColor]],
+                'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER, 'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER, 'wrapText' => true],
+                'borders' => ['allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN]],
+            ]);
         }
         $sheet->getRowDimension(2)->setRowHeight(40);
 

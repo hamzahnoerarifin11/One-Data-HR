@@ -69,27 +69,6 @@ class PerformanceController extends Controller
             });
         }
 
-        // Filter Perusahaan
-        if ($request->has('perusahaan') && $request->perusahaan != '') {
-            $query->whereHas('pekerjaan', function ($q) use ($request) {
-                $q->where('company_id', $request->perusahaan);
-            });
-        }
-
-        // Filter Divisi
-        if ($request->has('divisi') && $request->divisi != '') {
-            $query->whereHas('pekerjaan', function ($q) use ($request) {
-                $q->where('division_id', $request->divisi);
-            });
-        }
-
-        // Filter Departemen
-        if ($request->has('departemen') && $request->departemen != '') {
-            $query->whereHas('pekerjaan', function ($q) use ($request) {
-                $q->where('department_id', $request->departemen);
-            });
-        }
-
         // B. Filter Role (Manager/senior_manager hanya lihat bawahan)
         if ($user->hasRole(['manager', 'senior_manager', 'GM', 'manajer'])) {
             // MODIFIKASI: Manager melihat SEMUA karyawan di DIVISI-nya (bukan hanya direct subordinate)
@@ -148,8 +127,7 @@ class PerformanceController extends Controller
                 'id_karyawan' => $k->id_karyawan,
                 'nik'         => $k->NIK,
                 'nama'        => $k->Nama_Lengkap_Sesuai_Ijazah,
-                'level'     => $pekerjaanTerbaru?->level->name ?? '-',
-                'unit'      => $pekerjaanTerbaru?->unit->name ?? '-',
+                'jabatan'     => $pekerjaanTerbaru?->position?->name ?? '-',
                 'divisi'      => $pekerjaanTerbaru?->division?->name ?? '-',
                 'departemen'  => $pekerjaanTerbaru?->department?->name ?? '-',
                 'perusahaan'  => $pekerjaanTerbaru?->company?->name ?? '-',
@@ -477,27 +455,20 @@ class PerformanceController extends Controller
         }
 
         if ($mode === 'manager' && $user->hasRole(['manager', 'gm', 'manajer', 'senior_manager'])) {
-            if (!$me) {
-                $query->whereRaw('1 = 0');
-            } else {
-                // MOD: Manager see all in division
-                $latestJob = $me->pekerjaan()->latest('id_pekerjaan')->first();
-                $divisionId = $latestJob ? $latestJob->division_id : null;
+             // MOD: Manager see all in division
+            $latestJob = $me->pekerjaan()->latest('id_pekerjaan')->first();
+            $divisionId = $latestJob ? $latestJob->division_id : null;
 
-                if ($divisionId) {
-                    $query->whereHas('pekerjaan', function($q) use ($divisionId) {
-                        $q->where('division_id', $divisionId);
-                    });
-                } else {
-                    $query->where('atasan_id', $me->id_karyawan);
-                }
+            if ($divisionId) {
+                $query->whereHas('pekerjaan', function($q) use ($divisionId) {
+                    $q->where('division_id', $divisionId);
+                });
+            } else {
+                $query->where('atasan_id', $me->id_karyawan);
             }
         } elseif ($mode === 'manager' && $user->hasRole('staff')) {
-            if (!$me) {
-                $query->whereRaw('1 = 0');
-            } else {
-                $query->where('id_karyawan', $me->id_karyawan);
-            }        }
+            $query->where('id_karyawan', $me->id_karyawan);
+        }
 
         $karyawans = $query->get();
 
