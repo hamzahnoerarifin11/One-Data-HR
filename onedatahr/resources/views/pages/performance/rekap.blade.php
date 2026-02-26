@@ -332,7 +332,7 @@
             
             {{-- Toggle Arrow Icon --}}
             <div class="ml-4 shrink-0">
-                <svg id="arrow-divisi-{{ $divisiIndex }}" class="h-6 w-6 text-white transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg id="arrow-{{ $divisiIndex }}" class="h-6 w-6 text-white transform transition-transform duration-300 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
                 </svg>
             </div>
@@ -480,7 +480,12 @@
 // ======================================================
 function toggleDivisi(divisiId) {
     const content = document.getElementById(divisiId);
-    const arrow = document.getElementById('arrow-' + divisiId);
+    // Mengembalikan getElementById dengan prefix 'arrow-' dari parameter divisiId yang mengandung 'divisi-0' 
+    // Wait, kalau divisiId = 'divisi-0', kita butuh ID arrow-0 atau arrow-divisi-0?
+    // Di atas ID svg diperbarui menjadi 'arrow-{{ $divisiIndex }}'. Sementara parameter fungsi toggleDivisi('divisi-{{ $divisiIndex }}').
+    // Berarti id div-nya 'divisi-X', jadi kalau cuma dimaunya 'arrow-X', kita replace dulu.
+    const index = divisiId.replace('divisi-', '');
+    const arrow = document.getElementById('arrow-' + index);
     
     if (content) {
         content.classList.toggle('hidden');

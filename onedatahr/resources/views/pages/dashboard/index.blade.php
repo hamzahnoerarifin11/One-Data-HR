@@ -63,9 +63,16 @@
                                     <span class="text-4xl font-extrabold text-green-600">{{ $myKpi->total_skor_akhir }}</span>
                                     <span class="text-sm font-bold text-gray-500 mb-1">Skor Akhir</span>
                                 </div>
-                                <div class="mt-2">
-                                    <span class="inline-block px-2 py-0.5 bg-green-100 text-green-800 text-xs rounded font-bold border border-green-200">GRADE {{ $myKpi->grade }}</span>
-                                    <span class="inline-block px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded font-bold border border-blue-200 ml-1">FINAL</span>
+                                <!-- Progress Bar Visual -->
+                                <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 mt-3 mb-2">
+                                    <div class="bg-green-600 h-2.5 rounded-full" style="width: {{ min($myKpi->total_skor_akhir, 100) }}%"></div>
+                                </div>
+                                <div class="mt-2 flex justify-between items-center">
+                                    <div>
+                                        <span class="inline-block px-2 py-0.5 bg-green-100 text-green-800 text-xs rounded font-bold border border-green-200">GRADE {{ $myKpi->grade }}</span>
+                                        <span class="inline-block px-2 py-0.5 bg-blue-100 text-blue-800 text-xs rounded font-bold border border-blue-200 ml-1">FINAL</span>
+                                    </div>
+                                    <span class="text-xs text-gray-500 font-medium">{{ min($myKpi->total_skor_akhir, 100) }}/100</span>
                                 </div>
                             @elseif($myKpi->status == 'SUBMITTED')
                                 <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-center">
@@ -189,10 +196,16 @@
             </div>
 
             {{-- Monitoring Table --}}
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden border border-gray-200 dark:border-gray-700">
-                <div class="px-6 py-4 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 flex justify-between items-center">
+            <div x-data="{ filterStatus: 'all' }" class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden border border-gray-200 dark:border-gray-700">
+                <div class="px-6 py-4 border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h3 class="font-bold text-gray-700 dark:text-white text-sm">Daftar Anggota Tim</h3>
-                    {{-- Pagination info could go here --}}
+                    {{-- Tab Filter Alpine.js --}}
+                    <div class="flex bg-gray-200/50 dark:bg-gray-900/50 rounded-lg p-1 text-xs">
+                        <button @click="filterStatus = 'all'" :class="{ 'bg-white dark:bg-gray-700 shadow text-blue-600 font-bold': filterStatus === 'all', 'text-gray-500 hover:text-gray-700': filterStatus !== 'all' }" class="px-3 py-1.5 rounded-md transition-all">Semua</button>
+                        <button @click="filterStatus = 'needs_approval'" :class="{ 'bg-white dark:bg-gray-700 shadow text-yellow-600 font-bold': filterStatus === 'needs_approval', 'text-gray-500 hover:text-gray-700': filterStatus !== 'needs_approval' }" class="px-3 py-1.5 rounded-md transition-all">Butuh Approval</button>
+                        <button @click="filterStatus = 'draft'" :class="{ 'bg-white dark:bg-gray-700 shadow text-gray-800 dark:text-gray-200 font-bold': filterStatus === 'draft', 'text-gray-500 hover:text-gray-700': filterStatus !== 'draft' }" class="px-3 py-1.5 rounded-md transition-all">Draft KPI/KBI</button>
+                        <button @click="filterStatus = 'done'" :class="{ 'bg-white dark:bg-gray-700 shadow text-green-600 font-bold': filterStatus === 'done', 'text-gray-500 hover:text-gray-700': filterStatus !== 'done' }" class="px-3 py-1.5 rounded-md transition-all">Selesai</button>
+                    </div>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -209,8 +222,18 @@
                                 @php 
                                     $kpi = $member->kpiAssessment; 
                                     $kbi = $member->kbiAssessment;
+                                    $kpiStatus = $kpi ? strtoupper($kpi->status) : 'BELUM BUAT';
+                                    $kbiDone = ($kbi && $kbi->isNotEmpty());
+
+                                    $rowCategory = 'draft';
+                                    if ($kpiStatus == 'SUBMITTED') {
+                                        $rowCategory = 'needs_approval';
+                                    } elseif (in_array($kpiStatus, ['FINAL', 'APPROVED', 'DONE']) && $kbiDone) {
+                                        $rowCategory = 'done';
+                                    }
+                                    // if KPI is done but KBI is pending, we can classify it into a specific bucket or leave as 'draft' so they know work is needed
                                 @endphp
-                                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                                <tr x-show="filterStatus === 'all' || filterStatus === '{{ $rowCategory }}'" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-3">
                                             <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600">
@@ -262,17 +285,24 @@
                                     <td class="px-6 py-4 text-center">
                                         <div class="flex justify-center gap-2">
                                             @if($kpi)
-                                                <a href="{{ route('kpi.show', ['karyawan_id' => $member->id_karyawan, 'tahun' => $tahun]) }}" 
-                                                   class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded text-xs font-semibold transition">
-                                                    View KPI
-                                                </a>
+                                                @if(strtoupper($kpi->status) == 'SUBMITTED')
+                                                    <a href="{{ route('kpi.show', ['karyawan_id' => $member->id_karyawan, 'tahun' => $tahun]) }}" 
+                                                       class="text-yellow-700 hover:text-yellow-900 bg-yellow-100 hover:bg-yellow-200 px-3 py-1.5 rounded text-xs font-bold transition whitespace-nowrap">
+                                                        <i class="fas fa-search mr-1"></i> Review KPI
+                                                    </a>
+                                                @else
+                                                    <a href="{{ route('kpi.show', ['karyawan_id' => $member->id_karyawan, 'tahun' => $tahun]) }}" 
+                                                       class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded text-xs font-semibold transition whitespace-nowrap">
+                                                        View KPI
+                                                    </a>
+                                                @endif
                                             @endif
 
-                                            <!-- @if(!$kbi || $kbi->isEmpty())
+                                            @if(!$kbi || $kbi->isEmpty())
                                                 <a href="{{ route('kbi.create', ['karyawan_id' => $member->id_karyawan, 'tipe' => 'ATASAN']) }}" 
-                                                   class="text-white bg-purple-600 hover:bg-purple-700 px-3 py-1 rounded text-xs font-semibold shadow transition">
-                                                    Nilai KBI
-                                                </a> -->
+                                                   class="text-white bg-purple-600 hover:bg-purple-700 px-3 py-1.5 rounded text-xs font-semibold shadow transition whitespace-nowrap">
+                                                    <i class="fas fa-edit mr-1"></i> Nilai KBI
+                                                </a>
                                             @endif
                                         </div>
                                     </td>
