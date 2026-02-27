@@ -338,7 +338,7 @@
                                         {{-- Pastikan tahun yang dikirim adalah tahun yang dipilih di filter --}}
                                         <input type="hidden" name="tahun" value="{{ $tahun }}">
                                         <button type="submit" class="w-full justify-center font-medium text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-sm flex items-center gap-2 transition shadow">
-                                            <i class="fas fa-plus-circle"></i> Buat aw Baru
+                                            <i class="fas fa-plus-circle"></i> Buat KPI Baru
                                         </button>
                                     </form>
                                 @endif

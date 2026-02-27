@@ -28,13 +28,12 @@ class PosisiController extends Controller
             ->orderBy('id_posisi', 'DESC')
             ->get();
 
-        // Get unique job titles from employee work data
-        $jobTitles = Pekerjaan::select('Jabatan')
-            ->whereNotNull('Jabatan')
-            ->where('Jabatan', '!=', '')
+        // Get unique job titles based on positions used in pekerjaan
+        $usedPositionIds = Pekerjaan::whereNotNull('position_id')->pluck('position_id');
+        $jobTitles = \App\Models\Position::whereIn('id', $usedPositionIds)
             ->distinct()
-            ->orderBy('Jabatan')
-            ->pluck('Jabatan')
+            ->orderBy('name')
+            ->pluck('name')
             ->toArray();
 
         return view('pages.rekrutmen.posisi.index', [
