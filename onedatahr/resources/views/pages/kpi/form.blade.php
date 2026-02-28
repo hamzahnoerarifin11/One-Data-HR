@@ -61,7 +61,7 @@
     // Value $canAdjust Passed from Controller
     $isStaff = auth()->user()->hasRole('staff');
     // $canAdjust = defined in controller now
-    $canManageKpi = !$isStaff;
+    $canManageKpi = true;
 
     // Class CSS untuk input yang dikunci (Abu-abu & tidak bisa diklik)
     $readonlyClass = $isStaff ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-transparent text-orange-700 font-bold border-b border-orange-300';
