@@ -14,8 +14,8 @@ class WadjaIntegrationService
 
     public function __construct()
     {
-        $this->baseUrl = env('WADJA_INSTITUTE_API_BASE_URL', 'http://localhost:8000/api');
-        $this->apiKey = env('WADJA_INSTITUTE_API_KEY', '');
+        $this->baseUrl = env('WADJA_INSTITUTE_API_BASE_URL');
+        $this->apiKey = env('WADJA_INSTITUTE_API_KEY');
     }
 
     /**
@@ -30,12 +30,18 @@ class WadjaIntegrationService
         }
 
         try {
-            $response = Http::withHeaders([
-                    'X-API-Key' => $this->apiKey,
-                    'Accept'    => 'application/json',
-                ])
-                ->timeout(10) // Timeout 10 detik
-                ->get("{$this->baseUrl}/integration/pegawai-competencies");
+            $request = Http::withHeaders([
+                'X-API-Key' => $this->apiKey,
+                'Accept'    => 'application/json',
+            ])->timeout(10);
+            
+            // JIKA di lokal (APP_ENV=local), matikan cek SSL.
+            // JIKA di server asli (APP_ENV=production), nyalakan cek SSL untuk keamanan.
+            if (env('APP_ENV') === 'local') {
+                $request->withoutVerifying();
+            }
+
+            $response = $request->get("{$this->baseUrl}/integration/pegawai-competencies");
 
             $response->throw();
 

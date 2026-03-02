@@ -15,7 +15,6 @@ use App\Http\Controllers\WigRekrutmenController;
 use App\Http\Controllers\PosisiController;
 use App\Http\Controllers\RekrutmenDailyController;
 use App\Http\Controllers\RekrutmenCalendarController;
-// Import Controller yang sebelumnya tertinggal agar tidak error class not found
 use App\Http\Controllers\InterviewHrController;
 use App\Http\Controllers\KandidatLanjutUserController;
 use App\Http\Controllers\TrainingController;

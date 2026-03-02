@@ -67,7 +67,7 @@
   "variable": [
     {
       "key": "base_url",
-      "value": "http://localhost:8000/api"
+      "value": "https://wadjainstitute.id/api"
     },
     {
       "key": "api_key",

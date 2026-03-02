@@ -239,7 +239,7 @@ class MenuHelper
         $items[] = [
             'icon' => 'signout',
             'name' => 'Sign Out',
-            'action' => 'logout',
+            'action' => 'signout',
         ];
 
         return $items;

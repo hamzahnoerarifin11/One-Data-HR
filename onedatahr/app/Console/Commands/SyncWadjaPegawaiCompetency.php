@@ -59,32 +59,31 @@ class SyncWadjaPegawaiCompetency extends Command
 
         $successCount = 0;
         foreach ($listsOfData as $row) {
-            // -- WARNING --
-            // Karena JSON Postman tidak memberikan sampel kunci objek,
-            // baris ini menggunakan asumsional mapping yang paling umum ('nik', 'kompetensi', 'level')
-            
-            $rawNik = $row['nip'] ?? ($row['nik'] ?? ($row['user_id'] ?? null));
-            $namaKomp = $row['nama_kompetensi'] ?? ($row['kompetensi'] ?? 'Tidak Diketahui');
-            $levelKomp = $row['level'] ?? null;
-
+            $rawNik = $row['nip'] ?? ($row['nik'] ?? null);
             if (!$rawNik) continue;
 
             // Cari Karyawan Lokal berdasarkan NIK
             $karyawan = Karyawan::where('NIK', $rawNik)->first();
             
-            if ($karyawan) {
-                // Upsert Pegawai Kompetensi
-                PegawaiKompetensi::updateOrCreate(
-                    [
-                        'karyawan_id' => $karyawan->id_karyawan,
-                        'nama_kompetensi' => $namaKomp, // Mencegah duplikat kompetensi yang sama per karyawan
-                    ],
-                    [
-                        'level' => $levelKomp,
-                        'sumber' => 'LMS Wadja',
-                    ]
-                );
-                $successCount++;
+            // Jika Karyawan ditemukan dan dia memiliki array kompetensi
+            if ($karyawan && isset($row['kompetensi']) && is_array($row['kompetensi'])) {
+                foreach ($row['kompetensi'] as $itemKomp) {
+                    $namaKomp = $itemKomp['nama'] ?? 'Tidak Diketahui';
+                    $jenisKomp = $itemKomp['jenis'] ?? null; // Memanfaatkan kolom 'level' untuk menyimpan jenis (Fungsional, dll)
+
+                    // Upsert Pegawai Kompetensi per baris sertifikat
+                    PegawaiKompetensi::updateOrCreate(
+                        [
+                            'karyawan_id' => $karyawan->id_karyawan,
+                            'nama_kompetensi' => $namaKomp, // Mencegah duplikat kompetensi yang sama per karyawan
+                        ],
+                        [
+                            'level' => $jenisKomp, 
+                            'sumber' => 'LMS Wadja',
+                        ]
+                    );
+                    $successCount++;
+                }
             }
         }
         
