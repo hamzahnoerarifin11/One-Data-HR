@@ -65,9 +65,9 @@ class SyncWadjaPegawaiCompetency extends Command
             // Cari Karyawan Lokal berdasarkan NIK
             $karyawan = Karyawan::where('NIK', $rawNik)->first();
             
-            // Jika Karyawan ditemukan dan dia memiliki array kompetensi
-            if ($karyawan && isset($row['kompetensi']) && is_array($row['kompetensi'])) {
-                foreach ($row['kompetensi'] as $itemKomp) {
+            // Jika Karyawan ditemukan dan dia memiliki array kompetensi_diselesaikan
+            if ($karyawan && isset($row['kompetensi_diselesaikan']) && is_array($row['kompetensi_diselesaikan'])) {
+                foreach ($row['kompetensi_diselesaikan'] as $itemKomp) {
                     $namaKomp = $itemKomp['nama'] ?? 'Tidak Diketahui';
                     $jenisKomp = $itemKomp['jenis'] ?? null; // Memanfaatkan kolom 'level' untuk menyimpan jenis (Fungsional, dll)
 

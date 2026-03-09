@@ -113,4 +113,37 @@ class TempaMateriController extends Controller
 
         return Storage::disk('public')->download($materi->file_materi);
     }
+
+    public function bulkDelete(Request $request)
+    {
+        $this->authorize('createTempaMateri'); // Sesuaikan dengan permission destroy standar
+
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:tempa_materi,id_materi'
+        ]);
+
+        $ids = $request->ids;
+        $deletedCount = 0;
+
+        foreach ($ids as $id) {
+            $materi = TempaMateri::find($id);
+            if (!$materi) continue;
+
+            // Delete file
+            if ($materi->file_materi && Storage::disk('public')->exists($materi->file_materi)) {
+                Storage::disk('public')->delete($materi->file_materi);
+            }
+
+            $materi->delete();
+            $deletedCount++;
+        }
+
+        if ($deletedCount > 0) {
+            return redirect()->route('tempa.materi.index')
+                ->with('success', "$deletedCount materi berhasil dihapus.");
+        } else {
+            return back()->with('error', "Gagal menghapus materi. Pastikan Anda memilih materi yang valid.");
+        }
+    }
 }

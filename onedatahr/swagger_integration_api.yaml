@@ -1,0 +1,230 @@
+openapi: 3.0.3
+info:
+  title: Wadja Institute - Public Integration API
+  description: |
+    Public API for external integrations with API Key authentication.
+    This API provides access to employee competency data for integration purposes.
+  version: 1.0.0
+  contact:
+    name: Wadja Institute API Support
+
+servers:
+  - url: http://localhost:8000/api
+    description: Local development server
+  - url: https://wadjainstitute.id/api
+    description: Production server
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /integration/pegawai-competencies:
+    get:
+      summary: Get Employee Competencies
+      description: |
+        Retrieve competency data for all employees including both completed and available competencies.
+        This endpoint returns employee information along with their acquired competencies and all available competencies in the system.
+      tags:
+        - Integration
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Successful response with employee competency data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EmployeeCompetency'
+                  total_pegawai:
+                    type: integer
+                    description: Total number of employees
+                    example: 25
+                  message:
+                    type: string
+                    example: "Data pegawai dan kompetensi berhasil diambil"
+              example:
+                success: true
+                data:
+                  - nip: "123456789"
+                    nama: "John Doe"
+                    kompetensi_diselesaikan:
+                      - id: 1
+                        nama: "Leadership Skills"
+                        jenis: "Soft Skills"
+                        status: "completed"
+                      - id: 2
+                        nama: "Project Management"
+                        jenis: "Technical Skills"
+                        status: "completed"
+                    kompetensi_tersedia:
+                      - id: 1
+                        nama: "Leadership Skills"
+                        jenis: "Soft Skills"
+                        status: "completed"
+                      - id: 2
+                        nama: "Project Management"
+                        jenis: "Technical Skills"
+                        status: "completed"
+                      - id: 3
+                        nama: "Communication Skills"
+                        jenis: "Soft Skills"
+                        status: "available"
+                      - id: 4
+                        nama: "Data Analysis"
+                        jenis: "Technical Skills"
+                        status: "available"
+                    total_kompetensi_diselesaikan: 2
+                    total_kompetensi_tersedia: 4
+                  - nip: "987654321"
+                    nama: "Jane Smith"
+                    kompetensi_diselesaikan:
+                      - id: 3
+                        nama: "Communication Skills"
+                        jenis: "Soft Skills"
+                        status: "completed"
+                    kompetensi_tersedia:
+                      - id: 1
+                        nama: "Leadership Skills"
+                        jenis: "Soft Skills"
+                        status: "available"
+                      - id: 2
+                        nama: "Project Management"
+                        jenis: "Technical Skills"
+                        status: "available"
+                      - id: 3
+                        nama: "Communication Skills"
+                        jenis: "Soft Skills"
+                        status: "completed"
+                      - id: 4
+                        nama: "Data Analysis"
+                        jenis: "Technical Skills"
+                        status: "available"
+                    total_kompetensi_diselesaikan: 1
+                    total_kompetensi_tersedia: 4
+                total_pegawai: 2
+                message: "Data pegawai dan kompetensi berhasil diambil"
+        '401':
+          description: Unauthorized - Invalid or missing API key
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Unauthorized"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Terjadi kesalahan saat mengambil data"
+                  error:
+                    type: string
+                    example: "Database connection failed"
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API Key for authentication. Must be provided in X-API-Key header.
+
+  schemas:
+    Competency:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the competency
+          example: 1
+        nama:
+          type: string
+          description: Name of the competency
+          example: "Leadership Skills"
+        jenis:
+          type: string
+          description: Type/category of the competency
+          example: "Soft Skills"
+        status:
+          type: string
+          description: Status of competency for the employee
+          enum: [completed, available]
+          example: "completed"
+      required:
+        - id
+        - nama
+        - jenis
+        - status
+
+    EmployeeCompetency:
+      type: object
+      properties:
+        nip:
+          type: string
+          description: Employee identification number
+          example: "123456789"
+        nama:
+          type: string
+          description: Employee full name
+          example: "John Doe"
+        kompetensi_diselesaikan:
+          type: array
+          description: List of competencies completed by the employee
+          items:
+            $ref: '#/components/schemas/Competency'
+        kompetensi_tersedia:
+          type: array
+          description: List of all available competencies in the system
+          items:
+            $ref: '#/components/schemas/Competency'
+        total_kompetensi_diselesaikan:
+          type: integer
+          description: Total number of completed competencies for this employee
+          example: 2
+        total_kompetensi_tersedia:
+          type: integer
+          description: Total number of available competencies in the system
+          example: 15
+      required:
+        - nip
+        - nama
+        - kompetensi_diselesaikan
+        - kompetensi_tersedia
+        - total_kompetensi_diselesaikan
+        - total_kompetensi_tersedia
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: "Error message"
+        error:
+          type: string
+          example: "Detailed error information"
+      required:
+        - success
+        - message

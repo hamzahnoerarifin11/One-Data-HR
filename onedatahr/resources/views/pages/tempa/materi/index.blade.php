@@ -13,15 +13,34 @@
             </p>
         </div>
 
-        @can('createTempaMateri')
-        <a href="{{ route('tempa.materi.create') }}"
-           class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700 transition">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-            </svg>
-            Upload Materi
-        </a>
-        @endcan
+        <div class="flex flex-wrap items-center gap-2">
+            @can('createTempaMateri')
+            <a href="{{ route('tempa.materi.create') }}"
+               class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Upload Materi
+            </a>
+            
+            <form action="{{ route('tempa.materi.bulk-delete') }}" method="POST" id="bulkDeleteForm" class="inline-block"
+                  x-data="{ hasSelection: false }"
+                  @update-selection.window="hasSelection = $event.detail.length > 0">
+                @csrf
+                <!-- Input hidden diisi dari js alpine -->
+                <div id="hidden-inputs-container"></div>
+                
+                <button type="submit" x-show="hasSelection" x-cloak
+                        onclick="return confirm('Apakah Anda yakin ingin menghapus materi yang dipilih?')"
+                        class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-red-700 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m2 0H7m3-3h4a1 1 0 011 1v1H9V5a1 1 0 011-1z"/>
+                    </svg>
+                    Hapus Terpilih (<span x-text="$store.selection ? $store.selection.length : 0"></span>)
+                </button>
+            </form>
+            @endcan
+        </div>
     </div>
 
     @if(session('success'))
@@ -92,6 +111,9 @@
             <table class="w-full min-w-full border-collapse">
                 <thead>
                     <tr class="border-y border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-900">
+                        <th class="px-5 py-3 text-left w-12">
+                            <input type="checkbox" @change="toggleSelectAll($event)" :checked="isAllSelected" class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800">
+                        </th>
                         <th class="px-6 py-3 text-left text-md font-medium text-gray-600 dark:text-gray-400">#</th>
                         <th class="px-6 py-3 text-left text-md font-medium text-gray-600 dark:text-gray-400">
                             <span class="inline-flex items-center gap-2">
@@ -129,6 +151,9 @@
                 <tbody>
                     <template x-for="(row, index) in filtered.slice((page - 1) * perPage, page * perPage)" :key="row.id">
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/20">
+                            <td class="px-5 py-4 text-center">
+                                <input type="checkbox" :value="row.id" x-model="selectedItems" @change="updateSelection" class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800">
+                            </td>
                             <td class="px-6 py-4 text-md text-gray-500 dark:text-gray-400" x-text="getRowNumber(index)"></td>
                             <td class="px-6 py-4 text-md font-medium text-gray-900 dark:text-white" x-text="row.judul"></td>
                             <td class="px-6 py-4 text-md text-gray-600 dark:text-gray-300" x-text="row.uploader"></td>
@@ -188,6 +213,10 @@
 </div>
 
 <script>
+document.addEventListener('alpine:init', () => {
+    Alpine.store('selection', []);
+});
+
 function materiTable() {
     return {
         data: @json($tableData),
@@ -196,6 +225,18 @@ function materiTable() {
         sortDirection: 'asc',
         page: 1,
         perPage: 10,
+        selectedItems: [],
+
+        init() {
+            this.$watch('search', value => {
+                this.page = 1;
+                this.selectedItems = []; // Reset selesksi saat search
+                this.updateSelection();
+            });
+            this.$watch('page', value => {
+                // Opsional: reset selection saat ganti halaman
+            });
+        },
 
         get filtered() {
             let filtered = this.data.filter(item => {
@@ -280,6 +321,44 @@ function materiTable() {
 
         getRowNumber(index) {
             return (this.page - 1) * this.perPage + index + 1;
+        },
+
+        // Checkbox Logic
+        get paginated() {
+            const start = (this.page - 1) * this.perPage;
+            return this.filtered.slice(start, start + this.perPage);
+        },
+        get isAllSelected() {
+            if (this.paginated.length === 0) return false;
+            return this.paginated.every(item => this.selectedItems.includes(item.id.toString()) || this.selectedItems.includes(item.id));
+        },
+        toggleSelectAll(event) {
+            const isChecked = event.target.checked;
+            if (isChecked) {
+                const newSelections = this.paginated.map(item => item.id);
+                this.selectedItems = [...new Set([...this.selectedItems, ...newSelections])];
+            } else {
+                const currentIds = this.paginated.map(item => item.id);
+                this.selectedItems = this.selectedItems.filter(id => !currentIds.includes(parseInt(id)) && !currentIds.includes(id));
+            }
+            this.updateSelection();
+        },
+        updateSelection() {
+            Alpine.store('selection', this.selectedItems);
+            this.$dispatch('update-selection', this.selectedItems);
+            
+            // Update hidden inputs for mass delete
+            const container = document.getElementById('hidden-inputs-container');
+            if (container) {
+                container.innerHTML = '';
+                this.selectedItems.forEach(id => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'ids[]';
+                    input.value = id;
+                    container.appendChild(input);
+                });
+            }
         }
     }
 }

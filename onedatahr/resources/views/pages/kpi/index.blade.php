@@ -69,7 +69,7 @@
                 <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
                     <form method="GET" action="{{ route('kpi.index') }}">
                         
-                        <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 items-end">
                             
                             {{-- 1. TAHUN --}}
                             <div>
@@ -115,6 +115,22 @@
                                     @foreach($listJabatan as $jabatan)
                                         <option value="{{ $jabatan }}" {{ request('filter_jabatan') == $jabatan ? 'selected' : '' }}>
                                             {{ $jabatan }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            {{-- 4. DIVISI --}}
+                            <div>
+                                <label for="filter_divisi" class="block text-xs font-bold text-gray-500 mb-1">Divisi</label>
+                                <select name="filter_divisi"
+                                    class="w-full py-2 px-3 text-sm border border-gray-300 rounded-lg
+                                        focus:ring-blue-500 focus:border-blue-500
+                                        dark:bg-gray-700 dark:border-gray-600">
+                                    <option value="">Semua</option>
+                                    @foreach($listDivisi as $divisi)
+                                        <option value="{{ $divisi }}" {{ request('filter_divisi') == $divisi ? 'selected' : '' }}>
+                                            {{ $divisi }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -242,15 +258,6 @@
                 {{-- Update Judul Tahun --}}
                 <h3 class="font-bold text-gray-700 dark:text-gray-200">Daftar Status Karyawan ({{ $tahun ?? date('Y') }})</h3>
             </div>
-
-                <div class="mb-4 flex justify-between items-center hidden" id="bulkActionContainer">
-                    <div class="text-sm text-slate-600">
-                        <span id="selectedCount" class="font-bold">0</span> data dipilih
-                    </div>
-                    <button type="button" onclick="confirmBulkDelete()" class="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-bold hover:bg-red-700 transition shadow-sm flex items-center gap-2">
-                        <i class="fas fa-trash-alt"></i> Hapus Terpilih
-                    </button>
-                </div>
 
                 <div class="mb-4 flex justify-between items-center hidden" id="bulkActionContainer">
                     <div class="text-sm text-slate-600">
@@ -480,7 +487,6 @@
                 </div>
             </div>
         </div>
-    </div>
     </div>
 
     {{-- IMPORT MODAL --}}

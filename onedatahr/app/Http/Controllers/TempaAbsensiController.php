@@ -316,4 +316,55 @@ class TempaAbsensiController extends Controller
             ->route('tempa.absensi.index')
             ->with('success', 'Data absensi berhasil dihapus');
     }
+
+    public function bulkDelete(Request $request)
+    {
+        $this->authorize('deleteTempaAbsensi');
+
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:tempa_absensi,id_absensi'
+        ]);
+
+        $user = Auth::user();
+        if ($user instanceof \App\Models\User) {
+            $user->loadMissing('roles');
+            $isKetuaTempa = $user->hasRole('ketua_tempa') && !$user->hasRole(['admin', 'superadmin']);
+        } else {
+            $isKetuaTempa = false;
+        }
+
+        $ids = $request->ids;
+        $deletedCount = 0;
+        $skippedCount = 0;
+
+        foreach ($ids as $id) {
+            $absensiModel = TempaAbsensi::find($id);
+            if (!$absensiModel) continue;
+
+            // Cek akses ketua_tempa
+            if ($isKetuaTempa && $absensiModel->peserta->kelompok->ketua_tempa_id != $user->id) {
+                $skippedCount++;
+                continue;
+            }
+
+            // Delete file if exists
+            if ($absensiModel->bukti_foto && Storage::disk('public')->exists($absensiModel->bukti_foto)) {
+                Storage::disk('public')->delete($absensiModel->bukti_foto);
+            }
+
+            $absensiModel->delete();
+            $deletedCount++;
+        }
+
+        if ($deletedCount > 0 && $skippedCount == 0) {
+            return redirect()->route('tempa.absensi.index')
+                ->with('success', "$deletedCount absensi berhasil dihapus.");
+        } elseif ($deletedCount > 0 && $skippedCount > 0) {
+            return redirect()->route('tempa.absensi.index')
+                ->with('success', "$deletedCount absensi berhasil dihapus. $skippedCount absensi dilewati karena hak akses.");
+        } else {
+            return back()->with('error', "Gagal menghapus absensi. Pastikan Anda memiliki akses.");
+        }
+    }
 }

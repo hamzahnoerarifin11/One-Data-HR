@@ -232,6 +232,52 @@ class TempaPesertaController extends Controller
             ->with('success', 'Peserta berhasil dihapus');
     }
 
+    public function bulkDelete(Request $request)
+    {
+        $this->authorize('deleteTempaPeserta');
+
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:tempa_peserta,id_peserta'
+        ]);
+
+        $user = Auth::user();
+        $isKetuaTempa = false;
+
+        if ($user instanceof User) {
+            $user->loadMissing('roles');
+            $isKetuaTempa = $user->hasRole('ketua_tempa') && !$user->hasRole(['admin', 'superadmin']);
+        }
+
+        $ids = $request->ids;
+        $deletedCount = 0;
+        $skippedCount = 0;
+
+        foreach ($ids as $id) {
+            $pesertaModel = TempaPeserta::find($id);
+            if (!$pesertaModel) continue;
+
+            // Cek akses ketua_tempa
+            if ($isKetuaTempa && $pesertaModel->kelompok->ketua_tempa_id != $user->id) {
+                $skippedCount++;
+                continue;
+            }
+
+            $pesertaModel->delete();
+            $deletedCount++;
+        }
+
+        if ($deletedCount > 0 && $skippedCount == 0) {
+            return redirect()->route('tempa.peserta.index')
+                ->with('success', "$deletedCount peserta berhasil dihapus.");
+        } elseif ($deletedCount > 0 && $skippedCount > 0) {
+            return redirect()->route('tempa.peserta.index')
+                ->with('success', "$deletedCount peserta berhasil dihapus. $skippedCount peserta dilewati karena hak akses.");
+        } else {
+            return back()->with('error', "Gagal menghapus peserta. Pastikan Anda memiliki akses.");
+        }
+    }
+
     public function downloadTemplate()
     {
         $spreadsheet = new Spreadsheet();

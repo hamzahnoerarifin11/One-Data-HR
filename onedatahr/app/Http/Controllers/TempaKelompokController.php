@@ -33,15 +33,15 @@ class TempaKelompokController extends Controller
 
         if ($isKetuaTempa) {
             // Ketua TEMPA hanya melihat kelompoknya sendiri
-            $kelompoks = TempaKelompok::with(['ketuaTempa'])
+            $kelompok = TempaKelompok::with(['ketuaTempa'])
                 ->where('ketua_tempa_id', $user->id)
                 ->get();
         } else {
             // Admin/Superadmin melihat semua kelompok
-            $kelompoks = TempaKelompok::with(['ketuaTempa'])->get();
+            $kelompok = TempaKelompok::with(['ketuaTempa'])->get();
         }
 
-        return view('pages.tempa.kelompok.index', compact('kelompoks'));
+        return view('pages.tempa.kelompok.index', compact('kelompok'));
     }
 
     public function create()
@@ -187,6 +187,58 @@ class TempaKelompokController extends Controller
         return redirect()
             ->route('tempa.kelompok.index')
             ->with('success', 'Kelompok berhasil dihapus');
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $this->authorize('deleteTempaKelompok');
+
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:tempa_kelompok,id_kelompok'
+        ]);
+
+        $user = Auth::user();
+        $isKetuaTempa = false;
+
+        if ($user instanceof \App\Models\User) {
+            $user->loadMissing('roles');
+            $isKetuaTempa = $user->hasRole('ketua_tempa') && !$user->hasRole(['admin', 'superadmin']);
+        }
+
+        $ids = $request->ids;
+        $deletedCount = 0;
+        $skippedCount = 0;
+
+        foreach ($ids as $id) {
+            $kelompok = TempaKelompok::find($id);
+            if (!$kelompok) continue;
+
+            // Cek akses ketua_tempa
+            if ($isKetuaTempa && $kelompok->ketua_tempa_id != $user->id) {
+                $skippedCount++;
+                continue;
+            }
+
+            // Cek apakah ada peserta
+            if ($kelompok->pesertas()->count() > 0) {
+                $skippedCount++;
+                continue;
+            }
+
+            $kelompok->delete();
+            $deletedCount++;
+        }
+
+        if ($deletedCount > 0 && $skippedCount == 0) {
+            return redirect()->route('tempa.kelompok.index')
+                ->with('success', "$deletedCount kelompok berhasil dihapus.");
+        } elseif ($deletedCount > 0 && $skippedCount > 0) {
+            return redirect()->route('tempa.kelompok.index')
+                ->with('success', "$deletedCount kelompok berhasil dihapus. $skippedCount kelompok dilewati karena hak akses atau masih memiliki peserta.");
+        } else {
+            return back()->with('error', "Gagal menghapus kelompok. Pastikan Anda memiliki akses dan kelompok tidak memiliki peserta.");
+        }
     }
 
     public function downloadTemplate()

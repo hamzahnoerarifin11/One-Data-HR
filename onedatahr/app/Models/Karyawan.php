@@ -91,6 +91,11 @@ class Karyawan extends Model
         return $this->hasMany(KbiAssessment::class, 'karyawan_id', 'id_karyawan');
     }
 
+    public function pegawaiKompetensi()
+    {
+        return $this->hasMany(\App\Models\PegawaiKompetensi::class, 'karyawan_id', 'id_karyawan');
+    }
+
     // Struktur Organisasi (Atasan & Bawahan)
     public function atasan()
     {

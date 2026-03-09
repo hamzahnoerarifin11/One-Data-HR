@@ -62,12 +62,15 @@ class KpiAssessmentController extends Controller
             // List Jabatan Dropdown
             $listJabatan = \App\Models\Level::distinct()->orderBy('name')->pluck('name');
 
+            // List Divisi Dropdown
+            $listDivisi = \App\Models\Division::distinct()->orderBy('name')->pluck('name');
+
             // List Companies Dropdown
             $listCompanies = \App\Models\Company::distinct()->orderBy('name')->pluck('name');
 
             $karyawanList = $query->orderBy('Nama_Lengkap_Sesuai_Ijazah', 'ASC')->paginate(10)->appends($request->all());
 
-            return view('pages.kpi.index', compact('karyawanList', 'tahun', 'stats', 'listJabatan', 'listCompanies'));
+            return view('pages.kpi.index', compact('karyawanList', 'tahun', 'stats', 'listJabatan', 'listCompanies', 'listDivisi'));
         }
 
         // --- SKENARIO 1.B: DIREKTUR (Lihat Semua GM & Manager) ---
@@ -93,10 +96,11 @@ class KpiAssessmentController extends Controller
 
             $listJabatan = \App\Models\Level::distinct()->orderBy('name')->pluck('name');
             $listCompanies = \App\Models\Company::distinct()->orderBy('name')->pluck('name');
+            $listDivisi = \App\Models\Division::distinct()->orderBy('name')->pluck('name');
 
             $karyawanList = $query->orderBy('Nama_Lengkap_Sesuai_Ijazah', 'ASC')->paginate(10)->appends($request->all());
 
-            return view('pages.kpi.index', compact('karyawanList', 'tahun', 'stats', 'listJabatan', 'listCompanies', 'me'));
+            return view('pages.kpi.index', compact('karyawanList', 'tahun', 'stats', 'listJabatan', 'listCompanies', 'listDivisi', 'me'));
         }
 
         // --- SKENARIO 2: MANAGER (Dashboard Bawahan) ---
@@ -132,13 +136,15 @@ class KpiAssessmentController extends Controller
                 ];
                 $listJabatan = [];
                 $listCompanies = [];
+                $listDivisi = [];
 
-                return view('pages.kpi.index', compact('karyawanList', 'tahun', 'stats', 'listJabatan', 'listCompanies', 'me'))->with('error', 'Akun Anda tidak terdaftar dalam divisi manapun.');
+                return view('pages.kpi.index', compact('karyawanList', 'tahun', 'stats', 'listJabatan', 'listCompanies', 'listDivisi', 'me'))->with('error', 'Akun Anda tidak terdaftar dalam divisi manapun.');
             }
 
             $divisionId = $pekerjaanManager->division_id;
             $listJabatan = \App\Models\Level::distinct()->orderBy('name')->pluck('name');
             $listCompanies = \App\Models\Company::distinct()->orderBy('name')->pluck('name');
+            $listDivisi = \App\Models\Division::distinct()->orderBy('name')->pluck('name');
 
             $query = Karyawan::with([
                 'pekerjaan.company',
@@ -167,7 +173,7 @@ class KpiAssessmentController extends Controller
             // Paginasi untuk daftar karyawan (bisa dipakai di view ->links())
             $karyawanList = $query->orderBy('Nama_Lengkap_Sesuai_Ijazah', 'ASC')->paginate(10)->appends($request->all());
 
-            return view('pages.kpi.index', compact('karyawanList', 'tahun', 'stats', 'listJabatan', 'listCompanies', 'me'));
+            return view('pages.kpi.index', compact('karyawanList', 'tahun', 'stats', 'listJabatan', 'listCompanies', 'listDivisi', 'me'));
         }
 
         // =====================================================================
@@ -184,6 +190,7 @@ class KpiAssessmentController extends Controller
 
             $listJabatan = \App\Models\Level::distinct()->orderBy('name')->pluck('name');
             $listCompanies = \App\Models\Company::distinct()->orderBy('name')->pluck('name');
+            $listDivisi = \App\Models\Division::distinct()->orderBy('name')->pluck('name');
 
             $query = Karyawan::with([
                 'pekerjaan.company',
@@ -217,7 +224,7 @@ class KpiAssessmentController extends Controller
 
             $karyawanList = $query->orderBy('Nama_Lengkap_Sesuai_Ijazah', 'ASC')->paginate(10)->appends($request->all());
 
-            return view('pages.kpi.index', compact('karyawanList', 'tahun', 'stats', 'listJabatan', 'listCompanies', 'me'));
+            return view('pages.kpi.index', compact('karyawanList', 'tahun', 'stats', 'listJabatan', 'listCompanies', 'listDivisi', 'me'));
         }
 
         // --- SKENARIO 3: STAFF (Redirect ke Punya Sendiri) ---
@@ -790,6 +797,13 @@ class KpiAssessmentController extends Controller
                 $q->whereHas('company', function ($companyQ) use ($request) {
                     $companyQ->where('name', $request->filter_company);
                 });
+            });
+        }
+
+        // Filter Divisi
+        if ($request->filled('filter_divisi')) {
+            $query->whereHas('pekerjaan.division', function ($q) use ($request) {
+                $q->where('name', $request->filter_divisi);
             });
         }
     }

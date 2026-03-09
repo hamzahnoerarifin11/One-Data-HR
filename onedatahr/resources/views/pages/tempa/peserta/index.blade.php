@@ -30,6 +30,25 @@
                 </svg>
                 Tambah Peserta
             </a>
+
+            @can('deleteTempaPeserta')
+            <form action="{{ route('tempa.peserta.bulk-delete') }}" method="POST" id="bulkDeleteForm" class="inline-block"
+                  x-data="{ hasSelection: false }"
+                  @update-selection.window="hasSelection = $event.detail.length > 0">
+                @csrf
+                <!-- Input hidden diisi dari js alpine -->
+                <div id="hidden-inputs-container"></div>
+                
+                <button type="submit" x-show="hasSelection" x-cloak
+                        onclick="return confirm('Apakah Anda yakin ingin menghapus peserta yang dipilih?')"
+                        class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-red-700 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m2 0H7m3-3h4a1 1 0 011 1v1H9V5a1 1 0 011-1z"/>
+                    </svg>
+                    Hapus Terpilih (<span x-text="$store.selection ? $store.selection.length : 0"></span>)
+                </button>
+            </form>
+            @endcan
             @endcan
         </div>
     </div>
@@ -106,6 +125,9 @@
             <table class="w-full min-w-full border-collapse">
                 <thead>
                     <tr class="border-y border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-900">
+                        <th class="px-5 py-3 text-left w-12">
+                            <input type="checkbox" @change="toggleSelectAll($event)" :checked="isAllSelected" class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800">
+                        </th>
                         <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400 w-12">#</th>
                         <th @click="sortBy('nama_peserta')" class="px-6 py-3 text-left text-sm font-medium text-gray-600 dark:text-gray-400 cursor-pointer hover:text-blue-600 transition">
                             <div class="flex items-center gap-1">
@@ -143,6 +165,9 @@
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                     <template x-for="(row, index) in paginated" :key="row.id">
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/20 transition">
+                            <td class="px-5 py-4 text-center">
+                                <input type="checkbox" :value="row.id" x-model="selectedItems" @change="updateSelection" class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800">
+                            </td>
                             <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400" x-text="(page - 1) * perPage + index + 1"></td>
                             <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white" x-text="row.nama_peserta"></td>
                             <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300" x-text="row.nik"></td>
@@ -199,7 +224,7 @@
                     </template>
                     <template x-if="filtered.length === 0">
                         <tr>
-                            <td colspan="7" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
+                            <td colspan="8" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
                                 Tidak ada data peserta ditemukan.
                             </td>
                         </tr>
@@ -326,6 +351,10 @@
 </div>
 
 <script>
+document.addEventListener('alpine:init', () => {
+    Alpine.store('selection', []);
+});
+
 function pesertaTable() {
     return {
         data: @json($tableData),
@@ -334,6 +363,21 @@ function pesertaTable() {
         perPage: 10,
         sortCol: 'nama_peserta',
         sortDir: 'asc',
+        selectedItems: [],
+
+        init() {
+            this.$watch('search', value => {
+                this.resetPage();
+                this.selectedItems = []; // Reset selesksi saat search
+                this.updateSelection();
+            });
+            this.$watch('page', value => {
+                // Opsional: reset selection saat ganti halaman. 
+                // Jika ingin persist, comment baris di bawah.
+                // this.selectedItems = [];
+                // this.updateSelection();
+            });
+        },
 
         resetPage() { this.page = 1; },
         sortBy(column) {
@@ -378,7 +422,41 @@ function pesertaTable() {
             return pages;
         },
         get startItem() { return this.filtered.length === 0 ? 0 : (this.page - 1) * this.perPage + 1; },
-        get endItem() { return Math.min(this.page * this.perPage, this.filtered.length); }
+        get endItem() { return Math.min(this.page * this.perPage, this.filtered.length); },
+
+        // Checkbox Logic
+        get isAllSelected() {
+            if (this.paginated.length === 0) return false;
+            return this.paginated.every(item => this.selectedItems.includes(item.id.toString()) || this.selectedItems.includes(item.id));
+        },
+        toggleSelectAll(event) {
+            const isChecked = event.target.checked;
+            if (isChecked) {
+                const newSelections = this.paginated.map(item => item.id);
+                this.selectedItems = [...new Set([...this.selectedItems, ...newSelections])];
+            } else {
+                const currentIds = this.paginated.map(item => item.id);
+                this.selectedItems = this.selectedItems.filter(id => !currentIds.includes(parseInt(id)) && !currentIds.includes(id));
+            }
+            this.updateSelection();
+        },
+        updateSelection() {
+            Alpine.store('selection', this.selectedItems);
+            this.$dispatch('update-selection', this.selectedItems);
+            
+            // Update hidden inputs for mass delete
+            const container = document.getElementById('hidden-inputs-container');
+            if (container) {
+                container.innerHTML = '';
+                this.selectedItems.forEach(id => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'ids[]';
+                    input.value = id;
+                    container.appendChild(input);
+                });
+            }
+        }
     }
 }
 </script>

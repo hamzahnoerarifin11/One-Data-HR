@@ -10,9 +10,6 @@ class KpiItem extends Model
     protected $table = 'kpi_items';
     protected $primaryKey = 'id_kpi_item';
     
-    // UBAH DISINI:
-    // Kita ganti $guarded dengan $fillable agar lebih eksplisit
-    // Pastikan 'target', 'polaritas', dan 'satuan' masuk disini.
     protected $fillable = [
         'kpi_assessment_id',
         'key_result_area',

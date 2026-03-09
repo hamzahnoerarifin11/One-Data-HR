@@ -18,29 +18,30 @@ class KompetensiController extends Controller
             return redirect()->back()->with('error', 'Anda tidak memiliki akses ke halaman ini.');
         }
 
-        $query = PegawaiKompetensi::with(['karyawan.pekerjaan.company', 'karyawan.pekerjaan.division', 'karyawan.pekerjaan.department']);
+        $query = Karyawan::with(['pegawaiKompetensi', 'pekerjaan.company', 'pekerjaan.division', 'pekerjaan.department'])
+            ->whereHas('pegawaiKompetensi');
 
         // Filter Pencarian
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
-                // Cari berdasar nama kompetensi
-                $q->where('nama_kompetensi', 'LIKE', "%{$search}%")
-                  // Atau cari berdasar nama/NIK Karyawan
-                  ->orWhereHas('karyawan', function($kQuery) use ($search) {
-                      $kQuery->where('Nama_Lengkap_Sesuai_Ijazah', 'LIKE', "%{$search}%")
-                             ->orWhere('NIK', 'LIKE', "%{$search}%");
+                $q->where('Nama_Lengkap_Sesuai_Ijazah', 'LIKE', "%{$search}%")
+                  ->orWhere('NIK', 'LIKE', "%{$search}%")
+                  ->orWhereHas('pegawaiKompetensi', function($kompQuery) use ($search) {
+                      $kompQuery->where('nama_kompetensi', 'LIKE', "%{$search}%");
                   });
             });
         }
 
         // Filter Level (Opsional)
         if ($request->filled('level')) {
-            $query->where('level', $request->level);
+            $query->whereHas('pegawaiKompetensi', function ($q) use ($request) {
+                $q->where('level', $request->level);
+            });
         }
 
-        // Urutkan data terbaru
-        $kompetensiList = $query->orderBy('updated_at', 'DESC')->paginate(15)->appends($request->all());
+        // Urutkan data berdasarkan nama
+        $kompetensiList = $query->orderBy('Nama_Lengkap_Sesuai_Ijazah', 'ASC')->paginate(10)->appends($request->all());
 
         // Untuk Dropdown Filter (Level Kompetensi unik dari database)
         $listLevel = PegawaiKompetensi::select('level')->whereNotNull('level')->distinct()->pluck('level');

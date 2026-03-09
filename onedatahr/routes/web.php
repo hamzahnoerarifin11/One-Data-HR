@@ -300,6 +300,7 @@ Route::post('/kpi/items/bulk-delete', [KpiAssessmentController::class , 'bulkDes
 // Routes untuk TEMPA
 Route::middleware(['auth', 'role:admin|superadmin|ketua_tempa'])->prefix('tempa')->name('tempa.')->group(function () {
     // Kelompok TEMPA
+    Route::post('kelompok/bulk-delete', [\App\Http\Controllers\TempaKelompokController::class, 'bulkDelete'])->name('kelompok.bulk-delete');
     Route::get('kelompok/import-template', [\App\Http\Controllers\TempaKelompokController::class, 'downloadTemplate'])->name('kelompok.import-template');
     Route::post('kelompok/import', [\App\Http\Controllers\TempaKelompokController::class, 'import'])->name('kelompok.import');
     Route::resource('kelompok', \App\Http\Controllers\TempaKelompokController::class)->parameters([
@@ -307,6 +308,7 @@ Route::middleware(['auth', 'role:admin|superadmin|ketua_tempa'])->prefix('tempa'
     ]);
 
     // Peserta TEMPA
+    Route::post('peserta/bulk-delete', [\App\Http\Controllers\TempaPesertaController::class, 'bulkDelete'])->name('peserta.bulk-delete');
     Route::get('peserta/import-template', [\App\Http\Controllers\TempaPesertaController::class, 'downloadTemplate'])->name('peserta.import-template');
     Route::post('peserta/import', [\App\Http\Controllers\TempaPesertaController::class, 'import'])->name('peserta.import');
     Route::resource('peserta', \App\Http\Controllers\TempaPesertaController::class)->parameters([
@@ -314,12 +316,14 @@ Route::middleware(['auth', 'role:admin|superadmin|ketua_tempa'])->prefix('tempa'
     ]);
 
     // Absensi TEMPA
+    Route::post('absensi/bulk-delete', [\App\Http\Controllers\TempaAbsensiController::class, 'bulkDelete'])->name('absensi.bulk-delete');
     Route::resource('absensi', \App\Http\Controllers\TempaAbsensiController::class);
 
     // Monitoring TEMPA
     Route::get('monitoring', [\App\Http\Controllers\TempaMonitoringController::class , 'index'])->name('monitoring.index');
 
     // Materi TEMPA
+    Route::post('materi/bulk-delete', [\App\Http\Controllers\TempaMateriController::class, 'bulkDelete'])->name('materi.bulk-delete');
     Route::resource('materi', \App\Http\Controllers\TempaMateriController::class)->except(['show']);
     Route::get('materi/download/{id}', [\App\Http\Controllers\TempaMateriController::class , 'download'])->name('materi.download');
 });
