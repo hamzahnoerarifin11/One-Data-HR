@@ -34,10 +34,17 @@
                 </div>
             </div>
         @endif
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
-
-
-        <form action="{{ route('karyawan.update', $karyawan->id_karyawan) }}" method="POST" x-data="karyawanForm()" @submit.prevent="submit">
+        <form action="{{ route('karyawan.update', $karyawan->id_karyawan) }}" method="POST" x-data="karyawanForm(window.karyawanEditData)" @submit.prevent="submit">
             @csrf
             @method('PUT')
 
@@ -267,6 +274,7 @@
                     </div>
 
                     <!-- RT / RW -->
+                    <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">RT</label>
                         <input id="RT" name="RT" placeholder="Contoh: 01" value="{{ old('RT', $karyawan->RT) }}"
@@ -280,7 +288,7 @@
                             class="dark:bg-dark-900 shadow-theme-xs h-11 w-full rounded-lg border border-gray-300 bg-transparent
                             px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90" />
                     </div>
-
+                    </div>
                     <!-- Provinsi -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Provinsi</label>
@@ -369,7 +377,7 @@
 
                     <!--  CHECKBOX SAMA DENGAN KTP -->
                     <!-- ========================= -->
-                    <div class="col-span-4 flex items-center gap-2 mt-2">
+                    <div class="col-span-2 flex items-center gap-2 mt-2">
                         <div x-data="{ checkboxToggle: false }">
                         <label for="sameAsKTP"
                             class="flex cursor-pointer items-center text-sm font-medium text-gray-700 select-none dark:text-gray-400">
@@ -785,166 +793,97 @@
             <div x-show="currentStep===2" x-transition class="space-y-6">
                 <div class="grid grid-cols-2 gap-4">
 
-                    <!-- JABATAN -->
+                    <!-- PERUSAHAAN / HOLDING -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Jabatan
-                        </label>
-
-                        <div class="relative z-20">
-                            <select name="Jabatan"
-                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 px-4 pr-11 text-sm
-                                    shadow-theme-xs bg-transparent
-                                    focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
-                                    dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-
-                                <option value="">-- Pilih Jabatan --</option>
-
-                                @foreach ($jabatanOptions as $jabatan)
-                                    <option value="{{ $jabatan }}"
-                                        {{ old('Jabatan', optional($karyawan->pekerjaan->first())->Jabatan) === $jabatan ? 'selected' : '' }}>
-                                        {{ $jabatan }}
-                                    </option>
-                                @endforeach
-                            </select>
-
-                            <!-- Arrow -->
-                            <span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-gray-500">
-                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                    <path d="M4.8 7.4L10 12.6L15.2 7.4"
-                                        stroke-width="1.5"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"/>
-                                </svg>
-                            </span>
-                        </div>
-                    </div>
-
-
-                    <!-- BAGIAN -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Bagian</label>
-                        <input name="Bagian"
-                            placeholder="Contoh: Administrasi / Operasional"
-                            value="{{ old('Bagian', optional($karyawan->pekerjaan->first())->Bagian) }}"
-                             class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10
-                            dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent
-                            px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden
-                            dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30" />
-                    </div>
-
-                    <!-- DEPARTEMENT (ENUM) -->
-                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Departement
-                        </label>
-
-                        <div class="relative z-20">
-                            <select name="Departement"
-                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 px-4 pr-11 text-sm
-                                    shadow-theme-xs bg-transparent
-                                    focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
-                                    dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-
-                                <option value="">-- Pilih Departement --</option>
-
-                                @foreach ($departementOptions as $departement)
-                                    <option value="{{ $departement }}"
-                                        {{ old('Departement', optional($karyawan->pekerjaan->first())->Departement) === $departement ? 'selected' : '' }}>
-                                        {{ $departement }}
-                                    </option>
-                                        {{ old('Departement', optional($karyawan->pekerjaan->first())->Departement) === $departement ? 'selected' : '' }}>
-                                        {{ $departement }}
-                                    </option>
-                                @endforeach
-                            </select>
-
-                            <!-- Arrow -->
-                            <span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-gray-500">
-                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                    <path d="M4.8 7.4L10 12.6L15.2 7.4"
-                                        stroke-width="1.5"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"/>
-                                </svg>
-                            </span>
-                        </div>
+                        <x-searchable-select
+                            id="company"
+                            name="entity_selection"
+                            label="Perusahaan"
+                            :options="$companies"
+                            x-model="selectedCompany"
+                            @change="updateEntity($event.detail)"
+                            placeholder="-- Pilih Perusahaan --"
+                        />
+                        <!-- Hidden fields for actual company_id and holding_id -->
+                        <input type="hidden" name="company_id" :value="actualCompanyId">
+                        <input type="hidden" name="holding_id" :value="actualHoldingId">
                     </div>
 
                     <!-- DIVISI -->
-                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Divisi
-                        </label>
+                    <div>
+                        <x-searchable-select
+                            id="division"
+                            name="division_id"
+                            label="Divisi"
+                            x-effect="dynamicOptionsRaw = divisions"
+                            x-model="selectedDivision"
+                            @change="updateDepartments($event.detail)"
+                            placeholder="-- Pilih Divisi --"
+                        />
+                    </div>
 
-                        <div class="relative z-20">
-                            <select name="Divisi"
-                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 px-4 pr-11 text-sm
-                                    shadow-theme-xs bg-transparent
-                                    focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
-                                    dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-
-                                <option value="">-- Pilih Divisi --</option>
-
-                                @foreach ($divisiOptions as $divisi)
-                                    <option value="{{ $divisi }}"
-                                        {{ old('Divisi', optional($karyawan->pekerjaan->first())->Divisi) === $divisi ? 'selected' : '' }}>
-                                        {{ $divisi }}
-                                    </option>
-                                        {{ old('Divisi', optional($karyawan->pekerjaan->first())->Divisi) === $divisi ? 'selected' : '' }}>
-                                        {{ $divisi }}
-                                    </option>
-                                @endforeach
-                            </select>
-
-                            <!-- Arrow -->
-                            <span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-gray-500">
-                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                    <path d="M4.8 7.4L10 12.6L15.2 7.4"
-                                        stroke-width="1.5"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"/>
-                                </svg>
-                            </span>
-                        </div>
+                    <!-- DEPARTEMENT -->
+                    <div>
+                        <x-searchable-select
+                            id="department"
+                            name="department_id"
+                            label="Departement"
+                            x-effect="dynamicOptionsRaw = departments"
+                            x-model="selectedDepartment"
+                            @change="updateUnits($event.detail)"
+                            placeholder="-- Pilih Departement --"
+                        />
                     </div>
 
                     <!-- UNIT -->
-                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Unit
-                        </label>
+                    <div>
+                        <x-searchable-select
+                            id="unit"
+                            name="unit_id"
+                            label="Unit"
+                            x-effect="dynamicOptionsRaw = units"
+                            x-model="selectedUnit"
+                            placeholder="-- Pilih Unit --"
+                        />
+                    </div>
 
-                        <div class="relative z-20">
-                            <select name="Unit"
-                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 px-4 pr-11 text-sm
-                                    shadow-theme-xs bg-transparent
-                                    focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
-                                    dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-
-                                <option value="">-- Pilih Unit --</option>
-
-                                @foreach ($unitOptions as $unit)
-                                    <option value="{{ $unit }}"
-                                        {{ old('Unit', optional($karyawan->pekerjaan->first())->Unit) === $unit ? 'selected' : '' }}>
-                                        {{ $unit }}
-                                    </option>
-                                        {{ old('Unit', optional($karyawan->pekerjaan->first())->Unit) === $unit ? 'selected' : '' }}>
-                                        {{ $unit }}
-                                    </option>
-                                @endforeach
-                            </select>
-
-                            <!-- Arrow -->
-                            <span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-gray-500">
-                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                    <path d="M4.8 7.4L10 12.6L15.2 7.4"
-                                        stroke-width="1.5"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"/>
+                    <!-- LEVEL JABATAN -->
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                Level Jabatan
+                            </label>
+                            <button type="button"
+                                    @click="openLevelModal()"
+                                    class="text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 px-2 py-1 rounded transition dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/40">
+                                <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                                 </svg>
-                            </span>
+                                Tambah Level
+                            </button>
                         </div>
+
+                        <x-searchable-select
+                            id="levelSelect"
+                            name="level_id"
+                            required
+                            :options="$levels->map(fn($l) => ['id' => $l->id, 'name' => $l->name])"
+                            x-model="selectedLevel"
+                            placeholder="-- Pilih Level --"
+                        />
+                    </div>
+
+
+                    <!-- Jabatan -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">Nama Jabatan</label>
+                        <input name="Jabatan"
+                            placeholder="Contoh: Administrasi / Operasional"
+                            value="{{ old('Jabatan', optional($karyawan->pekerjaan->first())->position?->name) }}"
+                            class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10
+                            dark:focus:border-brand-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent
+                            px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden
+                            dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30" />
                     </div>
 
                     <!-- JENIS KONTRAK & PERJANJIAN (DEPENDENT DROPDOWN) -->
@@ -1046,45 +985,6 @@
                                     <option value="{{ $lokasikerja }}"
                                         {{ old('Lokasi_Kerja', optional($karyawan->pekerjaan->first())->Lokasi_Kerja) === $lokasikerja ? 'selected' : '' }}>
                                         {{ $lokasikerja }}
-                                    </option>
-                                        {{ old('Lokasi_Kerja', optional($karyawan->pekerjaan->first())->Lokasi_Kerja) === $lokasikerja ? 'selected' : '' }}>
-                                        {{ $lokasikerja }}
-                                    </option>
-                                @endforeach
-                            </select>
-
-                            <!-- Arrow -->
-                            <span class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-gray-500">
-                                <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                    <path d="M4.8 7.4L10 12.6L15.2 7.4"
-                                        stroke-width="1.5"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"/>
-                                </svg>
-                            </span>
-                        </div>
-                    </div>
-
-
-                    <!-- PERUSAHAAN -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">
-                            Perusahaan
-                        </label>
-
-                        <div class="relative z-20">
-                            <select name="Perusahaan"
-                                class="h-11 w-full appearance-none rounded-lg border border-gray-300 px-4 pr-11 text-sm
-                                    shadow-theme-xs bg-transparent
-                                    focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10
-                                    dark:border-gray-700 dark:bg-gray-900 dark:text-white/90">
-
-                                <option value="">-- Pilih Perusahaan --</option>
-
-                                @foreach ($perusahaanOptions as $perusahaan)
-                                    <option value="{{ $perusahaan }}"
-                                        {{ old('Perusahaan', optional($karyawan->perusahaan)->Perusahaan) === $perusahaan ? 'selected' : '' }}>
-                                        {{ $perusahaan }}
                                     </option>
                                 @endforeach
                             </select>
@@ -1213,7 +1113,7 @@
                     tanggalMulai: '{{ old(
                                         'Tanggal_Mulai_Tugas',
                                         optional($karyawan->kontrak)->Tanggal_Mulai_Tugas
-                                            ? \Carbon\Carbon::parse(optional($karyawan->kontrak)->Tanggal_Mulai_Tugas)->format('Y-m-d')
+                                            ? \Carbon\Carbon::parse(optional($karyawan->kontrak)->Tanggal_Mulai_Tugas)->translatedFormat('Y-m-d')
                                             : ''
                                     ) }}',
                     masaKerja: '{{ old('Masa_Kerja', optional($karyawan->kontrak)->Masa_Kerja) }}',
@@ -1573,24 +1473,144 @@
 
 @push('scripts')
 <script>
-function karyawanForm() {
+function karyawanForm(initData = {}) {
     return {
         steps: ['Data Karyawan','Data Keluarga','Pekerjaan','Pendidikan','Kontrak','Status Non Aktif','BPJS'],
         currentStep: 0,
-        // pendidikan: [{Pendidikan_Terakhir:'', Nama_Lengkap_Tempat_Pendidikan_Terakhir:'', Jurusan:''}],
-        // kontrak: [{Tanggal_Mulai_Tugas:'', PKWT_berakhir:'', Tanggal_Diangkat_Menjadi_Karyawan_Tetap:'', Riwayat_Penempatan:'', Tanggal_Riwayat_Penempatan:'',
-        //             Mutasi_Promosi_Demosi:'', Tanggal_Mutasi_Promosi_Demosi:'', Masa_Kerja:'', NO_PKWT_PERTAMA:'', NO_SK_PERTAMA:'',}],
+        
+        // Organization Data
+        companies: initData.companies || [],
+        divisions: initData.divisions || [],
+        departments: initData.departments || [],
+        units: initData.units || [],
+        levels: initData.levels || [],
+
+        // Organization Selection
+        selectedCompany: function() {
+            let cid = initData.current?.company_id;
+            let hid = initData.current?.holding_id;
+            
+            if (cid) return cid;
+            if (hid) return `holding_${hid}`;
+            return '';
+        }(),
+
+        selectedDivision: initData.current?.division_id || '',
+        selectedDepartment: initData.current?.department_id || '',
+        selectedUnit: initData.current?.unit_id || '',
+        selectedLevel: initData.current?.level_id || '',
+
+        // Actual IDs for form submission (parsed from selectedCompany)
+        actualCompanyId: initData.current?.company_id || '',
+        actualHoldingId: initData.current?.holding_id || '',
+
+        init() {
+             // Parse initial selection
+            if (this.selectedCompany) {
+                this.parseEntitySelection(this.selectedCompany);
+            }
+            
+            // Watchers for dependent dropdowns
+            this.$watch('selectedCompany', (val) => {
+                if(val) this.updateEntity(val);
+            });
+        },
+        
+        // Parse entity selection to set actualCompanyId or actualHoldingId
+        parseEntitySelection(val) {
+            if (String(val).startsWith('holding_')) {
+                this.actualHoldingId = String(val).replace('holding_', '');
+                this.actualCompanyId = '';
+            } else {
+                this.actualCompanyId = val;
+                this.actualHoldingId = '';
+            }
+        },
+        
+        // Called when entity (company/holding) is selected
+        updateEntity(val) {
+            this.parseEntitySelection(val);
+            this.updateDivisions(val);
+        },
+
+        fetchDivisions(entityId) {
+            if (!entityId) return;
+            
+            // Detect if this is a Holding ID (prefixed with 'holding_')
+            let url;
+            if (String(entityId).startsWith('holding_')) {
+                const holdingId = String(entityId).replace('holding_', '');
+                url = `/organization/division/by-holding/${holdingId}`;
+            } else {
+                url = `/karyawan/divisions/${entityId}`;
+            }
+            
+            fetch(url)
+                .then(r => r.json())
+                .then(data => this.divisions = data);
+        },
+
+        fetchDepartments(divisionId, chain = false) {
+            if (!divisionId) return;
+            fetch(`/karyawan/departments/${divisionId}`)
+                .then(r => r.json())
+                .then(data => {
+                    this.departments = data;
+                    if (chain && this.selectedDepartment) {
+                        this.fetchUnits(this.selectedDepartment, true);
+                    }
+                });
+        },
+
+        fetchUnits(departmentId, chain = false) {
+            if (!departmentId) return;
+            fetch(`/karyawan/units/${departmentId}`)
+                .then(r => r.json())
+                .then(data => {
+                     this.units = data;
+                });
+        },
+
+
+
+        updateDivisions(val) {
+            this.selectedDivision = '';
+            this.selectedDepartment = '';
+            this.selectedUnit = '';
+            this.divisions = [];
+            this.departments = [];
+            this.units = [];
+            // Note: levels are global and should not be reset
+            
+            if (val) this.fetchDivisions(val);
+        },
+
+        updateDepartments(val) {
+            this.selectedDepartment = '';
+            this.selectedUnit = '';
+            this.departments = [];
+            this.units = [];
+            // Note: levels are global and should not be reset
+
+            if (val) this.fetchDepartments(val);
+        },
+
+        updateUnits(val) {
+            this.selectedUnit = '';
+            this.units = [];
+            // Note: levels are global and should not be reset
+
+            if (val) this.fetchUnits(val);
+        },
+
         go(i){ this.currentStep = i; window.scrollTo(0,0); },
         next(){ if(this.currentStep < this.steps.length-1) this.currentStep++; window.scrollTo(0,0); },
         prev(){ if(this.currentStep > 0) this.currentStep--; window.scrollTo(0,0); },
-        // addPendidikan(){ this.pendidikan.push({Pendidikan_Terakhir:'', Nama_Lengkap_Tempat_Pendidikan_Terakhir:'', Jurusan:''}); },
-        // removePendidikan(i){ this.pendidikan.splice(i,1); },
-        // addKontrak(){ this.kontrak.push({Tanggal_Mulai_Tugas:'', PKWT_berakhir:'', Tanggal_Diangkat_Menjadi_Karyawan_Tetap:'', Riwayat_Penempatan:'', Tanggal_Riwayat_Penempatan:'',
-        //             Mutasi_Promosi_Demosi:'', Tanggal_Mutasi_Promosi_Demosi:'', Masa_Kerja:'', NO_PKWT_PERTAMA:'', NO_SK_PERTAMA:'',}); },
-        // removeKontrak(i){ this.kontrak.splice(i,1); },
+        
         calculateMasaKerja(idx) {
+            if (!this.kontrak || !this.kontrak[idx]) return;
+            
             const start = this.kontrak[idx].Tanggal_Mulai_Tugas;
-            console.log('calculateMasaKerja called for idx', idx, 'start=', start);
             if (!start) {
                 this.kontrak[idx].Masa_Kerja = '';
                 return;
@@ -1603,13 +1623,11 @@ function karyawanForm() {
             let months = today.getMonth() - startDate.getMonth();
             let days = today.getDate() - startDate.getDate();
 
-            // Koreksi bulan negatif
             if (months < 0) {
                 years--;
                 months += 12;
             }
 
-            // Koreksi hari negatif
             if (days < 0) {
                 months--;
                 const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0).getDate();
@@ -1624,7 +1642,6 @@ function karyawanForm() {
             this.kontrak[idx].Masa_Kerja = `${years} Tahun ${months} Bulan ${days} Hari`;
         },
         submit(e){
-            // submit native form
             $el = document.querySelector('form[x-data]');
             $el.submit();
         }
@@ -1921,6 +1938,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 </script>
+<script>
+ window.karyawanEditData = {
+
+                companies: @json($companies),
+                levels: @json($levels),
+                divisions: @json($divisions),
+                departments: @json($departments),
+                units: @json($units),
+                current: {
+                    company_id: @json(old('company_id', optional($karyawan->pekerjaan->first())->company_id)),
+                    holding_id: @json(old('holding_id', optional($karyawan->pekerjaan->first())->holding_id)),
+                    division_id: @json(old('division_id', optional($karyawan->pekerjaan->first())->division_id)),
+                    department_id: @json(old('department_id', optional($karyawan->pekerjaan->first())->department_id)),
+                    unit_id: @json(old('unit_id', optional($karyawan->pekerjaan->first())->unit_id)),
+                    level_id: @json(old('level_id', optional($karyawan->pekerjaan->first())->level_id))
+                }
+            };
+</script>
 <!-- <script>
 function kontrakForm() {
   return {
@@ -2008,4 +2043,8 @@ function kontrakForm() {
   };
 }
 </script> -->
+
+
+@include('pages.karyawan.partials.level-modal')
+
 @endpush

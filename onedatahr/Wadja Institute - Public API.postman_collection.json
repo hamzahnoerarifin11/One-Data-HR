@@ -1,0 +1,77 @@
+{
+  "info": {
+    "_postman_id": "2840b112-8e95-433a-8422-7b3f5b8ea828",
+    "name": "Wadja Institute - Public Integration API",
+    "description": "Postman collection for Public Integration API routes with API Key authentication",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "50149965",
+    "_collection_link": "https://go.postman.co/collection/50149965-2840b112-8e95-433a-8422-7b3f5b8ea828?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Public Integration API",
+      "item": [
+        {
+          "name": "Get Pegawai Competencies",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{api_key}}",
+                "description": "API Key for authentication"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/integration/pegawai-competencies",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "integration",
+                "pegawai-competencies"
+              ]
+            },
+            "description": "Retrieve competencies data for employees. Requires valid API key in X-API-Key header."
+          },
+          "response": []
+        }
+      ],
+      "description": "Public API endpoints that require API Key authentication for external integrations"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://wadjainstitute.id/api"
+    },
+    {
+      "key": "api_key",
+      "value": "288d23ebc5dca24e4998b0b7209527cd"
+    }
+  ]
+}

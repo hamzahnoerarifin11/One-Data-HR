@@ -1,320 +1,353 @@
 @extends('layouts.app')
+@section('title','Dashboard Rekrutmen')
 
 @section('content')
 <div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
 
-    <!-- Header -->
-    <div class="mb-6 flex items-start justify-between">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Recruitment Dashboard</h1>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Ringkasan aktivitas rekrutmen dan metrik penting</p>
-        </div>
-        <div class="flex items-center gap-2">
-            <a href="{{ route('rekrutmen.posisi.index') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition">Manage Posisi</a>
-            <a href="{{ route('rekrutmen.kandidat.index') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition">Manage Kandidat</a>
-            <a href="{{ route('rekrutmen.calendar') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition">Kalender Rekrutmen</a>
-            <a href="{{ route('rekrutmen.interview_hr.index') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition">Interview HR</a>
-            <a href="{{ route('rekrutmen.wig.index') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition">Database WIG</a>
-            <a href="{{ route('rekrutmen.metrics.pemberkasan.page') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition">Pemberkasan Monitor</a>
+    {{-- Header Section --}}
+    <div class="mb-8">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">
+                    Dashboard Rekrutmen
+                </h2>
+                <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                    Overview statistik funnel rekrutmen tahun <span class="font-semibold text-blue-600 dark:text-blue-400">{{ $year }}</span>
+                </p>
+            </div>
+            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 px-4 py-2 rounded-lg">
+                <p class="text-xs font-semibold text-blue-700 dark:text-blue-300">Update: {{ date('d M Y H:i') }}</p>
+            </div>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <!-- Filters -->
-        <div class="lg:col-span-1">
-            <x-rekrutmen.card title="Filters">
-                <form id="filter-form">
-                    <div class="mb-3">
-                        <label class="block text-sm font-medium text-gray-600 dark:text-gray-300">Posisi</label>
-                        <div class="flex items-center gap-2">
-                            <select name="posisi_id" id="posisi_id" class="mt-1 block w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-primary focus:ring-primary">
-                                <option value="">-- Semua Posisi --</option>
-                                @foreach($posisis as $pos)
-                                    <option value="{{ $pos->id_posisi }}">{{ $pos->nama_posisi }}</option>
-                                @endforeach
-                            </select>
+    {{-- Filter Section --}}
+    <div class="mb-8 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <form method="GET" action="{{ route('rekrutmen.dashboard') }}" class="flex flex-col sm:flex-row gap-4">
+            <div class="flex-1">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <i class="fas fa-calendar-alt mr-2 text-blue-600"></i>Tahun
+                </label>
+                <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
 
-                            <!-- small add button to create new posisi inline -->
-                            <button type="button" data-modal-id="add-posisi" class="mt-1 inline-flex h-9 w-9 items-center justify-center rounded-md border border-gray-200 bg-white text-sm text-gray-700 hover:bg-gray-50" title="Tambah Posisi">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                            </button>
+                <select name="year" onchange="this.form.submit()" class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
+                           :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true">
+                    @foreach($availableYears as $y)
+                        <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>
+                            Semua Tahun {{ $y }}
+                        </option>
+                    @endforeach
+                </select>
+                <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
+                            <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </span>
+                    </div>
+            </div>
+            <div class="flex-1">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <i class="fas fa-briefcase mr-2 text-purple-600"></i>Posisi
+                </label>
+                <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
+                <select name="posisi_id" onchange="this.form.submit()" class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
+                           :class="isOptionSelected && 'text-gray-800 dark:text-white/90'" @change="isOptionSelected = true">
+                    <option value="">-- Semua Posisi --</option>
+                    @foreach($posisi as $p)
+                        <option value="{{ $p->id_posisi }}" {{ $posisiId == $p->id_posisi ? 'selected' : '' }}>
+                            {{ $p->nama_posisi }}
+                        </option>
+                    @endforeach
+                </select>
+                <span class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
+                            <svg class="stroke-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </span>
+                    </div>
+            </div>
+        </form>
+    </div>
+
+    {{-- KPI Cards --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {{-- Total Pelamar --}}
+        <div class="group rounded-xl border border-gray-200 bg-gradient-to-br from-blue-50 to-blue-100 p-6 shadow-sm hover:shadow-md dark:border-gray-700 dark:from-blue-900/20 dark:to-blue-900/10 transition-all duration-300">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Pelamar</p>
+                    <h3 class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">{{ $funnelData['Total Pelamar'] }}</h3>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Orang</p>
+                </div>
+                <div class="flex h-14 w-14 items-center justify-center rounded-full bg-blue-200 text-blue-700 dark:bg-blue-800 dark:text-blue-300 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-user-plus text-lg"></i>
+                </div>
+            </div>
+        </div>
+
+        {{-- Lolos CV --}}
+        <div class="group rounded-xl border border-gray-200 bg-gradient-to-br from-green-50 to-green-100 p-6 shadow-sm hover:shadow-md dark:border-gray-700 dark:from-green-900/20 dark:to-green-900/10 transition-all duration-300">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Lolos CV</p>
+                    <h3 class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">{{ $funnelData['Lolos CV'] }}</h3>
+                    <p class="mt-1 text-xs text-green-600 dark:text-green-400 font-semibold">
+                        {{ $conversionRates['cv'] }}% dari total
+                    </p>
+                </div>
+                <div class="flex h-14 w-14 items-center justify-center rounded-full bg-green-200 text-green-700 dark:bg-green-800 dark:text-green-300 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-file text-lg"></i>
+                </div>
+            </div>
+        </div>
+
+        {{-- Lolos Psikotes --}}
+        <div class="group rounded-xl border border-gray-200 bg-gradient-to-br from-purple-50 to-purple-100 p-6 shadow-sm hover:shadow-md dark:border-gray-700 dark:from-purple-900/20 dark:to-purple-900/10 transition-all duration-300">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Lolos Psikotes</p>
+                    <h3 class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">{{ $funnelData['Lolos Psikotes'] }}</h3>
+                    <p class="mt-1 text-xs text-purple-600 dark:text-purple-400 font-semibold">
+                        {{ $conversionRates['psikotes'] }}% dari CV
+                    </p>
+                </div>
+                <div class="flex h-14 w-14 items-center justify-center rounded-full bg-purple-200 text-purple-700 dark:bg-purple-800 dark:text-purple-300 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-brain text-lg"></i>
+                </div>
+            </div>
+        </div>
+
+        {{-- Hired --}}
+        <div class="group rounded-xl border border-gray-200 bg-gradient-to-br from-orange-50 to-orange-100 p-6 shadow-sm hover:shadow-md dark:border-gray-700 dark:from-orange-900/20 dark:to-orange-900/10 transition-all duration-300">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Hired (Selesai)</p>
+                    <h3 class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">{{ $funnelData['Hired (Selesai)'] }}</h3>
+                    <p class="mt-1 text-xs text-orange-600 dark:text-orange-400 font-semibold">
+                        {{ $totalPelamar > 0 ? round(($funnelData['Hired (Selesai)'] / $totalPelamar) * 100, 2) : 0 }}% dari total
+                    </p>
+                </div>
+                <div class="flex h-14 w-14 items-center justify-center rounded-full bg-orange-200 text-orange-700 dark:bg-orange-800 dark:text-orange-300 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-thumbs-up text-lg"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Funnel Visualization --}}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        {{-- Left: Funnel Progress --}}
+        <div class="lg:col-span-2 rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+            <div class="mb-6">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <i class="fas fa-filter text-blue-600"></i>Funnel Progress
+                </h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Visualisasi progres kandidat melalui setiap tahap</p>
+            </div>
+
+            <div class="space-y-5">
+                @php
+                    $stages = [
+                        ['label' => '1. Total Pelamar', 'value' => $funnelData['Total Pelamar'], 'color' => 'from-blue-500 to-blue-600', 'icon' => 'fa-users', 'percent' => 100],
+                        ['label' => '2. Lolos CV', 'value' => $funnelData['Lolos CV'], 'color' => 'from-green-500 to-green-600', 'icon' => 'fa-file', 'percent' => $totalPelamar > 0 ? ($funnelData['Lolos CV'] / $totalPelamar) * 100 : 0],
+                        ['label' => '3. Lolos Psikotes', 'value' => $funnelData['Lolos Psikotes'], 'color' => 'from-purple-500 to-purple-600', 'icon' => 'fa-brain', 'percent' => $totalPelamar > 0 ? ($funnelData['Lolos Psikotes'] / $totalPelamar) * 100 : 0],
+                        ['label' => '4. Lolos Kompetensi', 'value' => $funnelData['Lolos Kompetensi'], 'color' => 'from-cyan-500 to-cyan-600', 'icon' => 'fa-check-circle', 'percent' => $totalPelamar > 0 ? ($funnelData['Lolos Kompetensi'] / $totalPelamar) * 100 : 0],
+                        ['label' => '5. Lolos Interview HR', 'value' => $funnelData['Lolos Interview HR'], 'color' => 'from-yellow-500 to-yellow-600', 'icon' => 'fa-handshake', 'percent' => $totalPelamar > 0 ? ($funnelData['Lolos Interview HR'] / $totalPelamar) * 100 : 0],
+                        ['label' => '6. Lolos User', 'value' => $funnelData['Lolos User'], 'color' => 'from-red-500 to-red-600', 'icon' => 'fa-star', 'percent' => $totalPelamar > 0 ? ($funnelData['Lolos User'] / $totalPelamar) * 100 : 0],
+                        ['label' => '7. Hired (Selesai)', 'value' => $funnelData['Hired (Selesai)'], 'color' => 'from-orange-500 to-orange-600', 'icon' => 'fa-trophy', 'percent' => $totalPelamar > 0 ? ($funnelData['Hired (Selesai)'] / $totalPelamar) * 100 : 0],
+                    ];
+                @endphp
+
+                @foreach($stages as $stage)
+                <div>
+                    <div class="mb-2 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-r {{ $stage['color'] }} text-white">
+                                <i class="fas {{ $stage['icon'] }} text-sm"></i>
+                            </div>
+                            <span class="font-medium text-gray-700 dark:text-gray-300">{{ $stage['label'] }}</span>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm font-bold text-gray-900 dark:text-white">{{ $stage['value'] }}</div>
+                            <div class="text-xs text-gray-500">{{ round($stage['percent'], 1) }}%</div>
                         </div>
                     </div>
+                    <div class="h-3 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                        <div class="h-3 rounded-full bg-gradient-to-r {{ $stage['color'] }} transition-all duration-500" style="width: {{ $stage['percent'] }}%"></div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
 
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-300">From</label>
-                            <input type="month" name="from" class="mt-1 block w-full rounded-md border border-gray-200 px-3 py-2 text-sm shadow-sm focus:border-primary focus:ring-primary">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600 dark:text-gray-300">To</label>
-                            <input type="month" name="to" class="mt-1 block w-full rounded-md border border-gray-200 px-3 py-2 text-sm shadow-sm focus:border-primary focus:ring-primary">
-                        </div>
+        {{-- Right: Summary Cards --}}
+        <div class="space-y-4">
+            {{-- Conversion Rate --}}
+            <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                <h4 class="text-sm font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                    <i class="fas fa-chart-line text-green-600"></i>Conversion Rate
+                </h4>
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600 dark:text-gray-400">CV → Psikotes</span>
+                        <span class="font-bold text-green-600 dark:text-green-400">{{ $conversionRates['psikotes'] }}%</span>
+                    </div>
+                    <div class="h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                        <div class="h-1 bg-green-500" style="width: {{ $conversionRates['psikotes'] }}%"></div>
                     </div>
 
-                    <div class="mt-4 flex flex-wrap items-center gap-3">
-                        <button type="button" id="apply-filters" class="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-white shadow hover:bg-primary-dark transition">Apply</button>
-                        <button type="button" id="reset-filters" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition">Reset</button>
+                    <div class="flex justify-between items-center pt-2">
+                        <span class="text-gray-600 dark:text-gray-400">Psikotes → Kompetensi</span>
+                        <span class="font-bold text-purple-600 dark:text-purple-400">{{ $conversionRates['kompetensi'] }}%</span>
+                    </div>
+                    <div class="h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                        <div class="h-1 bg-purple-500" style="width: {{ $conversionRates['kompetensi'] }}%"></div>
+                    </div>
 
-                        <div class="relative">
-                            <button id="export-toggle" type="button" class="inline-flex items-center gap-2 rounded-lg border border-green-100 bg-white px-3 py-2 text-sm font-medium text-green-600 shadow-sm hover:bg-green-50">Export CSV</button>
-                            <div id="export-menu" class="hidden absolute right-0 mt-2 w-44 rounded-md bg-white border shadow z-10 py-1 dark:bg-gray-800">
-                                <a id="export-candidates" class="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="#">Kandidat</a>
-                                <a id="export-cv" class="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="#">CV Lolos</a>
-                                <a id="export-psikotes" class="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="#">Psikotes Lolos</a>
-                                <a id="export-progress" class="block px-3 py-2 text-sm text-gray-700 hover:bg-gray-50" href="#">Progress</a>
+                    <div class="flex justify-between items-center pt-2">
+                        <span class="text-gray-600 dark:text-gray-400">HR → User</span>
+                        <span class="font-bold text-cyan-600 dark:text-cyan-400">{{ $conversionRates['user'] }}%</span>
+                    </div>
+                    <div class="h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                        <div class="h-1 bg-cyan-500" style="width: {{ $conversionRates['user'] }}%"></div>
+                    </div>
+
+                    <div class="flex justify-between items-center pt-2">
+                        <span class="text-gray-600 dark:text-gray-400">User → Hired</span>
+                        <span class="font-bold text-orange-600 dark:text-orange-400">{{ $conversionRates['hired'] }}%</span>
+                    </div>
+                    <div class="h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                        <div class="h-1 bg-orange-500" style="width: {{ $conversionRates['hired'] }}%"></div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Ditolak --}}
+            <div class="rounded-xl border border-red-200 dark:border-red-800 bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-900/10 p-5 shadow-sm">
+                <h4 class="text-sm font-bold text-red-900 dark:text-red-300 mb-3 flex items-center gap-2">
+                    <i class="fas fa-times-circle"></i>Ditolak
+                </h4>
+                <div class="text-3xl font-bold text-red-600 dark:text-red-400 mb-2">{{ $funnelData['Ditolak'] }}</div>
+                <div class="text-xs text-red-600 dark:text-red-400">
+                    {{ $totalPelamar > 0 ? round(($funnelData['Ditolak'] / $totalPelamar) * 100, 2) : 0 }}% dari total pelamar
+                </div>
+            </div>
+
+            {{-- Effective Rate --}}
+            <div class="rounded-xl border border-blue-200 dark:border-blue-800 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-900/10 p-5 shadow-sm">
+                <h4 class="text-sm font-bold text-blue-900 dark:text-blue-300 mb-3 flex items-center gap-2">
+                    <i class="fas fa-chart-bar"></i>Effective Rate
+                </h4>
+                <div class="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">
+                    {{ $totalPelamar > 0 ? round(($funnelData['Hired (Selesai)'] / $totalPelamar) * 100, 2) : 0 }}%
+                </div>
+                <div class="text-xs text-blue-600 dark:text-blue-400">
+                    {{ $funnelData['Hired (Selesai)'] }} dari {{ $totalPelamar }} pelamar diterima
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- {{-- Statistics by Position (jika belum filter) --}}
+    @if(!$posisiId && count($statsByPosition) > 0)
+    <div class="mb-8 rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+            <i class="fas fa-layer-group text-purple-600"></i>Statistik per Posisi
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            @foreach($statsByPosition as $stat)
+            <div class="rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-all">
+                <div class="flex items-start justify-between mb-3">
+                    <div>
+                        <h4 class="font-semibold text-gray-900 dark:text-white">{{ $stat->nama_posisi }}</h4>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ $stat->total }} pelamar</p>
+                    </div>
+                    <span class="inline-flex items-center justify-center h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-bold">
+                        {{ $stat->total }}
+                    </span>
+                </div>
+
+                <div class="space-y-2 text-xs">
+                    <div class="flex justify-between">
+                        <span class="text-gray-600 dark:text-gray-400">CV Lolos</span>
+                        <span class="font-bold text-green-600 dark:text-green-400">{{ $stat->cv_lolos }} ({{ $stat->total > 0 ? round(($stat->cv_lolos / $stat->total) * 100) : 0 }}%)</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600 dark:text-gray-400">Psikotes</span>
+                        <span class="font-bold text-purple-600 dark:text-purple-400">{{ $stat->psikotes_lolos }} ({{ $stat->total > 0 ? round(($stat->psikotes_lolos / $stat->total) * 100) : 0 }}%)</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600 dark:text-gray-400">Kompetensi</span>
+                        <span class="font-bold text-cyan-600 dark:text-cyan-400">{{ $stat->kompetensi_lolos }} ({{ $stat->total > 0 ? round(($stat->kompetensi_lolos / $stat->total) * 100) : 0 }}%)</span>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+    @endif -->
+
+    {{-- Monthly Distribution --}}
+    <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+            <i class="fas fa-calendar text-indigo-600"></i>Distribusi Pelamar per Bulan ({{ $year }})
+        </h3>
+
+        <div class="overflow-x-auto">
+            <div class="grid grid-cols-12 gap-2 min-w-max">
+                @php
+                    $monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                    $monthData = [];
+                    foreach($monthlyData as $data) {
+                        $monthData[$data->month] = $data->total;
+                    }
+                    $maxMonth = count($monthData) > 0 ? max($monthData) : 1;
+                @endphp
+
+                @for($month = 1; $month <= 12; $month++)
+                    @php $count = $monthData[$month] ?? 0; @endphp
+                    <div class="flex flex-col items-center">
+                        <div class="mb-2">
+                            <div class="h-24 w-10 rounded-t-lg bg-gradient-to-t from-blue-500 to-blue-400 dark:from-blue-600 dark:to-blue-500 flex items-end justify-center pb-1 transition-all hover:shadow-lg" style="height: {{ $count > 0 ? (($count / $maxMonth) * 100) . 'px' : '8px' }}">
+                                <span class="text-xs font-bold text-white mb-1">{{ $count }}</span>
                             </div>
                         </div>
-
-                        <p class="w-full text-xs text-gray-400">Exports reflect current filter selection.</p>
+                        <span class="text-xs font-semibold text-gray-600 dark:text-gray-400">{{ $monthNames[$month-1] }}</span>
                     </div>
-                </form>
-            </x-rekrutmen.card>
+                @endfor
+            </div>
         </div>
 
-        <!-- Main content: KPIs and Charts -->
-        <div class="lg:col-span-2">
-            <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-                <x-rekrutmen.card>
-                    <div class="text-center">
-                        <p class="text-sm text-gray-500">Total Kandidat</p>
-                        <div id="total-kandidat" class="mt-2 text-2xl font-bold text-gray-900">-</div>
-                    </div>
-                </x-rekrutmen.card>
-
-                <x-rekrutmen.card>
-                    <div class="text-center">
-                        <p class="text-sm text-gray-500">Total CV Lolos</p>
-                        <div id="total-cv" class="mt-2 text-2xl font-bold text-gray-900">-</div>
-                    </div>
-                </x-rekrutmen.card>
-
-                <x-rekrutmen.card>
-                    <div class="text-center">
-                        <p class="text-sm text-gray-500">Total Psikotes Lolos</p>
-                        <div id="total-psikotes" class="mt-2 text-2xl font-bold text-gray-900">-</div>
-                    </div>
-                </x-rekrutmen.card>
-            </div>
-
-            <div class="mt-4 grid grid-cols-1 gap-4">
-                <x-chart-card title="Grafik Kandidat Masuk (per posisi & per bulan)">
-                    <div id="chartCandidates" class="h-72"></div>
-                </x-chart-card>
-
-                <x-chart-card title="Grafik Lolos per Tahap">
-                    <div id="chartStages" class="h-72"></div>
-                </x-chart-card>
+        <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Total Pelamar</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $totalPelamar }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Rata-rata/Bulan</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ round($totalPelamar / 12, 0) }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Bulan Tertinggi</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $maxMonth }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Bulan Terdata</p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ count($monthData) }}</p>
+                </div>
             </div>
         </div>
     </div>
 
-    <x-modal id="add-posisi" title="Tambah Posisi" size="sm" closeLabel="Batal" confirmLabel="Tambah">
-        <div>
-            <label class="block text-sm font-medium text-gray-700">Nama Posisi</label>
-            <input id="new-posisi-name" type="text" class="mt-2 block w-full rounded-md border border-gray-200 px-3 py-2 text-sm shadow-sm" placeholder="Contoh: Backend Engineer" />
-            <div id="new-posisi-error" class="mt-2 text-xs text-red-500 hidden"></div>
-        </div>
-    </x-modal>
-
 </div>
-@endsection
 
-@section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-<script>
-    // Small helper for export dropdown
-    document.addEventListener('click', function (e) {
-        const exportToggle = document.getElementById('export-toggle');
-        const exportMenu = document.getElementById('export-menu');
-        if (!exportToggle || !exportMenu) return;
-        if (exportToggle.contains(e.target)) {
-            exportMenu.classList.toggle('hidden');
-        } else if (!exportMenu.contains(e.target)) {
-            exportMenu.classList.add('hidden');
+<style>
+    @media (prefers-color-scheme: dark) {
+        .group:hover {
+            border-color: rgb(59, 130, 246);
         }
-    });
-
-    function fetchCandidates(params = {}){
-        const url = new URL("{{ route('rekrutmen.metrics.candidates') }}", window.location.origin);
-        Object.keys(params).forEach(k => params[k] ? url.searchParams.append(k, params[k]) : null);
-        return fetch(url)
-            .then(r => r.json())
-            .then(data => { window.dataTotalCandidates = (data || []).reduce((s,i)=> s + (i.total||0),0); return data; });
     }
-
-    function fetchStages(params = {}){
-        const url = new URL("{{ route('rekrutmen.metrics.progress') }}", window.location.origin);
-        Object.keys(params).forEach(k => params[k] ? url.searchParams.append(k, params[k]) : null);
-        return fetch(url).then(r => r.json());
-    }
-
-    function fetchSummary(params = {}){
-        const urlCv = new URL("{{ route('rekrutmen.metrics.cv') }}", window.location.origin);
-        const urlPs = new URL("{{ route('rekrutmen.metrics.psikotes') }}", window.location.origin);
-        Object.keys(params).forEach(k => params[k] ? urlCv.searchParams.append(k, params[k]) : null);
-        Object.keys(params).forEach(k => params[k] ? urlPs.searchParams.append(k, params[k]) : null);
-        Promise.all([fetch(urlCv).then(r => r.json()), fetch(urlPs).then(r => r.json())])
-        .then(([cv, ps]) => {
-            const totalCv = (cv || []).reduce((s,i)=> s + (i.total||0),0);
-            const totalPs = (ps || []).reduce((s,i)=> s + (i.total||0),0);
-            document.getElementById('total-cv').innerText = totalCv;
-            document.getElementById('total-psikotes').innerText = totalPs;
-            const totalCandidates = window.dataTotalCandidates || '-';
-            if(document.getElementById('total-kandidat')) document.getElementById('total-kandidat').innerText = totalCandidates;
-        }).catch(()=>{});
-    }
-
-    // Update export links according to current filters
-    function updateExportLink(){
-        const form = document.getElementById('filter-form');
-        const params = new URLSearchParams();
-        if(form.posisi_id.value) params.append('posisi_id', form.posisi_id.value);
-        if(form.from.value) params.append('from', form.from.value + '-01');
-        if(form.to.value) params.append('to', form.to.value + '-31');
-        const urlCandidates = new URL("{{ route('rekrutmen.metrics.candidates.export') }}", window.location.origin);
-        const urlCv = new URL("{{ route('rekrutmen.metrics.cv.export') }}", window.location.origin);
-        const urlPs = new URL("{{ route('rekrutmen.metrics.psikotes.export') }}", window.location.origin);
-        const urlProgress = new URL("{{ route('rekrutmen.metrics.progress.export') }}", window.location.origin);
-        urlCandidates.search = params.toString();
-        urlCv.search = params.toString();
-        urlPs.search = params.toString();
-        urlProgress.search = params.toString();
-        document.getElementById('export-candidates').href = urlCandidates.toString();
-        document.getElementById('export-cv').href = urlCv.toString();
-        document.getElementById('export-psikotes').href = urlPs.toString();
-        document.getElementById('export-progress').href = urlProgress.toString();
-    }
-
-    // Apply filters
-    document.getElementById('apply-filters').addEventListener('click', function(){
-        const form = document.getElementById('filter-form');
-        const data = {
-            posisi_id: form.posisi_id.value,
-            from: form.from.value ? form.from.value + '-01' : null,
-            to: form.to.value ? form.to.value + '-31' : null,
-        };
-        fetchCandidates(data).then(renderCandidatesChart);
-        fetchStages(data).then(renderStages);
-        fetchSummary(data);
-        updateExportLink();
-    });
-
-    // Reset filters
-    document.getElementById('reset-filters').addEventListener('click', function(){
-        const form = document.getElementById('filter-form');
-        form.posisi_id.value = '';
-        form.from.value = '';
-        form.to.value = '';
-        fetchCandidates().then(renderCandidatesChart);
-        fetchStages().then(renderStages);
-        fetchSummary();
-        updateExportLink();
-    });
-
-    // Initialize export link on load
-    updateExportLink();
-
-    function renderCandidatesChart(data){
-        const categories = data.map(x => x.nama_posisi + ' ' + x.year + '-' + x.month);
-        const counts = data.map(x => x.total);
-        const options = {
-            chart: { type: 'bar', height: 320 },
-            series: [{ name: 'Kandidat', data: counts }],
-            xaxis: { categories },
-            plotOptions: { bar: { columnWidth: '60%' } }
-        };
-        if(window.candChart) { try { window.candChart.destroy(); } catch(e){} }
-        window.candChart = new ApexCharts(document.querySelector('#chartCandidates'), options);
-        window.candChart.render();
-    }
-
-    function renderStages(data){
-        const labels = data.map(x=> x.nama_posisi);
-        const cv = data.map(x=> x.percent_cv);
-        const psik = data.map(x=> x.percent_psikotes);
-        const komp = data.map(x=> x.percent_kompetensi);
-        const hr = data.map(x=> x.percent_hr);
-        const user = data.map(x=> x.percent_user);
-        const options = {
-            chart: { type: 'bar', height: 320 },
-            series: [
-                {name: 'CV %', data: cv},
-                {name: 'Psikotes %', data: psik},
-                {name: 'Kompetensi %', data: komp},
-                {name: 'HR %', data: hr},
-                {name: 'User %', data: user},
-            ],
-            xaxis: { categories: labels },
-            plotOptions: { bar: { horizontal: false, columnWidth: '55%' } },
-            yaxis: { max: 100 }
-        };
-        if(window.stageChart) { try { window.stageChart.destroy(); } catch(e){} }
-        window.stageChart = new ApexCharts(document.querySelector('#chartStages'), options);
-        window.stageChart.render();
-    }
-
-    // initial load
-    fetchCandidates().then(renderCandidatesChart);
-    fetchStages().then(renderStages);
-    fetchSummary();
-
-    // handle add-posisi modal confirmation to create a new posisi and update the select
-    window.addEventListener('modal-confirmed', function(e){
-        if(!e?.detail || e.detail.id !== 'add-posisi') return;
-        const nameEl = document.getElementById('new-posisi-name');
-        const errEl = document.getElementById('new-posisi-error');
-        if(!nameEl) return;
-        const name = nameEl.value.trim();
-        errEl.classList.add('hidden'); errEl.innerText = '';
-        if(!name){ errEl.innerText = 'Nama posisi tidak boleh kosong.'; errEl.classList.remove('hidden'); return; }
-
-        const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        fetch("{{ route('rekrutmen.posisi.store') }}", {
-            method: 'POST',
-            credentials: 'same-origin',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': token,
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({ nama_posisi: name })
-        }).then(async (r) => {
-            if (r.ok) return r.json();
-            // try to parse JSON for validation or error messages
-            let json = null;
-            try { json = await r.json(); } catch(e) { /* ignore */ }
-            if (r.status === 422 && json && json.errors) {
-                const msg = (json.errors.nama_posisi || []).join(' ') || 'Validasi gagal.';
-                errEl.innerText = msg; errEl.classList.remove('hidden');
-                return null;
-            }
-            if (r.status === 419) {
-                errEl.innerText = 'Session expired. Silakan refresh halaman dan coba lagi.'; errEl.classList.remove('hidden');
-                return null;
-            }
-            errEl.innerText = (json && json.message) ? json.message : 'Terjadi kesalahan server.'; errEl.classList.remove('hidden');
-            return null;
-        }).then(json => {
-            if (!json) return;
-            if(json?.success && json.posisi){
-                // append to select
-                const sel = document.getElementById('posisi_id');
-                const opt = document.createElement('option');
-                opt.value = json.posisi.id_posisi;
-                opt.text = json.posisi.nama_posisi;
-                sel.appendChild(opt);
-                sel.value = json.posisi.id_posisi;
-
-                // clear input and close modal
-                nameEl.value = '';
-                window.dispatchEvent(new CustomEvent('close-modal', { detail: { id: 'add-posisi' } }));
-
-                // update exports and re-run filters
-                updateExportLink();
-                document.getElementById('apply-filters').click();
-            }
-        }).catch((err) => { console.error('posisi create error', err); errEl.innerText = 'Terjadi kesalahan jaringan.'; errEl.classList.remove('hidden'); });
-    });
-</script>
+</style>
 @endsection

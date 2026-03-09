@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap') layer(base);
 @import 'prismjs/themes/prism.min.css';
 @import 'tailwindcss';
+@import "@fortawesome/fontawesome-free/css/all.min.css";
 
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -364,9 +365,9 @@
   @apply gap-1 !rounded-lg !border-gray-200 p-3 !shadow-theme-sm dark:!border-gray-800 dark:!bg-gray-900;
 }
 
-/* .apexcharts-tooltip-marker {
+.apexcharts-tooltip-marker {
   @apply !mr-1.5 !h-1.5 !w-1.5;
-} */
+}
 .apexcharts-legend-text {
   @apply !pl-5 !text-gray-700 dark:!text-gray-400;
 }

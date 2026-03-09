@@ -40,7 +40,9 @@ class DatabaseSeeder extends Seeder
         KpiSeeder::class,
         KpiTargetSeeder::class,
         KpiRealizationSeeder::class,
-    ]);
+        ]);
+    // Seed roles
+    $this->call(RoleSeeder::class);
 
 
         // Seed recruitment demo data
@@ -49,7 +51,28 @@ class DatabaseSeeder extends Seeder
         // Seed some default positions used by the dashboard filters and tests
         $this->call(\Database\Seeders\PosisiModalTestSeeder::class);
 
+        // Seed companies
+        $this->call(\Database\Seeders\CompanySeeder::class);
+
+        // Seed organizational hierarchy
+        $this->call(\Database\Seeders\DivisionSeeder::class);
+        $this->call(\Database\Seeders\DepartmentSeeder::class);
+        $this->call(\Database\Seeders\UnitSeeder::class);
+        $this->call(\Database\Seeders\PositionSeeder::class);
+
+        // Seed karyawan with hierarchical structure
+        $this->call(\Database\Seeders\KaryawanHierarchicalSeeder::class);
+
+        // Seed TEMPA data
+        $this->call([
+            TempaPesertaSeeder::class,
+            TempaAbsensiSeeder::class,
+        ]);
+
         // Seed some daily recruitment demo metrics (calendar)
         $this->call(\Database\Seeders\RekrutmenDailySeeder::class);
+
+        // Seed onboarding demo data
+        $this->call(\Database\Seeders\OnboardingKaryawanSeeder::class);
     }
 }

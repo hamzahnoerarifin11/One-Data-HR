@@ -4,21 +4,57 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class Posisi extends Model
 {
     use HasFactory;
 
     protected $table = 'posisi';
-    protected $primaryKey = 'id_posisi'; // Sesuai database
+    protected $primaryKey = 'id_posisi';
     public $incrementing = true;
     protected $keyType = 'int';
 
-    // Kolom yang boleh diisi secara mass-assignment
     protected $fillable = [
         'nama_posisi',
-        'status'
+        'status',
+        'progress_rekrutmen',
+        'total_pelamar',
+        'activated_at',
+        'fpk_file'
     ];
+
+    protected $appends = [
+        'hari_aktif',
+        'fpk_file_url'
+    ];
+
+    /* ================= ACCESSORS ================= */
+
+    public function getFpkFileUrlAttribute()
+    {
+        if (!$this->fpk_file) {
+            return null;
+        }
+
+        // Gunakan disk public (AMAN & STANDAR)
+        return Storage::disk('public')->url('fpk/' . $this->fpk_file);
+    }
+
+    /**
+     * Hitung hari aktif
+     */
+    public function getHariAktifAttribute()
+    {
+        if (!$this->activated_at) {
+            return 0;
+        }
+
+        return Carbon::parse($this->activated_at)
+            ->startOfDay()
+            ->diffInDays(now()->startOfDay());
+    }
 
     /* ===================== RELATIONSHIPS ===================== */
 

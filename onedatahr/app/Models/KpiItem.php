@@ -10,21 +10,20 @@ class KpiItem extends Model
     protected $table = 'kpi_items';
     protected $primaryKey = 'id_kpi_item';
     
-    // UBAH DISINI:
-    // Kita ganti $guarded dengan $fillable agar lebih eksplisit
-    // Pastikan 'target', 'polaritas', dan 'satuan' masuk disini.
     protected $fillable = [
         'kpi_assessment_id',
-        'perspektif',
         'key_result_area',
         'key_performance_indicator',
+        'perspektif',
+        'polaritas',
+        'calculation_method',
+        'units',   
         'bobot',
-        'target',      // <--- Kolom Baru (Penting untuk Template)
+        'target',      
+        'previous_progress',
         'realisasi',
         'skor',
         'skor_akhir',
-        'polaritas',   // <--- Kolom Baru (Penting untuk Template)
-        'units',      // <--- Kolom Baru (Penting untuk Template)
     ];
 
     public function scores()

@@ -10,13 +10,13 @@
 
                 <div class="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-7 2xl:gap-x-32">
                     <div>
-                        <p class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">First Name</p>
-                        <p class="text-sm font-medium text-gray-800 dark:text-white/90">Musharof</p>
+                        <p class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Full Name</p>
+                        <p class="text-sm font-medium text-gray-800 dark:text-white/90">{{ auth()->user()->name }}</p>
                     </div>
 
                     <div>
-                        <p class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Last Name</p>
-                        <p class="text-sm font-medium text-gray-800 dark:text-white/90">Chowdhury</p>
+                        <p class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Role</p>
+                        <p class="text-sm font-medium text-gray-800 dark:text-white/90">{{ auth()->user()->roles->pluck('name')->map(function($r){ return ucwords(str_replace('_',' ',$r)); })->join(', ') ?? '—' }}</p>
                     </div>
 
                     <div>
@@ -24,18 +24,18 @@
                             Email address
                         </p>
                         <p class="text-sm font-medium text-gray-800 dark:text-white/90">
-                            randomuser@pimjo.com
+                            {{ auth()->user()->email }}
                         </p>
                     </div>
 
                     <div>
                         <p class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Phone</p>
-                        <p class="text-sm font-medium text-gray-800 dark:text-white/90">+09 363 398 46</p>
+                        <p class="text-sm font-medium text-gray-800 dark:text-white/90">{{ auth()->user()->phone ?? '—' }}</p>
                     </div>
 
                     <div>
                         <p class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Bio</p>
-                        <p class="text-sm font-medium text-gray-800 dark:text-white/90">Team Manager</p>
+                        <p class="text-sm font-medium text-gray-800 dark:text-white/90">{{ auth()->user()->bio ?? '—' }}</p>
                     </div>
                 </div>
             </div>

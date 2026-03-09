@@ -2,59 +2,225 @@
 
 namespace App\Helpers;
 
+use Illuminate\Support\Facades\Auth;
+
 class MenuHelper
 {
     public static function getMainNavItems()
     {
-        return [
-            [
-                'icon' => 'dashboard',
-                'name' => 'Dashboard',
-                'path' => '/dashboard',
-            ],
-            [
+        $auth = Auth::user();
+        $user = $auth; // backwards-compat for existing checks
+        $menu = [];
+
+        // Prepare role matching **only for the KPI menu**: combine explicit user roles
+        // and derived roles from pekerjaan (level, position, Jabatan)
+        $userRoleNames = [];
+        $derivedRoles = [];
+        if ($auth) {
+            try {
+                $userRoleNames = $auth->roles()->pluck('name')->map(function ($r) {
+                    return strtolower($r);
+                })->toArray();
+            }
+            catch (\Throwable $e) {
+                $userRoleNames = [];
+            }
+
+            // Find related Karyawan (by user_id or by nik)
+            $karyawan = \App\Models\Karyawan::where('user_id', $auth->id)->first();
+            if (!$karyawan && !empty($auth->nik)) {
+                $karyawan = \App\Models\Karyawan::where('nik', $auth->nik)->first();
+            }
+
+            if ($karyawan) {
+                $pekerjaan = $karyawan->pekerjaanTerkini()->first() ?? $karyawan->pekerjaan()->first();
+                if ($pekerjaan) {
+                    if (!empty($pekerjaan->level) && !empty($pekerjaan->level->name))
+                        $derivedRoles[] = strtolower($pekerjaan->level->name);
+                    if (!empty($pekerjaan->position) && !empty($pekerjaan->position->name))
+                        $derivedRoles[] = strtolower($pekerjaan->position->name);
+                    if (!empty($pekerjaan->Jabatan))
+                        $derivedRoles[] = strtolower($pekerjaan->Jabatan);
+                }
+            }
+        }
+
+        $roleMatches = function ($roles) use ($userRoleNames, $derivedRoles) {
+            if (is_string($roles))
+                $roles = [$roles];
+            $roles = array_map('strtolower', $roles);
+            foreach ($roles as $r) {
+                if (in_array($r, $userRoleNames))
+                    return true;
+                if (in_array($r, $derivedRoles))
+                    return true;
+            }
+            return false;
+        };
+
+        // =============================================================
+        // 1. MENU UMUM
+        // =============================================================
+        $menu[] = [
+            'icon' => 'dashboard',
+            'name' => 'Dashboard',
+            'path' => '/dashboard',
+        ];
+
+
+
+
+        // =============================================================
+        // 5. MENU STRUKTUR PEKERJAAN (Untuk admin, superadmin)
+        // =============================================================
+        if ($user && $user->hasRole(['admin', 'superadmin'])) {
+            $menu[] = [
+                'icon' => 'ai-building',
+                'name' => 'Struktur Perusahaan',
+                'subItems' => [
+                    ['name' => 'Holding', 'path' => '/organization/holding'],
+                    ['name' => 'Perusahaan', 'path' => '/organization/company'],
+                    ['name' => 'Anak Perusahaan', 'path' => '/organization/subsidiary'],
+                    ['name' => 'Divisi', 'path' => '/organization/division'],
+                    ['name' => 'Departement', 'path' => '/organization/department'],
+                    ['name' => 'Unit', 'path' => '/organization/unit'],
+                    // ['name' => 'Level Jabatan', 'path' => '/organization/position'],
+                    ['name' => 'Level Jabatan', 'path' => '/organization/level'],
+                ],
+            ];
+        }
+
+        // =============================================================
+        // 2. MENU KHUSUS (Hanya Admin, HRD, Manager)
+        // =============================================================
+        // Logika: "Jika User ADA dan User BUKAN Staff"
+        if ($user && $user->hasRole(['admin', 'superadmin'])) {
+
+            $menu[] = [
                 'icon' => 'user-profile',
                 'name' => 'Data Karyawan',
                 'path' => '/karyawan',
-            ],
-            [
+            ];
+
+            $menu[] = [
                 'icon' => 'task',
                 'name' => 'Rekrutmen',
                 'subItems' => [
-                    ['name' => 'Dashboard Rekrutmen', 'path' => route('rekrutmen.dashboard')],
-                    ['name' => 'Manage Posisi', 'path' => route('rekrutmen.posisi.index')],
-                    ['name' => 'Manage Kandidat', 'path' => route('rekrutmen.kandidat.index')],
-                    ['name' => 'Kalender Rekrutmen', 'path' => route('rekrutmen.calendar')],
-                    ['name' => 'Interview HR', 'path' => route('rekrutmen.interview_hr.index')],
-                    ['name' => 'Database WIG', 'path' => route('rekrutmen.wig.index')],
-                    ['name' => 'Pemberkasan Monitor', 'path' => route('rekrutmen.metrics.pemberkasan.page')],
+                    ['name' => 'Dashboard Rekrutmen', 'path' => '/rekrutmen'],
+                    ['name' => 'Manage Posisi', 'path' => '/rekrutmen/posisi-manage'],
+                    ['name' => 'Manage Kandidat', 'path' => '/rekrutmen/kandidat'],
+                    ['name' => 'Kalender Rekrutmen', 'path' => '/rekrutmen/calendar'],
+                    ['name' => 'Interview HR', 'path' => '/rekrutmen/interview_hr'],
+                    ['name' => 'Kandidat Lanjut User', 'path' => '/rekrutmen/kandidat_lanjut_user'],
+                    ['name' => 'Pemberkasan', 'path' => '/rekrutmen/pemberkasan'],
+                    // ['name' => 'Database WIG',         'path' => '/rekrutmen/wig'],
                 ],
-                // 'path' => '/rekrutmen',
-            ],
-            [
+            ];
+
+            $menu[] = [
                 'icon' => 'forms',
-                'name' => 'Kontrak & Pekerjaan',
-                'subItems' => [
-                    ['name' => 'Kontrak', 'path' => '/kontrak'],
-                    ['name' => 'Pekerjaan', 'path' => '/pekerjaan'],
-                ],
-            ],
-            [
-                'icon' => 'tables',
-                'name' => 'Perusahaan',
-                'path' => '/perusahaan',
-            ],
-            [
-                'icon' => 'charts',
-                'name' => 'Laporan',
-                'path' => '/laporan',
-            ],
-            [
-                'icon' => 'charts',
-                'name' => 'KPI Karyawan', // Nama menu diperjelas
-                'path' => '/kpi/dashboard', // <-- Link baru ke halaman index
+                'name' => 'Training',
+                'path' => '/training',
+            ];
+
+            $menu[] = [
+                'icon' => 'user-shield',
+                'name' => 'Onboarding Karyawan',
+                'path' => '/onboarding',
+            ];
+
+            $menu[] = [
+                'icon' => 'chartline_down',
+                'name' => 'Data Turnover',
+                'path' => '/turnover',
+            ];
+        }
+
+
+        // =============================================================
+        // 0. MENU contoh materi untuk superadmin, manajer, admin 
+        // =============================================================
+        if ($roleMatches(['admin', 'superadmin', 'manajer'])) {
+            $menu[] = [
+                'icon' => 'book',
+                'name' => 'Materi',
+                'path' => '/materi',
+            ];
+        }
+
+
+        // =============================================================
+        // 3. MENU TEMPA (Untuk ketua_tempa, admin, superadmin)
+        // =============================================================
+        $tempaSubItems = [];
+        if ($user && $user->hasRole(['ketua_tempa', 'admin', 'superadmin'])) {
+            $tempaSubItems[] = ['name' => 'Kelompok TEMPA', 'path' => '/tempa/kelompok'];
+        }
+        if ($user && $user->hasRole(['ketua_tempa', 'admin', 'superadmin'])) {
+            $tempaSubItems[] = ['name' => 'Peserta TEMPA', 'path' => '/tempa/peserta'];
+        }
+        if ($user && $user->hasRole(['ketua_tempa', 'admin', 'superadmin'])) {
+            $tempaSubItems[] = ['name' => 'Absensi TEMPA', 'path' => '/tempa/absensi'];
+        }
+        if ($user && $user->hasRole(['admin', 'superadmin'])) {
+            $tempaSubItems[] = ['name' => 'Monitoring TEMPA', 'path' => '/tempa/monitoring'];
+        }
+        if ($user && $user->hasRole(['ketua_tempa', 'admin', 'superadmin'])) {
+            $tempaSubItems[] = ['name' => 'Materi TEMPA', 'path' => '/tempa/materi'];
+        }
+        if (!empty($tempaSubItems)) {
+            $menu[] = [
+                'icon' => 'tempa-journey',
+                'name' => 'TEMPA',
+                'subItems' => $tempaSubItems,
+            ];
+        }
+
+
+
+
+        // KPI Karyawan (Punya Staff Sendiri)
+        $menu[] = [
+            'icon' => 'chartline', // Icon untuk penilaian
+            'name' => 'Penilaian Karyawan',
+            'subItems' => [
+                ['name' => 'KPI Karyawan', 'path' => '/kpi/dashboard'],
+                ['name' => 'KBI Karyawan', 'path' => '/kbi/dashboard'],
             ],
         ];
+
+        if ($user && $user->hasRole(['admin', 'superadmin'])) {
+            $menu[count($menu) - 1]['subItems'][] = [
+                'name' => 'Master Perspektif KPI',
+                'path' => '/kpi/perspectives',
+            ];
+        }
+
+        if ($roleMatches(['admin', 'superadmin', 'direktur', 'manager', 'GM', 'senior_manager', 'supervisor'])) {
+            // Tambahkan ke subItems Penilaian Karyawan (roleMatches memperhitungkan role manajemen + role turunan dari pekerjaan)
+            $menu[count($menu) - 1]['subItems'][] = ['name' => 'Monitoring KBI', 'path' => '/kbi/monitoring'];
+        }
+
+        // Monitoring Kompetensi LMS (Khusus tim manajemen / HR)
+        if ($roleMatches(['admin', 'superadmin', 'direktur', 'manager', 'GM', 'senior_manager'])) {
+            $menu[count($menu) - 1]['subItems'][] = ['name' => 'Monitoring Kompetensi', 'path' => '/kompetensi/monitoring'];
+        }
+
+        // Rekap Performance (Supervisor TIDAK boleh lihat)
+        if ($roleMatches(['admin', 'superadmin', 'direktur', 'manager', 'GM', 'senior_manager'])) {
+            $menu[count($menu) - 1]['subItems'][] = ['name' => 'Rekap Performance', 'path' => '/performance/rekap'];
+        }
+        // Manajemen User
+        if ($user->hasRole('superadmin')) {
+            $menu[] = [
+                'icon' => 'authentication',
+                'name' => 'Manajemen User',
+                'path' => '/users',
+            ];
+        }
+
+
+        return $menu;
     }
       // --- [BARU] Menambahkan Menu Khusus Performance (KPI) ---
     public static function getPerformanceItems()
@@ -71,17 +237,24 @@ class MenuHelper
 
     public static function getOthersItems()
     {
-        return [
-            [
-                'icon' => 'support-ticket',
-                'name' => 'Tools',
-                'subItems' => [
-                    ['name' => 'Import Data', 'path' => '/tools/import'],
-                    ['name' => 'Export Data', 'path' => '/tools/export'],
-                    ['name' => 'Settings', 'path' => '/settings'],
-                ],
-            ],
+        $user = Auth::user();
+        $items = [];
+
+        // Profile link
+        $items[] = [
+            'icon' => 'user-profile',
+            'name' => 'Profile',
+            'path' => '/profile',
         ];
+
+        // Sign out action (rendered as a button that submits a POST logout form)
+        $items[] = [
+            'icon' => 'signout',
+            'name' => 'Sign Out',
+            'action' => 'signout',
+        ];
+
+        return $items;
     }
 
     public static function getMenuGroups()
@@ -94,13 +267,15 @@ class MenuHelper
             [
                 'title' => 'Others',
                 'items' => self::getOthersItems()
-            ]
+            ],
         ];
     }
+
 
     public static function isActive($path)
     {
         return request()->is(ltrim($path, '/'));
+        return request()->is(ltrim($path, 'route'));
     }
 
     public static function getIconSvg($iconName)
@@ -109,7 +284,26 @@ class MenuHelper
             'dashboard' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M5.5 3.25C4.25736 3.25 3.25 4.25736 3.25 5.5V8.99998C3.25 10.2426 4.25736 11.25 5.5 11.25H9C10.2426 11.25 11.25 10.2426 11.25 8.99998V5.5C11.25 4.25736 10.2426 3.25 9 3.25H5.5ZM4.75 5.5C4.75 5.08579 5.08579 4.75 5.5 4.75H9C9.41421 4.75 9.75 5.08579 9.75 5.5V8.99998C9.75 9.41419 9.41421 9.74998 9 9.74998H5.5C5.08579 9.74998 4.75 9.41419 4.75 8.99998V5.5ZM5.5 12.75C4.25736 12.75 3.25 13.7574 3.25 15V18.5C3.25 19.7426 4.25736 20.75 5.5 20.75H9C10.2426 20.75 11.25 19.7427 11.25 18.5V15C11.25 13.7574 10.2426 12.75 9 12.75H5.5ZM4.75 15C4.75 14.5858 5.08579 14.25 5.5 14.25H9C9.41421 14.25 9.75 14.5858 9.75 15V18.5C9.75 18.9142 9.41421 19.25 9 19.25H5.5C5.08579 19.25 4.75 18.9142 4.75 18.5V15ZM12.75 5.5C12.75 4.25736 13.7574 3.25 15 3.25H18.5C19.7426 3.25 20.75 4.25736 20.75 5.5V8.99998C20.75 10.2426 19.7426 11.25 18.5 11.25H15C13.7574 11.25 12.75 10.2426 12.75 8.99998V5.5ZM15 4.75C14.5858 4.75 14.25 5.08579 14.25 5.5V8.99998C14.25 9.41419 14.5858 9.74998 15 9.74998H18.5C18.9142 9.74998 19.25 9.41419 19.25 8.99998V5.5C19.25 5.08579 18.9142 4.75 18.5 4.75H15ZM15 12.75C13.7574 12.75 12.75 13.7574 12.75 15V18.5C12.75 19.7426 13.7574 20.75 15 20.75H18.5C19.7426 20.75 20.75 19.7427 20.75 18.5V15C20.75 13.7574 19.7426 12.75 18.5 12.75H15ZM14.25 15C14.25 14.5858 14.5858 14.25 15 14.25H18.5C18.9142 14.25 19.25 14.5858 19.25 15V18.5C19.25 18.9142 18.9142 19.25 18.5 19.25H15C14.5858 19.25 14.25 18.9142 14.25 18.5V15Z" fill="currentColor"></path></svg>',
 
             'ai-assistant' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18.75 2.42969V7.70424M9.42261 13.673C10.0259 14.4307 10.9562 14.9164 12 14.9164C13.0438 14.9164 13.9742 14.4307 14.5775 13.673M20 12V18.5C20 19.3284 19.3284 20 18.5 20H5.5C4.67157 20 4 19.3284 4 18.5V12C4 7.58172 7.58172 4 12 4C16.4183 4 20 7.58172 20 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M18.75 2.42969V2.43969M9.50391 9.875L9.50391 9.885M14.4961 9.875V9.885" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>',
+            'ai-building' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-building-icon lucide-building"><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M12 6h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M16 6h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/><path d="M8 6h.01"/><path d="M9 22v-3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/><rect x="4" y="2" width="16" height="20" rx="2"/></svg>',
 
+            'tempa-journey' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 4H14L18 8V20H6V4Z"
+                stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                <path d="M14 4V8H18"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M8 12L10.5 14.5L15.5 9.5"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>',
+            'tempa-monitoring' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 20H20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M7 16V12M12 16V9M17 16V6"
+                stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>',
+
+
+            'building' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 21V7L12 2L21 7V21H3Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M9 21V13H15V21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M7 9H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M7 12H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M7 15H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>',
             'ecommerce' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.31641 4H3.49696C4.24468 4 4.87822 4.55068 4.98234 5.29112L5.13429 6.37161M5.13429 6.37161L6.23641 14.2089C6.34053 14.9493 6.97407 15.5 7.72179 15.5L17.0833 15.5C17.6803 15.5 18.2205 15.146 18.4587 14.5986L21.126 8.47023C21.5572 7.4795 20.8312 6.37161 19.7507 6.37161H5.13429Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M7.7832 19.5H7.7932M16.3203 19.5H16.3303" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>',
 
             'calendar' => '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 2C8.41421 2 8.75 2.33579 8.75 2.75V3.75H15.25V2.75C15.25 2.33579 15.5858 2 16 2C16.4142 2 16.75 2.33579 16.75 2.75V3.75H18.5C19.7426 3.75 20.75 4.75736 20.75 6V9V19C20.75 20.2426 19.7426 21.25 18.5 21.25H5.5C4.25736 21.25 3.25 20.2426 3.25 19V9V6C3.25 4.75736 4.25736 3.75 5.5 3.75H7.25V2.75C7.25 2.33579 7.58579 2 8 2ZM8 5.25H5.5C5.08579 5.25 4.75 5.58579 4.75 6V8.25H19.25V6C19.25 5.58579 18.9142 5.25 18.5 5.25H16H8ZM19.25 9.75H4.75V19C4.75 19.4142 5.08579 19.75 5.5 19.75H18.5C18.9142 19.75 19.25 19.4142 19.25 19V9.75Z" fill="currentColor"></path></svg>',
@@ -135,6 +329,43 @@ class MenuHelper
             'support-ticket' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 17.0518V12C20 7.58174 16.4183 4 12 4C7.58168 4 3.99994 7.58174 3.99994 12V17.0518M19.9998 14.041V19.75C19.9998 20.5784 19.3282 21.25 18.4998 21.25H13.9998M6.5 18.75H5.5C4.67157 18.75 4 18.0784 4 17.25V13.75C4 12.9216 4.67157 12.25 5.5 12.25H6.5C7.32843 12.25 8 12.9216 8 13.75V17.25C8 18.0784 7.32843 18.75 6.5 18.75ZM17.4999 18.75H18.4999C19.3284 18.75 19.9999 18.0784 19.9999 17.25V13.75C19.9999 12.9216 19.3284 12.25 18.4999 12.25H17.4999C16.6715 12.25 15.9999 12.9216 15.9999 13.75V17.25C15.9999 18.0784 16.6715 18.75 17.4999 18.75Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>',
 
             'email' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.5 8.187V17.25C3.5 17.6642 3.83579 18 4.25 18H19.75C20.1642 18 20.5 17.6642 20.5 17.25V8.18747L13.2873 13.2171C12.5141 13.7563 11.4866 13.7563 10.7134 13.2171L3.5 8.187ZM20.5 6.2286C20.5 6.23039 20.5 6.23218 20.5 6.23398V6.24336C20.4976 6.31753 20.4604 6.38643 20.3992 6.42905L12.4293 11.9867C12.1716 12.1664 11.8291 12.1664 11.5713 11.9867L3.60116 6.42885C3.538 6.38481 3.50035 6.31268 3.50032 6.23568C3.50028 6.10553 3.60577 6 3.73592 6H20.2644C20.3922 6 20.4963 6.10171 20.5 6.2286ZM22 6.25648V17.25C22 18.4926 20.9926 19.5 19.75 19.5H4.25C3.00736 19.5 2 18.4926 2 17.25V6.23398C2 6.22371 2.00021 6.2135 2.00061 6.20333C2.01781 5.25971 2.78812 4.5 3.73592 4.5H20.2644C21.2229 4.5 22 5.27697 22.0001 6.23549C22.0001 6.24249 22.0001 6.24949 22 6.25648Z" fill="currentColor"></path></svg>',
+
+            'speedometer' => '<svg width="24" height="24" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 4a.5.5 0 0 1 .5.5V6a.5.5 0 0 1-1 0V4.5A.5.5 0 0 1 8 4zM3.732 5.732a.5.5 0 0 1 .707 0l.915.914a.5.5 0 1 1-.708.708l-.914-.915a.5.5 0 0 1 0-.707zM2 10a.5.5 0 0 1 .5-.5h1.586a.5.5 0 0 1 0 1H2.5A.5.5 0 0 1 2 10zm9.5 0a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 1 0 1H12a.5.5 0 0 1-.5-.5zm.754-4.246a.389.389 0 0 0-.527-.02L7.547 9.31a.91.91 0 1 0 1.302 1.258l3.434-4.297a.389.389 0 0 0-.029-.518z"/><path fill-rule="evenodd" d="M0 10a8 8 0 1 1 15.547 2.661c-.442 1.253-1.845 1.602-2.932 1.25C11.309 13.488 9.475 13 8 13c-1.474 0-3.31.488-4.615.911-1.087.352-2.49.003-2.932-1.25A7.988 7.988 0 0 1 0 10zm8-7a7 7 0 0 0-6.603 9.329c.203.575.923.876 1.68.63C4.397 12.533 6.358 12 8 12s3.604.532 4.923.96c.757.245 1.477-.056 1.68-.631A7 7 0 0 0 8 3z"/></svg>',
+            'SVGRepo_bgCarrier' => '<svg fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M19.2928932,8 L16.5,8 C16.2238576,8 16,7.77614237 16,7.5 C16,7.22385763 16.2238576,7 16.5,7 L20.5,7 C20.7761424,7 21,7.22385763 21,7.5 L21,11.5 C21,11.7761424 20.7761424,12 20.5,12 C20.2238576,12 20,11.7761424 20,11.5 L20,8.70710678 L14.8535534,13.8535534 C14.6582912,14.0488155 14.3417088,14.0488155 14.1464466,13.8535534 L11.5,11.2071068 L7.85355339,14.8535534 C7.65829124,15.0488155 7.34170876,15.0488155 7.14644661,14.8535534 C6.95118446,14.6582912 6.95118446,14.3417088 7.14644661,14.1464466 L11.1464466,10.1464466 C11.3417088,9.95118446 11.6582912,9.95118446 11.8535534,10.1464466 L14.5,12.7928932 L19.2928932,8 L19.2928932,8 Z M20.5,18 C20.7761424,18 21,18.2238576 21,18.5 C21,18.7761424 20.7761424,19 20.5,19 L5.5,19 C4.11928813,19 3,17.8807119 3,16.5 L3,7.5 C3,7.22385763 3.22385763,7 3.5,7 C3.77614237,7 4,7.22385763 4,7.5 L4,16.5 C4,17.3284271 4.67157288,18 5.5,18 L20.5,18 Z"></path> </g></svg>',
+            'desktop' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 21H17M3 17H21V5C21 4.44772 20.5523 4 20 4H4C3.44772 4 3 4.44772 3 5V17Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+            'chartline' => '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-graph-up-arrow" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M0 0h1v15h15v1H0V0z"/>
+            <path fill-rule="evenodd" d="M10 3.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0V4.707l-3.646 3.647a.5.5 0 0 1-.708 0L6.5 6.207l-3.146 3.147a.5.5 0 0 1-.708-.708l3.5-3.5a.5.5 0 0 1 .708 0L9 7.293l3.293-3.293H10.5a.5.5 0 0 1-.5-.5z"/>
+            </svg>',
+            'chartline_down' => '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-graph-down-arrow" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M0 0h1v15h15v1H0V0z"/>
+                <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-1 0v1.793l-3.646-3.647a.5.5 0 0 0-.708 0L6.5 9.793l-3.146-3.147a.5.5 0 1 0-.708.708l3.5 3.5a.5.5 0 0 0 .708 0L9 8.707l3.293 3.293H10.5a.5.5 0 0 0-.5.5z"/>
+            </svg>',
+
+            'signout' => '<svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>',
+
+
+            // 3. Ikon User Shield / Admin (Alternatif Monitoring)
+            'user-shield' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.1255 18.2745C19.7825 16.9231 18.6635 15.4286 16.5 14.7143C16.5 14.7143 15.2857 16.5 12 16.5C8.71429 16.5 7.5 14.7143 7.5 14.7143C5.33646 15.4286 4.21748 16.9231 3.87445 18.2745C3.59397 19.3795 4.43673 20.4286 5.57659 20.4286H18.4234C19.5633 20.4286 20.406 19.3795 20.1255 18.2745Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+
+            //rekap performance
+            'rekap' => '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                class="bi bi-list-check" viewBox="0 0 16 16"><path fill-rule="evenodd"
+                d="M5 11.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5z"/>
+            <path fill-rule="evenodd"
+                    d="M5 8.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5z"/>
+            <path fill-rule="evenodd"
+                    d="M5 5.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5z"/>
+            <path fill-rule="evenodd"
+                    d="M3.854 11.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/>
+            <path fill-rule="evenodd"
+                    d="M3.854 8.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/>
+            <path fill-rule="evenodd"
+                    d="M3.854 5.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/>
+            </svg>',
+
         ];
 
         return $icons[$iconName] ?? '<svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="currentColor"/></svg>';

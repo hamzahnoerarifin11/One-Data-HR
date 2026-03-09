@@ -9,8 +9,8 @@
             <p class="mt-2 text-gray-600 dark:text-gray-400">Informasi lengkap karyawan</p>
         </div>
         <div class="flex items-center gap-2">
-            @if(auth()->user() && auth()->user()->role === 'admin')
-                <a href="{{ route('karyawan.edit', $karyawan->id_karyawan) }}" class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-center text-white font-medium hover:bg-blue-700 transition">
+            <!-- @if(auth()->user() && auth()->user()->role === 'admin') -->
+                <a href="{{ route('karyawan.edit', $karyawan->id_karyawan) }}" class="inline-flex items-center gap-2 rounded-lg bg-yellow-500 px-5 py-2.5 text-center text-white font-medium hover:bg-yellow-600 transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                     </svg>
@@ -22,7 +22,7 @@
                     </svg>
                     Hapus
                 </button>
-            @endif
+            <!-- @endif -->
             <a href="{{ route('karyawan.index') }}" class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/[0.05] transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
@@ -89,7 +89,7 @@
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Tempat & Tanggal Lahir</p>
                 <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">
                     {{ $karyawan->Tempat_Lahir_Karyawan ?? '-' }},
-                    {{ $karyawan->Tanggal_Lahir_Karyawan ? \Carbon\Carbon::parse($karyawan->Tanggal_Lahir_Karyawan)->format('d M Y') : '-' }}
+                    {{ $karyawan->Tanggal_Lahir_Karyawan ? \Carbon\Carbon::parse($karyawan->Tanggal_Lahir_Karyawan)->translatedFormat('d M Y') : '-' }}
                 </p>
             </div>
 
@@ -132,6 +132,10 @@
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Nomor Telepon</p>
                 <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->Nomor_Telepon_Aktif_Karyawan ?? '-' }}</p>
             </div>
+        </div>
+        <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center text-xs text-gray-500">
+                <p>Dibuat pada: {{ $karyawan->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}</p>
+                <p>Terakhir diperbarui: {{ $karyawan->updated_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}</p>
         </div>
     </div>
 
@@ -177,57 +181,90 @@
                 <p class="text-base text-gray-700 dark:text-gray-300 mt-1">{{ $karyawan->Alamat_Lengkap ?? '-' }}</p>
             </div> -->
         </div>
+        <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center text-xs text-gray-500">
+                <p>Dibuat pada: {{ $karyawan->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}</p>
+                <p>Terakhir diperbarui: {{ $karyawan->updated_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}</p>
+        </div>
     </div>
 
     <!-- Data Pekerjaan -->
-    @if($karyawan->pekerjaan && $karyawan->pekerjaan->count() > 0)
+    @if($karyawan->pekerjaan->count() > 0)
     <div class="mb-6 rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-800 dark:bg-white/[0.03] p-6">
         <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Informasi Pekerjaan</h2>
-        @if($karyawan->perusahaan)
+
+        @if($karyawan->pekerjaan->first() && ($karyawan->pekerjaan->first()->company || $karyawan->pekerjaan->first()->holding))
         <div class="mb-4 p-4 rounded-lg border border-gray-100 dark:border-gray-700">
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Perusahaan</p>
-            <p class="text-base font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->perusahaan->Perusahaan ?? '-' }}</p>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Perusahaan / Holding</p>
+            <p class="text-base font-semibold text-gray-900 dark:text-white mt-1">
+                {{ $karyawan->pekerjaan->first()->company->name ?? $karyawan->pekerjaan->first()->holding->name ?? '-' }}
+            </p>
         </div>
         @endif
-        @foreach($karyawan->pekerjaan as $p)
+
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-            <!-- grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 -->
-            <div>
-                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Jabatan</p>
-                <p class="text-base font-semibold text-gray-900 dark:text-white mt-1">{{ $p->Jabatan ?? '-' }}</p>
-            </div>
-            <div>
-                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Bagian</p>
-                <p class="text-base font-semibold text-gray-900 dark:text-white mt-1">{{ $p->Bagian ?? '-' }}</p>
-            </div>
-            <div>
-                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Departement</p>
-                <p class="text-base font-semibold text-gray-900 dark:text-white mt-1">{{ $p->Departement ?? '-' }}</p>
-            </div>
             <div>
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Divisi</p>
-                <p class="text-base font-semibold text-gray-900 dark:text-white mt-1">{{ $p->Divisi ?? '-' }}</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaan->first()->division->name ?? '-' }}</p>
             </div>
+
+            <div>
+                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Departement</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaan->first()->department->name ?? '-' }}</p>
+            </div>
+
             <div>
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Unit</p>
-                <p class="text-base font-semibold text-gray-900 dark:text-white mt-1">{{ $p->Unit ?? '-' }}</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaan->first()->unit->name ?? '-' }}</p>
             </div>
+
+            <div>
+                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Level Jabatan</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">
+                    @if ($karyawan->pekerjaan->first() && $karyawan->pekerjaan->first()->level)
+                        <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
+                            {{ $karyawan->pekerjaan->first()->level->name }}
+                        </span>
+                    @else
+                        <span class="text-gray-500">-</span>
+                    @endif
+                </p>
+            </div>
+
+            <div>
+                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Jabatan</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ optional($karyawan->pekerjaan->first())->position?->name ?? '-' }}</p>
+            </div>
+
             <div>
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Jenis Kontrak</p>
-                <p class="text-base font-semibold text-gray-900 dark:text-white mt-1">{{ $p->Jenis_Kontrak ?? '-' }}</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaan->first()->Jenis_Kontrak ?? '-' }}</p>
             </div>
+
             <div>
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Perjanjian Kerja</p>
-                <p class="text-base font-semibold text-gray-900 dark:text-white mt-1">{{ $p->Perjanjian ?? '-' }}</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaan->first()->Perjanjian ?? '-' }}</p>
             </div>
+
             <div>
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Lokasi Kerja</p>
-                <p class="text-base font-semibold text-gray-900 dark:text-white mt-1">{{ $p->Lokasi_Kerja ?? '-' }}</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->pekerjaan->first()->Lokasi_Kerja ?? '-' }}</p>
             </div>
+
         </div>
-        @endforeach
+
+        <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center text-xs text-gray-500">
+            <span>
+                Dibuat pada:
+                {{ $karyawan->pekerjaan->first()->created_at?->timezone('Asia/Jakarta')->format('d/m/Y H:i') ?? '-' }}
+            </span>
+            <span>
+                Terakhir diperbarui:
+                {{ $karyawan->pekerjaan->first()->updated_at?->timezone('Asia/Jakarta')->format('d/m/Y H:i') ?? '-' }}
+            </span>
+        </div>
     </div>
     @endif
+
 
     <!-- ================= DATA PENDIDIKAN ================= -->
     @if($karyawan->pendidikan)
@@ -270,7 +307,10 @@
 
             </div>
         </div>
-
+        <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center text-xs text-gray-500">
+                <p>Dibuat pada: {{ $karyawan->pendidikan->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}</p>
+                <p>Terakhir diperbarui: {{ $karyawan->pendidikan->updated_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}</p>
+        </div>
     </div>
     @endif
 
@@ -352,7 +392,7 @@
                                         <p class="text-xs text-gray-500 dark:text-gray-400">Tanggal Lahir</p>
                                         <p class="text-sm font-medium text-gray-800 dark:text-white/90">
                                             {{ !empty($item['tanggal_lahir'])
-                                                ? \Carbon\Carbon::parse($item['tanggal_lahir'])->format('d M Y')
+                                                ? \Carbon\Carbon::parse($item['tanggal_lahir'])->translatedFormat('d M Y')
                                                 : '-' }}
                                         </p>
                                     </div>
@@ -387,6 +427,10 @@
 
             </div>
             <!-- ===== END DATA ANAK ===== -->
+             <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center text-xs text-gray-500">
+                <p>Dibuat pada: {{ $karyawan->keluarga->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}</p>
+                <p>Terakhir diperbarui: {{ $karyawan->keluarga->updated_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}</p>
+            </div>
         </div>
     </div>
     @endif
@@ -405,7 +449,7 @@
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Tanggal Mulai Tugas</p>
                 <p class="text-base text-gray-900 dark:text-white mt-1">
                     {{ $karyawan->kontrak->Tanggal_Mulai_Tugas
-                        ? date('d M Y', strtotime($karyawan->kontrak->Tanggal_Mulai_Tugas))
+                        ? \Carbon\Carbon::parse($karyawan->kontrak->Tanggal_Mulai_Tugas)->translatedFormat('d M Y')
                         : '-' }}
                 </p>
             </div>
@@ -415,7 +459,7 @@
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">PKWT Berakhir</p>
                 <p class="text-base text-gray-900 dark:text-white mt-1">
                     {{ $karyawan->kontrak->PKWT_Berakhir
-                        ? date('d M Y', strtotime($karyawan->kontrak->PKWT_Berakhir))
+                        ? \Carbon\Carbon::parse($karyawan->kontrak->PKWT_Berakhir)->translatedFormat('d M Y')
                         : '-' }}
                 </p>
             </div>
@@ -435,7 +479,7 @@
                 </p>
                 <p class="text-base text-gray-900 dark:text-white mt-1">
                     {{ $karyawan->kontrak->Tanggal_Diangkat_Menjadi_Karyawan_Tetap
-                        ? date('d M Y', strtotime($karyawan->kontrak->Tanggal_Diangkat_Menjadi_Karyawan_Tetap))
+                        ? \Carbon\Carbon::parse($karyawan->kontrak->Tanggal_Diangkat_Menjadi_Karyawan_Tetap)->translatedFormat('d M Y')
                         : '-' }}
                 </p>
             </div>
@@ -453,7 +497,7 @@
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Tanggal Riwayat Penempatan</p>
                 <p class="text-base text-gray-900 dark:text-white mt-1">
                     {{ $karyawan->kontrak->Tanggal_Riwayat_Penempatan
-                        ? date('d M Y', strtotime($karyawan->kontrak->Tanggal_Riwayat_Penempatan))
+                        ? \Carbon\Carbon::parse($karyawan->kontrak->Tanggal_Riwayat_Penempatan)->translatedFormat('d M Y')
                         : '-' }}
                 </p>
             </div>
@@ -475,7 +519,7 @@
                 </p>
                 <p class="text-base text-gray-900 dark:text-white mt-1">
                     {{ $karyawan->kontrak->Tanggal_Mutasi_Promosi_Demosi
-                        ? date('d M Y', strtotime($karyawan->kontrak->Tanggal_Mutasi_Promosi_Demosi))
+                        ? \Carbon\Carbon::parse($karyawan->kontrak->Tanggal_Mutasi_Promosi_Demosi)->translatedFormat('d M Y')
                         : '-' }}
                 </p>
             </div>
@@ -497,6 +541,10 @@
             </div>
 
         </div>
+        <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center text-xs text-gray-500">
+                <p>Dibuat pada: {{ $karyawan->kontrak?->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}</p>
+                <p>Terakhir diperbarui: {{ $karyawan->kontrak?->updated_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}</p>
+        </div>
     </div>
     @endif
 
@@ -506,7 +554,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div>
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Tanggal Non Aktif</p>
-                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ optional($karyawan->status)->Tanggal_Non_Aktif ? date('d M Y', strtotime($karyawan->status->Tanggal_Non_Aktif)) : '-' }}</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ optional($karyawan->status)->Tanggal_Non_Aktif ? \Carbon\Carbon::parse($karyawan->status->Tanggal_Non_Aktif)->translatedFormat('d M Y') : '-' }}</p>
             </div>
             <div>
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Alasan Non Aktif</p>
@@ -516,6 +564,10 @@
                 <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Ijazah Dikembalikan</p>
                 <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ $karyawan->status->Ijazah_Dikembalikan ?? '-' }}</p>
             </div>
+        </div>
+        <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center text-xs text-gray-500">
+                <p>Dibuat pada: {{ $karyawan->status->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}</p>
+                <p>Terakhir diperbarui: {{ $karyawan->status->updated_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}</p>
         </div>
     </div>
     <div class="mb-6 rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-800 dark:bg-white/[0.03] p-6">
@@ -530,10 +582,17 @@
                 <p class="text-lg font-semibold text-gray-900 dark:text-white mt-1">{{ optional($karyawan->bpjs)->Status_BPJS_KS ?? '-' }}</p>
             </div>
         </div>
+        <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center text-xs text-gray-500">
+                <p>Dibuat pada: {{ $karyawan->bpjs->created_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}</p>
+                <p>Terakhir diperbarui: {{ $karyawan->bpjs->updated_at->timezone('Asia/Jakarta')->format('d/m/Y H:i') }}</p>
+        </div>
     </div>
 
+
+
+
     <!-- Delete Form Hidden -->
-    @if(auth()->user() && auth()->user()->role === 'admin')
+    <!-- @if(auth()->user() && auth()->user()->role === 'admin') -->
     <form id="deleteForm" action="{{ route('karyawan.destroy', $karyawan->id_karyawan) }}" method="POST" style="display:none;">
         @csrf
         @method('DELETE')
@@ -543,6 +602,6 @@
     <x-modal id="delete-confirm" size="sm" title="Konfirmasi Hapus" closeLabel="Batal" confirmLabel="Hapus">
         <p class="text-sm text-gray-600">Gunakan tombol <strong>Hapus</strong> untuk mengonfirmasi penghapusan karyawan ini.</p>
     </x-modal>
-    @endif
+    <!-- @endif -->
 </div>
 @endsection
